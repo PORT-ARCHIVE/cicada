@@ -1,6 +1,7 @@
+# ライセンスがGPLにならないようにする指定
 AUTOMAKE_OPTIONS = foreign
-#実行ファイル名
+# 実行ファイル名
 bin_PROGRAMS = semicrf
-#ソースコード
+# ソースコード
 semicrf_SOURCES = Main.cpp SemiCrf.hpp SemiCrf.cpp
 
