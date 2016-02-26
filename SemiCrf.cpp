@@ -1,10 +1,14 @@
 
 #include "SemiCrf.hpp"
 
-SemiCrf::SemiCrf()
-{
-}
+namespace SemiCrf {
 
-SemiCrf::~SemiCrf()
-{
+	SemiCrf::SemiCrf()
+	{
+	}
+
+	SemiCrf::~SemiCrf()
+	{
+	}
+
 }
