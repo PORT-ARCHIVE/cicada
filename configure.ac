@@ -16,7 +16,7 @@ AM_INIT_AUTOMAKE
 cxxflags_save="$CXXFLAGS"
 AC_PROG_CXX
 CXXFLAGS="$cxxflags_save"
-test -n "$CXXFLAGS" || CXXFLAGS="-g"
+test -n "$CXXFLAGS" || CXXFLAGS="-g -std=c++11"
 
 # Checks for libraries.
 
