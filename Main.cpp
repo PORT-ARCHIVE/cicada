@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 		trainingData->read();
 	
 		SemiCrf::Algorithm learner(new SemiCrf::Learner());
-		learner->computeFfps(ffps, trainingData);
+		learner->compute(trainingData, ffps);
 	}
 
 	{ // Inference
@@ -19,11 +19,12 @@ int main(int argc, char *argv[])
 		inferenceData->read();
 
 		SemiCrf::Algorithm inferer(new SemiCrf::Inferer());
-		inferer->computeData(ffps, inferenceData);
+		inferer->compute(ffps, inferenceData);
 		inferenceData->write();
 	}
 		
 	return (0);
 }
+
 
 
