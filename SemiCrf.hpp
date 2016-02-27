@@ -48,14 +48,14 @@ namespace SemiCrf {
 
 	class TrainingData : public Data_ {
 	public:
-		virtual void read() { std::cout << "TrainingData::read()" << std::endl; };
-		virtual void write() { std::cout << "TrainingData::write()" << std::endl; };
+		virtual void read();
+		virtual void write();
 	};	
 
 	class InferenceData : public Data_ {
 	public:
-		virtual void read() { std::cout << "InferenceData::read()" << std::endl; };
-		virtual void write() { std::cout << "InferenceData::write()" << std::endl; };
+		virtual void read();
+		virtual void write();
 	};
 
 	class FeatureFunction_ {

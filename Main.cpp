@@ -5,10 +5,12 @@
 
 int main(int argc, char *argv[])
 {
+	typedef SemiCrf::FeatureFunction SFF;
+	
 	SemiCrf::Ffps ffps;
 
-	SemiCrf::FeatureFunction ff0(new ApplicationRequirements::AppReqF0());
-	SemiCrf::FeatureFunction ff1(new ApplicationRequirements::AppReqF1());
+	SFF ff0(new ApplicationRequirements::AppReqF0());
+	SFF ff1(new ApplicationRequirements::AppReqF1());
 
 	SemiCrf::Ffp ffp0 = std::make_pair(ff0, 0);
 	SemiCrf::Ffp ffp1 = std::make_pair(ff1, 0);
