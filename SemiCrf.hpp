@@ -1,6 +1,7 @@
 #ifndef SEMI_CRF__H
 #define SEMI_CRF__H
 
+#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -15,7 +16,6 @@ namespace SemiCrf {
 
 	class Segment {
 	public:
-
 		Segment(int start_, int end_, Label label_)
 			: start(start_), end(end_), label(label_) {}
 
@@ -29,55 +29,75 @@ namespace SemiCrf {
 		void setLabel(Label arg) { label = arg; }
 		
 	private:
-
 		int start;
 		int end;
 		Label label;
 	};
 
-
 	class Data_ {
-	private:
-		std::string str;
+	public:
+		Data_() { std::cout << "Data_::Data()" << std::endl; }
+		virtual ~Data_() { std::cout << "Data_::~Data()" << std::endl; }
+		virtual void read() = 0;
+		virtual void write() = 0;
+	protected:
+		std::vector<std::string> strs;
+		std::vector<Segment> segs;
 	};
+	
 	typedef std::shared_ptr<Data_> Data;	
 
 	class TrainingData : public Data_ {
 	public:
+		virtual void read() { std::cout << "TrainingData::read()" << std::endl; };
+		virtual void write() { std::cout << "TrainingData::write()" << std::endl; };
 	};	
 
 	class InferenceData : public Data_ {
-	public:		
+	public:
+		virtual void read() { std::cout << "InferenceData::read()" << std::endl; };
+		virtual void write() { std::cout << "InferenceData::write()" << std::endl; };
 	};
 
-	//class Parameters {};
-
-	class FeatureFunction_ {};
-	typedef std::shared_ptr<FeatureFunction_> FeatureFunction;
-
-	// class Algorithm {
-	// public:
-	// 	virtual void compute(std::vector<std::pair<FeatureFunction,double>> ffps, Data d) = 0;
-	// };
-
-	//class Learner : public Algorithm {
-	class Learner {		
+	class FeatureFunction_ {
 	public:
-		virtual void compute(std::vector<std::pair<FeatureFunction,double>> ffps, std::vector<Data> ds) {};
+		FeatureFunction_() {}
+		virtual ~FeatureFunction_() {}
+		// T.B.D.
+	};
+
+	typedef std::shared_ptr<FeatureFunction_> FeatureFunction;
+	typedef std::pair<FeatureFunction,double> Ffp;
+	typedef std::vector<Ffp> Ffps;
+
+	class Algorithm_ {
+	public:
+		Algorithm_() { std::cout << "Algorithm_::Algorithm_()" << std::endl; }
+		virtual ~Algorithm_() { std::cout << "Algorithm_::~Algorithm_()" << std::endl; }
+		virtual void computeFfps(Ffps ffps, const Data data) = 0;
+		virtual void computeData(const Ffps ffps, Data data) = 0;
+	};
+
+	typedef std::shared_ptr<Algorithm_> Algorithm;
+
+	class Learner : public Algorithm_ {
+	public:
+		Learner() { std::cout << "Learner::Learner()" << std::endl; }
+		~Learner() { std::cout << "Learner::~Learner()" << std::endl; }
+		virtual void computeFfps(Ffps ffps, const Data data)
+			{ std::cout << "Learner::compute()" << std::endl; };
+		virtual void computeData(const Ffps ffps, Data data){}; // error
 	private:
 	};
 
-	//class Inferer : public Algorithm {	
-	class Inferer {
+	class Inferer : public Algorithm_ {
 	public:
-		virtual void compute(std::vector<std::pair<FeatureFunction,double>> ffps, std::vector<Data> ds) {};
+		Inferer() { std::cout << "Inferer::Inferer()" << std::endl; }
+		~Inferer() { std::cout << "Inferer::~Inferer()" << std::endl; }
+		virtual void computeFfps(Ffps ffps, const Data data){}; // error
+		virtual void computeData(const Ffps ffps, Data data)
+			{ std::cout << "Inferer::compute()" << std::endl; };
 	private:		
-	};		
-
-	class SemiCrf {
-	public:
-		SemiCrf();
-		virtual ~SemiCrf();
 	};
 }
 
