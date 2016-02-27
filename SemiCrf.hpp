@@ -11,9 +11,6 @@ namespace SemiCrf {
 	class Label_ {};
 	typedef std::shared_ptr<Label_> Label;
 	
-	class Campany : public Label_ {};
-	class Location : public Label_ {};
-
 	class Segment_ {
 	public:
 		Segment_(int start_, int end_, Label label_)
@@ -86,8 +83,7 @@ namespace SemiCrf {
 	public:
 		Learner() { std::cout << "Learner::Learner()" << std::endl; }
 		~Learner() { std::cout << "Learner::~Learner()" << std::endl; }
-		virtual void compute(const Data data, Ffps ffps)
-			{ std::cout << "Learner::compute()" << std::endl; };
+		virtual void compute(const Data data, Ffps ffps);
 		virtual void compute(const Ffps ffps, Data data){}; // error
 	private:
 	};
@@ -97,8 +93,7 @@ namespace SemiCrf {
 		Inferer() { std::cout << "Inferer::Inferer()" << std::endl; }
 		~Inferer() { std::cout << "Inferer::~Inferer()" << std::endl; }
 		virtual void compute(const Data data, Ffps ffps){}; // error
-		virtual void compute(const Ffps ffps, Data data)
-			{ std::cout << "Inferer::compute()" << std::endl; };
+		virtual void compute(const Ffps ffps, Data data);
 	private:		
 	};
 }
