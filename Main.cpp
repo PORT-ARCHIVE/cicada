@@ -5,6 +5,7 @@
 
 int main(int argc, char *argv[])
 {
+	// prepare feature functions
 	typedef SemiCrf::FeatureFunction SFF;
 	
 	SemiCrf::Ffps ffps;
@@ -37,6 +38,3 @@ int main(int argc, char *argv[])
 		
 	return (0);
 }
-
-
-

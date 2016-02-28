@@ -11,18 +11,18 @@ namespace SemiCrf {
 	class Label_ {};
 	typedef std::shared_ptr<Label_> Label;
 	
-	class Segment_ {
+	class Segment_{
 	public:
 		Segment_(int start_, int end_, Label label_)
 			: start(start_), end(end_), label(label_) {}
 
-		int getStart() { return start; }
+		int getStart() const { return start; }
 		void setStart(int arg) { start = arg; }
 
-		int getEnd() { return end; }
+		int getEnd() const { return end; }
 		void setEnd(int arg) { end = arg; }
 
-		Label getLabel() { return label; }
+		Label getLabel() const { return label; } // const?
 		void setLabel(Label arg) { label = arg; }
 		
 	private:
@@ -38,7 +38,9 @@ namespace SemiCrf {
 		Data_() { std::cout << "Data_()" << std::endl; }
 		virtual ~Data_() { std::cout << "~Data_()" << std::endl; }
 		virtual void read() = 0;
-		virtual void write() = 0;
+		virtual void write() const = 0;
+		std::vector<std::string>&& getStrs() { return std::move(strs); }		
+		std::vector<Segment>&& getSegments() { return std::move(segs); }
 	protected:
 		std::vector<std::string> strs;
 		std::vector<Segment> segs;
@@ -49,20 +51,20 @@ namespace SemiCrf {
 	class TrainingData : public Data_ {
 	public:
 		virtual void read();
-		virtual void write();
+		virtual void write() const;
 	};	
 
 	class InferenceData : public Data_ {
 	public:
 		virtual void read();
-		virtual void write();
+		virtual void write() const;
 	};
 
 	class FeatureFunction_ {
 	public:
 		FeatureFunction_() { std::cout << "FeatureFunction_()" << std::endl; }
 		virtual ~FeatureFunction_() { std::cout << "~FeatureFunction_()" << std::endl; }
-		virtual void operator() (Segment s0, Segment s1, Data d) = 0;
+		virtual bool operator() (Segment s0, Segment s1, std::vector<std::string>&& strs) = 0;
 	};
 
 	typedef std::shared_ptr<FeatureFunction_> FeatureFunction;
