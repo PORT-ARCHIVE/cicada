@@ -35,8 +35,8 @@ namespace SemiCrf {
 
 	class Data_ {
 	public:
-		Data_() { std::cout << "Data_::Data()" << std::endl; }
-		virtual ~Data_() { std::cout << "Data_::~Data()" << std::endl; }
+		Data_() { std::cout << "Data_()" << std::endl; }
+		virtual ~Data_() { std::cout << "~Data_()" << std::endl; }
 		virtual void read() = 0;
 		virtual void write() = 0;
 	protected:
@@ -60,8 +60,8 @@ namespace SemiCrf {
 
 	class FeatureFunction_ {
 	public:
-		FeatureFunction_() {}
-		virtual ~FeatureFunction_() {}
+		FeatureFunction_() { std::cout << "FeatureFunction_()" << std::endl; }
+		virtual ~FeatureFunction_() { std::cout << "~FeatureFunction_()" << std::endl; }
 		virtual void operator() (Segment s0, Segment s1, Data d) = 0;
 	};
 
@@ -71,8 +71,8 @@ namespace SemiCrf {
 
 	class Algorithm_ {
 	public:
-		Algorithm_() { std::cout << "Algorithm_::Algorithm_()" << std::endl; }
-		virtual ~Algorithm_() { std::cout << "Algorithm_::~Algorithm_()" << std::endl; }
+		Algorithm_() { std::cout << "Algorithm_()" << std::endl; }
+		virtual ~Algorithm_() { std::cout << "~Algorithm_()" << std::endl; }
 		virtual void compute(const Data data, Ffps ffps) = 0;
 		virtual void compute(const Ffps ffps, Data data) = 0;		
 	};
@@ -81,20 +81,20 @@ namespace SemiCrf {
 
 	class Learner : public Algorithm_ {
 	public:
-		Learner() { std::cout << "Learner::Learner()" << std::endl; }
-		~Learner() { std::cout << "Learner::~Learner()" << std::endl; }
+		Learner() { std::cout << "Learner()" << std::endl; }
+		~Learner() { std::cout << "~Learner()" << std::endl; }
 		virtual void compute(const Data data, Ffps ffps);
-		virtual void compute(const Ffps ffps, Data data){}; // error
 	private:
+		virtual void compute(const Ffps ffps, Data data){}; // error		
 	};
 
 	class Inferer : public Algorithm_ {
 	public:
-		Inferer() { std::cout << "Inferer::Inferer()" << std::endl; }
-		~Inferer() { std::cout << "Inferer::~Inferer()" << std::endl; }
-		virtual void compute(const Data data, Ffps ffps){}; // error
+		Inferer() { std::cout << "Inferer()" << std::endl; }
+		~Inferer() { std::cout << "~Inferer()" << std::endl; }
 		virtual void compute(const Ffps ffps, Data data);
-	private:		
+	private:
+		virtual void compute(const Data data, Ffps ffps){}; // error		
 	};
 }
 

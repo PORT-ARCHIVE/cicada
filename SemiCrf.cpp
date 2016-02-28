@@ -33,8 +33,7 @@ namespace SemiCrf {
 		for(auto i : ffps) {
 			FeatureFunction f = i.first;
 			double p = i.second;
-			// T.B.D.			
+			// T.B.D. 
 		}
 	}
-	
 }
