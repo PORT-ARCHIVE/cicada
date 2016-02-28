@@ -5,35 +5,45 @@
 
 int main(int argc, char *argv[])
 {
-	// prepare feature functions
-	typedef SemiCrf::FeatureFunction SFF;
-	
 	SemiCrf::Ffps ffps;
 
-	SFF ff0(new ApplicationRequirements::AppReqF0());
-	SFF ff1(new ApplicationRequirements::AppReqF1());
+	try { // prepare feature functions
 
-	SemiCrf::Ffp ffp0 = std::make_pair(ff0, 0);
-	SemiCrf::Ffp ffp1 = std::make_pair(ff1, 0);
+		// T.B.D.
+		typedef SemiCrf::FeatureFunction SFF;	
+		SFF ff0(new ApplicationRequirements::AppReqF0());
+		SFF ff1(new ApplicationRequirements::AppReqF1());
 
-	ffps.push_back(ffp0);
-	ffps.push_back(ffp1);
+		SemiCrf::Ffp ffp0 = std::make_pair(ff0, 0);
+		SemiCrf::Ffp ffp1 = std::make_pair(ff1, 0);
 
-	{ // Traing
+		ffps.push_back(ffp0);
+		ffps.push_back(ffp1);
+
+	} catch(...) {
+	}
+
+	try { // Traing	
+	
 		SemiCrf::Data trainingData(new SemiCrf::TrainingData());
 		trainingData->read();
 	
 		SemiCrf::Algorithm learner(new SemiCrf::Learner());
 		learner->compute(trainingData, ffps);
+
+	} catch(...) {
 	}
 
-	{ // Inference
+	try { // Inference
+
 		SemiCrf::Data inferenceData(new SemiCrf::InferenceData());
 		inferenceData->read();
 
 		SemiCrf::Algorithm inferer(new SemiCrf::Inferer());
 		inferer->compute(ffps, inferenceData);
 		inferenceData->write();
+
+	} catch(...) {
 	}
 		
 	return (0);
