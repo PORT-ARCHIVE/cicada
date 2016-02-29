@@ -60,7 +60,24 @@ namespace SemiCrf {
 		}
 	}
 
-	void Learner::compute(const Data data, Ffps ffps){
+	void FtrFnctnPrmtrs::read() {
+		// T.B.D.		
+		// for( auto i : *this ) {
+		// 	FeatureFunction f = i.first;
+		// 	f->read();
+		// 	i.second = 0; 
+		// }
+	}
+
+	void FtrFnctnPrmtrs::write() {
+		for( auto i : *this ) {
+			FeatureFunction f = i.second;
+			f->write();
+			// i.second >> (stream)
+		}		
+	}	
+
+	void Learner::compute(const Data data, FtrFnctnPrmtrs ffps){
 		std::cout << "Learner::compute()" << std::endl;
 
 		std::vector<Segment> segments = data->getSegments();
@@ -73,15 +90,15 @@ namespace SemiCrf {
 
 			// iterate feature functions
 			for(auto fp : ffps) {
-				FeatureFunction f = fp.first;
-				double p = fp.second;
+				double p = fp.first;				
+				FeatureFunction f = fp.second;
 				bool v = (*f)(*si, *sj, std::move(strs));
 				// T.B.D.
 			}
 		}
 	}
 
-	void Inferer::compute(const Ffps ffps, Data data){
+	void Inferer::compute(const FtrFnctnPrmtrs ffps, Data data){
 		std::cout << "Inferer::compute()" << std::endl;
 
 		std::vector<Segment> segments = data->getSegments();
@@ -94,8 +111,8 @@ namespace SemiCrf {
 
 			// iterate feature functions
 			for(auto fp : ffps) {
-				FeatureFunction f = fp.first;
-				double p = fp.second;
+				double p = fp.first;				
+				FeatureFunction f = fp.second;
 				bool v = (*f)(*si, *sj, std::move(strs));
 				// T.B.D.
 			}

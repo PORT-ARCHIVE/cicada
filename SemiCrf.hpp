@@ -76,16 +76,24 @@ namespace SemiCrf {
 	};
 
 	typedef std::shared_ptr<FeatureFunction_> FeatureFunction;
-	typedef std::pair<FeatureFunction,double> Ffp; // 名前が分かりにくい
-	typedef std::vector<Ffp> Ffps; // 名前が分かりにくい
+	typedef std::pair<double,FeatureFunction> FtrFnctnPrmtr;
+
+	// 素性関数の集合
+	class FtrFnctnPrmtrs :  public std::vector<FtrFnctnPrmtr> {
+	public:
+		FtrFnctnPrmtrs() { std::cout << "FtrFnctnPrmtrs()" << std::endl; }
+		~FtrFnctnPrmtrs() { std::cout << "~FtrFnctnPrmtrs()" << std::endl; }
+		void read();
+		void write();		
+	};
 
 	// 抽象アルゴリズム
 	class Algorithm_ {
 	public:
 		Algorithm_() { std::cout << "Algorithm_()" << std::endl; }
 		virtual ~Algorithm_() { std::cout << "~Algorithm_()" << std::endl; }
-		virtual void compute(const Data data, Ffps ffps) = 0;
-		virtual void compute(const Ffps ffps, Data data) = 0;		
+		virtual void compute(const Data data, FtrFnctnPrmtrs ffps) = 0;
+		virtual void compute(const FtrFnctnPrmtrs ffps, Data data) = 0;		
 	};
 
 	typedef std::shared_ptr<Algorithm_> Algorithm;
@@ -95,9 +103,9 @@ namespace SemiCrf {
 	public:
 		Learner() { std::cout << "Learner()" << std::endl; }
 		~Learner() { std::cout << "~Learner()" << std::endl; }
-		virtual void compute(const Data data, Ffps ffps);
+		virtual void compute(const Data data, FtrFnctnPrmtrs ffps);
 	private:
-		virtual void compute(const Ffps ffps, Data data){}; // error		
+		virtual void compute(const FtrFnctnPrmtrs ffps, Data data){}; // error		
 	};
 
 	// 推論器
@@ -105,12 +113,10 @@ namespace SemiCrf {
 	public:
 		Inferer() { std::cout << "Inferer()" << std::endl; }
 		~Inferer() { std::cout << "~Inferer()" << std::endl; }
-		virtual void compute(const Ffps ffps, Data data);
+		virtual void compute(const FtrFnctnPrmtrs ffps, Data data);
 	private:
-		virtual void compute(const Data data, Ffps ffps){}; // error		
+		virtual void compute(const Data data, FtrFnctnPrmtrs ffps){}; // error
 	};
-
-	//////////////////////////////////////	
 }
 
 #endif // SEMI_CRF__H

@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[])
 {
-	SemiCrf::Ffps ffps;
+	SemiCrf::FtrFnctnPrmtrs ffps;
 
 	try { // 素性関数を準備する
 
@@ -14,8 +14,8 @@ int main(int argc, char *argv[])
 		SFF ff0(new ApplicationRequirements::AppReqF0());
 		SFF ff1(new ApplicationRequirements::AppReqF1());
 
-		SemiCrf::Ffp ffp0 = std::make_pair(ff0, 0);
-		SemiCrf::Ffp ffp1 = std::make_pair(ff1, 0);
+		SemiCrf::FtrFnctnPrmtr ffp0 = std::make_pair(0, ff0);
+		SemiCrf::FtrFnctnPrmtr ffp1 = std::make_pair(0, ff1);
 
 		ffps.push_back(ffp0);
 		ffps.push_back(ffp1);
@@ -33,11 +33,15 @@ int main(int argc, char *argv[])
 		SemiCrf::Algorithm learner(new SemiCrf::Learner());
 		learner->compute(trainingData, ffps);
 
+		ffps.write();
+
 	} catch(...) {
 		// T.B.D.		
 	}
 
 	try { // 推論
+
+		ffps.read();
 
 		SemiCrf::Data inferenceData(new SemiCrf::InferenceData());
 		inferenceData->read();
