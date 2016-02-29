@@ -15,13 +15,9 @@ namespace AppReqs {
 
 namespace SemiCrf {
 
-
-	//class Label_ {};
-	//typedef std::shared_ptr<Label_> Label;
-	// enum class Label : int {
-	// 	Campany,
-	// 	Location
-	// };
+	// ラベル集合
+	class Labels_ : public std::vector<AppReqs::Label> {};
+	typedef std::shared_ptr<Labels_> Labels;	
 
 	// セグメント 
 	class Segment_{
@@ -46,6 +42,16 @@ namespace SemiCrf {
 
 	typedef std::shared_ptr<Segment_> Segment;
 
+	// セグメント集合
+	class Segments_ : public std::vector<Segment> {};
+
+	typedef std::shared_ptr<Segments_> Segments;
+
+	// 文字列集合
+	class Strs_ : public std::vector<std::string> {};
+
+	typedef std::shared_ptr<Strs_> Strs;
+
 	// データ
 	class Data_ {
 	public:
@@ -53,11 +59,12 @@ namespace SemiCrf {
 		virtual ~Data_() { std::cout << "~Data_()" << std::endl; }
 		virtual void read() = 0;
 		virtual void write() const = 0;
-		std::vector<std::string>&& getStrs() { return std::move(strs); }		
-		std::vector<Segment>&& getSegments() { return std::move(segs); }
+		Strs getStrs() { return strs; }
+		Segments getSegments() { return segs; }
+		void setSegments(Segments arg) { segs = arg; }
 	protected:
-		std::vector<std::string> strs;
-		std::vector<Segment> segs;
+		Strs strs;
+		Segments segs;
 	};
 	
 	typedef std::shared_ptr<Data_> Data;	
@@ -76,35 +83,59 @@ namespace SemiCrf {
 		virtual void write() const;
 	};
 
+	// 重みベクトル
+	class Weights_ : public std::vector<double> {
+	public:
+		Weights_() { std::cout << "Weights()" << std::endl; }
+		virtual ~Weights_() { std::cout << "~Weights()" << std::endl; }
+		void read();
+		void write();		
+	};
+
+	typedef std::shared_ptr<Weights_> Weights;	
+
 	// 素性関数
 	class FeatureFunction_ {
 	public:
 		FeatureFunction_() { std::cout << "FeatureFunction_()" << std::endl; }
 		virtual ~FeatureFunction_() { std::cout << "~FeatureFunction_()" << std::endl; }
-		virtual double operator() (Segment s0, Segment s1, std::vector<std::string>&& strs) = 0;
+		virtual double operator() (Segment s0, Segment s1, Strs strs) = 0;
+		virtual double operator() (AppReqs::Label y, AppReqs::Label yd, Data x, int j, int i) = 0;
 		virtual void read() = 0;
 		virtual void write() = 0;
 	};
 
 	typedef std::shared_ptr<FeatureFunction_> FeatureFunction;
-	typedef std::pair<double,FeatureFunction> FtrFnctnPrmtr;
 
 	// 素性関数の集合
-	class FtrFnctnPrmtrs :  public std::vector<FtrFnctnPrmtr> {
+	class FeatureFunctions_ : public std::vector<FeatureFunction> {
 	public:
-		FtrFnctnPrmtrs() { std::cout << "FtrFnctnPrmtrs()" << std::endl; }
-		~FtrFnctnPrmtrs() { std::cout << "~FtrFnctnPrmtrs()" << std::endl; }
+		FeatureFunctions_() { std::cout << "FeatureFunctions_()" << std::endl; }
+		virtual ~FeatureFunctions_() { std::cout << "~FeatureFunctions_()" << std::endl; }
 		void read();
-		void write();		
+		void write();
 	};
+
+	typedef std::shared_ptr<FeatureFunctions_> FeatureFunctions;
 
 	// 抽象アルゴリズム
 	class Algorithm_ {
 	public:
 		Algorithm_() { std::cout << "Algorithm_()" << std::endl; }
 		virtual ~Algorithm_() { std::cout << "~Algorithm_()" << std::endl; }
-		virtual void compute(const Data data, FtrFnctnPrmtrs ffps) const = 0;
-		virtual void compute(const FtrFnctnPrmtrs ffps, Data data) const = 0;		
+		virtual void setLabels(Labels arg) { labels = arg; }
+		virtual void setMaxLength(int arg) { maxLength = arg; }
+		virtual void setData(Data arg) { data = arg; }
+		virtual void setFeatureFunctions(FeatureFunctions arg) { ffs = arg; }
+		virtual void setWeights(Weights arg) { weights = arg; }		
+		virtual void compute() const = 0;
+
+	protected:
+		Labels labels;
+		int maxLength; // 最大セグメント長
+		Data data;		
+		FeatureFunctions ffs;
+		Weights weights;
 	};
 
 	typedef std::shared_ptr<Algorithm_> Algorithm;
@@ -113,21 +144,19 @@ namespace SemiCrf {
 	class Learner : public Algorithm_ {
 	public:
 		Learner() { std::cout << "Learner()" << std::endl; }
-		~Learner() { std::cout << "~Learner()" << std::endl; }
-		virtual void compute(const Data data, FtrFnctnPrmtrs ffps) const;
-	private:
-		virtual void compute(const FtrFnctnPrmtrs ffps, Data data) const {}; // error
+		virtual ~Learner() { std::cout << "~Learner()" << std::endl; }
+		virtual void compute() const;
 	};
 
 	// 推論器
 	class Inferer : public Algorithm_ {
 	public:
 		Inferer() { std::cout << "Inferer()" << std::endl; }
-		~Inferer() { std::cout << "~Inferer()" << std::endl; }
-		virtual void compute(const FtrFnctnPrmtrs ffps, Data data) const;
+		virtual ~Inferer() { std::cout << "~Inferer()" << std::endl; }
+		virtual void compute() const;
+		
 	private:
-		virtual void compute(const Data data, FtrFnctnPrmtrs ffps) const {}; // error
-		double V(int i, AppReqs::Label y) const;
+		double V(int i, AppReqs::Label y, Segments segs, int& maxd) const;
 	};
 }
 

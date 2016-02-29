@@ -5,20 +5,24 @@
 
 int main(int argc, char *argv[])
 {
-	SemiCrf::FtrFnctnPrmtrs ffps;
+	int maxLength = 5;
+	SemiCrf::Weights weights; // T.B.D.
+	SemiCrf::FeatureFunctions ffs; // T.B.D.
+	SemiCrf::Labels labels; // T.B.D.
 
-	try { // 素性関数を準備する
+	try { // 素性関数,Labelを準備する
 
 		// T.B.D.
 		typedef SemiCrf::FeatureFunction SFF;	
 		SFF ff0(new AppReqs::AppReqF0());
 		SFF ff1(new AppReqs::AppReqF1());
 
-		SemiCrf::FtrFnctnPrmtr ffp0 = std::make_pair(0, ff0);
-		SemiCrf::FtrFnctnPrmtr ffp1 = std::make_pair(0, ff1);
+		ffs->push_back(ff0);
+		ffs->push_back(ff1);
 
-		ffps.push_back(ffp0);
-		ffps.push_back(ffp1);
+		labels->push_back(AppReqs::Label::None);
+		labels->push_back(AppReqs::Label::Campany);
+		labels->push_back(AppReqs::Label::Location);
 		// T.B.D.	
 
 	} catch(...) {
@@ -31,23 +35,34 @@ int main(int argc, char *argv[])
 		trainingData->read();
 	
 		SemiCrf::Algorithm learner(new SemiCrf::Learner());
-		learner->compute(trainingData, ffps);
+		learner->setLabels(labels);
+		learner->setMaxLength(maxLength);
+		learner->setData(trainingData);
+		learner->setFeatureFunctions(ffs);
+		learner->setWeights(weights);
+		learner->compute();
 
-		ffps.write();
+		ffs->write();
 
 	} catch(...) {
-		// T.B.D.		
+		// T.B.D.
 	}
 
 	try { // 推論
 
-		ffps.read();
+		ffs->read();
 
 		SemiCrf::Data inferenceData(new SemiCrf::InferenceData());
 		inferenceData->read();
 
 		SemiCrf::Algorithm inferer(new SemiCrf::Inferer());
-		inferer->compute(ffps, inferenceData);
+		inferer->setLabels(labels);
+		inferer->setMaxLength(maxLength);
+		inferer->setData(inferenceData);
+		inferer->setFeatureFunctions(ffs);
+		inferer->setWeights(weights);		
+		inferer->compute();
+		
 		inferenceData->write();
 
 	} catch(...) {

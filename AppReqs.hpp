@@ -6,6 +6,7 @@
 namespace AppReqs {
 
 	enum class Label : int {
+		None,
 		Campany,
 		Location
 	};	
@@ -16,7 +17,7 @@ namespace AppReqs {
 		AppReqF0(){ std::cout << "AppReqF0()" << std::endl; }
 		virtual ~AppReqF0(){ std::cout << "~AppReqF1()" << std::endl; }
 
-		virtual double operator() (SemiCrf::Segment s0, SemiCrf::Segment s1, std::vector<std::string>&& strs) {
+		virtual double operator() (SemiCrf::Segment s0, SemiCrf::Segment s1, SemiCrf::Strs strs) {
 			std::cout << "AppReqF0::operator()" << std::endl;
 			
 			// T.B.D.
@@ -30,7 +31,7 @@ namespace AppReqs {
 			AppReqs::Label l1 = s1->getLabel();
 
 			// T.B.D.						
-			for(auto s : strs) {
+			for(auto s : *strs) {
 				std::cout << s << std::endl;
 				// T.B.D.							
 			}
@@ -45,6 +46,10 @@ namespace AppReqs {
 		virtual void write() {
 			std::cout << "AppReqF0()::write()" << std::endl;			
 		};
+
+		virtual double operator() (AppReqs::Label y, AppReqs::Label yd, SemiCrf::Data x, int j, int i) {
+			return (0.0);
+		}
 	};
 	
 	class AppReqF1 : public SemiCrf::FeatureFunction_ {
@@ -53,7 +58,7 @@ namespace AppReqs {
 		AppReqF1(){ std::cout << "AppReqF1()" << std::endl; }
 		virtual ~AppReqF1(){ std::cout << "~AppReqF1()" << std::endl; }
 
-		virtual double operator() (SemiCrf::Segment s0, SemiCrf::Segment s1, std::vector<std::string>&& strs) {
+		virtual double operator() (SemiCrf::Segment s0, SemiCrf::Segment s1, SemiCrf::Strs strs) {
 			std::cout << "AppReqF1::operator()" << std::endl;
 
 			// T.B.D.										
@@ -66,7 +71,11 @@ namespace AppReqs {
 
 		virtual void write() {
 			std::cout << "AppReqF0::write()" << std::endl;			
-		};		
+		};
+
+		virtual double operator() (AppReqs::Label y, AppReqs::Label yd, SemiCrf::Data x, int j, int i) {
+			return (0.0);
+		}
 	};
 }
 
