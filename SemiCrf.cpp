@@ -59,6 +59,14 @@ namespace SemiCrf {
 		}
 	}
 
+	void Weights_::read() {
+		std::cout << "Weights_::read()" << std::endl;
+	}
+
+	void Weights_::write() {
+		std::cout << "Weights_::write()" << std::endl;
+	}	
+
 	void FeatureFunctions_::read() {
 		// T.B.D.		
 		// for( auto i : *this ) {
@@ -87,7 +95,7 @@ namespace SemiCrf {
 
 			// iterate feature functions
 			for(auto f : *ffs) {
-				bool v = (*f)(*si, *sj, std::move(strs));
+				bool v = (*f)(*si, *sj, strs);
 				// T.B.D.
 			}
 		}
@@ -97,9 +105,9 @@ namespace SemiCrf {
 		std::cout << "Inferer::compute()" << std::endl;
 
 		int maxd = - 1;
+		Segments maxsegs;		
 		AppReqs::Label maxy;
-		Segments maxsegs;
-		int s = data->getStrs()->size();		
+		int s = data->getStrs()->size();
 		double maxV = std::numeric_limits<double>::min();
 
 		for( auto y : *labels ) {
@@ -114,7 +122,7 @@ namespace SemiCrf {
 			}
 		}
 
-		Segment seg(new Segment_(s-maxd, s, maxy));
+		Segment seg(new Segment_(s-maxd+1, s, maxy));
 		maxsegs->push_back(seg);
 		data->setSegments(maxsegs);
 	}
@@ -129,15 +137,14 @@ namespace SemiCrf {
 
 			for( int d = 1; d <= maxLength; d++ ) {
 				for( auto yd : *labels ) {
-					double v = 0.0;
 
 					int tmp = -1;
-					v += V(i-d, yd, segs, tmp);
+					double v = V(i-d, yd, segs, tmp);
 
 					auto w = weights->begin();
 					for( auto f : *ffs ) {
 						v += (*w) * (*f)(y, yd, data, i-d+1, i);
-						w ++;
+						w++;
 					}
 					
 					if( maxV < v ) {
@@ -155,7 +162,7 @@ namespace SemiCrf {
 			maxV = 0.0;
 
 		} else if( i < 0 ) {
-			//  nothong to do;
+			// nothong to do
 		}
 
 		return maxV;

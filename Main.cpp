@@ -7,8 +7,8 @@ int main(int argc, char *argv[])
 {
 	int maxLength = 5;
 	SemiCrf::Weights weights; // T.B.D.
-	SemiCrf::FeatureFunctions ffs; // T.B.D.
-	SemiCrf::Labels labels; // T.B.D.
+	SemiCrf::FeatureFunctions ffs( new SemiCrf::FeatureFunctions_() );
+	SemiCrf::Labels labels( new SemiCrf::Labels_() );
 
 	try { // 素性関数,Labelを準備する
 
@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
 		learner->compute();
 
 		ffs->write();
+		weights->write();
 
 	} catch(...) {
 		// T.B.D.
@@ -51,6 +52,7 @@ int main(int argc, char *argv[])
 	try { // 推論
 
 		ffs->read();
+		weights->read();
 
 		SemiCrf::Data inferenceData(new SemiCrf::InferenceData());
 		inferenceData->read();

@@ -55,7 +55,8 @@ namespace SemiCrf {
 	// データ
 	class Data_ {
 	public:
-		Data_() { std::cout << "Data_()" << std::endl; }
+		Data_() : strs( new Strs_() ), segs( new Segments_() )
+			{ std::cout << "Data_()" << std::endl; }
 		virtual ~Data_() { std::cout << "~Data_()" << std::endl; }
 		virtual void read() = 0;
 		virtual void write() const = 0;
@@ -121,7 +122,12 @@ namespace SemiCrf {
 	// 抽象アルゴリズム
 	class Algorithm_ {
 	public:
-		Algorithm_() { std::cout << "Algorithm_()" << std::endl; }
+		Algorithm_() :
+			labels( new Labels_() ),
+			//data( new Data_() ),
+			ffs( new FeatureFunctions_() ),
+			weights( new Weights_() )
+			{ std::cout << "Algorithm_()" << std::endl; }
 		virtual ~Algorithm_() { std::cout << "~Algorithm_()" << std::endl; }
 		virtual void setLabels(Labels arg) { labels = arg; }
 		virtual void setMaxLength(int arg) { maxLength = arg; }
@@ -143,7 +149,11 @@ namespace SemiCrf {
 	// 学習器
 	class Learner : public Algorithm_ {
 	public:
-		Learner() { std::cout << "Learner()" << std::endl; }
+		Learner()
+			{
+				data = Data( new TrainingData() );				
+				std::cout << "Learner()" << std::endl;
+			}
 		virtual ~Learner() { std::cout << "~Learner()" << std::endl; }
 		virtual void compute() const;
 	};
@@ -151,7 +161,11 @@ namespace SemiCrf {
 	// 推論器
 	class Inferer : public Algorithm_ {
 	public:
-		Inferer() { std::cout << "Inferer()" << std::endl; }
+		Inferer()
+			{
+				data = Data( new InferenceData() );
+				std::cout << "Inferer()" << std::endl;
+			}
 		virtual ~Inferer() { std::cout << "~Inferer()" << std::endl; }
 		virtual void compute() const;
 		
