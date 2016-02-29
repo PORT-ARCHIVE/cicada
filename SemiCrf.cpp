@@ -85,7 +85,7 @@ namespace SemiCrf {
 
 		// iterate segments
 		auto si = segments.begin();
-		auto sj = si + 1;
+		auto sj = segments.begin()++;		
 		for( ; sj != segments.end(); si++, sj++ ){
 
 			// iterate feature functions
@@ -106,7 +106,7 @@ namespace SemiCrf {
 
 		// iterate segments
 		auto si = segments.begin();
-		auto sj = si + 1;
+		auto sj = segments.begin()++;
 		for( ; sj != segments.end(); si++, sj++ ){
 
 			// iterate feature functions
