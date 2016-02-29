@@ -35,6 +35,14 @@ namespace ApplicationRequirements {
 			
 			return true;
 		};
+
+		virtual void read() {
+			std::cout << "AppReqF0::read()" << std::endl;
+		};
+
+		virtual void write() {
+			std::cout << "AppReqF0()::write()" << std::endl;			
+		};
 	};
 	
 	class AppReqF1 : public SemiCrf::FeatureFunction_ {
@@ -49,6 +57,14 @@ namespace ApplicationRequirements {
 			// T.B.D.										
 			return true;
 		};
+
+		virtual void read() {
+			std::cout << "AppReqF1::read()" << std::endl;			
+		};
+
+		virtual void write() {
+			std::cout << "AppReqF0::write()" << std::endl;			
+		};		
 	};
 }
 

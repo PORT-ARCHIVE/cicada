@@ -8,9 +8,11 @@
 
 namespace SemiCrf {
 
+	// ラベル
 	class Label_ {};
 	typedef std::shared_ptr<Label_> Label;
-	
+
+	// セグメント 
 	class Segment_{
 	public:
 		Segment_(int start_, int end_, Label label_)
@@ -33,6 +35,7 @@ namespace SemiCrf {
 
 	typedef std::shared_ptr<Segment_> Segment;
 
+	// データ
 	class Data_ {
 	public:
 		Data_() { std::cout << "Data_()" << std::endl; }
@@ -48,29 +51,35 @@ namespace SemiCrf {
 	
 	typedef std::shared_ptr<Data_> Data;	
 
+	// 教師データ
 	class TrainingData : public Data_ {
 	public:
 		virtual void read();
 		virtual void write() const;
 	};	
 
+	// 推論データ
 	class InferenceData : public Data_ {
 	public:
 		virtual void read();
 		virtual void write() const;
 	};
 
+	// 素性関数
 	class FeatureFunction_ {
 	public:
 		FeatureFunction_() { std::cout << "FeatureFunction_()" << std::endl; }
 		virtual ~FeatureFunction_() { std::cout << "~FeatureFunction_()" << std::endl; }
 		virtual bool operator() (Segment s0, Segment s1, std::vector<std::string>&& strs) = 0;
+		virtual void read() = 0;
+		virtual void write() = 0;
 	};
 
 	typedef std::shared_ptr<FeatureFunction_> FeatureFunction;
-	typedef std::pair<FeatureFunction,double> Ffp;
-	typedef std::vector<Ffp> Ffps;
+	typedef std::pair<FeatureFunction,double> Ffp; // 名前が分かりにくい
+	typedef std::vector<Ffp> Ffps; // 名前が分かりにくい
 
+	// 抽象アルゴリズム
 	class Algorithm_ {
 	public:
 		Algorithm_() { std::cout << "Algorithm_()" << std::endl; }
@@ -81,6 +90,7 @@ namespace SemiCrf {
 
 	typedef std::shared_ptr<Algorithm_> Algorithm;
 
+	// 学習器
 	class Learner : public Algorithm_ {
 	public:
 		Learner() { std::cout << "Learner()" << std::endl; }
@@ -90,6 +100,7 @@ namespace SemiCrf {
 		virtual void compute(const Ffps ffps, Data data){}; // error		
 	};
 
+	// 推論器
 	class Inferer : public Algorithm_ {
 	public:
 		Inferer() { std::cout << "Inferer()" << std::endl; }
@@ -98,6 +109,8 @@ namespace SemiCrf {
 	private:
 		virtual void compute(const Data data, Ffps ffps){}; // error		
 	};
+
+	//////////////////////////////////////	
 }
 
 #endif // SEMI_CRF__H

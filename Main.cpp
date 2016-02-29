@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
 	SemiCrf::Ffps ffps;
 
-	try { // prepare feature functions
+	try { // 素性関数を準備する
 
 		// T.B.D.
 		typedef SemiCrf::FeatureFunction SFF;	
@@ -19,11 +19,13 @@ int main(int argc, char *argv[])
 
 		ffps.push_back(ffp0);
 		ffps.push_back(ffp1);
+		// T.B.D.		
 
 	} catch(...) {
+		// T.B.D.
 	}
 
-	try { // Traing	
+	try { // 学習
 	
 		SemiCrf::Data trainingData(new SemiCrf::TrainingData());
 		trainingData->read();
@@ -32,9 +34,10 @@ int main(int argc, char *argv[])
 		learner->compute(trainingData, ffps);
 
 	} catch(...) {
+		// T.B.D.		
 	}
 
-	try { // Inference
+	try { // 推論
 
 		SemiCrf::Data inferenceData(new SemiCrf::InferenceData());
 		inferenceData->read();
@@ -44,6 +47,7 @@ int main(int argc, char *argv[])
 		inferenceData->write();
 
 	} catch(...) {
+		// T.B.D.		
 	}
 		
 	return (0);
