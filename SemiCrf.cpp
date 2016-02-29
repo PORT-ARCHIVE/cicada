@@ -1,6 +1,6 @@
 
 #include "SemiCrf.hpp"
-#include "ApplicationRequirements.hpp"
+#include "AppReqs.hpp"
 
 namespace SemiCrf {
 
@@ -16,14 +16,12 @@ namespace SemiCrf {
 
 		// add feature functions
 		// T.B.D.		
-		Label l0( new ApplicationRequirements::Campany() );
-		Segment s0(new Segment_( 0, 1, l0 ));
+		Segment s0(new Segment_( 0, 1, AppReqs::Label::Campany ));
 		segs.push_back(s0);
 
 		// add feature functions
 		// T.B.D.				
-		Label l1( new ApplicationRequirements::Location() );
-		Segment s1(new Segment_( 2, 3, l1 ));
+		Segment s1(new Segment_( 2, 3, AppReqs::Label::Location ));
 		segs.push_back(s1);		
 	}
 
@@ -49,7 +47,7 @@ namespace SemiCrf {
 		for(auto i : segs){
 			int start = i->getStart();
 			int end = i->getEnd();
-			Label l = i->getLabel();
+			AppReqs::Label l = i->getLabel();
 			// T.B.D.			
 		}
 
@@ -77,7 +75,7 @@ namespace SemiCrf {
 		}		
 	}	
 
-	void Learner::compute(const Data data, FtrFnctnPrmtrs ffps){
+	void Learner::compute(const Data data, FtrFnctnPrmtrs ffps) const {
 		std::cout << "Learner::compute()" << std::endl;
 
 		std::vector<Segment> segments = data->getSegments();
@@ -98,11 +96,11 @@ namespace SemiCrf {
 		}
 	}
 
-	void Inferer::compute(const FtrFnctnPrmtrs ffps, Data data){
+	void Inferer::compute(const FtrFnctnPrmtrs ffps, Data data) const {
 		std::cout << "Inferer::compute()" << std::endl;
 
-		std::vector<Segment> segments = data->getSegments();
 		std::vector<std::string> strs = data->getStrs();
+		std::vector<Segment> segments = data->getSegments();
 
 		// iterate segments
 		auto si = segments.begin();
@@ -117,5 +115,9 @@ namespace SemiCrf {
 				// T.B.D.
 			}
 		}
+	}
+
+	double Inferer::V(int i, AppReqs::Label y) const {
+		return (0.0);
 	}
 }

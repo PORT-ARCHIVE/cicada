@@ -6,16 +6,27 @@
 #include <string>
 #include <vector>
 
-namespace SemiCrf {
+namespace AppReqs {
 
 	// ラベル
-	class Label_ {};
-	typedef std::shared_ptr<Label_> Label;
+	enum class Label : int;
+
+}
+
+namespace SemiCrf {
+
+
+	//class Label_ {};
+	//typedef std::shared_ptr<Label_> Label;
+	// enum class Label : int {
+	// 	Campany,
+	// 	Location
+	// };
 
 	// セグメント 
 	class Segment_{
 	public:
-		Segment_(int start_, int end_, Label label_)
+		Segment_(int start_, int end_, AppReqs::Label label_)
 			: start(start_), end(end_), label(label_) {}
 
 		int getStart() const { return start; }
@@ -24,13 +35,13 @@ namespace SemiCrf {
 		int getEnd() const { return end; }
 		void setEnd(int arg) { end = arg; }
 
-		Label getLabel() const { return label; } // const?
-		void setLabel(Label arg) { label = arg; }
+		AppReqs::Label getLabel() const { return label; } // const?
+		void setLabel(AppReqs::Label arg) { label = arg; }
 		
 	private:
 		int start;
 		int end;
-		Label label;
+		AppReqs::Label label;
 	};
 
 	typedef std::shared_ptr<Segment_> Segment;
@@ -70,7 +81,7 @@ namespace SemiCrf {
 	public:
 		FeatureFunction_() { std::cout << "FeatureFunction_()" << std::endl; }
 		virtual ~FeatureFunction_() { std::cout << "~FeatureFunction_()" << std::endl; }
-		virtual bool operator() (Segment s0, Segment s1, std::vector<std::string>&& strs) = 0;
+		virtual double operator() (Segment s0, Segment s1, std::vector<std::string>&& strs) = 0;
 		virtual void read() = 0;
 		virtual void write() = 0;
 	};
@@ -92,8 +103,8 @@ namespace SemiCrf {
 	public:
 		Algorithm_() { std::cout << "Algorithm_()" << std::endl; }
 		virtual ~Algorithm_() { std::cout << "~Algorithm_()" << std::endl; }
-		virtual void compute(const Data data, FtrFnctnPrmtrs ffps) = 0;
-		virtual void compute(const FtrFnctnPrmtrs ffps, Data data) = 0;		
+		virtual void compute(const Data data, FtrFnctnPrmtrs ffps) const = 0;
+		virtual void compute(const FtrFnctnPrmtrs ffps, Data data) const = 0;		
 	};
 
 	typedef std::shared_ptr<Algorithm_> Algorithm;
@@ -103,9 +114,9 @@ namespace SemiCrf {
 	public:
 		Learner() { std::cout << "Learner()" << std::endl; }
 		~Learner() { std::cout << "~Learner()" << std::endl; }
-		virtual void compute(const Data data, FtrFnctnPrmtrs ffps);
+		virtual void compute(const Data data, FtrFnctnPrmtrs ffps) const;
 	private:
-		virtual void compute(const FtrFnctnPrmtrs ffps, Data data){}; // error		
+		virtual void compute(const FtrFnctnPrmtrs ffps, Data data) const {}; // error
 	};
 
 	// 推論器
@@ -113,9 +124,10 @@ namespace SemiCrf {
 	public:
 		Inferer() { std::cout << "Inferer()" << std::endl; }
 		~Inferer() { std::cout << "~Inferer()" << std::endl; }
-		virtual void compute(const FtrFnctnPrmtrs ffps, Data data);
+		virtual void compute(const FtrFnctnPrmtrs ffps, Data data) const;
 	private:
-		virtual void compute(const Data data, FtrFnctnPrmtrs ffps){}; // error
+		virtual void compute(const Data data, FtrFnctnPrmtrs ffps) const {}; // error
+		double V(int i, AppReqs::Label y) const;
 	};
 }
 
