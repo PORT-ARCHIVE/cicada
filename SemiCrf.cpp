@@ -156,6 +156,7 @@ namespace SemiCrf {
 					double v = V(i-d, yd, segs, tmp, checkV);
 
 					auto w = weights->begin();
+					assert( weights->size() == ffs->size() );
 					for( auto f : *ffs ) {
 						v += (*w) * (*f)(y, yd, data, i-d+1, i);
 						w++;
