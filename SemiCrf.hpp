@@ -58,8 +58,8 @@ namespace SemiCrf {
 		Data_() : strs( new Strs_() ), segs( new Segments_() )
 			{ std::cout << "Data_()" << std::endl; }
 		virtual ~Data_() { std::cout << "~Data_()" << std::endl; }
-		virtual void read() = 0;
-		virtual void write() const = 0;
+		virtual void read();
+		virtual void write() const;
 		Strs getStrs() { return strs; }
 		Segments getSegments() { return segs; }
 		void setSegments(Segments arg) { segs = arg; }
@@ -69,20 +69,6 @@ namespace SemiCrf {
 	};
 	
 	typedef std::shared_ptr<Data_> Data;	
-
-	// 教師データ
-	class TrainingData : public Data_ {
-	public:
-		virtual void read();
-		virtual void write() const;
-	};	
-
-	// 推論データ
-	class InferenceData : public Data_ {
-	public:
-		virtual void read();
-		virtual void write() const;
-	};
 
 	// 重みベクトル
 	class Weights_ : public std::vector<double> {
@@ -151,7 +137,7 @@ namespace SemiCrf {
 	public:
 		Learner()
 			{
-				data = Data( new TrainingData() );				
+				data = Data( new Data_() );
 				std::cout << "Learner()" << std::endl;
 			}
 		virtual ~Learner() { std::cout << "~Learner()" << std::endl; }
@@ -163,7 +149,7 @@ namespace SemiCrf {
 	public:
 		Inferer()
 			{
-				data = Data( new InferenceData() );
+				data = Data( new Data_() );
 				std::cout << "Inferer()" << std::endl;
 			}
 		virtual ~Inferer() { std::cout << "~Inferer()" << std::endl; }

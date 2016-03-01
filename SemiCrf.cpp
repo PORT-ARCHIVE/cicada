@@ -6,7 +6,7 @@
 
 namespace SemiCrf {
 
-	void TrainingData::read() {
+	void Data_::read() {
 		std::cout << "TrainingData::read()" << std::endl;
 
 		// add strings
@@ -27,22 +27,7 @@ namespace SemiCrf {
 		segs->push_back(s1);		
 	}
 
-	void TrainingData::write() const {
-		std::cout << "TrainingData::write()" << std::endl;
-		// nothing to do
-	}
-
-	void InferenceData::read() {
-		std::cout << "InferenceData::read()" << std::endl;
-
-		// T.B.D.
-		strs->push_back("AAA");
-		strs->push_back("BBB");
-		strs->push_back("CCC");
-		strs->push_back("DDD");
-	}
-
-	void InferenceData::write() const {
+	void Data_::write() const {
 		std::cout << "InferenceData::write()" << std::endl;
 
 		// iterate segments

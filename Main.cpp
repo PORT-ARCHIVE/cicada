@@ -31,7 +31,8 @@ int main(int argc, char *argv[])
 
 	try { // 学習
 	
-		SemiCrf::Data trainingData(new SemiCrf::TrainingData());
+		//SemiCrf::Data trainingData(new SemiCrf::TrainingData());
+		SemiCrf::Data trainingData(new SemiCrf::Data_());
 		trainingData->read();
 	
 		SemiCrf::Algorithm learner(new SemiCrf::Learner());
@@ -54,7 +55,8 @@ int main(int argc, char *argv[])
 		ffs->read();
 		weights->read();
 
-		SemiCrf::Data inferenceData(new SemiCrf::InferenceData());
+		//SemiCrf::Data inferenceData(new SemiCrf::InferenceData());
+		SemiCrf::Data inferenceData(new SemiCrf::Data_());
 		inferenceData->read();
 
 		SemiCrf::Algorithm inferer(new SemiCrf::Inferer());
