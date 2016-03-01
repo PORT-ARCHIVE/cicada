@@ -20,7 +20,7 @@ namespace SemiCrf {
 	typedef std::shared_ptr<Labels_> Labels;	
 
 	// セグメント 
-	class Segment_{
+	class Segment_ {
 	public:
 		Segment_(int start_, int end_, AppReqs::Label label_)
 			: start(start_), end(end_), label(label_) {}
@@ -134,7 +134,7 @@ namespace SemiCrf {
 		virtual void setData(Data arg) { data = arg; }
 		virtual void setFeatureFunctions(FeatureFunctions arg) { ffs = arg; }
 		virtual void setWeights(Weights arg) { weights = arg; }		
-		virtual void compute() const = 0;
+		virtual void compute() = 0;
 
 	protected:
 		Labels labels;
@@ -155,7 +155,7 @@ namespace SemiCrf {
 				std::cout << "Learner()" << std::endl;
 			}
 		virtual ~Learner() { std::cout << "~Learner()" << std::endl; }
-		virtual void compute() const;
+		virtual void compute();
 	};
 
 	// 推論器
@@ -167,10 +167,10 @@ namespace SemiCrf {
 				std::cout << "Inferer()" << std::endl;
 			}
 		virtual ~Inferer() { std::cout << "~Inferer()" << std::endl; }
-		virtual void compute() const;
+		virtual void compute();
 		
 	private:
-		double V(int i, AppReqs::Label y, Segments segs, int& maxd) const;
+		double V(int i, AppReqs::Label y, Segments segs, int& maxd, std::vector<std::tuple<bool,double,int>>& checkV);
 	};
 }
 

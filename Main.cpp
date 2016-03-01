@@ -6,7 +6,7 @@
 int main(int argc, char *argv[])
 {
 	int maxLength = 5;
-	SemiCrf::Weights weights; // T.B.D.
+	SemiCrf::Weights weights( new SemiCrf::Weights_() );
 	SemiCrf::FeatureFunctions ffs( new SemiCrf::FeatureFunctions_() );
 	SemiCrf::Labels labels( new SemiCrf::Labels_() );
 

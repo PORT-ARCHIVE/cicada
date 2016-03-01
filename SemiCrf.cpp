@@ -1,5 +1,6 @@
 
 #include <limits>
+#include <assert.h>
 #include "SemiCrf.hpp"
 #include "AppReqs.hpp"
 
@@ -61,6 +62,8 @@ namespace SemiCrf {
 
 	void Weights_::read() {
 		std::cout << "Weights_::read()" << std::endl;
+		push_back(1.0);
+		push_back(2.0);
 	}
 
 	void Weights_::write() {
@@ -82,7 +85,7 @@ namespace SemiCrf {
 		}		
 	}	
 
-	void Learner::compute() const {
+	void Learner::compute() {
 		std::cout << "Learner::compute()" << std::endl;
 
 		Segments segments = data->getSegments();
@@ -101,19 +104,22 @@ namespace SemiCrf {
 		}
 	}
 
-	void Inferer::compute() const {
+	void Inferer::compute() {
 		std::cout << "Inferer::compute()" << std::endl;
 
+		int capacity = (labels->size())*(data->getStrs()->size());
+		std::vector<std::tuple<bool,double,int>> checkV(capacity, std::tuple<bool,double,int>());
+
 		int maxd = - 1;
-		Segments maxsegs;		
+		Segments maxsegs( new Segments_() );
 		AppReqs::Label maxy;
 		int s = data->getStrs()->size();
 		double maxV = std::numeric_limits<double>::min();
 
 		for( auto y : *labels ) {
 			int d = -1;
-			Segments segs;
-			double v = V(s, y, segs, d);
+			Segments segs( new Segments_() );
+			double v = V(s, y, segs, d, checkV);
 			if( maxV < v ) {
 				maxy = y;
 				maxV = v;
@@ -122,12 +128,20 @@ namespace SemiCrf {
 			}
 		}
 
+		assert( 0 < maxd );
 		Segment seg(new Segment_(s-maxd+1, s, maxy));
 		maxsegs->push_back(seg);
 		data->setSegments(maxsegs);
 	}
 
-	double Inferer::V(int i, AppReqs::Label y, Segments segs, int& maxd) const {
+	double Inferer::V(int i, AppReqs::Label y, Segments segs, int& maxd, std::vector<std::tuple<bool,double,int>>& checkV) {
+
+		int ind = (i*labels->size()) + (static_cast<int>(y));
+		auto& tp = checkV[ind];
+		if( std::get<0>(tp) ) {
+			maxd = std::get<2>(tp);
+			return std::get<1>(tp);
+		}
 
 		maxd = -1;
 		AppReqs::Label maxyd;
@@ -139,7 +153,7 @@ namespace SemiCrf {
 				for( auto yd : *labels ) {
 
 					int tmp = -1;
-					double v = V(i-d, yd, segs, tmp);
+					double v = V(i-d, yd, segs, tmp, checkV);
 
 					auto w = weights->begin();
 					for( auto f : *ffs ) {
@@ -155,6 +169,7 @@ namespace SemiCrf {
 				}
 			}
 
+			assert( 0 < maxd );
 			Segment seg(new Segment_(i-maxd+1, i, maxyd));
 			segs->push_back(seg);
 
@@ -165,6 +180,9 @@ namespace SemiCrf {
 			// nothong to do
 		}
 
+		std::get<0>(tp) = true;
+		std::get<1>(tp) = maxV;
+		std::get<2>(tp) = maxd;
 		return maxV;
 	}
 }
