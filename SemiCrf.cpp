@@ -45,6 +45,33 @@ namespace SemiCrf {
 		}
 	}
 
+	void Datas_::read() {
+		std::cout << "Datas_::read()" << std::endl;
+
+		// T.B.D.
+
+		Data data0(new Data_());
+		data0->getStrs()->push_back("AAA");
+		data0->getStrs()->push_back("BBB");
+		data0->getStrs()->push_back("CCC");
+		data0->getStrs()->push_back("DDD");
+		push_back(data0);
+
+		Data data1(new Data_());
+		data1->getStrs()->push_back("AAA");
+		data1->getStrs()->push_back("BBB");
+		data1->getStrs()->push_back("CCC");
+		data1->getStrs()->push_back("DDD");
+		push_back(data1);
+	}
+
+	void Datas_::write() const {
+		std::cout << "Datas_::write()" << std::endl;
+		for( auto i : *this ) {
+			i->write();
+		}
+	}
+
 	void Weights_::read() {
 		std::cout << "Weights_::read()" << std::endl;
 		push_back(1.0);
@@ -73,18 +100,21 @@ namespace SemiCrf {
 	void Learner::compute() {
 		std::cout << "Learner::compute()" << std::endl;
 
-		Segments segments = data->getSegments();
-		Strs strs = data->getStrs();
+		for( auto data : *datas ) {
 
-		// iterate segments
-		auto si = segments->begin();
-		auto sj = segments->begin()++;		
-		for( ; sj != segments->end(); si++, sj++ ){
+			Segments segments = data->getSegments();
+			Strs strs = data->getStrs();
 
-			// iterate feature functions
-			for(auto f : *ffs) {
-				bool v = (*f)(*si, *sj, strs);
-				// T.B.D.
+			// iterate segments
+			auto si = segments->begin();
+			auto sj = segments->begin()++;
+			for( ; sj != segments->end(); si++, sj++ ){
+
+				// iterate feature functions
+				for(auto f : *ffs) {
+					bool v = (*f)(*si, *sj, strs);
+					// T.B.D.
+				}
 			}
 		}
 	}
@@ -92,40 +122,55 @@ namespace SemiCrf {
 	void Inferer::compute() {
 		std::cout << "Inferer::compute()" << std::endl;
 
-		int capacity = (labels->size())*(data->getStrs()->size());
-		std::vector<std::tuple<bool,double,int>> checkV(capacity, std::tuple<bool,double,int>());
+		for( auto current_data : *datas ) {
 
-		int maxd = - 1;
-		Segments maxsegs( new Segments_() );
-		AppReqs::Label maxy;
-		int s = data->getStrs()->size();
-		double maxV = std::numeric_limits<double>::min();
+			data = current_data;
 
-		for( auto y : *labels ) {
-			int d = -1;
-			Segments segs( new Segments_() );
-			double v = V(s, y, segs, d, checkV);
-			if( maxV < v ) {
-				maxy = y;
-				maxV = v;
-				maxd = d;
-				maxsegs = segs;
+			int l = labels->size();
+			int s = data->getStrs()->size();
+			int capacity = l*s;
+
+			CheckTable current_ctab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
+			ctab = current_ctab;
+
+			int maxd = - 1;
+			AppReqs::Label maxy;
+			Segments maxsegs( new Segments_() );
+			double maxV = std::numeric_limits<double>::min();
+
+			for( auto y : *labels ) {
+
+				int d = -1;
+				Segments current_segs( new Segments_() );
+				segs = current_segs;
+				double v = V(s-1, y, d);
+
+				if( maxV < v ) {
+					maxy = y;
+					maxV = v;
+					maxd = d;
+					maxsegs = segs;
+				}
 			}
-		}
 
-		assert( 0 < maxd );
-		Segment seg(new Segment_(s-maxd+1, s, maxy));
-		maxsegs->push_back(seg);
-		data->setSegments(maxsegs);
+			assert( 0 < maxd );
+			Segment seg(new Segment_(s-maxd+1, s, maxy));
+			maxsegs->push_back(seg);
+			data->setSegments(maxsegs);
+		}
 	}
 
-	double Inferer::V(int i, AppReqs::Label y, Segments segs, int& maxd, std::vector<std::tuple<bool,double,int>>& checkV) {
+	double Inferer::V(int i, AppReqs::Label y, int& maxd) {
+
+		std::cout << "i=" << i << ", y=" << int(y) << std::endl;
 
 		int ind = (i*labels->size()) + (static_cast<int>(y));
-		auto& tp = checkV[ind];
-		if( std::get<0>(tp) ) {
-			maxd = std::get<2>(tp);
-			return std::get<1>(tp);
+		if( -1 < i ) {
+			auto& tp = ctab->at(ind);
+			if( std::get<0>(tp) ) {
+				maxd = std::get<2>(tp);
+				return std::get<1>(tp);
+			}
 		}
 
 		maxd = -1;
@@ -138,7 +183,7 @@ namespace SemiCrf {
 				for( auto yd : *labels ) {
 
 					int tmp = -1;
-					double v = V(i-d, yd, segs, tmp, checkV);
+					double v = V(i-d, yd, tmp);
 
 					auto w = weights->begin();
 					assert( weights->size() == ffs->size() );
@@ -166,9 +211,12 @@ namespace SemiCrf {
 			// nothong to do
 		}
 
-		std::get<0>(tp) = true;
-		std::get<1>(tp) = maxV;
-		std::get<2>(tp) = maxd;
+		if( -1 < i ) {
+			auto& tp = ctab->at(ind);
+			std::get<0>(tp) = true;
+			std::get<1>(tp) = maxV;
+			std::get<2>(tp) = maxd;
+		}
 		return maxV;
 	}
 }

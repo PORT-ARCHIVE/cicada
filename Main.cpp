@@ -31,14 +31,14 @@ int main(int argc, char *argv[])
 
 	try { // 学習
 	
-		//SemiCrf::Data trainingData(new SemiCrf::TrainingData());
-		SemiCrf::Data trainingData(new SemiCrf::Data_());
-		trainingData->read();
+		SemiCrf::Datas trainingDatas(new SemiCrf::Datas_());
+		//trainingData->read(); T.B.D.
 	
 		SemiCrf::Algorithm learner(new SemiCrf::Learner());
 		learner->setLabels(labels);
 		learner->setMaxLength(maxLength);
-		learner->setData(trainingData);
+		//learner->setData(trainingData);
+		learner->setDatas(trainingDatas);
 		learner->setFeatureFunctions(ffs);
 		learner->setWeights(weights);
 		learner->compute();
@@ -55,19 +55,19 @@ int main(int argc, char *argv[])
 		ffs->read();
 		weights->read();
 
-		//SemiCrf::Data inferenceData(new SemiCrf::InferenceData());
-		SemiCrf::Data inferenceData(new SemiCrf::Data_());
-		inferenceData->read();
+		SemiCrf::Datas inferenceDatas(new SemiCrf::Datas_());
+		inferenceDatas->read();
 
 		SemiCrf::Algorithm inferer(new SemiCrf::Inferer());
 		inferer->setLabels(labels);
 		inferer->setMaxLength(maxLength);
-		inferer->setData(inferenceData);
+		inferer->setDatas(inferenceDatas);
+		inferer->setDatas(inferenceDatas);
 		inferer->setFeatureFunctions(ffs);
 		inferer->setWeights(weights);		
 		inferer->compute();
 		
-		inferenceData->write();
+		//inferenceData->write(); T.B.D.
 
 	} catch(...) {
 		// T.B.D.		

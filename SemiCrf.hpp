@@ -68,7 +68,18 @@ namespace SemiCrf {
 		Segments segs;
 	};
 	
-	typedef std::shared_ptr<Data_> Data;	
+	typedef std::shared_ptr<Data_> Data;
+
+	// データ集合
+	class Datas_ : public std::vector<Data> {
+	public:
+		Datas_() {};
+		virtual ~Datas_() {};
+		virtual void read();
+		virtual void write() const;
+	};
+
+	typedef std::shared_ptr<Datas_> Datas;
 
 	// 重みベクトル
 	class Weights_ : public std::vector<double> {
@@ -105,6 +116,13 @@ namespace SemiCrf {
 
 	typedef std::shared_ptr<FeatureFunctions_> FeatureFunctions;
 
+
+	// チェックテーブル
+	typedef std::tuple<bool,double,int> CheckTuple;
+	typedef std::vector<CheckTuple> CheckTable_;
+	typedef std::shared_ptr<CheckTable_> CheckTable;
+
+
 	// 抽象アルゴリズム
 	class Algorithm_ {
 	public:
@@ -117,7 +135,8 @@ namespace SemiCrf {
 		virtual ~Algorithm_() { std::cout << "~Algorithm_()" << std::endl; }
 		virtual void setLabels(Labels arg) { labels = arg; }
 		virtual void setMaxLength(int arg) { maxLength = arg; }
-		virtual void setData(Data arg) { data = arg; }
+		//virtual void setData(Data arg) { data = arg; }
+		virtual void setDatas(Datas arg) { datas = arg; }
 		virtual void setFeatureFunctions(FeatureFunctions arg) { ffs = arg; }
 		virtual void setWeights(Weights arg) { weights = arg; }		
 		virtual void compute() = 0;
@@ -125,9 +144,12 @@ namespace SemiCrf {
 	protected:
 		Labels labels;
 		int maxLength; // 最大セグメント長
-		Data data;		
+		Data data;
+		Datas datas;
 		FeatureFunctions ffs;
 		Weights weights;
+		Segments segs;
+		CheckTable ctab;
 	};
 
 	typedef std::shared_ptr<Algorithm_> Algorithm;
@@ -137,7 +159,7 @@ namespace SemiCrf {
 	public:
 		Learner()
 			{
-				data = Data( new Data_() );
+				datas = Datas( new Datas_() );
 				std::cout << "Learner()" << std::endl;
 			}
 		virtual ~Learner() { std::cout << "~Learner()" << std::endl; }
@@ -149,14 +171,14 @@ namespace SemiCrf {
 	public:
 		Inferer()
 			{
-				data = Data( new Data_() );
+				datas = Datas( new Datas_() );
 				std::cout << "Inferer()" << std::endl;
 			}
 		virtual ~Inferer() { std::cout << "~Inferer()" << std::endl; }
 		virtual void compute();
 		
 	private:
-		double V(int i, AppReqs::Label y, Segments segs, int& maxd, std::vector<std::tuple<bool,double,int>>& checkV);
+		double V(int i, AppReqs::Label y, int& maxd);
 	};
 }
 
