@@ -100,21 +100,27 @@ namespace SemiCrf {
 	void Learner::compute() {
 		std::cout << "Learner::compute()" << std::endl;
 
+		std::vector<double> gs;
+
 		for( auto data : *datas ) {
 
 			Segments segments = data->getSegments();
 			Strs strs = data->getStrs();
 
-			// iterate segments
-			auto si = segments->begin();
-			auto sj = segments->begin()++;
-			for( ; sj != segments->end(); si++, sj++ ){
+			// iterate feature functions
+			for(auto f : *ffs) {
 
-				// iterate feature functions
-				for(auto f : *ffs) {
-					bool v = (*f)(*si, *sj, strs);
-					// T.B.D.
+				double g = 0.0;
+
+				// iterate segments
+				auto si = segments->begin();
+				auto sj = segments->begin()++;
+				for( ; sj != segments->end(); si++, sj++ ){
+
+					g += (*f)(*si, *sj, strs);
 				}
+
+				gs.push_back(g);
 			}
 		}
 	}
@@ -179,7 +185,8 @@ namespace SemiCrf {
 		
 		if( 0 < i ) {
 
-			for( int d = 1; d <= maxLength; d++ ) {
+			//for( int d = 1; d <= maxLength; d++ ) {
+			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
 				for( auto yd : *labels ) {
 
 					int tmp = -1;
