@@ -129,7 +129,8 @@ namespace SemiCrf {
 		Algorithm_() :
 			labels( new Labels_() ),
 			ffs( new FeatureFunctions_() ),
-			weights( new Weights_() )
+			weights( new Weights_() ),
+			datas( new Datas_() )
 			{ std::cout << "Algorithm_()" << std::endl; }
 		virtual ~Algorithm_() { std::cout << "~Algorithm_()" << std::endl; }
 		virtual void setLabels(Labels arg) { labels = arg; }
@@ -141,13 +142,15 @@ namespace SemiCrf {
 
 	protected:
 		Labels labels;
-		int maxLength; // 最大セグメント長
-		Data data;
-		Datas datas;
 		FeatureFunctions ffs;
 		Weights weights;
+		Datas datas;
+		int maxLength; // 最大セグメント長
+		Data current_data;
 		Segments segs;
-		CheckTable ctab;
+		CheckTable current_vctab;
+		CheckTable current_actab;
+		CheckTable current_ectab;
 	};
 
 	typedef std::shared_ptr<Algorithm_> Algorithm;
@@ -155,25 +158,19 @@ namespace SemiCrf {
 	// 学習器
 	class Learner : public Algorithm_ {
 	public:
-		Learner()
-			{
-				datas = Datas( new Datas_() );
-				std::cout << "Learner()" << std::endl;
-			}
+		Learner() { std::cout << "Learner()" << std::endl; }
 		virtual ~Learner() { std::cout << "~Learner()" << std::endl; }
 		virtual void compute();
+
 	private:
 		double alpha(int i, AppReqs::Label y);
+		double eta(int i, AppReqs::Label y, int k);
 	};
 
 	// 推論器
 	class Inferer : public Algorithm_ {
 	public:
-		Inferer()
-			{
-				datas = Datas( new Datas_() );
-				std::cout << "Inferer()" << std::endl;
-			}
+		Inferer() { std::cout << "Inferer()" << std::endl; }
 		virtual ~Inferer() { std::cout << "~Inferer()" << std::endl; }
 		virtual void compute();
 		

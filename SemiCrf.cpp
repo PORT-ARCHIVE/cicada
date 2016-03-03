@@ -100,12 +100,15 @@ namespace SemiCrf {
 
 	void Learner::compute() {
 		std::cout << "Learner::compute()" << std::endl;
+		assert( weights->size() == ffs->size() );
 
+		int l = labels->size();
 		std::vector<double> gs;
 
-		for( auto x : *datas ) {
+		for( auto data : *datas ) {
+			current_data = data;
 
-			Segments segments = x->getSegments();
+			Segments segments = current_data->getSegments();
 
 			// iterate feature functions
 			for(auto f : *ffs) {
@@ -121,10 +124,21 @@ namespace SemiCrf {
 					auto y1 = (*sj)->getLabel();
 					int ti = (*si)->getStart();
 					int ui = (*si)->getEnd();
-					g += (*f)(y, y1, x, ti, ui);
+					g += (*f)(y, y1, current_data, ti, ui);
 				}
 
 				gs.push_back(g);
+			}
+
+			int s = current_data->getStrs()->size();
+			int capacity = l*s;
+			current_vctab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
+			current_ectab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
+
+			double Z = 0.0;
+			for( auto y : *labels ) {
+				int size = current_data->getStrs()->size();
+				Z += alpha(size, y);
 			}
 		}
 	}
@@ -135,16 +149,15 @@ namespace SemiCrf {
 
 		int ind = (i*labels->size()) + (static_cast<int>(y));
 		if( -1 < i ) {
-			// auto& tp = ctab->at(ind);
-			// if( std::get<0>(tp) ) {
-			// 	maxd = std::get<2>(tp);
-			// 	return std::get<1>(tp);
-			// }
+			auto& tp = current_actab->at(ind);
+			if( std::get<0>(tp) ) {
+				return std::get<1>(tp);
+			}
 		}
 
 		double v = 0;
 
-		if( 0 < i ) {
+		if( 1 < i ) {
 
 			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
 				for( auto yd : *labels ) {
@@ -152,34 +165,69 @@ namespace SemiCrf {
 					v = alpha(i-d, yd);
 
 					double e;
-					for( auto x : *datas ) {
-
-						Segments segments = x->getSegments();
-						auto w = weights->begin();
-						assert( weights->size() == ffs->size() );
-
-						for( auto f : *ffs ) {
-							e += (*w) * (*f)(y, yd, x, i-d+1, i);
-							w++;
-						}
+					auto w = weights->begin();
+					for( auto f : *ffs ) {
+						e += (*w) * (*f)(y, yd, current_data, i-d+1, i);
+						w++;
 					}
 
 					v *= exp(e);
 				}
 			}
 
-		} else if( i == 0 ) {
-			v = 0.0;
+		} else if( i == 1 ) {
 
-		} else if( i < 0 ) {
+			for( auto yd : *labels ) {
+
+				double e;
+				auto w = weights->begin();
+				for( auto f : *ffs ) {
+					e += (*w) * (*f)(y, yd, current_data, 1, 1);
+					w++;
+				}
+
+				v = exp(e);
+			}
+
+		} else if( i < 1 ) {
 			// nothong to do
 		}
 
 		if( -1 < i ) {
-			// auto& tp = ctab->at(ind);
-			// std::get<0>(tp) = true;
-			// std::get<1>(tp) = maxV;
-			// std::get<2>(tp) = maxd;
+			auto& tp = current_actab->at(ind);
+			std::get<0>(tp) = true;
+			std::get<1>(tp) = v;
+		}
+
+		return v;
+	}
+
+	double Learner::eta(int i, AppReqs::Label y, int k) {
+
+		std::cout << "i=" << i << ", y=" << int(y) << std::endl;
+
+		int ind = (i*labels->size()) + (static_cast<int>(y));
+		if( -1 < i ) {
+			auto& tp = current_ectab->at(ind);
+			if( std::get<0>(tp) ) {
+				return std::get<1>(tp);
+			}
+		}
+
+		double v = 0;
+
+		if( 1 < i ) {
+
+		} else if( i == 1 ) {
+
+		} else if( i < 1 ) {
+			// nothong to do
+		}
+
+		if( -1 < i ) {
+			auto& tp = current_ectab->at(ind);
+			std::get<0>(tp) = true;
+			std::get<1>(tp) = v;
 		}
 
 		return v;
@@ -188,16 +236,15 @@ namespace SemiCrf {
 	void Inferer::compute() {
 		std::cout << "Inferer::compute()" << std::endl;
 
-		for( auto current_data : *datas ) {
+		for( auto data : *datas ) {
 
-			data = current_data;
+			current_data = data;
 
 			int l = labels->size();
-			int s = data->getStrs()->size();
+			int s = current_data->getStrs()->size();
 			int capacity = l*s;
 
-			CheckTable current_ctab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
-			ctab = current_ctab;
+			current_vctab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
 
 			int maxd = - 1;
 			AppReqs::Label maxy;
@@ -222,7 +269,7 @@ namespace SemiCrf {
 			assert( 0 < maxd );
 			Segment seg(new Segment_(s-maxd+1, s, maxy));
 			maxsegs->push_back(seg);
-			data->setSegments(maxsegs);
+			current_data->setSegments(maxsegs);
 		}
 	}
 
@@ -232,7 +279,7 @@ namespace SemiCrf {
 
 		int ind = (i*labels->size()) + (static_cast<int>(y));
 		if( -1 < i ) {
-			auto& tp = ctab->at(ind);
+			auto& tp = current_vctab->at(ind);
 			if( std::get<0>(tp) ) {
 				maxd = std::get<2>(tp);
 				return std::get<1>(tp);
@@ -255,7 +302,7 @@ namespace SemiCrf {
 					auto w = weights->begin();
 					assert( weights->size() == ffs->size() );
 					for( auto f : *ffs ) {
-						v += (*w) * (*f)(y, yd, data, i-d+1, i);
+						v += (*w) * (*f)(y, yd, current_data, i-d+1, i);
 						w++;
 					}
 					
@@ -279,7 +326,7 @@ namespace SemiCrf {
 		}
 
 		if( -1 < i ) {
-			auto& tp = ctab->at(ind);
+			auto& tp = current_vctab->at(ind);
 			std::get<0>(tp) = true;
 			std::get<1>(tp) = maxV;
 			std::get<2>(tp) = maxd;
