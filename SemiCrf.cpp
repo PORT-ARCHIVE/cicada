@@ -102,12 +102,16 @@ namespace SemiCrf {
 		std::cout << "Learner::compute()" << std::endl;
 		assert( weights->size() == ffs->size() );
 
+		std::vector<double> dw;
 		int l = labels->size();
-		std::vector<double> gs;
 
 		for( auto data : *datas ) {
 			current_data = data;
 
+			std::vector<double> gs;
+			std::vector<double> gms;
+
+			int size = current_data->getStrs()->size();
 			Segments segments = current_data->getSegments();
 
 			// iterate feature functions
@@ -137,8 +141,22 @@ namespace SemiCrf {
 
 			double Z = 0.0;
 			for( auto y : *labels ) {
-				int size = current_data->getStrs()->size();
+
 				Z += alpha(size, y);
+			}
+
+			double gm = 0.0;
+			for( int k = 0; k < ffs->size(); k++ ) {
+				for( auto y : *labels ) {
+
+					gm += eta(size, y, k);
+				}
+
+				gms.push_back(gm/Z);
+			}
+
+			for( int k = 0; k < ffs->size(); k++ ) {
+				dw.push_back( gs.at(k) - gms.at(k) );
 			}
 		}
 	}
@@ -218,7 +236,16 @@ namespace SemiCrf {
 
 		if( 1 < i ) {
 
+			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
+				for( auto yd : *labels ) {
+
+					FeatureFunction_& gk = *(ffs->at(k));
+					v += eta(i-d, yd, k) + alpha(i-d, yd) * gk(y, yd, current_data, i-d+1, i);
+				}
+			}
+
 		} else if( i == 1 ) {
+			// T.B.D.
 
 		} else if( i < 1 ) {
 			// nothong to do
