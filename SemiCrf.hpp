@@ -128,14 +128,12 @@ namespace SemiCrf {
 	public:
 		Algorithm_() :
 			labels( new Labels_() ),
-			//data( new Data_() ),
 			ffs( new FeatureFunctions_() ),
 			weights( new Weights_() )
 			{ std::cout << "Algorithm_()" << std::endl; }
 		virtual ~Algorithm_() { std::cout << "~Algorithm_()" << std::endl; }
 		virtual void setLabels(Labels arg) { labels = arg; }
 		virtual void setMaxLength(int arg) { maxLength = arg; }
-		//virtual void setData(Data arg) { data = arg; }
 		virtual void setDatas(Datas arg) { datas = arg; }
 		virtual void setFeatureFunctions(FeatureFunctions arg) { ffs = arg; }
 		virtual void setWeights(Weights arg) { weights = arg; }		
@@ -164,6 +162,8 @@ namespace SemiCrf {
 			}
 		virtual ~Learner() { std::cout << "~Learner()" << std::endl; }
 		virtual void compute();
+	private:
+		double alpha(int i, AppReqs::Label y);
 	};
 
 	// 推論器

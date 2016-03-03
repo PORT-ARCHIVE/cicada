@@ -1,6 +1,7 @@
 
 #include <limits>
-#include <assert.h>
+#include <cassert>
+#include <cmath>
 #include "SemiCrf.hpp"
 #include "AppReqs.hpp"
 
@@ -102,10 +103,9 @@ namespace SemiCrf {
 
 		std::vector<double> gs;
 
-		for( auto data : *datas ) {
+		for( auto x : *datas ) {
 
-			Segments segments = data->getSegments();
-			Strs strs = data->getStrs();
+			Segments segments = x->getSegments();
 
 			// iterate feature functions
 			for(auto f : *ffs) {
@@ -113,16 +113,76 @@ namespace SemiCrf {
 				double g = 0.0;
 
 				// iterate segments
-				auto si = segments->begin();
-				auto sj = segments->begin()++;
-				for( ; sj != segments->end(); si++, sj++ ){
+				auto sj = segments->begin();
+				auto si = segments->begin()++;
+				for( ; si != segments->end(); si++, sj++ ){
 
-					g += (*f)(*si, *sj, strs);
+					auto y = (*si)->getLabel();
+					auto y1 = (*sj)->getLabel();
+					int ti = (*si)->getStart();
+					int ui = (*si)->getEnd();
+					g += (*f)(y, y1, x, ti, ui);
 				}
 
 				gs.push_back(g);
 			}
 		}
+	}
+
+	double Learner::alpha(int i, AppReqs::Label y) {
+
+		std::cout << "i=" << i << ", y=" << int(y) << std::endl;
+
+		int ind = (i*labels->size()) + (static_cast<int>(y));
+		if( -1 < i ) {
+			// auto& tp = ctab->at(ind);
+			// if( std::get<0>(tp) ) {
+			// 	maxd = std::get<2>(tp);
+			// 	return std::get<1>(tp);
+			// }
+		}
+
+		double v = 0;
+
+		if( 0 < i ) {
+
+			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
+				for( auto yd : *labels ) {
+
+					v = alpha(i-d, yd);
+
+					double e;
+					for( auto x : *datas ) {
+
+						Segments segments = x->getSegments();
+						auto w = weights->begin();
+						assert( weights->size() == ffs->size() );
+
+						for( auto f : *ffs ) {
+							e += (*w) * (*f)(y, yd, x, i-d+1, i);
+							w++;
+						}
+					}
+
+					v *= exp(e);
+				}
+			}
+
+		} else if( i == 0 ) {
+			v = 0.0;
+
+		} else if( i < 0 ) {
+			// nothong to do
+		}
+
+		if( -1 < i ) {
+			// auto& tp = ctab->at(ind);
+			// std::get<0>(tp) = true;
+			// std::get<1>(tp) = maxV;
+			// std::get<2>(tp) = maxd;
+		}
+
+		return v;
 	}
 
 	void Inferer::compute() {
