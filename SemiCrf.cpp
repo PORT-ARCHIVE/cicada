@@ -239,13 +239,38 @@ namespace SemiCrf {
 			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
 				for( auto yd : *labels ) {
 
+					double e0 = 0.0;
 					FeatureFunction_& gk = *(ffs->at(k));
-					v += eta(i-d, yd, k) + alpha(i-d, yd) * gk(y, yd, current_data, i-d+1, i);
+					e0 += eta(i-d, yd, k) + alpha(i-d, yd) * gk(y, yd, current_data, i-d+1, i);
+
+					double e1 = 0.0;
+					auto w = weights->begin();
+					for( auto f : *ffs ) {
+						e1 += (*w) * (*f)(y, yd, current_data, i-d+1, i);
+						w++;
+					}
+
+					v += e0*exp(e1);
 				}
 			}
 
 		} else if( i == 1 ) {
-			// T.B.D.
+
+			for( auto yd : *labels ) {
+
+				double e0 = 0.0;
+				FeatureFunction_& gk = *(ffs->at(k));
+				e0 += gk(y, yd, current_data, 1, 1);
+
+				double e1 = 0.0;
+				auto w = weights->begin();
+				for( auto f : *ffs ) {
+					e1 += (*w) * (*f)(y, yd, current_data, 1, 1);
+					w++;
+				}
+
+				v += e0*exp(e1);
+			}
 
 		} else if( i < 1 ) {
 			// nothong to do
