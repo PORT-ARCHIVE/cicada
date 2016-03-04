@@ -48,22 +48,7 @@ namespace SemiCrf {
 
 	void Datas_::read() {
 		std::cout << "Datas_::read()" << std::endl;
-
 		// T.B.D.
-
-		Data data0(new Data_());
-		data0->getStrs()->push_back("AAA");
-		data0->getStrs()->push_back("BBB");
-		data0->getStrs()->push_back("CCC");
-		data0->getStrs()->push_back("DDD");
-		push_back(data0);
-
-		Data data1(new Data_());
-		data1->getStrs()->push_back("AAA");
-		data1->getStrs()->push_back("BBB");
-		data1->getStrs()->push_back("CCC");
-		data1->getStrs()->push_back("DDD");
-		push_back(data1);
 	}
 
 	void Datas_::write() const {
@@ -100,6 +85,8 @@ namespace SemiCrf {
 
 	void Learner::compute() {
 		std::cout << "Learner::compute()" << std::endl;
+		std::cout << "weights->size()=" << weights->size() << std::endl;
+		std::cout << "ffs->size()=" << ffs->size() << std::endl;
 		assert( weights->size() == ffs->size() );
 
 		std::vector<double> dw;
@@ -121,7 +108,7 @@ namespace SemiCrf {
 
 				// iterate segments
 				auto sj = segments->begin();
-				auto si = segments->begin()++;
+				auto si = segments->begin(); si++;
 				for( ; si != segments->end(); si++, sj++ ){
 
 					auto y = (*si)->getLabel();
@@ -136,20 +123,20 @@ namespace SemiCrf {
 
 			int s = current_data->getStrs()->size();
 			int capacity = l*s;
-			current_vctab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
+			current_actab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
 			current_ectab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
 
 			double Z = 0.0;
 			for( auto y : *labels ) {
 
-				Z += alpha(size, y);
+				Z += alpha(size-1, y);
 			}
 
 			double gm = 0.0;
 			for( int k = 0; k < ffs->size(); k++ ) {
 				for( auto y : *labels ) {
 
-					gm += eta(size, y, k);
+					gm += eta(size-1, y, k);
 				}
 
 				gms.push_back(gm/Z);
@@ -180,16 +167,16 @@ namespace SemiCrf {
 			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
 				for( auto yd : *labels ) {
 
-					v = alpha(i-d, yd);
+					double e0 = alpha(i-d, yd);
 
-					double e;
+					double e1 = 0.0;
 					auto w = weights->begin();
 					for( auto f : *ffs ) {
-						e += (*w) * (*f)(y, yd, current_data, i-d+1, i);
+						e1 += (*w) * (*f)(y, yd, current_data, i-d+1, i);
 						w++;
 					}
 
-					v *= exp(e);
+					v += e0*exp(e1);
 				}
 			}
 
@@ -204,7 +191,7 @@ namespace SemiCrf {
 					w++;
 				}
 
-				v = exp(e);
+				v += exp(e);
 			}
 
 		} else if( i < 1 ) {
@@ -344,7 +331,6 @@ namespace SemiCrf {
 		
 		if( 0 < i ) {
 
-			//for( int d = 1; d <= maxLength; d++ ) {
 			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
 				for( auto yd : *labels ) {
 
@@ -352,6 +338,8 @@ namespace SemiCrf {
 					double v = V(i-d, yd, tmp);
 
 					auto w = weights->begin();
+					std::cout << "weights->size()=" << weights->size() << std::endl;
+					std::cout << "ffs->size()=" << ffs->size() << std::endl;
 					assert( weights->size() == ffs->size() );
 					for( auto f : *ffs ) {
 						v += (*w) * (*f)(y, yd, current_data, i-d+1, i);
