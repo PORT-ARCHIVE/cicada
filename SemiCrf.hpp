@@ -163,6 +163,9 @@ namespace SemiCrf {
 		virtual void compute();
 
 	private:
+		void computeG(std::vector<double>& Gs);
+		void computeZ(double& Z);
+		void computeGm(std::vector<double>& Gms, double Z);
 		double alpha(int i, AppReqs::Label y);
 		double eta(int i, AppReqs::Label y, int k);
 	};
