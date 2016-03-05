@@ -97,7 +97,7 @@ namespace SemiCrf {
 	public:
 		FeatureFunction_() { std::cout << "FeatureFunction_()" << std::endl; }
 		virtual ~FeatureFunction_() { std::cout << "~FeatureFunction_()" << std::endl; }
-		virtual double operator() (Segment s0, Segment s1, Strs strs) = 0;
+		//virtual double operator() (Segment s0, Segment s1, Strs strs) = 0;
 		virtual double operator() (AppReqs::Label y, AppReqs::Label yd, Data x, int j, int i) = 0;
 		virtual void read() = 0;
 		virtual void write() = 0;
@@ -163,9 +163,9 @@ namespace SemiCrf {
 		virtual void compute();
 
 	private:
-		void computeG(std::vector<double>& Gs);
-		void computeZ(double& Z);
-		void computeGm(std::vector<double>& Gms, double Z);
+		std::vector<double>&& computeG();
+		double computeZ();
+		std::vector<double>&& computeGm(double Z);
 		double alpha(int i, AppReqs::Label y);
 		double eta(int i, AppReqs::Label y, int k);
 	};

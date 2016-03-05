@@ -53,6 +53,7 @@ void buildTmpInferenceDatas(SemiCrf::Datas datas)
 
 int main(int argc, char *argv[])
 {
+	std::cout << "##### Start Semi-CRF ####" << std::endl;
 	int maxLength = 5;
 	SemiCrf::Weights weights( new SemiCrf::Weights_() );
 	SemiCrf::FeatureFunctions ffs( new SemiCrf::FeatureFunctions_() );

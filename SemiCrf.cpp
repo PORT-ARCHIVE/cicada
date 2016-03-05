@@ -81,7 +81,9 @@ namespace SemiCrf {
 		for( auto f : *this ) {
 			f->write();
 		}		
-	}	
+	}
+
+	//// Learner ////
 
 	void Learner::compute() {
 
@@ -94,20 +96,14 @@ namespace SemiCrf {
 		for( auto data : *datas ) {
 
 			current_data = data;
-
-			std::vector<double> Gs;
-			computeG(Gs);
-
 			int s = current_data->getStrs()->size();
 			int capacity = l*s;
 			current_actab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
 			current_ectab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
 
-			double Z;
-			computeZ(Z);
-
-			std::vector<double> Gms;
-			computeGm(Gms, Z);
+			std::vector<double>&& Gs = computeG();
+			double Z = computeZ();
+			std::vector<double>&& Gms = computeGm(Z);
 
 			for( int k = 0; k < ffs->size(); k++ ) {
 				(*pdW) += Gs[k] - Gms[k];
@@ -117,8 +113,9 @@ namespace SemiCrf {
 		}
 	}
 
-	void Learner::computeG(std::vector<double>& Gs) {
+	std::vector<double>&& Learner::computeG() {
 
+		std::vector<double> Gs;
 		Segments segments = current_data->getSegments();
 
 		for(auto g : *ffs) {
@@ -138,20 +135,25 @@ namespace SemiCrf {
 
 			Gs.push_back(G);
 		}
+
+		return(std::move(Gs));
 	}
 
-	void Learner::computeZ(double& Z) {
+	double Learner::computeZ() {
 
-		Z = 0;
+		double Z = 0;
 		int size = current_data->getStrs()->size();
 
 		for( auto y : *labels ) {
 			Z += alpha(size-1, y);
 		}
+
+		return Z;
 	}
 
-	void Learner::computeGm(std::vector<double>& Gms, double Z) {
+	std::vector<double>&& Learner::computeGm(double Z) {
 
+		std::vector<double> Gms;
 		int size = current_data->getStrs()->size();
 		double Gm = 0.0;
 
@@ -162,6 +164,8 @@ namespace SemiCrf {
 
 			Gms.push_back(Gm/Z);
 		}
+
+		return(std::move(Gms));
 	}
 
 	double Learner::alpha(int i, AppReqs::Label y) {
@@ -294,6 +298,8 @@ namespace SemiCrf {
 
 		return v;
 	}
+
+	//// Inferer ////
 
 	void Inferer::compute() {
 
