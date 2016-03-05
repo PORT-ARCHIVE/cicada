@@ -32,7 +32,7 @@ namespace SemiCrf {
 		std::cout << "InferenceData::write()" << std::endl;
 
 		// iterate segments
-		for(auto i : *segs){
+		for( auto i : *segs ){
 			int start = i->getStart();
 			int end = i->getEnd();
 			AppReqs::Label l = i->getLabel();
@@ -40,7 +40,7 @@ namespace SemiCrf {
 		}
 
 		// iterate strings
-		for(auto i : *strs){
+		for( auto i : *strs ){
 			std::string& s = i;
 			// T.B.D.
 		}
@@ -101,8 +101,8 @@ namespace SemiCrf {
 			current_actab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
 			current_ectab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
 
-			std::vector<double>&& Gs = computeG();
 			double Z = computeZ();
+			std::vector<double>&& Gs = computeG();
 			std::vector<double>&& Gms = computeGm(Z);
 
 			for( int k = 0; k < ffs->size(); k++ ) {
@@ -118,7 +118,7 @@ namespace SemiCrf {
 		std::vector<double> Gs;
 		Segments segments = current_data->getSegments();
 
-		for(auto g : *ffs) {
+		for( auto g : *ffs ) {
 
 			double G = 0.0;
 			auto sj = segments->begin();
@@ -173,11 +173,9 @@ namespace SemiCrf {
 		std::cout << "i=" << i << ", y=" << int(y) << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
-		if( -1 < i ) {
-			auto& tp = current_actab->at(idx);
-			if( std::get<0>(tp) ) {
-				return std::get<1>(tp);
-			}
+		auto& tp = current_actab->at(idx);
+		if( std::get<0>(tp) ) {
+			return std::get<1>(tp);
 		}
 
 		double v = 0;
@@ -192,7 +190,6 @@ namespace SemiCrf {
 					auto w = weights->begin();
 
 					for( auto g : *ffs ) {
-
 						e1 += (*w) * (*g)(y, yd, current_data, i-d+1, i);
 						w++;
 					}
@@ -209,7 +206,6 @@ namespace SemiCrf {
 				auto w = weights->begin();
 
 				for( auto g : *ffs ) {
-
 					e += (*w) * (*g)(y, yd, current_data, 1, 1);
 					w++;
 				}
@@ -217,15 +213,12 @@ namespace SemiCrf {
 				v += exp(e);
 			}
 
-		} else if( i < 1 ) {
-			// nothong to do
+		} else {
+			assert( 0 <= i );
 		}
 
-		if( -1 < i ) {
-			auto& tp = current_actab->at(idx);
-			std::get<0>(tp) = true;
-			std::get<1>(tp) = v;
-		}
+		std::get<0>(tp) = true;
+		std::get<1>(tp) = v;
 
 		return v;
 	}
@@ -235,11 +228,9 @@ namespace SemiCrf {
 		std::cout << "i=" << i << ", y=" << int(y) << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
-		if( -1 < i ) {
-			auto& tp = current_ectab->at(idx);
-			if( std::get<0>(tp) ) {
-				return std::get<1>(tp);
-			}
+		auto& tp = current_ectab->at(idx);
+		if( std::get<0>(tp) ) {
+			return std::get<1>(tp);
 		}
 
 		double v = 0;
@@ -257,7 +248,6 @@ namespace SemiCrf {
 					auto w = weights->begin();
 
 					for( auto f : *ffs ) {
-
 						e1 += (*w) * (*f)(y, yd, current_data, i-d+1, i);
 						w++;
 					}
@@ -278,7 +268,6 @@ namespace SemiCrf {
 				auto w = weights->begin();
 
 				for( auto g : *ffs ) {
-
 					e1 += (*w) * (*g)(y, yd, current_data, 1, 1);
 					w++;
 				}
@@ -286,15 +275,12 @@ namespace SemiCrf {
 				v += e0*exp(e1);
 			}
 
-		} else if( i < 1 ) {
-			// nothong to do
+		} else {
+			assert( 0 <= i );
 		}
 
-		if( -1 < i ) {
-			auto& tp = current_ectab->at(idx);
-			std::get<0>(tp) = true;
-			std::get<1>(tp) = v;
-		}
+		std::get<0>(tp) = true;
+		std::get<1>(tp) = v;
 
 		return v;
 	}
@@ -348,12 +334,10 @@ namespace SemiCrf {
 		std::cout << "i=" << i << ", y=" << int(y) << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
-		if( -1 < i ) {
-			auto& tp = current_vctab->at(idx);
-			if( std::get<0>(tp) ) {
-				maxd = std::get<2>(tp);
-				return std::get<1>(tp);
-			}
+		auto& tp = current_vctab->at(idx);
+		if( std::get<0>(tp) ) {
+			maxd = std::get<2>(tp);
+			return std::get<1>(tp);
 		}
 
 		maxd = -1;
@@ -370,7 +354,6 @@ namespace SemiCrf {
 
 					auto w = weights->begin();
 					for( auto g : *ffs ) {
-
 						v += (*w) * (*g)(y, yd, current_data, i-d+1, i);
 						w++;
 					}
@@ -390,16 +373,13 @@ namespace SemiCrf {
 		} else if( i == 0 ) {
 			maxV = 0.0;
 
-		} else if( i < 0 ) {
-			// nothong to do
+		} else {
+			assert( 0 <= i );
 		}
 
-		if( -1 < i ) {
-			auto& tp = current_vctab->at(idx);
-			std::get<0>(tp) = true;
-			std::get<1>(tp) = maxV;
-			std::get<2>(tp) = maxd;
-		}
+		std::get<0>(tp) = true;
+		std::get<1>(tp) = maxV;
+		std::get<2>(tp) = maxd;
 
 		return maxV;
 	}
