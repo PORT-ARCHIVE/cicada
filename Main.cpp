@@ -55,9 +55,9 @@ int main(int argc, char *argv[])
 {
 	std::cout << "##### Start Semi-CRF ####" << std::endl;
 	int maxLength = 5;
-	SemiCrf::Weights weights( new SemiCrf::Weights_() );
-	SemiCrf::FeatureFunctions ffs( new SemiCrf::FeatureFunctions_() );
-	SemiCrf::Labels labels( new SemiCrf::Labels_() );
+	SemiCrf::Weights weights = SemiCrf::createWeights();
+	SemiCrf::FeatureFunctions ffs = SemiCrf::createFeatureFunctions();
+	SemiCrf::Labels labels = SemiCrf::createLabels();
 
 	try { // 素性関数,Labelを準備する
 
@@ -83,10 +83,10 @@ int main(int argc, char *argv[])
 		ffs->read();
 		weights->read();
 
-		SemiCrf::Datas trainingDatas(new SemiCrf::Datas_());
+		SemiCrf::Datas trainingDatas = SemiCrf::createDatas();
 		trainingDatas->read();
 	
-		SemiCrf::Algorithm learner(new SemiCrf::Learner());
+		SemiCrf::Algorithm learner = SemiCrf::createLearner();
 		learner->setLabels(labels);
 		learner->setMaxLength(maxLength);
 
@@ -110,10 +110,10 @@ int main(int argc, char *argv[])
 		ffs->read();
 		//weights->read();
 
-		SemiCrf::Datas inferenceDatas(new SemiCrf::Datas_());
+		SemiCrf::Datas inferenceDatas = SemiCrf::createDatas();
 		inferenceDatas->read();
 
-		SemiCrf::Algorithm inferer(new SemiCrf::Inferer());
+		SemiCrf::Algorithm inferer = SemiCrf::createInferer();
 		inferer->setLabels(labels);
 		inferer->setMaxLength(maxLength);
 

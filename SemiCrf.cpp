@@ -7,6 +7,14 @@
 
 namespace SemiCrf {
 
+	// ctr
+	Weights createWeights() { return Weights( new Weights_() ); }
+	Labels	createLabels() { return Labels( new Labels_() ); }
+	FeatureFunctions createFeatureFunctions() { return FeatureFunctions( new FeatureFunctions_() ); }
+	Segment createSegment(int start, int end, AppReqs::Label label) { return Segment( new Segment_(start, end, label) ); }
+	Segments createSegments() { return Segments( new Segments_() ); }
+	CheckTable createCheckTable(int capacity) { return CheckTable( new CheckTable_(capacity, CheckTuple()) ); }
+
 	void Data_::read() {
 		std::cout << "TrainingData::read()" << std::endl;
 
@@ -58,6 +66,8 @@ namespace SemiCrf {
 		}
 	}
 
+	Datas createDatas() { return Datas( new Datas_() ); }
+
 	void Weights_::read() {
 		std::cout << "Weights_::read()" << std::endl;
 		push_back(1.0);
@@ -100,6 +110,8 @@ namespace SemiCrf {
 
 	//// Learner ////
 
+	Algorithm createLearner() { return std::shared_ptr<Learner>(new Learner()); }
+
 	void Learner::compute() {
 
 		std::cout << "Learner::compute()" << std::endl;
@@ -113,8 +125,8 @@ namespace SemiCrf {
 			current_data = data;
 			int s = current_data->getStrs()->size();
 			int capacity = l*s;
-			current_actab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
-			current_ectab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
+			current_actab = createCheckTable(capacity);
+			current_ectab = createCheckTable(capacity);
 
 			double Z = computeZ();
 			auto&& Gs = computeG();
@@ -270,6 +282,8 @@ namespace SemiCrf {
 
 	//// Inferer ////
 
+	Algorithm createInferer() { return std::shared_ptr<Inferer>(new Inferer()); }
+
 	void Inferer::compute() {
 
 		std::cout << "Inferer::compute()" << std::endl;
@@ -283,18 +297,17 @@ namespace SemiCrf {
 			int s = current_data->getStrs()->size();
 			int capacity = l*s;
 
-			current_vctab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
+			current_vctab = createCheckTable(capacity);
 
 			int maxd = - 1;
 			AppReqs::Label maxy;
-			Segments maxsegs( new Segments_() );
+			Segments maxsegs = createSegments();
 			double maxV = std::numeric_limits<double>::min();
 
 			for( auto y : *labels ) {
 
 				int d = -1;
-				Segments current_segs( new Segments_() );
-				segs = current_segs;
+				Segments segs = createSegments();
 				double v = V(s-1, y, d);
 
 				if( maxV < v ) {
@@ -306,7 +319,7 @@ namespace SemiCrf {
 			}
 
 			assert( 0 < maxd );
-			Segment seg(new Segment_(s-maxd, s-1, maxy));
+			Segment seg = createSegment(s-maxd, s-1, maxy);
 			maxsegs->push_back(seg);
 			current_data->setSegments(maxsegs);
 		}
@@ -345,7 +358,7 @@ namespace SemiCrf {
 			}
 
 			assert( 0 < maxd );
-			Segment seg(new Segment_(i-maxd+1, i, maxyd));
+			Segment seg = createSegment(i-maxd+1, i, maxyd);
 			segs->push_back(seg);
 
 		} else if( i == 0 ) {

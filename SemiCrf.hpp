@@ -17,7 +17,8 @@ namespace SemiCrf {
 
 	// ラベル集合
 	class Labels_ : public std::vector<AppReqs::Label> {};
-	typedef std::shared_ptr<Labels_> Labels;	
+	typedef std::shared_ptr<Labels_> Labels;
+	Labels	createLabels();
 
 	// セグメント 
 	class Segment_ {
@@ -41,15 +42,15 @@ namespace SemiCrf {
 	};
 
 	typedef std::shared_ptr<Segment_> Segment;
+	Segment createSegment(int start, int end, AppReqs::Label label);
 
 	// セグメント集合
 	class Segments_ : public std::vector<Segment> {};
-
 	typedef std::shared_ptr<Segments_> Segments;
+	Segments createSegments();
 
 	// 文字列集合
 	class Strs_ : public std::vector<std::string> {};
-
 	typedef std::shared_ptr<Strs_> Strs;
 
 	// データ
@@ -80,6 +81,7 @@ namespace SemiCrf {
 	};
 
 	typedef std::shared_ptr<Datas_> Datas;
+	Datas createDatas();
 
 	// 重みベクトル
 	class Weights_ : public std::vector<double> {
@@ -90,14 +92,14 @@ namespace SemiCrf {
 		void write();		
 	};
 
-	typedef std::shared_ptr<Weights_> Weights;	
+	typedef std::shared_ptr<Weights_> Weights;
+	Weights createWeights();
 
 	// 素性関数
 	class FeatureFunction_ {
 	public:
 		FeatureFunction_() { std::cout << "FeatureFunction_()" << std::endl; }
 		virtual ~FeatureFunction_() { std::cout << "~FeatureFunction_()" << std::endl; }
-		//virtual double operator() (Segment s0, Segment s1, Strs strs) = 0;
 		virtual double operator() (AppReqs::Label y, AppReqs::Label yd, Data x, int j, int i) = 0;
 		virtual void read() = 0;
 		virtual void write() = 0;
@@ -115,13 +117,13 @@ namespace SemiCrf {
 	};
 
 	typedef std::shared_ptr<FeatureFunctions_> FeatureFunctions;
-
+	FeatureFunctions createFeatureFunctions();
 
 	// チェックテーブル
 	typedef std::tuple<bool,double,int> CheckTuple;
 	typedef std::vector<CheckTuple> CheckTable_;
 	typedef std::shared_ptr<CheckTable_> CheckTable;
-
+	CheckTable createCheckTable(int capacity);
 
 	// 抽象アルゴリズム
 	class Algorithm_ {
@@ -165,12 +167,14 @@ namespace SemiCrf {
 		virtual void compute();
 
 	private:
-		std::vector<double>&& computeG();
 		double computeZ();
+		std::vector<double>&& computeG();
 		std::vector<double>&& computeGm(double Z);
 		double alpha(int i, AppReqs::Label y);
 		double eta(int i, AppReqs::Label y, int k);
 	};
+
+	Algorithm createLearner();
 
 	// 推論器
 	class Inferer : public Algorithm_ {
@@ -182,6 +186,8 @@ namespace SemiCrf {
 	private:
 		double V(int i, AppReqs::Label y, int& maxd);
 	};
+
+	Algorithm createInferer();
 }
 
 #endif // SEMI_CRF__H
