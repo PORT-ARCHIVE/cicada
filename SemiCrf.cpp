@@ -83,6 +83,21 @@ namespace SemiCrf {
 		}		
 	}
 
+	//// Algorithm ////
+
+	double Algorithm_::computeWG(AppReqs::Label y, AppReqs::Label yd, int i, int d)
+	{
+		double v = 0.0;
+		auto w = weights->begin();
+
+		for( auto g : *ffs ) {
+			v += (*w) * (*g)(y, yd, current_data, i-d+1, i);
+			w++;
+		}
+
+		return v;
+	}
+
 	//// Learner ////
 
 	void Learner::compute() {
@@ -102,8 +117,8 @@ namespace SemiCrf {
 			current_ectab = CheckTable( new CheckTable_(capacity, CheckTuple()) );
 
 			double Z = computeZ();
-			std::vector<double>&& Gs = computeG();
-			std::vector<double>&& Gms = computeGm(Z);
+			auto&& Gs = computeG();
+			auto&& Gms = computeGm(Z);
 
 			for( int k = 0; k < ffs->size(); k++ ) {
 				(*pdW) += Gs[k] - Gms[k];
@@ -116,7 +131,7 @@ namespace SemiCrf {
 	std::vector<double>&& Learner::computeG() {
 
 		std::vector<double> Gs;
-		Segments segments = current_data->getSegments();
+		auto segments = current_data->getSegments();
 
 		for( auto g : *ffs ) {
 
@@ -186,14 +201,7 @@ namespace SemiCrf {
 				for( auto yd : *labels ) {
 
 					double e0 = alpha(i-d, yd);
-					double e1 = 0.0;
-					auto w = weights->begin();
-
-					for( auto g : *ffs ) {
-						e1 += (*w) * (*g)(y, yd, current_data, i-d+1, i);
-						w++;
-					}
-
+					double e1 = computeWG(y, yd, i, d);
 					v += e0*exp(e1);
 				}
 			}
@@ -202,15 +210,8 @@ namespace SemiCrf {
 
 			for( auto yd : *labels ) {
 
-				double e;
-				auto w = weights->begin();
-
-				for( auto g : *ffs ) {
-					e += (*w) * (*g)(y, yd, current_data, 1, 1);
-					w++;
-				}
-
-				v += exp(e);
+				double e = computeWG(y, yd, 1, 1);
+				v = exp(e);
 			}
 
 		} else {
@@ -240,18 +241,9 @@ namespace SemiCrf {
 			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
 				for( auto yd : *labels ) {
 
-					double e0 = 0.0;
 					FeatureFunction_& gk = *(ffs->at(k));
-					e0 += eta(i-d, yd, k) + alpha(i-d, yd) * gk(y, yd, current_data, i-d+1, i);
-
-					double e1 = 0.0;
-					auto w = weights->begin();
-
-					for( auto f : *ffs ) {
-						e1 += (*w) * (*f)(y, yd, current_data, i-d+1, i);
-						w++;
-					}
-
+					double e0 = eta(i-d, yd, k) + alpha(i-d, yd) * gk(y, yd, current_data, i-d+1, i);
+					double e1 = computeWG(y, yd, i, d);
 					v += e0*exp(e1);
 				}
 			}
@@ -260,19 +252,10 @@ namespace SemiCrf {
 
 			for( auto yd : *labels ) {
 
-				double e0 = 0.0;
 				FeatureFunction_& gk = *(ffs->at(k));
-				e0 += gk(y, yd, current_data, 1, 1);
-
-				double e1 = 0.0;
-				auto w = weights->begin();
-
-				for( auto g : *ffs ) {
-					e1 += (*w) * (*g)(y, yd, current_data, 1, 1);
-					w++;
-				}
-
-				v += e0*exp(e1);
+				double e0 = gk(y, yd, current_data, 1, 1);
+				double e1 = computeWG(y, yd, 1, 1);
+				v = e0*exp(e1);
 			}
 
 		} else {
@@ -351,12 +334,7 @@ namespace SemiCrf {
 
 					int tmp = -1;
 					double v = V(i-d, yd, tmp);
-
-					auto w = weights->begin();
-					for( auto g : *ffs ) {
-						v += (*w) * (*g)(y, yd, current_data, i-d+1, i);
-						w++;
-					}
+					v += computeWG(y, yd, i, d);
 					
 					if( maxV < v ) {
 						maxV = v;						

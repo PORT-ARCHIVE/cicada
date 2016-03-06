@@ -141,6 +141,8 @@ namespace SemiCrf {
 		virtual void compute() = 0;
 
 	protected:
+		double computeWG(AppReqs::Label y, AppReqs::Label yd, int i, int d);
+
 		Labels labels;
 		FeatureFunctions ffs;
 		Weights weights;
