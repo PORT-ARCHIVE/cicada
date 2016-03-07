@@ -55,7 +55,7 @@ namespace SemiCrf {
 		}
 	}
 
-	std::string&& nfind(const std::string& str0, const std::string& str1, int n) {
+	std::string  nfind(const std::string& str0, const std::string& str1, int n) {
 
 		int match = 0;
 		size_t pos0 = 0;
@@ -67,34 +67,30 @@ namespace SemiCrf {
 
 		size_t pos1 = str0.find(str1, pos0);
 		std::string m1 = str0.substr(pos0, pos1-pos0);
-		return std::move(m1);
+		return m1;
 	}
 
-	void Datas_::read() {
+	void Datas_::read(const char* input) {
 		std::cout << "Datas_::read()" << std::endl;
 
 		setlocale(LC_CTYPE, "ja_JP.UTF-8");
-		const char input[] = u8"これが機械学習エンジニアの募集要項です。";
 		Data data( new Data_() );
 		std::string delimita(",");
-		typedef std::shared_ptr<MeCab::Tagger> MeCabTagger;
-		MeCabTagger tagger = std::shared_ptr<MeCab::Tagger>(MeCab::createTagger(""));
+		typedef std::shared_ptr<MeCab::Tagger> Tagger;
+		Tagger tagger = std::shared_ptr<MeCab::Tagger>(MeCab::createTagger(""));
 		const MeCab::Node* node = tagger->parseToNode(input);
 
 		for( ; node ; node = node->next ) {
 
 			std::string cppstr = node->feature;
-
-			if( cppstr == "\n" ) {
-				this->push_back(data);
-				data = Data( new Data_() );
-			}
-
-			std::cout << cppstr << std::endl;
-			std::string&& m = nfind(cppstr, delimita, 6);
-			std::cout << m << std::endl;
-			data->getStrs()->push_back(m);
+			// std::cout << cppstr << std::endl;
+			// std::string m = nfind(cppstr, delimita, 6);
+			// std::cout << m << std::endl;
+			// data->getStrs()->push_back(m);
+			data->getStrs()->push_back(cppstr);
 		}
+
+		push_back(data);
 	}
 
 	void Datas_::write() const {

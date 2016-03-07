@@ -76,7 +76,7 @@ namespace SemiCrf {
 	public:
 		Datas_() {};
 		virtual ~Datas_() {};
-		virtual void read();
+		virtual void read(const char* input);
 		virtual void write() const;
 	};
 
