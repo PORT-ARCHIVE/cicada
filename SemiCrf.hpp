@@ -56,9 +56,8 @@ namespace SemiCrf {
 	// データ
 	class Data_ {
 	public:
-		Data_() : strs( new Strs_() ), segs( new Segments_() )
-			{ std::cout << "Data_()" << std::endl; }
-		virtual ~Data_() { std::cout << "~Data_()" << std::endl; }
+		Data_();
+		virtual ~Data_();
 		virtual void read();
 		virtual void write() const;
 		Strs getStrs() { return strs; }
@@ -74,8 +73,8 @@ namespace SemiCrf {
 	// データ集合
 	class Datas_ : public std::vector<Data> {
 	public:
-		Datas_() {};
-		virtual ~Datas_() {};
+		Datas_();
+		virtual ~Datas_();
 		virtual void read(const char* input);
 		virtual void write() const;
 	};
@@ -83,6 +82,28 @@ namespace SemiCrf {
 	typedef std::shared_ptr<Datas_> Datas;
 	Datas createDatas();
 
+	// 教師データ集合
+	class TrainingDatas_ : public Datas_ {
+	public:
+		TrainingDatas_();
+		virtual ~TrainingDatas_();
+		virtual void read(const char* input);
+		//virtual void write() const;
+	};
+
+	Datas createTrainingDatas();
+
+	// 推論データ集合
+	class InferenceDatas_ : public Datas_ {
+	public:
+		InferenceDatas_();
+		virtual ~InferenceDatas_();
+		virtual void read(const char* input);
+		//virtual void write() const;
+	};
+
+	Datas createInferenceDatas();
+  
 	// 重みベクトル
 	class Weights_ : public std::vector<double> {
 	public:
@@ -128,18 +149,13 @@ namespace SemiCrf {
 	// 抽象アルゴリズム
 	class Algorithm_ {
 	public:
-		Algorithm_() :
-			labels( new Labels_() ),
-			ffs( new FeatureFunctions_() ),
-			weights( new Weights_() ),
-			datas( new Datas_() )
-			{ std::cout << "Algorithm_()" << std::endl; }
-		virtual ~Algorithm_() { std::cout << "~Algorithm_()" << std::endl; }
-		virtual void setLabels(Labels arg) { labels = arg; }
-		virtual void setMaxLength(int arg) { maxLength = arg; }
-		virtual void setDatas(Datas arg) { datas = arg; }
-		virtual void setFeatureFunctions(FeatureFunctions arg) { ffs = arg; }
-		virtual void setWeights(Weights arg) { weights = arg; }		
+		Algorithm_();
+		virtual ~Algorithm_();
+		virtual void setLabels(Labels arg);
+		virtual void setMaxLength(int arg);
+		virtual void setDatas(Datas arg);
+		virtual void setFeatureFunctions(FeatureFunctions arg);
+		virtual void setWeights(Weights arg);
 		virtual void compute() = 0;
 
 	protected:

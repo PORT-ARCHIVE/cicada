@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 		ffs->read();
 		weights->read();
 
-		SemiCrf::Datas trainingDatas = SemiCrf::createDatas();
+		SemiCrf::Datas trainingDatas = SemiCrf::createTrainingDatas();
 		trainingDatas->read("これが機械学習エンジニアの募集要項です。");
 	
 		SemiCrf::Algorithm learner = SemiCrf::createLearner();
@@ -93,7 +93,6 @@ int main(int argc, char *argv[])
 		buildTmpTrainingDatas(trainingDatas);
 		learner->setDatas(trainingDatas);
 
-		learner->setDatas(trainingDatas);
 		learner->setFeatureFunctions(ffs);
 		learner->setWeights(weights);
 		learner->compute();
@@ -110,7 +109,7 @@ int main(int argc, char *argv[])
 		ffs->read();
 		//weights->read();
 
-		SemiCrf::Datas inferenceDatas = SemiCrf::createDatas();
+		SemiCrf::Datas inferenceDatas = SemiCrf::createInferenceDatas();
 		inferenceDatas->read("これが機械学習エンジニアの募集要項です。");
 
 		SemiCrf::Algorithm inferer = SemiCrf::createInferer();

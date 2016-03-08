@@ -9,12 +9,22 @@
 namespace SemiCrf {
 
 	// ctr
-	Weights createWeights() { return Weights( new Weights_() ); }
 	Labels	createLabels() { return Labels( new Labels_() ); }
-	FeatureFunctions createFeatureFunctions() { return FeatureFunctions( new FeatureFunctions_() ); }
 	Segment createSegment(int start, int end, AppReqs::Label label) { return Segment( new Segment_(start, end, label) ); }
 	Segments createSegments() { return Segments( new Segments_() ); }
 	CheckTable createCheckTable(int capacity) { return CheckTable( new CheckTable_(capacity, CheckTuple()) ); }
+
+	// Data_ ctr
+	Data_::Data_()
+		: strs( new Strs_() )
+		, segs( new Segments_() )
+	{
+		std::cout << "Data_()" << std::endl;
+	}
+
+	Data_::~Data_() {
+		std::cout << "~Data_()" << std::endl;
+	}
 
 	void Data_::read() {
 		std::cout << "TrainingData::read()" << std::endl;
@@ -27,14 +37,14 @@ namespace SemiCrf {
 		strs->push_back("DDD");
 
 		// add feature functions
-		// T.B.D.		
+		// T.B.D.
 		Segment s0(new Segment_( 0, 1, AppReqs::Label::Campany ));
 		segs->push_back(s0);
 
 		// add feature functions
-		// T.B.D.				
+		// T.B.D.
 		Segment s1(new Segment_( 2, 3, AppReqs::Label::Location ));
-		segs->push_back(s1);		
+		segs->push_back(s1);
 	}
 
 	void Data_::write() const {
@@ -45,7 +55,7 @@ namespace SemiCrf {
 			int start = i->getStart();
 			int end = i->getEnd();
 			AppReqs::Label l = i->getLabel();
-			// T.B.D.			
+			// T.B.D.
 		}
 
 		// iterate strings
@@ -55,7 +65,23 @@ namespace SemiCrf {
 		}
 	}
 
-	std::string  nfind(const std::string& str0, const std::string& str1, int n) {
+	// Datas ctr
+	Datas_::Datas_()
+	{
+		std::cout << "Datas_()" << std::endl;
+	};
+
+	Datas_::~Datas_()
+	{
+		std::cout << "~Datas_()" << std::endl;
+	};
+
+	Datas createDatas() {
+		return Datas( new Datas_() );
+	}
+
+	// str0をstr1をデリミタとして区切りn番目の区間を返す
+	std::string nfind(const std::string& str0, const std::string& str1, int n) {
 
 		int match = 0;
 		size_t pos0 = 0;
@@ -100,7 +126,86 @@ namespace SemiCrf {
 		}
 	}
 
-	Datas createDatas() { return Datas( new Datas_() ); }
+	// TrainingDatas ctr
+	TrainingDatas_::TrainingDatas_()
+	{
+		std::cout << "TrainingDatas_()" << std::endl;
+	}
+
+	TrainingDatas_::~TrainingDatas_()
+	{
+		std::cout << "~TrainingDatas_()" << std::endl;
+	}
+
+	Datas createTrainingDatas()
+	{
+		return Datas( new TrainingDatas_() );
+	}
+
+	void TrainingDatas_::read(const char* input) {
+		std::cout << "Datas_::read()" << std::endl;
+
+		setlocale(LC_CTYPE, "ja_JP.UTF-8");
+		Data data( new Data_() );
+		std::string delimita(",");
+		typedef std::shared_ptr<MeCab::Tagger> Tagger;
+		Tagger tagger = std::shared_ptr<MeCab::Tagger>(MeCab::createTagger(""));
+		const MeCab::Node* node = tagger->parseToNode(input);
+
+		for( ; node ; node = node->next ) {
+
+			std::string cppstr = node->feature;
+			// std::cout << cppstr << std::endl;
+			// std::string m = nfind(cppstr, delimita, 6);
+			// std::cout << m << std::endl;
+			// data->getStrs()->push_back(m);
+			data->getStrs()->push_back(cppstr);
+		}
+
+		push_back(data);
+	}
+
+	// InferenceDatas ctr
+	InferenceDatas_::InferenceDatas_()
+	{
+		std::cout << "InferenceDatas_()" << std::endl;
+	}
+
+	InferenceDatas_::~InferenceDatas_()
+	{
+		std::cout << "~InferenceDatas_()" << std::endl;
+	}
+
+	Datas createInferenceDatas()
+	{
+		return Datas( new InferenceDatas_() );
+	}
+
+	void InferenceDatas_::read(const char* input) {
+		std::cout << "Datas_::read()" << std::endl;
+
+		setlocale(LC_CTYPE, "ja_JP.UTF-8");
+		Data data( new Data_() );
+		std::string delimita(",");
+		typedef std::shared_ptr<MeCab::Tagger> Tagger;
+		Tagger tagger = std::shared_ptr<MeCab::Tagger>(MeCab::createTagger(""));
+		const MeCab::Node* node = tagger->parseToNode(input);
+
+		for( ; node ; node = node->next ) {
+
+			std::string cppstr = node->feature;
+			// std::cout << cppstr << std::endl;
+			// std::string m = nfind(cppstr, delimita, 6);
+			// std::cout << m << std::endl;
+			// data->getStrs()->push_back(m);
+			data->getStrs()->push_back(cppstr);
+		}
+
+		push_back(data);
+	}
+
+	// Weights ctr
+	Weights createWeights() { return Weights( new Weights_() ); }
 
 	void Weights_::read() {
 		std::cout << "Weights_::read()" << std::endl;
@@ -110,7 +215,10 @@ namespace SemiCrf {
 
 	void Weights_::write() {
 		std::cout << "Weights_::write()" << std::endl;
-	}	
+	}
+
+	// FeatureFunctions ctr
+	FeatureFunctions createFeatureFunctions() { return FeatureFunctions( new FeatureFunctions_() ); }	
 
 	void FeatureFunctions_::read() {
 		// T.B.D.		
@@ -128,6 +236,45 @@ namespace SemiCrf {
 	}
 
 	//// Algorithm ////
+
+	Algorithm_::Algorithm_()
+		: labels( nullptr )
+		, ffs( nullptr )
+		, weights( nullptr )
+		, datas( nullptr )
+	{
+		std::cout << "Algorithm_()" << std::endl;
+	}
+
+	Algorithm_::~Algorithm_()
+	{
+		std::cout << "~Algorithm_()" << std::endl;
+	}
+
+	void Algorithm_::setLabels(Labels arg)
+	{
+		labels = arg;
+	}
+
+	void Algorithm_::setMaxLength(int arg)
+	{
+		maxLength = arg;
+	}
+
+	void Algorithm_::setDatas(Datas arg)
+	{
+		datas = arg;
+	}
+
+	void Algorithm_::setFeatureFunctions(FeatureFunctions arg)
+	{
+		ffs = arg;
+	}
+
+	void Algorithm_::setWeights(Weights arg)
+	{
+		weights = arg;
+	}
 
 	double Algorithm_::computeWG(AppReqs::Label y, AppReqs::Label yd, int i, int d)
 	{
@@ -151,8 +298,8 @@ namespace SemiCrf {
 		std::cout << "Learner::compute()" << std::endl;
 		assert( weights->size() == ffs->size() );
 		int l = labels->size();
-		std::vector<double> dW(datas->size());
-		auto pdW = dW.begin();
+		std::vector<double> dL(datas->size());
+		auto pdL = dL.begin();
 
 		for( auto data : *datas ) {
 
@@ -167,10 +314,10 @@ namespace SemiCrf {
 			auto&& Gms = computeGm(Z);
 
 			for( int k = 0; k < ffs->size(); k++ ) {
-				(*pdW) += Gs[k] - Gms[k];
+				(*pdL) += Gs[k] - Gms[k];
 			}
 
-			pdW++;
+			pdL++;
 		}
 	}
 
@@ -178,6 +325,7 @@ namespace SemiCrf {
 
 		std::vector<double> Gs;
 		auto segments = current_data->getSegments();
+		assert( 0 < segments->size() );
 
 		for( auto g : *ffs ) {
 
