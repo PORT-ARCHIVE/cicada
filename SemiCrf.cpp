@@ -35,10 +35,10 @@ namespace SemiCrf {
 
 		// add strings
 		// T.B.D.
-		strs->push_back("AAA");
-		strs->push_back("BBB");
-		strs->push_back("CCC");
-		strs->push_back("DDD");
+		// strs->push_back("AAA");
+		// strs->push_back("BBB");
+		// strs->push_back("CCC");
+		// strs->push_back("DDD");
 
 		// add feature functions
 		// T.B.D.
@@ -64,7 +64,7 @@ namespace SemiCrf {
 
 		// iterate strings
 		for( auto i : *strs ){
-			std::string& s = i;
+			std::vector<std::string>& s = i;
 			// T.B.D.
 		}
 	}
@@ -117,7 +117,10 @@ namespace SemiCrf {
 			// std::string m = nfind(cppstr, delimita, 6);
 			// std::cout << m << std::endl;
 			// data->getStrs()->push_back(m);
-			data->getStrs()->push_back(cppstr);
+			//data->getStrs()->push_back(cppstr);
+			std::vector<std::string> vs;
+			vs.push_back(cppstr);
+			data->getStrs()->push_back(vs);
 		}
 
 		push_back(data);
@@ -147,18 +150,17 @@ namespace SemiCrf {
 	}
 
     // 文字列を置換する
-	std::string Replace( std::string String1, std::string String2, std::string String3 ){
-		std::string::size_type  Pos( String1.find( String2 ) );
-		while( Pos != std::string::npos ) {
-			String1.replace( Pos, String2.length(), String3 );
-			Pos = String1.find( String2, Pos + String3.length() );
-		}
-		return String1;
-	}
+	// std::string Replace( std::string String1, std::string String2, std::string String3 ){
+	// 	std::string::size_type  Pos( String1.find( String2 ) );
+	// 	while( Pos != std::string::npos ) {
+	// 		String1.replace( Pos, String2.length(), String3 );
+	// 		Pos = String1.find( String2, Pos + String3.length() );
+	// 	}
+	// 	return String1;
+	// }
 
 	class MultiByteIterator {
 	public:
-
 		MultiByteIterator(const std::string& arg);
 		virtual ~MultiByteIterator();
 		char operator * ();
@@ -181,25 +183,30 @@ namespace SemiCrf {
 		setBuf();
 	}
 
-	MultiByteIterator::~MultiByteIterator() {
+	MultiByteIterator::~MultiByteIterator()
+	{
 		std::cout << "~MultiByteIterator()" << std::endl;
 		delete [] buf;
 	}
 
-	char MultiByteIterator::operator * () {
+	char MultiByteIterator::operator * ()
+	{
 		return buf[0];
 	}
 
-	MultiByteIterator::operator const char* () {
+	MultiByteIterator::operator const char* ()
+	{
 		return buf;
 	}
 
-	MultiByteIterator& MultiByteIterator::operator ++() {
+	MultiByteIterator& MultiByteIterator::operator ++()
+	{
 		setBuf();
 		return (*this);
 	}
 
-	void MultiByteIterator::setBuf() {
+	void MultiByteIterator::setBuf()
+	{
 		int i = 0;
 		int s = mblen(p, MB_CUR_MAX);
 		for( i = 0; i < s; i++ ) {
@@ -208,23 +215,16 @@ namespace SemiCrf {
 		buf[i] = '\0';
 	}
 
-	class MultiByteTokenizer {
+	class MultiByteTokenizer
+	{
 	public:
-		// MultiByteTokenizer(MultiByteIterator& arg);
 		MultiByteTokenizer(std::string str);
 		virtual ~MultiByteTokenizer();
 		std::string get();
 
 	private:
-		//MultiByteIterator& itr;
 		MultiByteIterator itr;
 	};
-
-	// MultiByteTokenizer::MultiByteTokenizer(MultiByteIterator& arg)
-	// 	: itr(arg)
-	// {
-	// 	std::cout << "MultiByteTokenizer()" << std::endl;
-	// }
 
 	MultiByteTokenizer::MultiByteTokenizer(std::string str)
 	 	: itr(str)
@@ -237,17 +237,19 @@ namespace SemiCrf {
 		std::cout << "~MultiByteTokenizer()" << std::endl;
 	}
 
-	std::string MultiByteTokenizer::get() {
+	std::string MultiByteTokenizer::get()
+	{
 
-		int cmp = strcmp(itr, " ");
 		while( strcmp(itr, " ") == 0 ||
-			   strcmp(itr, "　") == 0 ) {
+			   strcmp(itr, "　") == 0 ||
+			   strcmp(itr, ",") == 0 ) {
 			++itr;
 		}
 
 		std::string token;
 		while( strcmp(itr, " ") != 0 &&
 			   strcmp(itr, "　") != 0 &&
+			   strcmp(itr, ",") != 0 &&
 			   strcmp(itr, "\0") != 0 ) {
 
 			const char* p = itr;
@@ -262,14 +264,17 @@ namespace SemiCrf {
 		return token;
 	}
 
-	void TrainingDatas_::read(const char* input) {
+	void TrainingDatas_::read(const char* input)
+	{
 		std::cout << "Datas_::read()" << std::endl;
 
 		setlocale(LC_CTYPE, "ja_JP.UTF-8");
 
 		std::ifstream ifs;
-		ifs.open("test_data/test0.txt");
-		// T.B.D.
+		ifs.open("test_data/test0.txt"); // T.B.D.
+		if( ifs.fail() ) {
+			// T.B.D.
+		}
 
 		int counter = -1;
 		int seg_start = -1;
@@ -287,8 +292,10 @@ namespace SemiCrf {
 				if( line == "# BEGIN" ) {
 					data = Data( new Data_() );
 					counter = -1;
+					std::cout << "BEGIN : data was created." << std::endl;
 				} else if( line == "# END" ) {
 					push_back(data);
+					std::cout << "END : data was pushed." << std::endl;
 				}
 				continue;
 			}
@@ -301,7 +308,9 @@ namespace SemiCrf {
 				// T.B.D.
 			} else {
 				std::cout << word << std::endl;
-				data->getStrs()->push_back(word);
+				std::vector<std::string> vs;
+				vs.push_back(word);
+				data->getStrs()->push_back(vs);
 			}
 
 			std::string descriptor = tokenizer.get();
@@ -369,46 +378,84 @@ namespace SemiCrf {
 		return Datas( new InferenceDatas_() );
 	}
 
-	void InferenceDatas_::read(const char* input) {
+	void InferenceDatas_::read(const char* file)
+	{
 		std::cout << "Datas_::read()" << std::endl;
+		typedef std::shared_ptr<MeCab::Tagger> Tagger;
 
 		setlocale(LC_CTYPE, "ja_JP.UTF-8");
-		Data data( new Data_() );
-		std::string delimita(",");
-		typedef std::shared_ptr<MeCab::Tagger> Tagger;
-		Tagger tagger = std::shared_ptr<MeCab::Tagger>(MeCab::createTagger(""));
-		const MeCab::Node* node = tagger->parseToNode(input);
 
-		for( ; node ; node = node->next ) {
-
-			std::string cppstr = node->feature;
-			// std::cout << cppstr << std::endl;
-			// std::string m = nfind(cppstr, delimita, 6);
-			// std::cout << m << std::endl;
-			// data->getStrs()->push_back(m);
-			data->getStrs()->push_back(cppstr);
+		std::ifstream ifs;
+		ifs.open("test_data/test1.txt"); // T.B.D.
+		if( ifs.fail() ) {
+			// T.B.D.
 		}
 
-		push_back(data);
+		Data data;
+		std::string input;
+		std::string line;
+
+		while( std::getline(ifs, line) ) {
+
+			if( line == "" ) {
+				continue;
+			}
+
+			if( line[0] == '#' ) {
+
+				if( line == "# BEGIN" ) {
+					data = Data( new Data_() );
+					std::cout << "BEGIN : data was created." << std::endl;
+
+				} else if( line == "# END" ) {
+
+					Tagger tagger = std::shared_ptr<MeCab::Tagger>(MeCab::createTagger(""));
+					const MeCab::Node* node = tagger->parseToNode(input.c_str());
+
+					for( ; node ; node = node->next ) {
+						std::string cppstr = node->feature;
+						std::vector<std::string> vs;
+						vs.push_back(cppstr); // T.B.D
+						data->getStrs()->push_back(vs);
+					}
+
+					push_back(data);
+					std::cout << "END : data was pushed." << std::endl;
+				}
+
+				continue;
+			}
+
+			input += line;
+		}
 	}
 
 	// Weights ctr
-	Weights createWeights() { return Weights( new Weights_() ); }
+	Weights createWeights()
+	{
+		return Weights( new Weights_() );
+	}
 
-	void Weights_::read() {
+	void Weights_::read()
+	{
 		std::cout << "Weights_::read()" << std::endl;
 		push_back(1.0);
 		push_back(2.0);
 	}
 
-	void Weights_::write() {
+	void Weights_::write()
+	{
 		std::cout << "Weights_::write()" << std::endl;
 	}
 
 	// FeatureFunctions ctr
-	FeatureFunctions createFeatureFunctions() { return FeatureFunctions( new FeatureFunctions_() ); }	
+	FeatureFunctions createFeatureFunctions()
+	{
+		return FeatureFunctions( new FeatureFunctions_() );
+	}
 
-	void FeatureFunctions_::read() {
+	void FeatureFunctions_::read()
+	{
 		// T.B.D.		
 		// for( auto i : *this ) {
 		// 	FeatureFunction f = i.first;
@@ -417,7 +464,8 @@ namespace SemiCrf {
 		// }
 	}
 
-	void FeatureFunctions_::write() {
+	void FeatureFunctions_::write()
+	{
 		for( auto f : *this ) {
 			f->write();
 		}		
@@ -479,10 +527,13 @@ namespace SemiCrf {
 
 	//// Learner ////
 
-	Algorithm createLearner() { return std::shared_ptr<Learner>(new Learner()); }
+	Algorithm createLearner()
+	{
+		return std::shared_ptr<Learner>(new Learner());
+	}
 
-	void Learner::compute() {
-
+	void Learner::compute()
+	{
 		std::cout << "Learner::compute()" << std::endl;
 		assert( weights->size() == ffs->size() );
 		int l = labels->size();
@@ -509,8 +560,8 @@ namespace SemiCrf {
 		}
 	}
 
-	std::vector<double>&& Learner::computeG() {
-
+	std::vector<double>&& Learner::computeG()
+	{
 		std::vector<double> Gs;
 		auto segments = current_data->getSegments();
 		assert( 0 < segments->size() );
@@ -536,8 +587,8 @@ namespace SemiCrf {
 		return(std::move(Gs));
 	}
 
-	double Learner::computeZ() {
-
+	double Learner::computeZ()
+	{
 		double Z = 0;
 		int size = current_data->getStrs()->size();
 
@@ -548,8 +599,8 @@ namespace SemiCrf {
 		return Z;
 	}
 
-	std::vector<double>&& Learner::computeGm(double Z) {
-
+	std::vector<double>&& Learner::computeGm(double Z)
+	{
 		std::vector<double> Gms;
 		int size = current_data->getStrs()->size();
 		double Gm = 0.0;
@@ -565,8 +616,8 @@ namespace SemiCrf {
 		return(std::move(Gms));
 	}
 
-	double Learner::alpha(int i, AppReqs::Label y) {
-
+	double Learner::alpha(int i, AppReqs::Label y)
+	{
 		std::cout << "i=" << i << ", y=" << int(y) << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
@@ -606,8 +657,8 @@ namespace SemiCrf {
 		return v;
 	}
 
-	double Learner::eta(int i, AppReqs::Label y, int k) {
-
+	double Learner::eta(int i, AppReqs::Label y, int k)
+	{
 		std::cout << "i=" << i << ", y=" << int(y) << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
@@ -652,10 +703,13 @@ namespace SemiCrf {
 
 	//// Inferer ////
 
-	Algorithm createInferer() { return std::shared_ptr<Inferer>(new Inferer()); }
+	Algorithm createInferer()
+	{
+		return std::shared_ptr<Inferer>(new Inferer());
+	}
 
-	void Inferer::compute() {
-
+	void Inferer::compute()
+	{
 		std::cout << "Inferer::compute()" << std::endl;
 		assert( weights->size() == ffs->size() );
 
@@ -695,8 +749,8 @@ namespace SemiCrf {
 		}
 	}
 
-	double Inferer::V(int i, AppReqs::Label y, int& maxd) {
-
+	double Inferer::V(int i, AppReqs::Label y, int& maxd)
+	{
 		std::cout << "i=" << i << ", y=" << int(y) << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 

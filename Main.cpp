@@ -3,51 +3,51 @@
 #include "SemiCrf.hpp"
 #include "AppReqs.hpp"
 
-void buildTmpTrainingDatas(SemiCrf::Datas datas)
-{
-	SemiCrf::Data data0(new SemiCrf::Data_());
-	data0->getStrs()->push_back("AAA");
-	data0->getStrs()->push_back("BBB");
-	data0->getStrs()->push_back("CCC");
-	data0->getStrs()->push_back("DDD");
+// void buildTmpTrainingDatas(SemiCrf::Datas datas)
+// {
+// 	SemiCrf::Data data0(new SemiCrf::Data_());
+// 	data0->getStrs()->push_back("AAA");
+// 	data0->getStrs()->push_back("BBB");
+// 	data0->getStrs()->push_back("CCC");
+// 	data0->getStrs()->push_back("DDD");
 
-	SemiCrf::Segment s0(new SemiCrf::Segment_( 0, 1, AppReqs::Label::CAMPANY ));
-	data0->getSegments()->push_back(s0);
+// 	SemiCrf::Segment s0(new SemiCrf::Segment_( 0, 1, AppReqs::Label::CAMPANY ));
+// 	data0->getSegments()->push_back(s0);
 
-	SemiCrf::Segment s1(new SemiCrf::Segment_( 2, 3, AppReqs::Label::LOCATION ));
-	data0->getSegments()->push_back(s1);
+// 	SemiCrf::Segment s1(new SemiCrf::Segment_( 2, 3, AppReqs::Label::LOCATION ));
+// 	data0->getSegments()->push_back(s1);
 
-	datas->push_back(data0);
+// 	datas->push_back(data0);
 
-	SemiCrf::Data data1(new SemiCrf::Data_());
-	data1->getStrs()->push_back("AAA");
-	data1->getStrs()->push_back("BBB");
-	data1->getStrs()->push_back("CCC");
-	data1->getStrs()->push_back("DDD");
+// 	SemiCrf::Data data1(new SemiCrf::Data_());
+// 	data1->getStrs()->push_back("AAA");
+// 	data1->getStrs()->push_back("BBB");
+// 	data1->getStrs()->push_back("CCC");
+// 	data1->getStrs()->push_back("DDD");
 
-	SemiCrf::Segment s2(new SemiCrf::Segment_( 0, 1, AppReqs::Label::CAMPANY ));
-	data1->getSegments()->push_back(s2);
+// 	SemiCrf::Segment s2(new SemiCrf::Segment_( 0, 1, AppReqs::Label::CAMPANY ));
+// 	data1->getSegments()->push_back(s2);
 
-	SemiCrf::Segment s3(new SemiCrf::Segment_( 2, 3, AppReqs::Label::LOCATION ));
-	data1->getSegments()->push_back(s3);
+// 	SemiCrf::Segment s3(new SemiCrf::Segment_( 2, 3, AppReqs::Label::LOCATION ));
+// 	data1->getSegments()->push_back(s3);
 
-	datas->push_back(data1);
-}
+// 	datas->push_back(data1);
+// }
 
 void buildTmpInferenceDatas(SemiCrf::Datas datas)
 {
 	SemiCrf::Data data0(new SemiCrf::Data_());
-	data0->getStrs()->push_back("AAA");
-	data0->getStrs()->push_back("BBB");
-	data0->getStrs()->push_back("CCC");
-	data0->getStrs()->push_back("DDD");
+	// data0->getStrs()->push_back("AAA");
+	// data0->getStrs()->push_back("BBB");
+	// data0->getStrs()->push_back("CCC");
+	// data0->getStrs()->push_back("DDD");
 	datas->push_back(data0);
 
 	SemiCrf::Data data1(new SemiCrf::Data_());
-	data1->getStrs()->push_back("AAA");
-	data1->getStrs()->push_back("BBB");
-	data1->getStrs()->push_back("CCC");
-	data1->getStrs()->push_back("DDD");
+	// data1->getStrs()->push_back("AAA");
+	// data1->getStrs()->push_back("BBB");
+	// data1->getStrs()->push_back("CCC");
+	// data1->getStrs()->push_back("DDD");
 	datas->push_back(data1);
 }
 
@@ -84,18 +84,18 @@ int main(int argc, char *argv[])
 		weights->read();
 
 		SemiCrf::Datas trainingDatas = SemiCrf::createTrainingDatas();
-		trainingDatas->read("これが機械学習エンジニアの募集要項です。");
+		trainingDatas->read(""); // T.B.D.
 	
 		SemiCrf::Algorithm learner = SemiCrf::createLearner();
 		learner->setLabels(labels);
 		learner->setMaxLength(maxLength);
 
-		buildTmpTrainingDatas(trainingDatas);
+		//buildTmpTrainingDatas(trainingDatas);
 		learner->setDatas(trainingDatas);
 
 		learner->setFeatureFunctions(ffs);
 		learner->setWeights(weights);
-		learner->compute();
+		// learner->compute();
 
 		ffs->write();
 		weights->write();
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 		//weights->read();
 
 		SemiCrf::Datas inferenceDatas = SemiCrf::createInferenceDatas();
-		inferenceDatas->read("これが機械学習エンジニアの募集要項です。");
+		inferenceDatas->read(""); // T.B.D
 
 		SemiCrf::Algorithm inferer = SemiCrf::createInferer();
 		inferer->setLabels(labels);

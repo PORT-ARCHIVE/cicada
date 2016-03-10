@@ -2,7 +2,6 @@
 #define SEMI_CRF__H
 
 #include <iostream>
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -52,7 +51,7 @@ namespace SemiCrf {
 	Segments createSegments();
 
 	// 文字列集合
-	class Strs_ : public std::vector<std::string> {};
+	class Strs_ : public std::vector<std::vector<std::string>> {};
 	typedef std::shared_ptr<Strs_> Strs;
 
 	// データ
