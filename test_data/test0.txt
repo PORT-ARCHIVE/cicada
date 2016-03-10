@@ -1,20 +1,38 @@
 #形態素     位置　    ラベル
+
+# BEGIN
 This      is        pen
 当社　　　 　N  　　　 　-
 の 　　　　　N　  　　　 -
-機械　　　 　S　　　  　職種
-学習　　　 　M　　　  　職種
-エンジニア 　E　　　  　職種
+機械　　　 　S　　　  　OCCUPATION
+学習　　　 　M　　　  　OCCUPATION
+エンジニア 　E　　　  　OCCUPATION
 の　　　　 　N  　　　　 -
 年収　　　 　N　  　　　 -
 は　　　　 　N　　  　　 -
-1000　　　　S  　　　　給与
-万　　　　 　M　  　　　給与
-円　　　　 　E　　  　　給与
+1000　　　　S  　　　　 SALARY
+万　　　　 　M　  　　　SALARY
+円　　　　 　E　　  　　SALARY
 です　　　 　N　　　  　 -
 。　　　　 　N　　　　   -
 
+# BEGIN
+That      is        pen
+当社　　　 　N  　　　 　-
+の 　　　　　N　  　　　 -
+機械　　　 　S　　　    OCCUPATION
+学習　　　 　M　　　  　OCCUPATION
+エンジニア 　E　　　  　OCCUPATION
+の　　　　 　N  　　　　 -
+年収　　　 　N　  　　　 -
+は　　　　 　N　　  　　 -
+1000　　　　S  　　　   SALARY
+万　　　　 　M　  　　　SALARY
+円　　　　 　E　　  　　SALARY
+です　　　 　N　　　  　 -
+。　　　　 　N　　　　   -
 
+# END
 
 
 

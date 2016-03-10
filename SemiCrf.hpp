@@ -11,6 +11,8 @@ namespace AppReqs {
 	// ラベル
 	enum class Label : int;
 
+	// // 文字列→ラベル
+	Label string2Label(std::string str);
 }
 
 namespace SemiCrf {

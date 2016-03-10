@@ -11,10 +11,10 @@ void buildTmpTrainingDatas(SemiCrf::Datas datas)
 	data0->getStrs()->push_back("CCC");
 	data0->getStrs()->push_back("DDD");
 
-	SemiCrf::Segment s0(new SemiCrf::Segment_( 0, 1, AppReqs::Label::Campany ));
+	SemiCrf::Segment s0(new SemiCrf::Segment_( 0, 1, AppReqs::Label::CAMPANY ));
 	data0->getSegments()->push_back(s0);
 
-	SemiCrf::Segment s1(new SemiCrf::Segment_( 2, 3, AppReqs::Label::Location ));
+	SemiCrf::Segment s1(new SemiCrf::Segment_( 2, 3, AppReqs::Label::LOCATION ));
 	data0->getSegments()->push_back(s1);
 
 	datas->push_back(data0);
@@ -25,10 +25,10 @@ void buildTmpTrainingDatas(SemiCrf::Datas datas)
 	data1->getStrs()->push_back("CCC");
 	data1->getStrs()->push_back("DDD");
 
-	SemiCrf::Segment s2(new SemiCrf::Segment_( 0, 1, AppReqs::Label::Campany ));
+	SemiCrf::Segment s2(new SemiCrf::Segment_( 0, 1, AppReqs::Label::CAMPANY ));
 	data1->getSegments()->push_back(s2);
 
-	SemiCrf::Segment s3(new SemiCrf::Segment_( 2, 3, AppReqs::Label::Location ));
+	SemiCrf::Segment s3(new SemiCrf::Segment_( 2, 3, AppReqs::Label::LOCATION ));
 	data1->getSegments()->push_back(s3);
 
 	datas->push_back(data1);
@@ -69,9 +69,9 @@ int main(int argc, char *argv[])
 		ffs->push_back(ff0);
 		ffs->push_back(ff1);
 
-		labels->push_back(AppReqs::Label::None);
-		labels->push_back(AppReqs::Label::Campany);
-		labels->push_back(AppReqs::Label::Location);
+		labels->push_back(AppReqs::Label::NONE);
+		labels->push_back(AppReqs::Label::CAMPANY);
+		labels->push_back(AppReqs::Label::LOCATION);
 		// T.B.D.	
 
 	} catch(...) {

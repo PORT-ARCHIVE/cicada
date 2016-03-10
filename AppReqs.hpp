@@ -6,9 +6,11 @@
 namespace AppReqs {
 
 	enum class Label : int {
-		None = 0,
-		Campany,
-		Location
+		NONE = 0,
+		CAMPANY,
+		OCCUPATION,
+		SALARY,
+		LOCATION
 	};
 
 	class AppReqF0 : public SemiCrf::FeatureFunction_ {

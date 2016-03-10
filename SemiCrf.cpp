@@ -42,12 +42,12 @@ namespace SemiCrf {
 
 		// add feature functions
 		// T.B.D.
-		Segment s0(new Segment_( 0, 1, AppReqs::Label::Campany ));
+		Segment s0(new Segment_( 0, 1, AppReqs::Label::CAMPANY ));
 		segs->push_back(s0);
 
 		// add feature functions
 		// T.B.D.
-		Segment s1(new Segment_( 2, 3, AppReqs::Label::Location ));
+		Segment s1(new Segment_( 2, 3, AppReqs::Label::LOCATION ));
 		segs->push_back(s1);
 	}
 
@@ -158,7 +158,8 @@ namespace SemiCrf {
 
 	class MultiByteIterator {
 	public:
-		MultiByteIterator(std::string arg);
+
+		MultiByteIterator(const std::string& arg);
 		virtual ~MultiByteIterator();
 		char operator * ();
 		operator const char* ();
@@ -166,14 +167,17 @@ namespace SemiCrf {
 		void setBuf();
 
 	private:
+		std::string str;
 		char* buf;
 		char* p;
 	};
 
-	MultiByteIterator::MultiByteIterator(std::string arg) {
+	MultiByteIterator::MultiByteIterator(const std::string& arg)
+		: str(arg)
+	{
 		std::cout << "MultiByteIterator()" << std::endl;
 		buf = new char[MB_CUR_MAX];
-		p = const_cast<char*>(arg.c_str());
+		p = const_cast<char*>(str.c_str());
 		setBuf();
 	}
 
@@ -234,22 +238,27 @@ namespace SemiCrf {
 	}
 
 	std::string MultiByteTokenizer::get() {
-		char c = *itr;
+
 		int cmp = strcmp(itr, " ");
-		while( strcmp(itr, " ") == 0 || strcmp(itr, "　") == 0 ) {
+		while( strcmp(itr, " ") == 0 ||
+			   strcmp(itr, "　") == 0 ) {
 			++itr;
 		}
-		c = *itr;
+
 		std::string token;
 		while( strcmp(itr, " ") != 0 &&
 			   strcmp(itr, "　") != 0 &&
 			   strcmp(itr, "\0") != 0 ) {
-			token.push_back(*itr);
-			c = *itr;
+
+			const char* p = itr;
+			int s = mblen(p, MB_CUR_MAX);
+			for( int i = 0; i < s; i++ ) {
+				token.push_back(p[i]);
+			}
+
 			++itr;
-			c = *itr;
 		}
-		c = *itr;
+
 		return token;
 	}
 
@@ -260,33 +269,87 @@ namespace SemiCrf {
 
 		std::ifstream ifs;
 		ifs.open("test_data/test0.txt");
+		// T.B.D.
 
-		std::string str;
-		while(std::getline(ifs,str)) {
-			if( str[0] == '#' ) {
+		int counter = -1;
+		int seg_start = -1;
+		Segment seg;
+		Data data;
+		std::string line;
+
+		while( std::getline(ifs, line) ) {
+
+			if( line == "" ) {
 				continue;
 			}
 
-			std::cout<< str << std::endl;
-
-			// MultiByteIterator itr(str);
-			// MultiByteTokenizer tokenizer(itr);
-			MultiByteTokenizer tokenizer(str);
-			std::string tok = tokenizer.get();
-			std::cout << tok << std::endl;
-			while( !tok.empty() ) {
-				tok = tokenizer.get();
-			 	std::cout << tok << std::endl;
+			if( line[0] == '#' ) {
+				if( line == "# BEGIN" ) {
+					data = Data( new Data_() );
+					counter = -1;
+				} else if( line == "# END" ) {
+					push_back(data);
+				}
+				continue;
 			}
 
-			// MultiByteIterator mi(str);
-			// while( *mi ) {
-			//  	std::cout << mi << std::endl;
-			//  	++mi;
-			// }
+			MultiByteTokenizer tokenizer(line);
+			counter++;
+
+			std::string word = tokenizer.get();
+			if( word.empty() ) {
+				// T.B.D.
+			} else {
+				std::cout << word << std::endl;
+				data->getStrs()->push_back(word);
+			}
+
+			std::string descriptor = tokenizer.get();
+			if( descriptor.empty() ) {
+				// T.B.D.
+			} else {
+				std::cout << descriptor << std::endl;
+			}
+
+			std::string label = tokenizer.get();
+			if( label.empty() ) {
+				// T.B.D.
+
+			} else {
+				std::cout << label << std::endl;
+
+				AppReqs::Label l = AppReqs::string2Label(label);
+
+				if( descriptor == "N" ) {
+
+					seg = createSegment(counter, counter, l);
+					data->getSegments()->push_back(seg);
+
+				} else if( descriptor == "S" ) {
+
+					seg_start = counter;
+
+				} else if( descriptor == "M" ) {
+
+					// nothing to do
+
+				} else if( descriptor == "E" ) {
+
+					seg	= createSegment(seg_start, counter, l);
+					data->getSegments()->push_back(seg);
+
+				} else {
+
+					std::cout << "warning: unknown descriptor" << std::endl;
+				}
+			}
+
+			std::string remains = tokenizer.get();
+			while( !remains.empty() ) {
+				// T.B.D.
+			}
 		}
 
-		//push_back(data);
 		ifs.close();
 	}
 
