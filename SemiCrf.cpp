@@ -405,6 +405,7 @@ namespace SemiCrf {
 
 				if( line == "# BEGIN" ) {
 					data = Data( new Data_() );
+					input = "";
 					std::cout << "BEGIN : data was created." << std::endl;
 
 				} else if( line == "# END" ) {
@@ -413,9 +414,22 @@ namespace SemiCrf {
 					const MeCab::Node* node = tagger->parseToNode(input.c_str());
 
 					for( ; node ; node = node->next ) {
+
 						std::string cppstr = node->feature;
+						std::cout << cppstr << std::endl;
+						if( cppstr.find("BOS") == 0 ) {
+							continue;
+						}
 						std::vector<std::string> vs;
-						vs.push_back(cppstr); // T.B.D
+						MultiByteTokenizer tok(cppstr);
+						std::string t =tok.get();
+
+						while( !t.empty() ) {
+							std::cout << t << std::endl;
+							vs.push_back(t);
+							t = tok.get();
+						}
+
 						data->getStrs()->push_back(vs);
 					}
 

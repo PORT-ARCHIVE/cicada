@@ -2,6 +2,7 @@
 #define SEMI_CRF__H
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
