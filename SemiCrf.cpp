@@ -1,7 +1,11 @@
 
 #include <limits>
+#include <iostream>
+#include <fstream>
+#include <boost/algorithm/string.hpp>
 #include <cassert>
 #include <cmath>
+#include <clocale>
 #include <mecab.h>
 #include "SemiCrf.hpp"
 #include "AppReqs.hpp"
@@ -142,27 +146,148 @@ namespace SemiCrf {
 		return Datas( new TrainingDatas_() );
 	}
 
+    // 文字列を置換する
+	std::string Replace( std::string String1, std::string String2, std::string String3 ){
+		std::string::size_type  Pos( String1.find( String2 ) );
+		while( Pos != std::string::npos ) {
+			String1.replace( Pos, String2.length(), String3 );
+			Pos = String1.find( String2, Pos + String3.length() );
+		}
+		return String1;
+	}
+
+	class MultiByteIterator {
+	public:
+		MultiByteIterator(std::string arg);
+		virtual ~MultiByteIterator();
+		char operator * ();
+		operator const char* ();
+		MultiByteIterator& operator ++();
+		void setBuf();
+
+	private:
+		char* buf;
+		char* p;
+	};
+
+	MultiByteIterator::MultiByteIterator(std::string arg) {
+		std::cout << "MultiByteIterator()" << std::endl;
+		buf = new char[MB_CUR_MAX];
+		p = const_cast<char*>(arg.c_str());
+		setBuf();
+	}
+
+	MultiByteIterator::~MultiByteIterator() {
+		std::cout << "~MultiByteIterator()" << std::endl;
+		delete [] buf;
+	}
+
+	char MultiByteIterator::operator * () {
+		return buf[0];
+	}
+
+	MultiByteIterator::operator const char* () {
+		return buf;
+	}
+
+	MultiByteIterator& MultiByteIterator::operator ++() {
+		setBuf();
+		return (*this);
+	}
+
+	void MultiByteIterator::setBuf() {
+		int i = 0;
+		int s = mblen(p, MB_CUR_MAX);
+		for( i = 0; i < s; i++ ) {
+			buf[i] = *(p++);
+		}
+		buf[i] = '\0';
+	}
+
+	class MultiByteTokenizer {
+	public:
+		// MultiByteTokenizer(MultiByteIterator& arg);
+		MultiByteTokenizer(std::string str);
+		virtual ~MultiByteTokenizer();
+		std::string get();
+
+	private:
+		//MultiByteIterator& itr;
+		MultiByteIterator itr;
+	};
+
+	// MultiByteTokenizer::MultiByteTokenizer(MultiByteIterator& arg)
+	// 	: itr(arg)
+	// {
+	// 	std::cout << "MultiByteTokenizer()" << std::endl;
+	// }
+
+	MultiByteTokenizer::MultiByteTokenizer(std::string str)
+	 	: itr(str)
+	{
+	 	std::cout << "MultiByteTokenizer()" << std::endl;
+	}
+
+	MultiByteTokenizer::~MultiByteTokenizer()
+	{
+		std::cout << "~MultiByteTokenizer()" << std::endl;
+	}
+
+	std::string MultiByteTokenizer::get() {
+		char c = *itr;
+		int cmp = strcmp(itr, " ");
+		while( strcmp(itr, " ") == 0 || strcmp(itr, "　") == 0 ) {
+			++itr;
+		}
+		c = *itr;
+		std::string token;
+		while( strcmp(itr, " ") != 0 &&
+			   strcmp(itr, "　") != 0 &&
+			   strcmp(itr, "\0") != 0 ) {
+			token.push_back(*itr);
+			c = *itr;
+			++itr;
+			c = *itr;
+		}
+		c = *itr;
+		return token;
+	}
+
 	void TrainingDatas_::read(const char* input) {
 		std::cout << "Datas_::read()" << std::endl;
 
 		setlocale(LC_CTYPE, "ja_JP.UTF-8");
-		Data data( new Data_() );
-		std::string delimita(",");
-		typedef std::shared_ptr<MeCab::Tagger> Tagger;
-		Tagger tagger = std::shared_ptr<MeCab::Tagger>(MeCab::createTagger(""));
-		const MeCab::Node* node = tagger->parseToNode(input);
 
-		for( ; node ; node = node->next ) {
+		std::ifstream ifs;
+		ifs.open("test_data/test0.txt");
 
-			std::string cppstr = node->feature;
-			// std::cout << cppstr << std::endl;
-			// std::string m = nfind(cppstr, delimita, 6);
-			// std::cout << m << std::endl;
-			// data->getStrs()->push_back(m);
-			data->getStrs()->push_back(cppstr);
+		std::string str;
+		while(std::getline(ifs,str)) {
+			if( str[0] == '#' ) {
+				continue;
+			}
+
+			std::cout<< str << std::endl;
+
+			// MultiByteIterator itr(str);
+			// MultiByteTokenizer tokenizer(itr);
+			MultiByteTokenizer tokenizer(str);
+			std::string tok = tokenizer.get();
+			std::cout << tok << std::endl;
+			while( !tok.empty() ) {
+				tok = tokenizer.get();
+			 	std::cout << tok << std::endl;
+			}
+
+			// MultiByteIterator mi(str);
+			// while( *mi ) {
+			//  	std::cout << mi << std::endl;
+			//  	++mi;
+			// }
 		}
 
-		push_back(data);
+		//push_back(data);
+		ifs.close();
 	}
 
 	// InferenceDatas ctr
