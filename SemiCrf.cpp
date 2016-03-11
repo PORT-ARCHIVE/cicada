@@ -10,6 +10,7 @@
 #include <mecab.h>
 #include "SemiCrf.hpp"
 #include "AppReqs.hpp"
+#include "MultiByteTokenizer.hpp"
 #include "DebugOut.hpp"
 
 namespace SemiCrf {
@@ -82,22 +83,6 @@ namespace SemiCrf {
 		Debug::out() << "~Datas_()" << std::endl;
 	};
 
-	// str0をstr1をデリミタとして区切りn番目の区間を返す
-	// std::string nfind(const std::string& str0, const std::string& str1, int n) {
-
-	// 	int match = 0;
-	// 	size_t pos0 = 0;
-	// 	do {
-	// 		pos0 = str0.find(str1, pos0);
-	// 		pos0++;
-	// 		match++;
-	// 	} while( match != n && pos0 != std::string::npos );
-
-	// 	size_t pos1 = str0.find(str1, pos0);
-	// 	std::string m1 = str0.substr(pos0, pos1-pos0);
-	// 	return m1;
-	// }
-
 	void Datas_::write() const {
 		Debug::out() << "Datas_::write()" << std::endl;
 		for( auto i : *this ) {
@@ -119,106 +104,6 @@ namespace SemiCrf {
 	Datas createTrainingDatas()
 	{
 		return Datas( new TrainingDatas_() );
-	}
-
-	class MultiByteIterator {
-	public:
-		MultiByteIterator(const std::string& arg);
-		virtual ~MultiByteIterator();
-		char operator * ();
-		operator const char* ();
-		MultiByteIterator& operator ++();
-		void setBuf();
-
-	private:
-		std::string str;
-		char* buf;
-		char* p;
-	};
-
-	MultiByteIterator::MultiByteIterator(const std::string& arg)
-		: str(arg)
-	{
-		buf = new char[MB_CUR_MAX];
-		p = const_cast<char*>(str.c_str());
-		setBuf();
-	}
-
-	MultiByteIterator::~MultiByteIterator()
-	{
-		delete [] buf;
-	}
-
-	char MultiByteIterator::operator * ()
-	{
-		return buf[0];
-	}
-
-	MultiByteIterator::operator const char* ()
-	{
-		return buf;
-	}
-
-	MultiByteIterator& MultiByteIterator::operator ++()
-	{
-		setBuf();
-		return (*this);
-	}
-
-	void MultiByteIterator::setBuf()
-	{
-		int i = 0;
-		int s = mblen(p, MB_CUR_MAX);
-		for( i = 0; i < s; i++ ) {
-			buf[i] = *(p++);
-		}
-		buf[i] = '\0';
-	}
-
-	class MultiByteTokenizer
-	{
-	public:
-		MultiByteTokenizer(std::string str);
-		virtual ~MultiByteTokenizer();
-		std::string get();
-
-	private:
-		MultiByteIterator itr;
-	};
-
-	MultiByteTokenizer::MultiByteTokenizer(std::string str)
-	 	: itr(str)
-	{
-	}
-
-	MultiByteTokenizer::~MultiByteTokenizer()
-	{
-	}
-
-	std::string MultiByteTokenizer::get()
-	{
-		while( strcmp(itr, " ") == 0 ||
-			   strcmp(itr, "　") == 0 ||
-			   strcmp(itr, ",") == 0 ) {
-			++itr;
-		}
-
-		std::string token;
-		while( strcmp(itr, " ") != 0 &&
-			   strcmp(itr, "　") != 0 &&
-			   strcmp(itr, ",") != 0 &&
-			   strcmp(itr, "\0") != 0 ) {
-
-			const char* p = itr;
-			int s = mblen(p, MB_CUR_MAX);
-			for( int i = 0; i < s; i++ ) {
-				token.push_back(p[i]);
-			}
-
-			++itr;
-		}
-
-		return token;
 	}
 
 	void TrainingDatas_::read(std::istream& strm)
