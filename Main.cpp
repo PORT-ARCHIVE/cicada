@@ -2,37 +2,7 @@
 #include <iostream>
 #include "SemiCrf.hpp"
 #include "AppReqs.hpp"
-
-// void buildTmpTrainingDatas(SemiCrf::Datas datas)
-// {
-// 	SemiCrf::Data data0(new SemiCrf::Data_());
-// 	data0->getStrs()->push_back("AAA");
-// 	data0->getStrs()->push_back("BBB");
-// 	data0->getStrs()->push_back("CCC");
-// 	data0->getStrs()->push_back("DDD");
-
-// 	SemiCrf::Segment s0(new SemiCrf::Segment_( 0, 1, AppReqs::Label::CAMPANY ));
-// 	data0->getSegments()->push_back(s0);
-
-// 	SemiCrf::Segment s1(new SemiCrf::Segment_( 2, 3, AppReqs::Label::LOCATION ));
-// 	data0->getSegments()->push_back(s1);
-
-// 	datas->push_back(data0);
-
-// 	SemiCrf::Data data1(new SemiCrf::Data_());
-// 	data1->getStrs()->push_back("AAA");
-// 	data1->getStrs()->push_back("BBB");
-// 	data1->getStrs()->push_back("CCC");
-// 	data1->getStrs()->push_back("DDD");
-
-// 	SemiCrf::Segment s2(new SemiCrf::Segment_( 0, 1, AppReqs::Label::CAMPANY ));
-// 	data1->getSegments()->push_back(s2);
-
-// 	SemiCrf::Segment s3(new SemiCrf::Segment_( 2, 3, AppReqs::Label::LOCATION ));
-// 	data1->getSegments()->push_back(s3);
-
-// 	datas->push_back(data1);
-// }
+#include "DebugOut.hpp"
 
 void buildTmpInferenceDatas(SemiCrf::Datas datas)
 {
@@ -53,7 +23,8 @@ void buildTmpInferenceDatas(SemiCrf::Datas datas)
 
 int main(int argc, char *argv[])
 {
-	std::cout << "##### Start Semi-CRF ####" << std::endl;
+	Debug::out() << "##### Start Semi-CRF ####" << std::endl;
+
 	int maxLength = 5;
 	SemiCrf::Weights weights = SemiCrf::createWeights();
 	SemiCrf::FeatureFunctions ffs = SemiCrf::createFeatureFunctions();

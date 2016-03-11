@@ -9,6 +9,7 @@
 #include <mecab.h>
 #include "SemiCrf.hpp"
 #include "AppReqs.hpp"
+#include "DebugOut.hpp"
 
 namespace SemiCrf {
 
@@ -23,15 +24,15 @@ namespace SemiCrf {
 		: strs( new Strs_() )
 		, segs( new Segments_() )
 	{
-		std::cout << "Data_()" << std::endl;
+		Debug::out() << "Data_()" << std::endl;
 	}
 
 	Data_::~Data_() {
-		std::cout << "~Data_()" << std::endl;
+		Debug::out() << "~Data_()" << std::endl;
 	}
 
 	void Data_::read() {
-		std::cout << "TrainingData::read()" << std::endl;
+		Debug::out() << "TrainingData::read()" << std::endl;
 
 		// add strings
 		// T.B.D.
@@ -52,7 +53,7 @@ namespace SemiCrf {
 	}
 
 	void Data_::write() const {
-		std::cout << "InferenceData::write()" << std::endl;
+		Debug::out() << "InferenceData::write()" << std::endl;
 
 		// iterate segments
 		for( auto i : *segs ){
@@ -72,62 +73,32 @@ namespace SemiCrf {
 	// Datas ctr
 	Datas_::Datas_()
 	{
-		std::cout << "Datas_()" << std::endl;
+		Debug::out() << "Datas_()" << std::endl;
 	};
 
 	Datas_::~Datas_()
 	{
-		std::cout << "~Datas_()" << std::endl;
+		Debug::out() << "~Datas_()" << std::endl;
 	};
 
-	Datas createDatas() {
-		return Datas( new Datas_() );
-	}
-
 	// str0をstr1をデリミタとして区切りn番目の区間を返す
-	std::string nfind(const std::string& str0, const std::string& str1, int n) {
+	// std::string nfind(const std::string& str0, const std::string& str1, int n) {
 
-		int match = 0;
-		size_t pos0 = 0;
-		do {
-			pos0 = str0.find(str1, pos0);
-			pos0++;
-			match++;
-		} while( match != n && pos0 != std::string::npos );
+	// 	int match = 0;
+	// 	size_t pos0 = 0;
+	// 	do {
+	// 		pos0 = str0.find(str1, pos0);
+	// 		pos0++;
+	// 		match++;
+	// 	} while( match != n && pos0 != std::string::npos );
 
-		size_t pos1 = str0.find(str1, pos0);
-		std::string m1 = str0.substr(pos0, pos1-pos0);
-		return m1;
-	}
-
-	void Datas_::read(const char* input) {
-		std::cout << "Datas_::read()" << std::endl;
-
-		setlocale(LC_CTYPE, "ja_JP.UTF-8");
-		Data data( new Data_() );
-		std::string delimita(",");
-		typedef std::shared_ptr<MeCab::Tagger> Tagger;
-		Tagger tagger = std::shared_ptr<MeCab::Tagger>(MeCab::createTagger(""));
-		const MeCab::Node* node = tagger->parseToNode(input);
-
-		for( ; node ; node = node->next ) {
-
-			std::string cppstr = node->feature;
-			// std::cout << cppstr << std::endl;
-			// std::string m = nfind(cppstr, delimita, 6);
-			// std::cout << m << std::endl;
-			// data->getStrs()->push_back(m);
-			//data->getStrs()->push_back(cppstr);
-			std::vector<std::string> vs;
-			vs.push_back(cppstr);
-			data->getStrs()->push_back(vs);
-		}
-
-		push_back(data);
-	}
+	// 	size_t pos1 = str0.find(str1, pos0);
+	// 	std::string m1 = str0.substr(pos0, pos1-pos0);
+	// 	return m1;
+	// }
 
 	void Datas_::write() const {
-		std::cout << "Datas_::write()" << std::endl;
+		Debug::out() << "Datas_::write()" << std::endl;
 		for( auto i : *this ) {
 			i->write();
 		}
@@ -136,28 +107,18 @@ namespace SemiCrf {
 	// TrainingDatas ctr
 	TrainingDatas_::TrainingDatas_()
 	{
-		std::cout << "TrainingDatas_()" << std::endl;
+		Debug::out() << "TrainingDatas_()" << std::endl;
 	}
 
 	TrainingDatas_::~TrainingDatas_()
 	{
-		std::cout << "~TrainingDatas_()" << std::endl;
+		Debug::out() << "~TrainingDatas_()" << std::endl;
 	}
 
 	Datas createTrainingDatas()
 	{
 		return Datas( new TrainingDatas_() );
 	}
-
-    // 文字列を置換する
-	// std::string Replace( std::string String1, std::string String2, std::string String3 ){
-	// 	std::string::size_type  Pos( String1.find( String2 ) );
-	// 	while( Pos != std::string::npos ) {
-	// 		String1.replace( Pos, String2.length(), String3 );
-	// 		Pos = String1.find( String2, Pos + String3.length() );
-	// 	}
-	// 	return String1;
-	// }
 
 	class MultiByteIterator {
 	public:
@@ -177,7 +138,7 @@ namespace SemiCrf {
 	MultiByteIterator::MultiByteIterator(const std::string& arg)
 		: str(arg)
 	{
-		// std::cout << "MultiByteIterator()" << std::endl;
+		// Debug::out() << "MultiByteIterator()" << std::endl;
 		buf = new char[MB_CUR_MAX];
 		p = const_cast<char*>(str.c_str());
 		setBuf();
@@ -185,7 +146,7 @@ namespace SemiCrf {
 
 	MultiByteIterator::~MultiByteIterator()
 	{
-		// std::cout << "~MultiByteIterator()" << std::endl;
+		// Debug::out() << "~MultiByteIterator()" << std::endl;
 		delete [] buf;
 	}
 
@@ -229,17 +190,16 @@ namespace SemiCrf {
 	MultiByteTokenizer::MultiByteTokenizer(std::string str)
 	 	: itr(str)
 	{
-	 	// std::cout << "MultiByteTokenizer()" << std::endl;
+	 	// Debug::out() << "MultiByteTokenizer()" << std::endl;
 	}
 
 	MultiByteTokenizer::~MultiByteTokenizer()
 	{
-		// std::cout << "~MultiByteTokenizer()" << std::endl;
+		// Debug::out() << "~MultiByteTokenizer()" << std::endl;
 	}
 
 	std::string MultiByteTokenizer::get()
 	{
-
 		while( strcmp(itr, " ") == 0 ||
 			   strcmp(itr, "　") == 0 ||
 			   strcmp(itr, ",") == 0 ) {
@@ -266,7 +226,7 @@ namespace SemiCrf {
 
 	void TrainingDatas_::read(const char* input)
 	{
-		std::cout << "Datas_::read()" << std::endl;
+		Debug::out() << "Datas_::read()" << std::endl;
 
 		setlocale(LC_CTYPE, "ja_JP.UTF-8");
 
@@ -292,10 +252,10 @@ namespace SemiCrf {
 				if( line == "# BEGIN" ) {
 					data = Data( new Data_() );
 					counter = -1;
-					std::cout << "BEGIN : data was created." << std::endl;
+					Debug::out() << "BEGIN : data was created." << std::endl;
 				} else if( line == "# END" ) {
 					push_back(data);
-					std::cout << "END : data was pushed." << std::endl;
+					Debug::out() << "END : data was pushed." << std::endl;
 				}
 				continue;
 			}
@@ -307,7 +267,7 @@ namespace SemiCrf {
 			if( word.empty() ) {
 				// T.B.D.
 			} else {
-				std::cout << word << std::endl;
+				Debug::out() << word << std::endl;
 				std::vector<std::string> vs;
 				vs.push_back(word);
 				data->getStrs()->push_back(vs);
@@ -317,7 +277,7 @@ namespace SemiCrf {
 			if( descriptor.empty() ) {
 				// T.B.D.
 			} else {
-				std::cout << descriptor << std::endl;
+				Debug::out() << descriptor << std::endl;
 			}
 
 			std::string label = tokenizer.get();
@@ -325,7 +285,7 @@ namespace SemiCrf {
 				// T.B.D.
 
 			} else {
-				std::cout << label << std::endl;
+				Debug::out() << label << std::endl;
 
 				AppReqs::Label l = AppReqs::string2Label(label);
 
@@ -349,7 +309,7 @@ namespace SemiCrf {
 
 				} else {
 
-					std::cout << "warning: unknown descriptor" << std::endl;
+					Debug::out() << "warning: unknown descriptor" << std::endl;
 				}
 			}
 
@@ -365,12 +325,12 @@ namespace SemiCrf {
 	// InferenceDatas ctr
 	InferenceDatas_::InferenceDatas_()
 	{
-		std::cout << "InferenceDatas_()" << std::endl;
+		Debug::out() << "InferenceDatas_()" << std::endl;
 	}
 
 	InferenceDatas_::~InferenceDatas_()
 	{
-		std::cout << "~InferenceDatas_()" << std::endl;
+		Debug::out() << "~InferenceDatas_()" << std::endl;
 	}
 
 	Datas createInferenceDatas()
@@ -380,7 +340,7 @@ namespace SemiCrf {
 
 	void InferenceDatas_::read(const char* file)
 	{
-		std::cout << "Datas_::read()" << std::endl;
+		Debug::out() << "Datas_::read()" << std::endl;
 		typedef std::shared_ptr<MeCab::Tagger> Tagger;
 
 		setlocale(LC_CTYPE, "ja_JP.UTF-8");
@@ -406,7 +366,7 @@ namespace SemiCrf {
 				if( line == "# BEGIN" ) {
 					data = Data( new Data_() );
 					input = "";
-					std::cout << "BEGIN : data was created." << std::endl;
+					Debug::out() << "BEGIN : data was created." << std::endl;
 
 				} else if( line == "# END" ) {
 
@@ -416,7 +376,7 @@ namespace SemiCrf {
 					for( ; node ; node = node->next ) {
 
 						std::string cppstr = node->feature;
-						//std::cout << cppstr << std::endl;
+						//Debug::out() << cppstr << std::endl;
 						if( cppstr.find("BOS") == 0 ) {
 							continue;
 						}
@@ -431,14 +391,14 @@ namespace SemiCrf {
 						}
 
 						vs.push_back(word);
-						std::cout << word << std::endl;
+						Debug::out() << word << std::endl;
 
 						MultiByteTokenizer tok(cppstr);
 						std::string t = tok.get();
 						// tok.get();
 
 						while( !t.empty() ) {
-							// std::cout << t << std::endl;
+							Debug::out() << t << std::endl;
 							vs.push_back(t);
 							t = tok.get();
 						}
@@ -447,7 +407,7 @@ namespace SemiCrf {
 					}
 
 					push_back(data);
-					std::cout << "END : data was pushed." << std::endl;
+					Debug::out() << "END : data was pushed." << std::endl;
 				}
 
 				continue;
@@ -463,22 +423,52 @@ namespace SemiCrf {
 		return Weights( new Weights_() );
 	}
 
+	Weights_::Weights_()
+	{
+		Debug::out() << "Weights()" << std::endl;
+	}
+
+	Weights_::~Weights_()
+	{
+		Debug::out() << "~Weights()" << std::endl;
+	}
+
 	void Weights_::read()
 	{
-		std::cout << "Weights_::read()" << std::endl;
+		Debug::out() << "Weights_::read()" << std::endl;
 		push_back(1.0);
 		push_back(2.0);
 	}
 
 	void Weights_::write()
 	{
-		std::cout << "Weights_::write()" << std::endl;
+		Debug::out() << "Weights_::write()" << std::endl;
+	}
+
+	FeatureFunction_::FeatureFunction_()
+	{
+		Debug::out() << "FeatureFunction_()" << std::endl;
+	}
+
+	FeatureFunction_::~FeatureFunction_()
+	{
+		Debug::out() << "~FeatureFunction_()" << std::endl;
 	}
 
 	// FeatureFunctions ctr
 	FeatureFunctions createFeatureFunctions()
 	{
 		return FeatureFunctions( new FeatureFunctions_() );
+	}
+
+	FeatureFunctions_::FeatureFunctions_()
+	{
+		Debug::out() << "FeatureFunctions_()" << std::endl;
+	}
+
+	FeatureFunctions_::~FeatureFunctions_()
+	{
+		Debug::out() << "~FeatureFunctions_()" << std::endl;
 	}
 
 	void FeatureFunctions_::read()
@@ -506,12 +496,12 @@ namespace SemiCrf {
 		, weights( nullptr )
 		, datas( nullptr )
 	{
-		std::cout << "Algorithm_()" << std::endl;
+		Debug::out() << "Algorithm_()" << std::endl;
 	}
 
 	Algorithm_::~Algorithm_()
 	{
-		std::cout << "~Algorithm_()" << std::endl;
+		Debug::out() << "~Algorithm_()" << std::endl;
 	}
 
 	void Algorithm_::setLabels(Labels arg)
@@ -559,9 +549,19 @@ namespace SemiCrf {
 		return std::shared_ptr<Learner>(new Learner());
 	}
 
+	Learner::Learner()
+	{
+		Debug::out() << "Learner()" << std::endl;
+	}
+
+	Learner::~Learner()
+	{
+		Debug::out() << "~Learner()" << std::endl;
+	}
+
 	void Learner::compute()
 	{
-		std::cout << "Learner::compute()" << std::endl;
+		Debug::out() << "Learner::compute()" << std::endl;
 		assert( weights->size() == ffs->size() );
 		int l = labels->size();
 		std::vector<double> dL(datas->size());
@@ -645,7 +645,7 @@ namespace SemiCrf {
 
 	double Learner::alpha(int i, AppReqs::Label y)
 	{
-		std::cout << "i=" << i << ", y=" << int(y) << std::endl;
+		Debug::out() << "i=" << i << ", y=" << int(y) << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
 		auto& tp = current_actab->at(idx);
@@ -686,7 +686,7 @@ namespace SemiCrf {
 
 	double Learner::eta(int i, AppReqs::Label y, int k)
 	{
-		std::cout << "i=" << i << ", y=" << int(y) << std::endl;
+		Debug::out() << "i=" << i << ", y=" << int(y) << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
 		auto& tp = current_ectab->at(idx);
@@ -735,9 +735,18 @@ namespace SemiCrf {
 		return std::shared_ptr<Inferer>(new Inferer());
 	}
 
+	Inferer::Inferer()
+	{
+		Debug::out() << "Inferer()" << std::endl;
+	}
+
+	Inferer::~Inferer() {
+		Debug::out() << "~Inferer()" << std::endl;
+	}
+
 	void Inferer::compute()
 	{
-		std::cout << "Inferer::compute()" << std::endl;
+		Debug::out() << "Inferer::compute()" << std::endl;
 		assert( weights->size() == ffs->size() );
 
 		for( auto data : *datas ) {
@@ -778,7 +787,7 @@ namespace SemiCrf {
 
 	double Inferer::V(int i, AppReqs::Label y, int& maxd)
 	{
-		std::cout << "i=" << i << ", y=" << int(y) << std::endl;
+		Debug::out() << "i=" << i << ", y=" << int(y) << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
 		auto& tp = current_vctab->at(idx);

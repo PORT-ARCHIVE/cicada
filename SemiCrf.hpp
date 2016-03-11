@@ -77,12 +77,11 @@ namespace SemiCrf {
 	public:
 		Datas_();
 		virtual ~Datas_();
-		virtual void read(const char* input);
+		virtual void read(const char* input) = 0;
 		virtual void write() const;
 	};
 
 	typedef std::shared_ptr<Datas_> Datas;
-	Datas createDatas();
 
 	// 教師データ集合
 	class TrainingDatas_ : public Datas_ {
@@ -109,8 +108,8 @@ namespace SemiCrf {
 	// 重みベクトル
 	class Weights_ : public std::vector<double> {
 	public:
-		Weights_() { std::cout << "Weights()" << std::endl; }
-		virtual ~Weights_() { std::cout << "~Weights()" << std::endl; }
+		Weights_();
+		virtual ~Weights_();
 		void read();
 		void write();		
 	};
@@ -121,8 +120,8 @@ namespace SemiCrf {
 	// 素性関数
 	class FeatureFunction_ {
 	public:
-		FeatureFunction_() { std::cout << "FeatureFunction_()" << std::endl; }
-		virtual ~FeatureFunction_() { std::cout << "~FeatureFunction_()" << std::endl; }
+		FeatureFunction_();
+		virtual ~FeatureFunction_();
 		virtual double operator() (AppReqs::Label y, AppReqs::Label yd, Data x, int j, int i) = 0;
 		virtual void read() = 0;
 		virtual void write() = 0;
@@ -133,8 +132,8 @@ namespace SemiCrf {
 	// 素性関数の集合
 	class FeatureFunctions_ : public std::vector<FeatureFunction> {
 	public:
-		FeatureFunctions_() { std::cout << "FeatureFunctions_()" << std::endl; }
-		virtual ~FeatureFunctions_() { std::cout << "~FeatureFunctions_()" << std::endl; }
+		FeatureFunctions_();
+		virtual ~FeatureFunctions_();
 		void read();
 		void write();
 	};
@@ -180,8 +179,8 @@ namespace SemiCrf {
 	// 学習器
 	class Learner : public Algorithm_ {
 	public:
-		Learner() { std::cout << "Learner()" << std::endl; }
-		virtual ~Learner() { std::cout << "~Learner()" << std::endl; }
+		Learner();
+		virtual ~Learner();
 		virtual void compute();
 
 	private:
@@ -197,8 +196,8 @@ namespace SemiCrf {
 	// 推論器
 	class Inferer : public Algorithm_ {
 	public:
-		Inferer() { std::cout << "Inferer()" << std::endl; }
-		virtual ~Inferer() { std::cout << "~Inferer()" << std::endl; }
+		Inferer();
+		virtual ~Inferer();
 		virtual void compute();
 		
 	private:
