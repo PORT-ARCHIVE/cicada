@@ -245,8 +245,8 @@ namespace SemiCrf {
 					for( ; node ; node = node->next ) {
 
 						std::string cppstr = node->feature;
-						//Debug::out() << cppstr << std::endl;
-						if( cppstr.find("BOS") == 0 ) {
+						Debug::out() << cppstr << std::endl;
+						if( cppstr.find("BOS") == 0 ) { // T.B.D.
 							continue;
 						}
 
@@ -260,12 +260,10 @@ namespace SemiCrf {
 						}
 
 						vs.push_back(word);
-						//Debug::out() << word << std::endl;
-						std::cout << word << std::endl;
+						Debug::out() << word << std::endl;
 
 						MultiByteTokenizer tok(cppstr);
 						std::string t = tok.get();
-						// tok.get();
 
 						while( !t.empty() ) {
 							Debug::out() << t << std::endl;
@@ -344,11 +342,6 @@ namespace SemiCrf {
 	void FeatureFunctions_::read()
 	{
 		// T.B.D.		
-		// for( auto i : *this ) {
-		// 	FeatureFunction f = i.first;
-		// 	f->read();
-		// 	i.second = 0; 
-		// }
 	}
 
 	void FeatureFunctions_::write()
