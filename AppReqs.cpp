@@ -1,5 +1,6 @@
 
 #include "AppReqs.hpp"
+#include "DebugOut.hpp"
 
 namespace AppReqs {
 
@@ -15,7 +16,7 @@ namespace AppReqs {
 		} else if( str == "LOCATION" ) {
 			return Label::LOCATION;
 		} else {
-			std::cout << "warning: unknown label" << std::endl; // T.B.D.
+			Debug::out() << "warning: unknown label" << std::endl; // T.B.D.
 			return Label::NONE;			
 		}
 	}

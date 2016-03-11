@@ -1,28 +1,52 @@
 
 #include <iostream>
+#include <sstream>
 #include "SemiCrf.hpp"
 #include "AppReqs.hpp"
 #include "DebugOut.hpp"
 
-void buildTmpInferenceDatas(SemiCrf::Datas datas)
-{
-	SemiCrf::Data data0(new SemiCrf::Data_());
-	// data0->getStrs()->push_back("AAA");
-	// data0->getStrs()->push_back("BBB");
-	// data0->getStrs()->push_back("CCC");
-	// data0->getStrs()->push_back("DDD");
-	datas->push_back(data0);
+class error {
+public:
+	error(std::string arg) : msg(arg) {};
+	const std::string& what() { return msg; }
+private:
+	std::string msg;
+};
 
-	SemiCrf::Data data1(new SemiCrf::Data_());
-	// data1->getStrs()->push_back("AAA");
-	// data1->getStrs()->push_back("BBB");
-	// data1->getStrs()->push_back("CCC");
-	// data1->getStrs()->push_back("DDD");
-	datas->push_back(data1);
-}
+class Options {
+public:
+	Options()
+		: training_data_file("")
+		, inference_data_file("")
+		, debug(false) {};
+public:
+	std::string training_data_file;
+	std::string inference_data_file;
+	bool debug;
+};
 
 int main(int argc, char *argv[])
 {
+	int ret = 0x0;
+
+	Options options;
+	for( int i = 0; i < argc; i++ ) {
+		std::string arg = argv[i];
+		if( arg == "-t" ) {
+			options.training_data_file = argv[++i];
+		} else if( arg == "-i" ) {
+			options.inference_data_file = argv[++i];
+		} else if( arg == "--debug" ) {
+			options.debug = true;
+		}
+	}
+
+	if( options.debug ) {
+		Debug::on();
+	} else {
+		Debug::off();
+	}
+
 	Debug::out() << "##### Start Semi-CRF ####" << std::endl;
 
 	int maxLength = 5;
@@ -51,54 +75,78 @@ int main(int argc, char *argv[])
 
 	try { // 学習
 
-		ffs->read();
-		weights->read();
+		if( !options.training_data_file.empty() ) {
 
-		SemiCrf::Datas trainingDatas = SemiCrf::createTrainingDatas();
-		trainingDatas->read(""); // T.B.D.
-	
-		SemiCrf::Algorithm learner = SemiCrf::createLearner();
-		learner->setLabels(labels);
-		learner->setMaxLength(maxLength);
+			ffs->read();
+			weights->read();
 
-		//buildTmpTrainingDatas(trainingDatas);
-		learner->setDatas(trainingDatas);
+			std::ifstream ifs;
+			ifs.open( options.training_data_file.c_str() );
+			if( ifs.fail() ) {
+				std::stringstream ss;
+				ss << "error: connot open such file: " << options.training_data_file;
+				throw error(ss.str());
+			}
 
-		learner->setFeatureFunctions(ffs);
-		learner->setWeights(weights);
-		// learner->compute();
+			SemiCrf::Datas trainingDatas = SemiCrf::createTrainingDatas();
+			trainingDatas->read(ifs);
 
-		ffs->write();
-		weights->write();
+			SemiCrf::Algorithm learner = SemiCrf::createLearner();
+			learner->setLabels(labels);
+			learner->setMaxLength(maxLength);
+			learner->setDatas(trainingDatas);
+			learner->setFeatureFunctions(ffs);
+			learner->setWeights(weights);
+			// learner->compute();
 
+			ffs->write();
+			weights->write();
+		}
+
+	} catch(error& e) {
+		std::cerr << e.what() << std::endl;
+		ret = 0x1;
 	} catch(...) {
-		// T.B.D.
+		std::cerr << "error: unexpected exception" << std::endl;
+		ret = 0x2;
 	}
 
 	try { // 推論
 
-		ffs->read();
-		//weights->read();
+		if( !options.inference_data_file.empty() ) {
 
-		SemiCrf::Datas inferenceDatas = SemiCrf::createInferenceDatas();
-		inferenceDatas->read(""); // T.B.D
+			ffs->read();
+			//weights->read(); T.B.D.
 
-		SemiCrf::Algorithm inferer = SemiCrf::createInferer();
-		inferer->setLabels(labels);
-		inferer->setMaxLength(maxLength);
+			std::ifstream ifs;
+			ifs.open( options.inference_data_file.c_str() );
+			if( ifs.fail() ) {
+				std::stringstream ss;
+				ss << "error: connot open such file: " << options.inference_data_file;
+				throw error(ss.str());
+			}
 
-		buildTmpInferenceDatas(inferenceDatas);
-		inferer->setDatas(inferenceDatas);
+			SemiCrf::Datas inferenceDatas = SemiCrf::createInferenceDatas();
+			inferenceDatas->read(ifs);
 
-		inferer->setFeatureFunctions(ffs);
-		inferer->setWeights(weights);		
-		inferer->compute();
+			SemiCrf::Algorithm inferer = SemiCrf::createInferer();
+			inferer->setLabels(labels);
+			inferer->setMaxLength(maxLength);
+			inferer->setDatas(inferenceDatas);
+			inferer->setFeatureFunctions(ffs);
+			inferer->setWeights(weights);
+			// inferer->compute();
 
-		//inferenceData->write(); T.B.D.
+			//inferenceData->write(); T.B.D.
+		}
 
+	} catch(error& e) {
+		std::cerr << e.what() << std::endl;
+		ret = 0x3;
 	} catch(...) {
-		// T.B.D.
+		std::cerr << "error: unexpected exception" << std::endl;
+		ret = 0x4;
 	}
 
-	return (0);
+	exit(ret);
 }

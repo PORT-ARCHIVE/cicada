@@ -77,7 +77,7 @@ namespace SemiCrf {
 	public:
 		Datas_();
 		virtual ~Datas_();
-		virtual void read(const char* input) = 0;
+		virtual void read(std::istream& input) = 0;
 		virtual void write() const;
 	};
 
@@ -88,7 +88,7 @@ namespace SemiCrf {
 	public:
 		TrainingDatas_();
 		virtual ~TrainingDatas_();
-		virtual void read(const char* input);
+		virtual void read(std::istream& input);
 		//virtual void write() const;
 	};
 
@@ -99,7 +99,7 @@ namespace SemiCrf {
 	public:
 		InferenceDatas_();
 		virtual ~InferenceDatas_();
-		virtual void read(const char* input);
+		virtual void read(std::istream& input);
 		//virtual void write() const;
 	};
 

@@ -1,4 +1,5 @@
 
+#include <cstdio>
 #include <limits>
 #include <iostream>
 #include <fstream>
@@ -138,7 +139,6 @@ namespace SemiCrf {
 	MultiByteIterator::MultiByteIterator(const std::string& arg)
 		: str(arg)
 	{
-		// Debug::out() << "MultiByteIterator()" << std::endl;
 		buf = new char[MB_CUR_MAX];
 		p = const_cast<char*>(str.c_str());
 		setBuf();
@@ -146,7 +146,6 @@ namespace SemiCrf {
 
 	MultiByteIterator::~MultiByteIterator()
 	{
-		// Debug::out() << "~MultiByteIterator()" << std::endl;
 		delete [] buf;
 	}
 
@@ -190,12 +189,10 @@ namespace SemiCrf {
 	MultiByteTokenizer::MultiByteTokenizer(std::string str)
 	 	: itr(str)
 	{
-	 	// Debug::out() << "MultiByteTokenizer()" << std::endl;
 	}
 
 	MultiByteTokenizer::~MultiByteTokenizer()
 	{
-		// Debug::out() << "~MultiByteTokenizer()" << std::endl;
 	}
 
 	std::string MultiByteTokenizer::get()
@@ -224,17 +221,11 @@ namespace SemiCrf {
 		return token;
 	}
 
-	void TrainingDatas_::read(const char* input)
+	void TrainingDatas_::read(std::istream& strm)
 	{
-		Debug::out() << "Datas_::read()" << std::endl;
+		Debug::out() << "TrainingDatas_::read()" << std::endl;
 
-		setlocale(LC_CTYPE, "ja_JP.UTF-8");
-
-		std::ifstream ifs;
-		ifs.open("test_data/test0.txt"); // T.B.D.
-		if( ifs.fail() ) {
-			// T.B.D.
-		}
+		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D
 
 		int counter = -1;
 		int seg_start = -1;
@@ -242,7 +233,7 @@ namespace SemiCrf {
 		Data data;
 		std::string line;
 
-		while( std::getline(ifs, line) ) {
+		while( std::getline(strm, line) ) {
 
 			if( line == "" ) {
 				continue;
@@ -267,7 +258,8 @@ namespace SemiCrf {
 			if( word.empty() ) {
 				// T.B.D.
 			} else {
-				Debug::out() << word << std::endl;
+				//Debug::out() << word << std::endl;
+				std::cout << word << std::endl;
 				std::vector<std::string> vs;
 				vs.push_back(word);
 				data->getStrs()->push_back(vs);
@@ -318,8 +310,6 @@ namespace SemiCrf {
 				// T.B.D.
 			}
 		}
-
-		ifs.close();
 	}
 
 	// InferenceDatas ctr
@@ -338,24 +328,18 @@ namespace SemiCrf {
 		return Datas( new InferenceDatas_() );
 	}
 
-	void InferenceDatas_::read(const char* file)
+	void InferenceDatas_::read(std::istream& strm)
 	{
-		Debug::out() << "Datas_::read()" << std::endl;
+		Debug::out() << "InferenceDatas_::read()" << std::endl;
 		typedef std::shared_ptr<MeCab::Tagger> Tagger;
 
-		setlocale(LC_CTYPE, "ja_JP.UTF-8");
-
-		std::ifstream ifs;
-		ifs.open("test_data/test1.txt"); // T.B.D.
-		if( ifs.fail() ) {
-			// T.B.D.
-		}
+		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
 
 		Data data;
 		std::string input;
 		std::string line;
 
-		while( std::getline(ifs, line) ) {
+		while( std::getline(strm, line) ) {
 
 			if( line == "" ) {
 				continue;
@@ -391,7 +375,8 @@ namespace SemiCrf {
 						}
 
 						vs.push_back(word);
-						Debug::out() << word << std::endl;
+						//Debug::out() << word << std::endl;
+						std::cout << word << std::endl;
 
 						MultiByteTokenizer tok(cppstr);
 						std::string t = tok.get();
