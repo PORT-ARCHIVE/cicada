@@ -177,7 +177,7 @@ namespace SemiCrf {
 	MultiByteIterator::MultiByteIterator(const std::string& arg)
 		: str(arg)
 	{
-		std::cout << "MultiByteIterator()" << std::endl;
+		// std::cout << "MultiByteIterator()" << std::endl;
 		buf = new char[MB_CUR_MAX];
 		p = const_cast<char*>(str.c_str());
 		setBuf();
@@ -185,7 +185,7 @@ namespace SemiCrf {
 
 	MultiByteIterator::~MultiByteIterator()
 	{
-		std::cout << "~MultiByteIterator()" << std::endl;
+		// std::cout << "~MultiByteIterator()" << std::endl;
 		delete [] buf;
 	}
 
@@ -229,12 +229,12 @@ namespace SemiCrf {
 	MultiByteTokenizer::MultiByteTokenizer(std::string str)
 	 	: itr(str)
 	{
-	 	std::cout << "MultiByteTokenizer()" << std::endl;
+	 	// std::cout << "MultiByteTokenizer()" << std::endl;
 	}
 
 	MultiByteTokenizer::~MultiByteTokenizer()
 	{
-		std::cout << "~MultiByteTokenizer()" << std::endl;
+		// std::cout << "~MultiByteTokenizer()" << std::endl;
 	}
 
 	std::string MultiByteTokenizer::get()
@@ -410,22 +410,35 @@ namespace SemiCrf {
 
 				} else if( line == "# END" ) {
 
-					Tagger tagger = std::shared_ptr<MeCab::Tagger>(MeCab::createTagger(""));
+					Tagger tagger = std::shared_ptr<MeCab::Tagger>(MeCab::createTagger("")); // T.B.D.
 					const MeCab::Node* node = tagger->parseToNode(input.c_str());
 
 					for( ; node ; node = node->next ) {
 
 						std::string cppstr = node->feature;
-						std::cout << cppstr << std::endl;
+						//std::cout << cppstr << std::endl;
 						if( cppstr.find("BOS") == 0 ) {
 							continue;
 						}
+
 						std::vector<std::string> vs;
+						std::string word;
+
+						auto c = node->surface;
+						for( int i = 0; i < node->length; i++ ) {
+							word.push_back(*c);
+							c++;
+						}
+
+						vs.push_back(word);
+						std::cout << word << std::endl;
+
 						MultiByteTokenizer tok(cppstr);
-						std::string t =tok.get();
+						std::string t = tok.get();
+						// tok.get();
 
 						while( !t.empty() ) {
-							std::cout << t << std::endl;
+							// std::cout << t << std::endl;
 							vs.push_back(t);
 							t = tok.get();
 						}
