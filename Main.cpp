@@ -73,35 +73,41 @@ int main(int argc, char *argv[])
 		// T.B.D.
 	}
 
-	try { // 学習
+	try {
 
+		std::string file;
+		SemiCrf::Algorithm algorithm;
 		if( !options.training_data_file.empty() ) {
 
-			ffs->read();
-			weights->read();
+			file = options.training_data_file;
+			algorithm = SemiCrf::createLearner();
 
-			std::ifstream ifs;
-			ifs.open( options.training_data_file.c_str() );
-			if( ifs.fail() ) {
-				std::stringstream ss;
-				ss << "error: connot open such file: " << options.training_data_file;
-				throw error(ss.str());
-			}
+		} else if( !options.inference_data_file.empty() ) {
 
-			SemiCrf::Datas trainingDatas = SemiCrf::createTrainingDatas();
-			trainingDatas->read(ifs);
-
-			SemiCrf::Algorithm learner = SemiCrf::createLearner();
-			learner->setLabels(labels);
-			learner->setMaxLength(maxLength);
-			learner->setDatas(trainingDatas);
-			learner->setFeatureFunctions(ffs);
-			learner->setWeights(weights);
-			// learner->compute();
-
-			ffs->write();
-			weights->write();
+			file = options.inference_data_file;
+			algorithm = SemiCrf::createInferer();
 		}
+
+		algorithm->setFeatureFunctions(ffs);
+		algorithm->setWeights(weights);
+		algorithm->preProcess();
+
+		std::ifstream ifs;
+		ifs.open( file.c_str() );
+		if( ifs.fail() ) {
+			std::stringstream ss;
+			ss << "error: connot open such file: " << options.training_data_file;
+			throw error(ss.str());
+		}
+
+		SemiCrf::Datas datas = algorithm->createDatas();
+		datas->read(ifs);
+		algorithm->setLabels(labels);
+		algorithm->setMaxLength(maxLength);
+		algorithm->setDatas(datas);
+		// algorithm->compute();
+
+		algorithm->postProcess();
 
 	} catch(error& e) {
 		std::cerr << e.what() << std::endl;
@@ -109,43 +115,6 @@ int main(int argc, char *argv[])
 	} catch(...) {
 		std::cerr << "error: unexpected exception" << std::endl;
 		ret = 0x2;
-	}
-
-	try { // 推論
-
-		if( !options.inference_data_file.empty() ) {
-
-			ffs->read();
-			//weights->read(); T.B.D.
-
-			std::ifstream ifs;
-			ifs.open( options.inference_data_file.c_str() );
-			if( ifs.fail() ) {
-				std::stringstream ss;
-				ss << "error: connot open such file: " << options.inference_data_file;
-				throw error(ss.str());
-			}
-
-			SemiCrf::Datas inferenceDatas = SemiCrf::createInferenceDatas();
-			inferenceDatas->read(ifs);
-
-			SemiCrf::Algorithm inferer = SemiCrf::createInferer();
-			inferer->setLabels(labels);
-			inferer->setMaxLength(maxLength);
-			inferer->setDatas(inferenceDatas);
-			inferer->setFeatureFunctions(ffs);
-			inferer->setWeights(weights);
-			// inferer->compute();
-
-			//inferenceData->write(); T.B.D.
-		}
-
-	} catch(error& e) {
-		std::cerr << e.what() << std::endl;
-		ret = 0x3;
-	} catch(...) {
-		std::cerr << "error: unexpected exception" << std::endl;
-		ret = 0x4;
 	}
 
 	exit(ret);

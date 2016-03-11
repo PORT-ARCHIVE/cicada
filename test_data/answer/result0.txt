@@ -5,6 +5,8 @@ FeatureFunction_()
 AppReqF0()
 FeatureFunction_()
 AppReqF1()
+Algorithm_()
+Learner()
 Weights_::read()
 Datas_()
 TrainingDatas_()
@@ -103,8 +105,6 @@ N
 N
 -
 END : data was pushed.
-Algorithm_()
-Learner()
 AppReqF0()::write()
 AppReqF0::write()
 Weights_::write()

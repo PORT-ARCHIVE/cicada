@@ -158,6 +158,9 @@ namespace SemiCrf {
 		virtual void setFeatureFunctions(FeatureFunctions arg);
 		virtual void setWeights(Weights arg);
 		virtual void compute() = 0;
+		virtual Datas createDatas() = 0;
+		virtual void preProcess() = 0;
+		virtual void postProcess() = 0;
 
 	protected:
 		double computeWG(AppReqs::Label y, AppReqs::Label yd, int i, int d);
@@ -182,6 +185,9 @@ namespace SemiCrf {
 		Learner();
 		virtual ~Learner();
 		virtual void compute();
+		virtual Datas createDatas();
+		virtual void preProcess();
+		virtual void postProcess();
 
 	private:
 		double computeZ();
@@ -199,6 +205,9 @@ namespace SemiCrf {
 		Inferer();
 		virtual ~Inferer();
 		virtual void compute();
+		virtual Datas createDatas();
+		virtual void preProcess();
+		virtual void postProcess();
 		
 	private:
 		double V(int i, AppReqs::Label y, int& maxd);

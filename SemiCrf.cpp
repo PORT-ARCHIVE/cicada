@@ -101,11 +101,6 @@ namespace SemiCrf {
 		Debug::out() << "~TrainingDatas_()" << std::endl;
 	}
 
-	Datas createTrainingDatas()
-	{
-		return Datas( new TrainingDatas_() );
-	}
-
 	void TrainingDatas_::read(std::istream& strm)
 	{
 		Debug::out() << "TrainingDatas_::read()" << std::endl;
@@ -206,11 +201,6 @@ namespace SemiCrf {
 	InferenceDatas_::~InferenceDatas_()
 	{
 		Debug::out() << "~InferenceDatas_()" << std::endl;
-	}
-
-	Datas createInferenceDatas()
-	{
-		return Datas( new InferenceDatas_() );
 	}
 
 	void InferenceDatas_::read(std::istream& strm)
@@ -422,6 +412,23 @@ namespace SemiCrf {
 		Debug::out() << "~Learner()" << std::endl;
 	}
 
+	Datas Learner::createDatas()
+	{
+		return Datas( new TrainingDatas_() );
+	}
+
+	void Learner::preProcess()
+	{
+		ffs->read();
+		weights->read();
+	}
+
+	void Learner::postProcess()
+	{
+		ffs->write();
+		weights->write();
+	}
+
 	void Learner::compute()
 	{
 		Debug::out() << "Learner::compute()" << std::endl;
@@ -605,6 +612,22 @@ namespace SemiCrf {
 
 	Inferer::~Inferer() {
 		Debug::out() << "~Inferer()" << std::endl;
+	}
+
+	Datas Inferer::createDatas()
+	{
+		return Datas( new InferenceDatas_() );
+	}
+
+	void Inferer::preProcess()
+	{
+		ffs->read();
+		//weights->read(); T.B.D.
+	}
+
+	void Inferer::postProcess()
+	{
+		// datas->write(); T.B.D.
 	}
 
 	void Inferer::compute()

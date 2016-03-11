@@ -5,6 +5,8 @@ FeatureFunction_()
 AppReqF0()
 FeatureFunction_()
 AppReqF1()
+Algorithm_()
+Inferer()
 Datas_()
 InferenceDatas_()
 InferenceDatas_::read()
@@ -510,8 +512,6 @@ BOS/EOS,*,*,*,*,*,*,*,*
 。
 BOS/EOS,*,*,*,*,*,*,*,*
 END : data was pushed.
-Algorithm_()
-Inferer()
 ~Inferer()
 ~Algorithm_()
 ~InferenceDatas_()
