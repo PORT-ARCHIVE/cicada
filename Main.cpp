@@ -19,27 +19,34 @@ public:
 		: training_data_file("")
 		, inference_data_file("")
 		, debug(false) {};
+	void parse(int argc, char *argv[]);
 public:
 	std::string training_data_file;
 	std::string inference_data_file;
 	bool debug;
 };
 
-int main(int argc, char *argv[])
+void Options::parse(int argc, char *argv[])
 {
-	int ret = 0x0;
-
-	Options options;
 	for( int i = 0; i < argc; i++ ) {
 		std::string arg = argv[i];
 		if( arg == "-t" ) {
-			options.training_data_file = argv[++i];
+			training_data_file = argv[++i];
 		} else if( arg == "-i" ) {
-			options.inference_data_file = argv[++i];
+			inference_data_file = argv[++i];
 		} else if( arg == "--debug" ) {
-			options.debug = true;
+			debug = true;
 		}
 	}
+}
+
+int main(int argc, char *argv[])
+{
+	int ret = 0x0;
+	int maxLength = 5;
+
+	Options options;
+	options.parse(argc, argv);
 
 	if( options.debug ) {
 		Debug::on();
@@ -49,12 +56,11 @@ int main(int argc, char *argv[])
 
 	Debug::out() << "##### Start Semi-CRF ####" << std::endl;
 
-	int maxLength = 5;
-	SemiCrf::Weights weights = SemiCrf::createWeights();
-	SemiCrf::FeatureFunctions ffs = SemiCrf::createFeatureFunctions();
-	SemiCrf::Labels labels = SemiCrf::createLabels();
+	try {
 
-	try { // 素性関数,Labelを準備する
+		SemiCrf::Weights weights = SemiCrf::createWeights();
+		SemiCrf::FeatureFunctions ffs = SemiCrf::createFeatureFunctions();
+		SemiCrf::Labels labels = SemiCrf::createLabels();
 
 		// T.B.D.
 		typedef SemiCrf::FeatureFunction SFF;	
@@ -68,12 +74,6 @@ int main(int argc, char *argv[])
 		labels->push_back(AppReqs::Label::CAMPANY);
 		labels->push_back(AppReqs::Label::LOCATION);
 		// T.B.D.	
-
-	} catch(...) {
-		// T.B.D.
-	}
-
-	try {
 
 		std::string file;
 		SemiCrf::Algorithm algorithm;
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 		ifs.open( file.c_str() );
 		if( ifs.fail() ) {
 			std::stringstream ss;
-			ss << "error: connot open such file: " << options.training_data_file;
+			ss << "error: connot open such file: " << file;
 			throw error(ss.str());
 		}
 
