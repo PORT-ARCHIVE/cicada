@@ -24,8 +24,8 @@ namespace AppReqs {
 	SemiCrf::FeatureFunctions createFeatureFunctions()
 	{
 		SemiCrf::FeatureFunctions ffs = SemiCrf::createFeatureFunctions();
-		SemiCrf::FeatureFunction ff0(new AppReqs::AppReqF0());
-		SemiCrf::FeatureFunction ff1(new AppReqs::AppReqF1());
+		SemiCrf::FeatureFunction ff0(new AppReqF0());
+		SemiCrf::FeatureFunction ff1(new AppReqF1());
 
 		ffs->push_back(ff0);
 		ffs->push_back(ff1);
@@ -37,9 +37,9 @@ namespace AppReqs {
 	{
 		SemiCrf::Labels labels = SemiCrf::createLabels();
 
-		labels->push_back(AppReqs::Label::NONE);
-		labels->push_back(AppReqs::Label::CAMPANY);
-		labels->push_back(AppReqs::Label::LOCATION);
+		labels->push_back(Label::NONE);
+		labels->push_back(Label::CAMPANY);
+		labels->push_back(Label::LOCATION);
 
 		return labels;
 	}
