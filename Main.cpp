@@ -63,21 +63,8 @@ int main(int argc, char *argv[])
 	try {
 
 		SemiCrf::Weights weights = SemiCrf::createWeights();
-		SemiCrf::FeatureFunctions ffs = SemiCrf::createFeatureFunctions();
-		SemiCrf::Labels labels = SemiCrf::createLabels();
-
-		// T.B.D.
-		typedef SemiCrf::FeatureFunction SFF;	
-		SFF ff0(new AppReqs::AppReqF0());
-		SFF ff1(new AppReqs::AppReqF1());
-
-		ffs->push_back(ff0);
-		ffs->push_back(ff1);
-
-		labels->push_back(AppReqs::Label::NONE);
-		labels->push_back(AppReqs::Label::CAMPANY);
-		labels->push_back(AppReqs::Label::LOCATION);
-		// T.B.D.	
+		SemiCrf::FeatureFunctions ffs = AppReqs::createFeatureFunctions();
+		SemiCrf::Labels labels = AppReqs::createLabels();
 
 		std::string file;
 		SemiCrf::Algorithm algorithm;
