@@ -462,7 +462,7 @@ namespace SemiCrf {
 
 			assert( weights->size() == dL.size() );
 
-			const double ep0 = 1.0e-5;
+			const double ep0 = 1.0e-5; // !!!!
 			auto wi = weights->begin();
 			auto dLi = dL.begin();
 			for( ; wi != weights->end(); wi++, dLi++ ) {
@@ -473,7 +473,7 @@ namespace SemiCrf {
 
 	bool Learner::isConv(const std::vector<double>& dL)
 	{
-		const double ep1 = 1.0e-5;
+		const double ep1 = 1.0e-5; // !!!!
 		double l = 0.0;
 		for( auto i : dL ) {
 			l += i*i;
