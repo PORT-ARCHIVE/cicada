@@ -138,8 +138,7 @@ namespace SemiCrf {
 			if( word.empty() ) {
 				// T.B.D.
 			} else {
-				//Debug::out() << word << std::endl;
-				std::cout << word << std::endl;
+				Debug::out() << word << std::endl;
 				std::vector<std::string> vs;
 				vs.push_back(word);
 				data->getStrs()->push_back(vs);
