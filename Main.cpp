@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 #include "SemiCrf.hpp"
 #include "AppReqs.hpp"
 #include "DebugOut.hpp"
@@ -18,11 +19,13 @@ public:
 	Options()
 		: training_data_file("")
 		, inference_data_file("")
+		, maxLength(5)
 		, debug(false) {};
 	void parse(int argc, char *argv[]);
 public:
 	std::string training_data_file;
 	std::string inference_data_file;
+	int maxLength;
 	bool debug;
 };
 
@@ -34,6 +37,8 @@ void Options::parse(int argc, char *argv[])
 			training_data_file = argv[++i];
 		} else if( arg == "-i" ) {
 			inference_data_file = argv[++i];
+		} else if( arg == "-l" ) {
+			maxLength = boost::lexical_cast<int>(argv[++i]);
 		} else if( arg == "--debug" ) {
 			debug = true;
 		}
@@ -43,7 +48,6 @@ void Options::parse(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	int ret = 0x0;
-	int maxLength = 5;
 
 	Options options;
 	options.parse(argc, argv);
@@ -103,7 +107,7 @@ int main(int argc, char *argv[])
 		SemiCrf::Datas datas = algorithm->createDatas();
 		datas->read(ifs);
 		algorithm->setLabels(labels);
-		algorithm->setMaxLength(maxLength);
+		algorithm->setMaxLength(options.maxLength);
 		algorithm->setDatas(datas);
 		// algorithm->compute();
 
