@@ -6,9 +6,9 @@
 #include "AppReqs.hpp"
 #include "DebugOut.hpp"
 
-class error {
+class Error {
 public:
-	error(std::string arg) : msg(arg) {};
+	Error(const std::string& arg) : msg(arg) {}
 	const std::string& what() { return msg; }
 private:
 	std::string msg;
@@ -49,22 +49,16 @@ int main(int argc, char *argv[])
 {
 	int ret = 0x0;
 
-	Options options;
-	options.parse(argc, argv);
-
-	if( options.debug ) {
-		Debug::on();
-	} else {
-		Debug::off();
-	}
-
-	Debug::out() << "##### Start Semi-CRF ####" << std::endl;
-
 	try {
 
-		SemiCrf::Weights weights = SemiCrf::createWeights();
-		SemiCrf::FeatureFunctions ffs = AppReqs::createFeatureFunctions();
-		SemiCrf::Labels labels = AppReqs::createLabels();
+		Options options;
+		options.parse(argc, argv);
+
+		if( options.debug ) {
+			Debug::on();
+		} else {
+			Debug::off();
+		}
 
 		std::string file;
 		SemiCrf::Algorithm algorithm;
@@ -77,33 +71,50 @@ int main(int argc, char *argv[])
 
 			file = options.inference_data_file;
 			algorithm = SemiCrf::createInferer();
+
+		} else {
+
+			std::stringstream ss;
+			ss << "error: no input file specified";
+			throw Error(ss.str());
 		}
 
+		SemiCrf::FeatureFunctions ffs = AppReqs::createFeatureFunctions();
 		algorithm->setFeatureFunctions(ffs);
+
+		SemiCrf::Labels labels = AppReqs::createLabels();
+		algorithm->setLabels(labels);
+
+		SemiCrf::Weights weights = SemiCrf::createWeights();
 		algorithm->setWeights(weights);
+
 		algorithm->preProcess();
 
 		std::ifstream ifs;
 		ifs.open( file.c_str() );
 		if( ifs.fail() ) {
+
 			std::stringstream ss;
 			ss << "error: connot open such file: " << file;
-			throw error(ss.str());
+			throw Error(ss.str());
 		}
 
 		SemiCrf::Datas datas = algorithm->createDatas();
 		datas->read(ifs);
-		algorithm->setLabels(labels);
-		algorithm->setMaxLength(options.maxLength);
 		algorithm->setDatas(datas);
+
+		algorithm->setMaxLength(options.maxLength);
 		// algorithm->compute();
 
 		algorithm->postProcess();
 
-	} catch(error& e) {
+	} catch(Error& e) {
+
 		std::cerr << e.what() << std::endl;
 		ret = 0x1;
+
 	} catch(...) {
+
 		std::cerr << "error: unexpected exception" << std::endl;
 		ret = 0x2;
 	}
