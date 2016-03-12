@@ -190,6 +190,7 @@ namespace SemiCrf {
 		virtual void postProcess();
 
 	private:
+		bool isConv(const std::vector<double>& dL);
 		double computeZ();
 		std::vector<double>&& computeG();
 		std::vector<double>&& computeGm(double Z);

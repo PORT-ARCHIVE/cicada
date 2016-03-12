@@ -433,27 +433,54 @@ namespace SemiCrf {
 		Debug::out() << "Learner::compute()" << std::endl;
 		assert( weights->size() == ffs->size() );
 		int l = labels->size();
-		std::vector<double> dL(datas->size());
-		auto pdL = dL.begin();
 
-		for( auto data : *datas ) {
+		std::vector<double> dL(datas->size(), 1.0);
 
-			current_data = data;
-			int s = current_data->getStrs()->size();
-			int capacity = l*s;
-			current_actab = createCheckTable(capacity);
-			current_ectab = createCheckTable(capacity);
+		while( !isConv(dL) ) {
 
-			double Z = computeZ();
-			auto&& Gs = computeG();
-			auto&& Gms = computeGm(Z);
+			dL.clear();
+			auto pdL = dL.begin();
 
-			for( int k = 0; k < ffs->size(); k++ ) {
-				(*pdL) += Gs[k] - Gms[k];
+			for( auto data : *datas ) {
+
+				current_data = data;
+				int s = current_data->getStrs()->size();
+				int capacity = l*s;
+				current_actab = createCheckTable(capacity);
+				current_ectab = createCheckTable(capacity);
+
+				double Z = computeZ();
+				auto&& Gs = computeG();
+				auto&& Gms = computeGm(Z);
+
+				for( int k = 0; k < ffs->size(); k++ ) {
+					(*pdL) += Gs[k] - Gms[k];
+				}
+
+				pdL++;
 			}
 
-			pdL++;
+			assert( weights->size() == dL.size() );
+
+			const double ep0 = 1.0e-5;
+			auto wi = weights->begin();
+			auto dLi = dL.begin();
+			for( ; wi != weights->end(); wi++, dLi++ ) {
+				(*wi) = (*wi) + ep0 * (*dLi); // !!!!
+			}
 		}
+	}
+
+	bool Learner::isConv(const std::vector<double>& dL)
+	{
+		const double ep1 = 1.0e-5;
+		double l = 0.0;
+		for( auto i : dL ) {
+			l += i*i;
+		}
+		l = sqrt(l);
+
+		return (l < ep1);
 	}
 
 	std::vector<double>&& Learner::computeG()
