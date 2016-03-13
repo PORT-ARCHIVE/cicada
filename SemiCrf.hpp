@@ -154,6 +154,8 @@ namespace SemiCrf {
 		virtual ~Algorithm_();
 		virtual void setLabels(Labels arg);
 		virtual void setMaxLength(int arg);
+		virtual void setE0(double arg);
+		virtual void setE1(double arg);
 		virtual void setDatas(Datas arg);
 		virtual void setFeatureFunctions(FeatureFunctions arg);
 		virtual void setWeights(Weights arg);
@@ -170,6 +172,8 @@ namespace SemiCrf {
 		Weights weights;
 		Datas datas;
 		int maxLength; // 最大セグメント長
+		double e0;
+		double e1;
 		Data current_data;
 		Segments segs;
 		CheckTable current_vctab;

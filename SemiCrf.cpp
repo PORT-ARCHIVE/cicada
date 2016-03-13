@@ -389,6 +389,9 @@ namespace SemiCrf {
 		, ffs( nullptr )
 		, weights( nullptr )
 		, datas( nullptr )
+		, maxLength(5)
+		, e0(1.0e-5)
+		, e1(1.0e-5)
 	{
 		Debug::out() << "Algorithm_()" << std::endl;
 	}
@@ -406,6 +409,16 @@ namespace SemiCrf {
 	void Algorithm_::setMaxLength(int arg)
 	{
 		maxLength = arg;
+	}
+
+	void Algorithm_::setE0(double arg)
+	{
+		e0 = arg;
+	}
+
+	void Algorithm_::setE1(double arg)
+	{
+		e1 = arg;
 	}
 
 	void Algorithm_::setDatas(Datas arg)
@@ -516,25 +529,23 @@ namespace SemiCrf {
 
 			assert( weights->size() == dL.size() );
 
-			const double ep0 = 1.0e-5; // !!!!
 			auto wi = weights->begin();
 			auto dLi = dL.begin();
 			for( ; wi != weights->end(); wi++, dLi++ ) {
-				(*wi) = (*wi) + ep0 * (*dLi); // !!!!
+				(*wi) = (*wi) + e0 * (*dLi); // !!!!
 			}
 		}
 	}
 
 	bool Learner::isConv(const std::vector<double>& dL)
 	{
-		const double ep1 = 1.0e-5; // !!!!
 		double tdl = 0.0;
 		for( auto dl : dL ) {
 			tdl += dl*dl;
 		}
 		tdl = sqrt(tdl);
 
-		return (tdl < ep1);
+		return (tdl < e1);
 	}
 
 	std::vector<double>&& Learner::computeG()

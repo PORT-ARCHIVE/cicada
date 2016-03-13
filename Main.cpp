@@ -14,6 +14,8 @@ public:
 		, inference_data_file("")
 		, weights_file("weights.txt")
 		, maxLength(5)
+		, e0(1.0e-5)
+		, e1(1.0e-5)
 		, debug(false) {};
 	void parse(int argc, char *argv[]);
 public:
@@ -21,6 +23,8 @@ public:
 	std::string inference_data_file;
 	std::string weights_file;
 	int maxLength;
+	double e0;
+	double e1;
 	bool debug;
 };
 
@@ -34,6 +38,10 @@ void Options::parse(int argc, char *argv[])
 			inference_data_file = argv[++i];
 		} else if( arg == "-l" ) {
 			maxLength = boost::lexical_cast<int>(argv[++i]);
+		} else if( arg == "-e0" ) {
+			e0 = boost::lexical_cast<int>(argv[++i]);
+		} else if( arg == "-e1" ) {
+			e1 = boost::lexical_cast<int>(argv[++i]);
 		} else if( arg == "-w" ) {
 			weights_file = argv[++i];
 		} else if( arg == "--debug" ) {
