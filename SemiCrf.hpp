@@ -110,8 +110,8 @@ namespace SemiCrf {
 	public:
 		Weights_();
 		virtual ~Weights_();
-		void read();
-		void write();		
+		void read(std::ifstream& ifs);
+		void write(std::ofstream& ofs);
 	};
 
 	typedef std::shared_ptr<Weights_> Weights;
@@ -159,8 +159,8 @@ namespace SemiCrf {
 		virtual void setWeights(Weights arg);
 		virtual void compute() = 0;
 		virtual Datas createDatas() = 0;
-		virtual void preProcess() = 0;
-		virtual void postProcess() = 0;
+		virtual void preProcess(const std::string& wfile) = 0;
+		virtual void postProcess(const std::string& wfile) = 0;
 
 	protected:
 		double computeWG(AppReqs::Label y, AppReqs::Label yd, int i, int d);
@@ -186,8 +186,8 @@ namespace SemiCrf {
 		virtual ~Learner();
 		virtual void compute();
 		virtual Datas createDatas();
-		virtual void preProcess();
-		virtual void postProcess();
+		virtual void preProcess(const std::string& wfile);
+		virtual void postProcess(const std::string& wfile);
 
 	private:
 		bool isConv(const std::vector<double>& dL);
@@ -207,8 +207,8 @@ namespace SemiCrf {
 		virtual ~Inferer();
 		virtual void compute();
 		virtual Datas createDatas();
-		virtual void preProcess();
-		virtual void postProcess();
+		virtual void preProcess(const std::string& wfile);
+		virtual void postProcess(const std::string& wfile);
 		
 	private:
 		double V(int i, AppReqs::Label y, int& maxd);

@@ -3,7 +3,8 @@
 #include <limits>
 #include <iostream>
 #include <fstream>
-#include <boost/algorithm/string.hpp>
+#include <sstream>
+#include <boost/lexical_cast.hpp>
 #include <cassert>
 #include <cmath>
 #include <clocale>
@@ -12,6 +13,7 @@
 #include "AppReqs.hpp"
 #include "MultiByteTokenizer.hpp"
 #include "DebugOut.hpp"
+#include "Error.hpp"
 
 namespace SemiCrf {
 
@@ -290,16 +292,56 @@ namespace SemiCrf {
 		Debug::out() << "~Weights()" << std::endl;
 	}
 
-	void Weights_::read()
+	void Weights_::read(std::ifstream& ifs)
 	{
 		Debug::out() << "Weights_::read()" << std::endl;
-		push_back(1.0);
-		push_back(2.0);
+
+		bool state = false;
+
+		std::string line;
+		while( std::getline(ifs, line) ) {
+
+			if( line == "" ) {
+				continue;
+			}
+
+			if( line[0] == '#' ) {
+				if( line == "# BEGIN" ) {
+					state = true;
+				} else if( line == "# END" ) {
+					state = false;
+					break;
+				}
+				continue;
+			}
+
+			if( state ) {
+
+				MultiByteTokenizer tokenizer(line);
+				std::string weight = tokenizer.get();
+				double wv  = boost::lexical_cast<double>(weight);
+				push_back(wv);
+
+				if( !tokenizer.get().empty() ) {
+					// T.B.D
+				}
+			}
+		}
 	}
 
-	void Weights_::write()
+	void Weights_::write(std::ofstream& ofs)
 	{
 		Debug::out() << "Weights_::write()" << std::endl;
+
+		ofs << "# Semi-CRF Weights" << std::endl;
+		ofs << std::endl;
+		ofs << "# BEGIN" << std::endl;
+
+		for( auto w : *this ) {
+			ofs << w << std::endl;
+		}
+
+		ofs << "# END" << std::endl;
 	}
 
 	FeatureFunction_::FeatureFunction_()
@@ -416,16 +458,28 @@ namespace SemiCrf {
 		return Datas( new TrainingDatas_() );
 	}
 
-	void Learner::preProcess()
+	void Learner::preProcess(const std::string& wfile)
 	{
+		SemiCrf::Weights weights = SemiCrf::createWeights();
+		setWeights(weights);
 		ffs->read();
-		weights->read();
 	}
 
-	void Learner::postProcess()
+	void Learner::postProcess(const std::string& wfile)
 	{
 		ffs->write();
-		weights->write();
+
+		std::ofstream ofs; // 出力
+		ofs.open( wfile.c_str() );
+		if( ofs.fail() ) {
+
+			std::stringstream ss;
+			ss << "error: connot open such file: " << wfile;
+			throw Error(ss.str());
+		}
+
+		weights->write(ofs);
+		ofs.close();
 	}
 
 	void Learner::compute()
@@ -645,13 +699,26 @@ namespace SemiCrf {
 		return Datas( new InferenceDatas_() );
 	}
 
-	void Inferer::preProcess()
+	void Inferer::preProcess(const std::string& wfile)
 	{
+		SemiCrf::Weights weights = SemiCrf::createWeights();
+
+		std::ifstream ifs; // 入力
+		ifs.open( wfile.c_str() );
+		if( ifs.fail() ) {
+
+			std::stringstream ss;
+			ss << "error: connot open such file: " << wfile;
+			throw Error(ss.str());
+		}
+		weights->read(ifs);
+		ifs.close();
+
+		setWeights(weights);
 		ffs->read();
-		//weights->read(); T.B.D.
 	}
 
-	void Inferer::postProcess()
+	void Inferer::postProcess(const std::string& wfile)
 	{
 		// datas->write(); T.B.D.
 	}

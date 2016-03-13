@@ -12,12 +12,14 @@ public:
 	Options()
 		: training_data_file("")
 		, inference_data_file("")
+		, weights_file("weights.txt")
 		, maxLength(5)
 		, debug(false) {};
 	void parse(int argc, char *argv[]);
 public:
 	std::string training_data_file;
 	std::string inference_data_file;
+	std::string weights_file;
 	int maxLength;
 	bool debug;
 };
@@ -32,6 +34,8 @@ void Options::parse(int argc, char *argv[])
 			inference_data_file = argv[++i];
 		} else if( arg == "-l" ) {
 			maxLength = boost::lexical_cast<int>(argv[++i]);
+		} else if( arg == "-w" ) {
+			weights_file = argv[++i];
 		} else if( arg == "--debug" ) {
 			debug = true;
 		}
@@ -78,10 +82,7 @@ int main(int argc, char *argv[])
 		SemiCrf::Labels labels = AppReqs::createLabels();
 		algorithm->setLabels(labels);
 
-		SemiCrf::Weights weights = SemiCrf::createWeights();
-		algorithm->setWeights(weights);
-
-		algorithm->preProcess();
+		algorithm->preProcess(options.weights_file);
 
 		std::ifstream ifs;
 		ifs.open( file.c_str() );
@@ -94,12 +95,14 @@ int main(int argc, char *argv[])
 
 		SemiCrf::Datas datas = algorithm->createDatas();
 		datas->read(ifs);
+		ifs.close();
+
 		algorithm->setDatas(datas);
 
 		algorithm->setMaxLength(options.maxLength);
 		// algorithm->compute();
 
-		algorithm->postProcess();
+		algorithm->postProcess(options.weights_file);
 
 	} catch(Error& e) {
 
