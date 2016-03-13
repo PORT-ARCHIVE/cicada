@@ -108,6 +108,8 @@ int main(int argc, char *argv[])
 		algorithm->setDatas(datas);
 
 		algorithm->setMaxLength(options.maxLength);
+		algorithm->setE0(options.e0);
+		algorithm->setE1(options.e1);b
 		// algorithm->compute();
 
 		algorithm->postProcess(options.weights_file);
