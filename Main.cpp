@@ -30,23 +30,40 @@ public:
 
 void Options::parse(int argc, char *argv[])
 {
-	for( int i = 0; i < argc; i++ ) {
-		std::string arg = argv[i];
-		if( arg == "-t" ) {
-			training_data_file = argv[++i];
-		} else if( arg == "-i" ) {
-			inference_data_file = argv[++i];
-		} else if( arg == "-l" ) {
-			maxLength = boost::lexical_cast<int>(argv[++i]);
-		} else if( arg == "-e0" ) {
-			e0 = boost::lexical_cast<int>(argv[++i]);
-		} else if( arg == "-e1" ) {
-			e1 = boost::lexical_cast<int>(argv[++i]);
-		} else if( arg == "-w" ) {
-			weights_file = argv[++i];
-		} else if( arg == "--debug" ) {
-			debug = true;
+	try {
+		for( int i = 1; i < argc; i++ ) {
+			std::string arg = argv[i];
+			if( arg == "-t" ) {
+				training_data_file = argv[++i];
+			} else if( arg == "-i" ) {
+				inference_data_file = argv[++i];
+			} else if( arg == "-l" ) {
+				maxLength = boost::lexical_cast<int>(argv[++i]);
+			} else if( arg == "-e0" ) {
+				e0 = boost::lexical_cast<double>(argv[++i]);
+			} else if( arg == "-e1" ) {
+				e1 = boost::lexical_cast<double>(argv[++i]);
+			} else if( arg == "-w" ) {
+				weights_file = argv[++i];
+			} else if( arg == "--debug" ) {
+				debug = true;
+			} else {
+
+				std::stringstream ss;
+				ss << "error: unknown option specified";
+				throw Error(ss.str());
+			}
 		}
+
+	} catch(Error& e) {
+
+		throw e;
+
+	} catch(...) {
+
+		std::stringstream ss;
+		ss << "error: invalid option specified";
+		throw Error(ss.str());
 	}
 }
 
@@ -78,18 +95,15 @@ int main(int argc, char *argv[])
 			algorithm = SemiCrf::createInferer();
 
 		} else {
-
 			std::stringstream ss;
 			ss << "error: no input file specified";
 			throw Error(ss.str());
 		}
 
 		SemiCrf::FeatureFunctions ffs = AppReqs::createFeatureFunctions();
-		algorithm->setFeatureFunctions(ffs);
-
 		SemiCrf::Labels labels = AppReqs::createLabels();
+		algorithm->setFeatureFunctions(ffs);
 		algorithm->setLabels(labels);
-
 		algorithm->preProcess(options.weights_file);
 
 		std::ifstream ifs;
@@ -104,14 +118,12 @@ int main(int argc, char *argv[])
 		SemiCrf::Datas datas = algorithm->createDatas();
 		datas->read(ifs);
 		ifs.close();
-
 		algorithm->setDatas(datas);
 
 		algorithm->setMaxLength(options.maxLength);
 		algorithm->setE0(options.e0);
 		algorithm->setE1(options.e1);
 		// algorithm->compute();
-
 		algorithm->postProcess(options.weights_file);
 
 	} catch(Error& e) {
