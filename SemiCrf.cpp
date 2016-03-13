@@ -474,13 +474,13 @@ namespace SemiCrf {
 	bool Learner::isConv(const std::vector<double>& dL)
 	{
 		const double ep1 = 1.0e-5; // !!!!
-		double l = 0.0;
-		for( auto i : dL ) {
-			l += i*i;
+		double tdl = 0.0;
+		for( auto dl : dL ) {
+			tdl += dl*dl;
 		}
-		l = sqrt(l);
+		tdl = sqrt(tdl);
 
-		return (l < ep1);
+		return (tdl < ep1);
 	}
 
 	std::vector<double>&& Learner::computeG()
