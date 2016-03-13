@@ -59,18 +59,34 @@ namespace SemiCrf {
 	void Data_::write() const {
 		Debug::out() << "InferenceData::write()" << std::endl;
 
-		// iterate segments
-		for( auto i : *segs ){
-			int start = i->getStart();
-			int end = i->getEnd();
-			AppReqs::Label l = i->getLabel();
-			// T.B.D.
-		}
+		for( auto s : *segs ){
 
-		// iterate strings
-		for( auto i : *strs ){
-			std::vector<std::string>& s = i;
-			// T.B.D.
+			int start = s->getStart();
+			int end = s->getEnd();
+			AppReqs::Label l = s->getLabel();
+
+			for( int i = start; i <= end; i++ ) {
+
+				std::cout << strs->at(0).at(i);
+
+				if( i == start ) {
+
+					std::cout << "\tS\t";
+
+				} else if( start < i && i < end ) {
+
+					std::cout << "\tM\t";
+
+				} else if( i == end ) {
+
+					std::cout << "\tE\t";
+
+				} else {
+					// T.B.D.
+				}
+
+				std::cout << label2String(l) << std::endl;
+			}
 		}
 	}
 
@@ -87,8 +103,11 @@ namespace SemiCrf {
 
 	void Datas_::write() const {
 		Debug::out() << "Datas_::write()" << std::endl;
-		for( auto i : *this ) {
-			i->write();
+		for( auto d : *this ) {
+			std::cout << "# BEGIN" << std::endl;
+		 	d->write();
+			std::cout << "# END" << std::endl;
+			std::cout << std::endl;
 		}
 	}
 

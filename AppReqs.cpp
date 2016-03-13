@@ -4,7 +4,7 @@
 
 namespace AppReqs {
 
-	Label string2Label(std::string str) {
+	Label string2Label(const std::string& str) {
 		if( str == "NONE" || str == "-" || str.empty() ) {
 			return Label::NONE;
 		} else if( str == "COMPANY" ) {
@@ -17,8 +17,12 @@ namespace AppReqs {
 			return Label::LOCATION;
 		} else {
 			Debug::out() << "warning: unknown label" << std::endl; // T.B.D.
-			return Label::NONE;			
+			return Label::NONE;
 		}
+	}
+
+	std::string label2String(Label label) {
+		return std::string("NONE");
 	}
 
 	SemiCrf::FeatureFunctions createFeatureFunctions()
