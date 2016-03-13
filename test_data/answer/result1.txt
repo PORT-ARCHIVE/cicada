@@ -512,6 +512,19 @@ BOS/EOS,*,*,*,*,*,*,*,*
 。
 BOS/EOS,*,*,*,*,*,*,*,*
 END : data was pushed.
+Datas_::write()
+# BEGIN
+InferenceData::write()
+# END
+
+# BEGIN
+InferenceData::write()
+# END
+
+# BEGIN
+InferenceData::write()
+# END
+
 ~Inferer()
 ~Algorithm_()
 ~InferenceDatas_()

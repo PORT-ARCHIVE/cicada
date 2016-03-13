@@ -37,23 +37,6 @@ namespace SemiCrf {
 
 	void Data_::read() {
 		Debug::out() << "TrainingData::read()" << std::endl;
-
-		// add strings
-		// T.B.D.
-		// strs->push_back("AAA");
-		// strs->push_back("BBB");
-		// strs->push_back("CCC");
-		// strs->push_back("DDD");
-
-		// add feature functions
-		// T.B.D.
-		Segment s0(new Segment_( 0, 1, AppReqs::Label::CAMPANY ));
-		segs->push_back(s0);
-
-		// add feature functions
-		// T.B.D.
-		Segment s1(new Segment_( 2, 3, AppReqs::Label::LOCATION ));
-		segs->push_back(s1);
 	}
 
 	void Data_::write() const {
@@ -103,7 +86,9 @@ namespace SemiCrf {
 
 	void Datas_::write() const {
 		Debug::out() << "Datas_::write()" << std::endl;
+
 		for( auto d : *this ) {
+
 			std::cout << "# BEGIN" << std::endl;
 		 	d->write();
 			std::cout << "# END" << std::endl;
@@ -373,7 +358,6 @@ namespace SemiCrf {
 		Debug::out() << "~FeatureFunction_()" << std::endl;
 	}
 
-	// FeatureFunctions ctr
 	FeatureFunctions createFeatureFunctions()
 	{
 		return FeatureFunctions( new FeatureFunctions_() );
@@ -391,14 +375,12 @@ namespace SemiCrf {
 
 	void FeatureFunctions_::read()
 	{
-		// T.B.D.		
+		// T.B.D.
 	}
 
 	void FeatureFunctions_::write()
 	{
-		for( auto f : *this ) {
-			f->write();
-		}		
+		// T.B.D.
 	}
 
 	//// Algorithm ////
@@ -494,13 +476,10 @@ namespace SemiCrf {
 	{
 		SemiCrf::Weights weights = SemiCrf::createWeights();
 		setWeights(weights);
-		ffs->read();
 	}
 
 	void Learner::postProcess(const std::string& wfile)
 	{
-		ffs->write();
-
 		std::ofstream ofs; // 出力
 		ofs.open( wfile.c_str() );
 		if( ofs.fail() ) {
@@ -551,7 +530,7 @@ namespace SemiCrf {
 			auto wi = weights->begin();
 			auto dLi = dL.begin();
 			for( ; wi != weights->end(); wi++, dLi++ ) {
-				(*wi) = (*wi) + e0 * (*dLi); // !!!!
+				(*wi) = (*wi) + e0 * (*dLi);
 			}
 		}
 	}
@@ -559,11 +538,12 @@ namespace SemiCrf {
 	bool Learner::isConv(const std::vector<double>& dL)
 	{
 		double tdl = 0.0;
+
 		for( auto dl : dL ) {
 			tdl += dl*dl;
 		}
-		tdl = sqrt(tdl);
 
+		tdl = sqrt(tdl);
 		return (tdl < e1);
 	}
 
@@ -745,12 +725,11 @@ namespace SemiCrf {
 		ifs.close();
 
 		setWeights(weights);
-		ffs->read();
 	}
 
 	void Inferer::postProcess(const std::string& wfile)
 	{
-		// datas->write(); T.B.D.
+		datas->write();
 	}
 
 	void Inferer::compute()

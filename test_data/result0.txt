@@ -103,8 +103,6 @@ N
 N
 -
 END : data was pushed.
-AppReqF0()::write()
-AppReqF0::write()
 Weights_::write()
 ~Learner()
 ~Algorithm_()
