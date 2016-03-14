@@ -22,7 +22,7 @@ private:
 class MultiByteTokenizer
 {
 public:
-	MultiByteTokenizer(std::string str);
+	MultiByteTokenizer(const std::string& str);
 	virtual ~MultiByteTokenizer();
 	std::string get();
 

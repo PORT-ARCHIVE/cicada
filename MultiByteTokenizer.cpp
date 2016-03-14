@@ -41,7 +41,7 @@ void MultiByteIterator::setBuf()
 	buf[i] = '\0';
 }
 
-MultiByteTokenizer::MultiByteTokenizer(std::string str)
+MultiByteTokenizer::MultiByteTokenizer(const std::string& str)
 	: itr(str)
 {
 }
