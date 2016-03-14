@@ -1,4 +1,5 @@
 
+#include <cstdlib>
 #include "MultiByteTokenizer.hpp"
 
 MultiByteIterator::MultiByteIterator(const std::string& arg)
