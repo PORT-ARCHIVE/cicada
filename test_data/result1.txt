@@ -1,5 +1,5 @@
 Algorithm_()
-Inferer()
+Pridector()
 FeatureFunctions_()
 FeatureFunction_()
 AppReqF0()
@@ -8,8 +8,8 @@ AppReqF1()
 Weights()
 Weights_::read()
 Datas_()
-InferenceDatas_()
-InferenceDatas_::read()
+PridectionDatas_()
+PridectionDatas_::read()
 Data_()
 BEGIN : data was created.
 BOS/EOS,*,*,*,*,*,*,*,*
@@ -514,20 +514,20 @@ BOS/EOS,*,*,*,*,*,*,*,*
 END : data was pushed.
 Datas_::write()
 # BEGIN
-InferenceData::write()
+PridectionData::write()
 # END
 
 # BEGIN
-InferenceData::write()
+PridectionData::write()
 # END
 
 # BEGIN
-InferenceData::write()
+PridectionData::write()
 # END
 
-~Inferer()
+~Pridector()
 ~Algorithm_()
-~InferenceDatas_()
+~PridectionDatas_()
 ~Datas_()
 ~Data_()
 ~Data_()

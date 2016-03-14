@@ -98,15 +98,15 @@ namespace SemiCrf {
 	Datas createTrainingDatas();
 
 	// 推論データ集合
-	class InferenceDatas_ : public Datas_ {
+	class PridectionDatas_ : public Datas_ {
 	public:
-		InferenceDatas_();
-		virtual ~InferenceDatas_();
+		PridectionDatas_();
+		virtual ~PridectionDatas_();
 		virtual void read(std::istream& input);
 		//virtual void write() const;
 	};
 
-	Datas createInferenceDatas();
+	Datas createPridectionDatas();
   
 	// 重みベクトル
 	class Weights_ : public std::vector<double> {
@@ -208,10 +208,10 @@ namespace SemiCrf {
 	Algorithm createLearner();
 
 	// 推論器
-	class Inferer : public Algorithm_ {
+	class Pridector : public Algorithm_ {
 	public:
-		Inferer();
-		virtual ~Inferer();
+		Pridector();
+		virtual ~Pridector();
 		virtual void compute();
 		virtual Datas createDatas();
 		virtual void preProcess(const std::string& wfile);
@@ -221,7 +221,7 @@ namespace SemiCrf {
 		double V(int i, AppReqs::Label y, int& maxd);
 	};
 
-	Algorithm createInferer();
+	Algorithm createPridector();
 }
 
 #endif // SEMI_CRF__H

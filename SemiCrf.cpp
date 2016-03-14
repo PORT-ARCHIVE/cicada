@@ -40,7 +40,7 @@ namespace SemiCrf {
 	}
 
 	void Data_::write() const {
-		Debug::out() << "InferenceData::write()" << std::endl;
+		Debug::out() << "PridectionData::write()" << std::endl;
 
 		for( auto s : *segs ){
 
@@ -197,20 +197,20 @@ namespace SemiCrf {
 		}
 	}
 
-	// InferenceDatas ctr
-	InferenceDatas_::InferenceDatas_()
+	// PridectionDatas ctr
+	PridectionDatas_::PridectionDatas_()
 	{
-		Debug::out() << "InferenceDatas_()" << std::endl;
+		Debug::out() << "PridectionDatas_()" << std::endl;
 	}
 
-	InferenceDatas_::~InferenceDatas_()
+	PridectionDatas_::~PridectionDatas_()
 	{
-		Debug::out() << "~InferenceDatas_()" << std::endl;
+		Debug::out() << "~PridectionDatas_()" << std::endl;
 	}
 
-	void InferenceDatas_::read(std::istream& strm)
+	void PridectionDatas_::read(std::istream& strm)
 	{
-		Debug::out() << "InferenceDatas_::read()" << std::endl;
+		Debug::out() << "PridectionDatas_::read()" << std::endl;
 		typedef std::shared_ptr<MeCab::Tagger> Tagger;
 
 		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
@@ -688,28 +688,28 @@ namespace SemiCrf {
 		return v;
 	}
 
-	//// Inferer ////
+	//// Pridector ////
 
-	Algorithm createInferer()
+	Algorithm createPridector()
 	{
-		return std::shared_ptr<Inferer>(new Inferer());
+		return std::shared_ptr<Pridector>(new Pridector());
 	}
 
-	Inferer::Inferer()
+	Pridector::Pridector()
 	{
-		Debug::out() << "Inferer()" << std::endl;
+		Debug::out() << "Pridector()" << std::endl;
 	}
 
-	Inferer::~Inferer() {
-		Debug::out() << "~Inferer()" << std::endl;
+	Pridector::~Pridector() {
+		Debug::out() << "~Pridector()" << std::endl;
 	}
 
-	Datas Inferer::createDatas()
+	Datas Pridector::createDatas()
 	{
-		return Datas( new InferenceDatas_() );
+		return Datas( new PridectionDatas_() );
 	}
 
-	void Inferer::preProcess(const std::string& wfile)
+	void Pridector::preProcess(const std::string& wfile)
 	{
 		SemiCrf::Weights weights = SemiCrf::createWeights();
 
@@ -727,14 +727,14 @@ namespace SemiCrf {
 		setWeights(weights);
 	}
 
-	void Inferer::postProcess(const std::string& wfile)
+	void Pridector::postProcess(const std::string& wfile)
 	{
 		datas->write();
 	}
 
-	void Inferer::compute()
+	void Pridector::compute()
 	{
-		Debug::out() << "Inferer::compute()" << std::endl;
+		Debug::out() << "Pridector::compute()" << std::endl;
 		assert( weights->size() == ffs->size() );
 
 		for( auto data : *datas ) {
@@ -773,7 +773,7 @@ namespace SemiCrf {
 		}
 	}
 
-	double Inferer::V(int i, AppReqs::Label y, int& maxd)
+	double Pridector::V(int i, AppReqs::Label y, int& maxd)
 	{
 		Debug::out() << "i=" << i << ", y=" << int(y) << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));

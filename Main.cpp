@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 		} else if( !options.inference_data_file.empty() ) {
 
 			file = options.inference_data_file;
-			algorithm = SemiCrf::createInferer();
+			algorithm = SemiCrf::createPridector();
 
 		} else {
 			std::stringstream ss;
