@@ -481,16 +481,8 @@ namespace SemiCrf {
 	void Learner::postProcess(const std::string& wfile)
 	{
 		std::ofstream ofs; // 出力
-		ofs.open( wfile.c_str() );
-		if( ofs.fail() ) {
-
-			std::stringstream ss;
-			ss << "error: connot open such file: " << wfile;
-			throw Error(ss.str());
-		}
-
+		open(ofs, wfile);
 		weights->write(ofs);
-		ofs.close();
 	}
 
 	void Learner::compute()
@@ -712,18 +704,9 @@ namespace SemiCrf {
 	void Pridector::preProcess(const std::string& wfile)
 	{
 		SemiCrf::Weights weights = SemiCrf::createWeights();
-
 		std::ifstream ifs; // 入力
-		ifs.open( wfile.c_str() );
-		if( ifs.fail() ) {
-
-			std::stringstream ss;
-			ss << "error: connot open such file: " << wfile;
-			throw Error(ss.str());
-		}
+		open(ifs, wfile);
 		weights->read(ifs);
-		ifs.close();
-
 		setWeights(weights);
 	}
 

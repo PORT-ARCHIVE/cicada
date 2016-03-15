@@ -67,6 +67,25 @@ void Options::parse(int argc, char *argv[])
 	}
 }
 
+void createAlgorithm(Options& options, SemiCrf::Algorithm& algorithm, std::string& file)
+{
+	if( !options.training_data_file.empty() ) {
+
+		file = options.training_data_file;
+		algorithm = SemiCrf::createLearner();
+
+	} else if( !options.inference_data_file.empty() ) {
+
+		file = options.inference_data_file;
+		algorithm = SemiCrf::createPridector();
+
+	} else {
+		std::stringstream ss;
+		ss << "error: no input file specified";
+		throw Error(ss.str());
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	int ret = 0x0;
@@ -84,21 +103,7 @@ int main(int argc, char *argv[])
 
 		std::string file;
 		SemiCrf::Algorithm algorithm;
-		if( !options.training_data_file.empty() ) {
-
-			file = options.training_data_file;
-			algorithm = SemiCrf::createLearner();
-
-		} else if( !options.inference_data_file.empty() ) {
-
-			file = options.inference_data_file;
-			algorithm = SemiCrf::createPridector();
-
-		} else {
-			std::stringstream ss;
-			ss << "error: no input file specified";
-			throw Error(ss.str());
-		}
+		createAlgorithm(options, algorithm, file);
 
 		SemiCrf::FeatureFunctions ffs = AppReqs::createFeatureFunctions();
 		SemiCrf::Labels labels = AppReqs::createLabels();
@@ -107,17 +112,9 @@ int main(int argc, char *argv[])
 		algorithm->preProcess(options.weights_file);
 
 		std::ifstream ifs;
-		ifs.open( file.c_str() );
-		if( ifs.fail() ) {
-
-			std::stringstream ss;
-			ss << "error: connot open such file: " << file;
-			throw Error(ss.str());
-		}
-
+		SemiCrf::open(ifs, file);
 		SemiCrf::Datas datas = algorithm->createDatas();
 		datas->read(ifs);
-		ifs.close();
 		algorithm->setDatas(datas);
 
 		algorithm->setMaxLength(options.maxLength);

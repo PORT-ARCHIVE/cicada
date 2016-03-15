@@ -2,9 +2,11 @@
 #define SEMI_CRF__H
 
 #include <iostream>
+#include <sstream>
 #include <memory>
 #include <string>
 #include <vector>
+#include "Error.hpp"
 
 namespace AppReqs {
 
@@ -19,6 +21,16 @@ namespace AppReqs {
 }
 
 namespace SemiCrf {
+
+	template <class T>
+	void open(T& strm, const std::string& arg) {
+		strm.open( arg.c_str() );
+		if( strm.fail() ) {
+			std::stringstream ss;
+			ss << "error: connot open such file: " << arg;
+			throw Error(ss.str());
+		}
+	}
 
 	// ラベル集合
 	class Labels_ : public std::vector<AppReqs::Label> {};
