@@ -73,5 +73,5 @@ std::string MultiByteTokenizer::get()
 		++itr;
 	}
 
-	return token;
+	return ( std::move(token) );
 }

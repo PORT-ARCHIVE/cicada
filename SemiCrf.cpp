@@ -507,8 +507,8 @@ namespace SemiCrf {
 				current_ectab = createCheckTable(capacity);
 
 				double Z = computeZ();
-				auto&& Gs = computeG();
-				auto&& Gms = computeGm(Z);
+				auto Gs = computeG();
+				auto Gms = computeGm(Z);
 
 				for( int k = 0; k < ffs->size(); k++ ) {
 					(*pdL) += Gs[k] - Gms[k];
@@ -539,7 +539,7 @@ namespace SemiCrf {
 		return (tdl < e1);
 	}
 
-	std::vector<double>&& Learner::computeG()
+	std::vector<double> Learner::computeG()
 	{
 		std::vector<double> Gs;
 		auto segments = current_data->getSegments();
@@ -578,7 +578,7 @@ namespace SemiCrf {
 		return Z;
 	}
 
-	std::vector<double>&& Learner::computeGm(double Z)
+	std::vector<double> Learner::computeGm(double Z)
 	{
 		std::vector<double> Gms;
 		int size = current_data->getStrs()->size();

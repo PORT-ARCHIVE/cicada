@@ -22,7 +22,7 @@ namespace AppReqs {
 	}
 
 	std::string label2String(Label label) {
-		return std::string("NONE");
+		return std::move( std::string("NONE") );
 	}
 
 	SemiCrf::FeatureFunctions createFeatureFunctions()
