@@ -1,5 +1,3 @@
-// Copyright:: Copyright 2016 PORT INC.
-// Author:: Jiro Iwai
 
 #include <cstdlib>
 #include "MultiByteTokenizer.hpp"

@@ -1,6 +1,3 @@
-// Copyright:: Copyright 2016 PORT INC.
-// Author:: Jiro Iwai
-
 #ifndef MULTI_BYTE_TOKENIZER__H
 #define MULTI_BYTE_TOKENIZER__H
 

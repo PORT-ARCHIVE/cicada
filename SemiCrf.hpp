@@ -1,6 +1,3 @@
-// Copyright:: Copyright 2016 PORT INC.
-// Author:: Jiro Iwai
-
 #ifndef SEMI_CRF__H
 #define SEMI_CRF__H
 

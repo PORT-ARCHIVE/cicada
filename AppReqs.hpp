@@ -1,6 +1,3 @@
-// Copyright:: Copyright 2016 PORT INC.
-// Author:: Jiro Iwai
-
 #ifndef APP_REQS__H
 #define APP_REQS__H
 

@@ -1,5 +1,3 @@
-// Copyright:: Copyright 2016 PORT INC.
-// Author:: Jiro Iwai
 
 #include <iostream>
 #include <sstream>
@@ -15,9 +13,9 @@ public:
 		: training_data_file("")
 		, inference_data_file("")
 		, weights_file("weights.txt")
-		, maxLength(5) // T.B.D.
-		, e0(1.0e-5) // T.B.D.
-		, e1(1.0e-5) // T.B.D.
+		, maxLength(5)
+		, e0(1.0e-5)
+		, e1(1.0e-5)
 		, debug(false) {};
 	void parse(int argc, char *argv[]);
 public:
@@ -33,7 +31,6 @@ public:
 void Options::parse(int argc, char *argv[])
 {
 	try {
-
 		for( int i = 1; i < argc; i++ ) {
 			std::string arg = argv[i];
 			if( arg == "-t" ) {
@@ -42,18 +39,16 @@ void Options::parse(int argc, char *argv[])
 				inference_data_file = argv[++i];
 			} else if( arg == "-l" ) {
 				maxLength = boost::lexical_cast<int>(argv[++i]);
-				// T.B.D.
 			} else if( arg == "-e0" ) {
 				e0 = boost::lexical_cast<double>(argv[++i]);
-				// T.B.D.
 			} else if( arg == "-e1" ) {
 				e1 = boost::lexical_cast<double>(argv[++i]);
-				// T.B.D.
 			} else if( arg == "-w" ) {
 				weights_file = argv[++i];
 			} else if( arg == "--debug" ) {
 				debug = true;
 			} else {
+
 				std::stringstream ss;
 				ss << "error: unknown option specified";
 				throw Error(ss.str());
