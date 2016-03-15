@@ -1,4 +1,4 @@
-
+// © 20116 PORT INC.
 #include <cstdlib>
 #include "MultiByteTokenizer.hpp"
 
