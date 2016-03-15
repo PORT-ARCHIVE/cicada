@@ -1,3 +1,5 @@
+// Copyright:: Copyright 2016 PORT INC.
+// Author:: Jiro Iwai
 
 #include <cstdio>
 #include <limits>

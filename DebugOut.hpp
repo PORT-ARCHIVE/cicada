@@ -1,3 +1,6 @@
+// Copyright:: Copyright 2016 PORT INC.
+// Author:: Jiro Iwai
+
 #ifndef DEBUG_OUT__H
 #define DEBUG_OUT__H
 
