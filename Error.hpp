@@ -1,4 +1,5 @@
-// © 20116 PORT INC.
+// © 2016 PORT INC.
+
 #ifndef ERROR__H
 #define ERROR__H
 

@@ -1,4 +1,5 @@
-// © 20116 PORT INC.
+// © 2016 PORT INC.
+
 #ifndef DEBUG_OUT__H
 #define DEBUG_OUT__H
 
