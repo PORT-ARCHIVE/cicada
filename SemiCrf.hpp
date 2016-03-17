@@ -139,24 +139,14 @@ namespace SemiCrf {
 	public:
 		FeatureFunction_();
 		virtual ~FeatureFunction_();
-		virtual double operator() (AppReqs::Label y, AppReqs::Label yd, Data x, int j, int i) = 0;
+		virtual double operator() (int k, AppReqs::Label y, AppReqs::Label yd, Data x, int j, int i) = 0;
 		virtual void read() = 0;
 		virtual void write() = 0;
 	};
 
 	typedef std::shared_ptr<FeatureFunction_> FeatureFunction;
 
-	// 素性関数の集合
-	class FeatureFunctions_ : public std::vector<FeatureFunction> {
-	public:
-		FeatureFunctions_();
-		virtual ~FeatureFunctions_();
-		void read();
-		void write();
-	};
-
-	typedef std::shared_ptr<FeatureFunctions_> FeatureFunctions;
-	FeatureFunctions createFeatureFunctions();
+	FeatureFunction createFeatureFunction();
 
 	// チェックテーブル
 	typedef std::tuple<bool,double,int> CheckTuple;
@@ -174,7 +164,7 @@ namespace SemiCrf {
 		virtual void setE0(double arg);
 		virtual void setE1(double arg);
 		virtual void setDatas(Datas arg);
-		virtual void setFeatureFunctions(FeatureFunctions arg);
+		virtual void setFeatureFunction(FeatureFunction arg);
 		virtual void setWeights(Weights arg);
 		virtual void compute() = 0;
 		virtual Datas createDatas() = 0;
@@ -185,7 +175,7 @@ namespace SemiCrf {
 		double computeWG(AppReqs::Label y, AppReqs::Label yd, int i, int d);
 
 		Labels labels;
-		FeatureFunctions ffs;
+		FeatureFunction ff;
 		Weights weights;
 		Datas datas;
 		int maxLength; // 最大セグメント長

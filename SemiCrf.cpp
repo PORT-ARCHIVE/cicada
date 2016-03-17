@@ -359,36 +359,11 @@ namespace SemiCrf {
 		Debug::out() << "~FeatureFunction_()" << std::endl;
 	}
 
-	FeatureFunctions createFeatureFunctions()
-	{
-		return FeatureFunctions( new FeatureFunctions_() );
-	}
-
-	FeatureFunctions_::FeatureFunctions_()
-	{
-		Debug::out() << "FeatureFunctions_()" << std::endl;
-	}
-
-	FeatureFunctions_::~FeatureFunctions_()
-	{
-		Debug::out() << "~FeatureFunctions_()" << std::endl;
-	}
-
-	void FeatureFunctions_::read()
-	{
-		// T.B.D.
-	}
-
-	void FeatureFunctions_::write()
-	{
-		// T.B.D.
-	}
-
 	//// Algorithm ////
 
 	Algorithm_::Algorithm_()
 		: labels( nullptr )
-		, ffs( nullptr )
+		, ff( nullptr )
 		, weights( nullptr )
 		, datas( nullptr )
 		, maxLength(5)
@@ -428,9 +403,9 @@ namespace SemiCrf {
 		datas = arg;
 	}
 
-	void Algorithm_::setFeatureFunctions(FeatureFunctions arg)
+	void Algorithm_::setFeatureFunction(FeatureFunction arg)
 	{
-		ffs = arg;
+		ff = arg;
 	}
 
 	void Algorithm_::setWeights(Weights arg)
@@ -443,9 +418,10 @@ namespace SemiCrf {
 		double v = 0.0;
 		auto w = weights->begin();
 
-		for( auto g : *ffs ) {
-			v += (*w) * (*g)(y, yd, current_data, i-d+1, i);
-			w++;
+		int k = 0;
+		for( auto w : *weights ) {
+			v += w * (*ff)(k, y, yd, current_data, i-d+1, i);
+			k++;
 		}
 
 		return v;
@@ -489,7 +465,6 @@ namespace SemiCrf {
 	void Learner::compute()
 	{
 		Debug::out() << "Learner::compute()" << std::endl;
-		assert( weights->size() == ffs->size() );
 		int l = labels->size();
 
 		std::vector<double> dL(datas->size(), 1.0);
@@ -511,7 +486,7 @@ namespace SemiCrf {
 				auto Gs = computeG();
 				auto Gms = computeGm(Z);
 
-				for( int k = 0; k < ffs->size(); k++ ) {
+				for( int k = 0; k < weights->size(); k++ ) {
 					(*pdL) += Gs[k] - Gms[k];
 				}
 
@@ -546,7 +521,8 @@ namespace SemiCrf {
 		auto segments = current_data->getSegments();
 		assert( 0 < segments->size() );
 
-		for( auto g : *ffs ) {
+		int k = 0;
+		for( auto w : *weights ) {
 
 			double G = 0.0;
 			auto sj = segments->begin();
@@ -558,10 +534,11 @@ namespace SemiCrf {
 				auto y1 = (*sj)->getLabel();
 				int ti = (*si)->getStart();
 				int ui = (*si)->getEnd();
-				G += (*g)(y, y1, current_data, ti, ui);
+				G += (*ff)(k, y, y1, current_data, ti, ui);
 			}
 
 			Gs.push_back(G);
+			k++;
 		}
 
 		return(std::move(Gs));
@@ -585,7 +562,7 @@ namespace SemiCrf {
 		int size = current_data->getStrs()->size();
 		double Gm = 0.0;
 
-		for( int k = 0; k < ffs->size(); k++ ) {
+		for( int k = 0; k < weights->size(); k++ ) {
 			for( auto y : *labels ) {
 				Gm += eta(size-1, y, k);
 			}
@@ -654,8 +631,7 @@ namespace SemiCrf {
 			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
 				for( auto yd : *labels ) {
 
-					FeatureFunction_& gk = *(ffs->at(k));
-					double e0 = eta(i-d, yd, k) + alpha(i-d, yd) * gk(y, yd, current_data, i-d+1, i);
+					double e0 = eta(i-d, yd, k) + alpha(i-d, yd) * (*ff)(k, y, yd, current_data, i-d+1, i);
 					double e1 = computeWG(y, yd, i, d);
 					v += e0*exp(e1);
 				}
@@ -665,8 +641,7 @@ namespace SemiCrf {
 
 			for( auto yd : *labels ) {
 
-				FeatureFunction_& gk = *(ffs->at(k));
-				double e0 = gk(y, yd, current_data, 1, 1);
+				double e0 = (*ff)(k, y, yd, current_data, 1, 1);
 				double e1 = computeWG(y, yd, 1, 1);
 				v = e0*exp(e1);
 			}
@@ -719,7 +694,6 @@ namespace SemiCrf {
 	void Pridector::compute()
 	{
 		Debug::out() << "Pridector::compute()" << std::endl;
-		assert( weights->size() == ffs->size() );
 
 		for( auto data : *datas ) {
 

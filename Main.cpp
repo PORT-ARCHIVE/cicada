@@ -106,9 +106,9 @@ int main(int argc, char *argv[])
 		SemiCrf::Algorithm algorithm;
 		createAlgorithm(options, algorithm, file);
 
-		SemiCrf::FeatureFunctions ffs = AppReqs::createFeatureFunctions();
+		SemiCrf::FeatureFunction ff = AppReqs::createFeatureFunction();
 		SemiCrf::Labels labels = AppReqs::createLabels();
-		algorithm->setFeatureFunctions(ffs);
+		algorithm->setFeatureFunction(ff);
 		algorithm->setLabels(labels);
 		algorithm->preProcess(options.weights_file);
 
