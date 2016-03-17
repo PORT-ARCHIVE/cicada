@@ -283,12 +283,13 @@ namespace SemiCrf {
 	}
 
 	// Weights ctr
-	Weights createWeights()
+	Weights createWeights(int dim)
 	{
-		return Weights( new Weights_() );
+		return Weights( new Weights_(dim) );
 	}
 
-	Weights_::Weights_()
+	Weights_::Weights_(int dim)
+		: std::vector<double>(dim)
 	{
 		Debug::out() << "Weights()" << std::endl;
 	}
@@ -452,7 +453,8 @@ namespace SemiCrf {
 
 	void Learner::preProcess(const std::string& wfile)
 	{
-		SemiCrf::Weights weights = SemiCrf::createWeights();
+		int dim = App::getFeatureDimention();
+		SemiCrf::Weights weights = SemiCrf::createWeights(dim);
 		setWeights(weights);
 	}
 
@@ -680,7 +682,8 @@ namespace SemiCrf {
 
 	void Pridector::preProcess(const std::string& wfile)
 	{
-		SemiCrf::Weights weights = SemiCrf::createWeights();
+		int dim = App::getFeatureDimention();
+		SemiCrf::Weights weights = SemiCrf::createWeights(dim);
 		std::ifstream ifs; // 入力
 		open(ifs, wfile);
 		weights->read(ifs);

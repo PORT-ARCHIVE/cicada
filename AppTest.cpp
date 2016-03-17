@@ -33,6 +33,11 @@ namespace App {
 		return ff;
 	}
 
+	int getFeatureDimention()
+	{
+		return (35);
+	}
+
 	SemiCrf::Labels createLabels()
 	{
 		SemiCrf::Labels labels = SemiCrf::createLabels();
@@ -51,39 +56,34 @@ namespace App {
 			int ydval = static_cast<int>(yd);
 
 			// y2x
-			if( k < 100 ) {
+			if( k < 10 ) {
 
 				int col = k % 5;
-				int row = k % 10;
-				int xval = boost::lexical_cast<int>(x->getStrs()->at(0).at(j+col));
+				int row = k < 5 ? 0 : 1;
 
-				if( col <= i-j && col == xval ) {
+				for( int k = 0; k < i-j+1; k++ ) {
 
-					if( ( yval == 0 &&  row < 5  )
-					 || ( yval == 1 &&  5 <= row ) ) {
+					int xval = boost::lexical_cast<int>(x->getStrs()->at(0).at(j+k));
+					if( col < i-j+1 && col == xval ) {
 
-						ret = 1;
+						if( ( yval == 0 && row == 0 )
+						 || ( yval == 1 && row == 1 ) ) {
+
+							ret += 1;
+						}
 					}
-
-				} else {
-
-					ret = 0;
 				}
 
 			// y2y
 			} else {
 
-				int index = k - 100;
+				int index = k - 10;
 				int col = index % 5;
-				int row = ( index - 5 ) / 5;
+				int row = ( index - col ) / 5;
 
 				if( yval == row && ydval == col ) {
 
 					ret = 1;
-
-				} else {
-
-					ret = 0;
 				}
 			}
 

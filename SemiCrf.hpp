@@ -125,14 +125,14 @@ namespace SemiCrf {
 	// 重みベクトル
 	class Weights_ : public std::vector<double> {
 	public:
-		Weights_();
+		Weights_(int dim);
 		virtual ~Weights_();
 		void read(std::ifstream& ifs);
 		void write(std::ofstream& ofs);
 	};
 
 	typedef std::shared_ptr<Weights_> Weights;
-	Weights createWeights();
+	Weights createWeights(int dim);
 
 	// 素性関数
 	class FeatureFunction_ {

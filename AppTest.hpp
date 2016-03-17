@@ -31,6 +31,7 @@ namespace App {
 	};
 
 	SemiCrf::FeatureFunction createFeatureFunction();
+	int getFeatureDimention();
 
 	SemiCrf::Labels createLabels();
 }
