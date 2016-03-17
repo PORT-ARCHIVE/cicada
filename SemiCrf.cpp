@@ -11,7 +11,8 @@
 #include <clocale>
 #include <mecab.h>
 #include "SemiCrf.hpp"
-#include "AppReqs.hpp"
+//#include "AppReqs.hpp"
+#include "AppTest.hpp"
 #include "MultiByteTokenizer.hpp"
 #include "DebugOut.hpp"
 #include "Error.hpp"
@@ -20,7 +21,7 @@ namespace SemiCrf {
 
 	// ctr
 	Labels	createLabels() { return Labels( new Labels_() ); }
-	Segment createSegment(int start, int end, AppReqs::Label label) { return Segment( new Segment_(start, end, label) ); }
+	Segment createSegment(int start, int end, App::Label label) { return Segment( new Segment_(start, end, label) ); }
 	Segments createSegments() { return Segments( new Segments_() ); }
 	CheckTable createCheckTable(int capacity) { return CheckTable( new CheckTable_(capacity, CheckTuple()) ); }
 
@@ -47,7 +48,7 @@ namespace SemiCrf {
 
 			int start = s->getStart();
 			int end = s->getEnd();
-			AppReqs::Label l = s->getLabel();
+			App::Label l = s->getLabel();
 
 			for( int i = start; i <= end; i++ ) {
 
@@ -165,7 +166,7 @@ namespace SemiCrf {
 			} else {
 				Debug::out() << label << std::endl;
 
-				AppReqs::Label l = AppReqs::string2Label(label);
+				App::Label l = App::string2Label(label);
 
 				if( descriptor == "N" ) {
 
@@ -413,7 +414,7 @@ namespace SemiCrf {
 		weights = arg;
 	}
 
-	double Algorithm_::computeWG(AppReqs::Label y, AppReqs::Label yd, int i, int d)
+	double Algorithm_::computeWG(App::Label y, App::Label yd, int i, int d)
 	{
 		double v = 0.0;
 		auto w = weights->begin();
@@ -573,7 +574,7 @@ namespace SemiCrf {
 		return(std::move(Gms));
 	}
 
-	double Learner::alpha(int i, AppReqs::Label y)
+	double Learner::alpha(int i, App::Label y)
 	{
 		Debug::out() << "i=" << i << ", y=" << int(y) << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
@@ -614,7 +615,7 @@ namespace SemiCrf {
 		return v;
 	}
 
-	double Learner::eta(int i, AppReqs::Label y, int k)
+	double Learner::eta(int i, App::Label y, int k)
 	{
 		Debug::out() << "i=" << i << ", y=" << int(y) << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
@@ -706,7 +707,7 @@ namespace SemiCrf {
 			current_vctab = createCheckTable(capacity);
 
 			int maxd = - 1;
-			AppReqs::Label maxy;
+			App::Label maxy;
 			Segments maxsegs = createSegments();
 			double maxV = std::numeric_limits<double>::min();
 
@@ -731,7 +732,7 @@ namespace SemiCrf {
 		}
 	}
 
-	double Pridector::V(int i, AppReqs::Label y, int& maxd)
+	double Pridector::V(int i, App::Label y, int& maxd)
 	{
 		Debug::out() << "i=" << i << ", y=" << int(y) << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
@@ -743,7 +744,7 @@ namespace SemiCrf {
 		}
 
 		maxd = -1;
-		AppReqs::Label maxyd;
+		App::Label maxyd;
 		double maxV = std::numeric_limits<double>::min();
 		
 		if( 0 < i ) {

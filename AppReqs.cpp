@@ -4,7 +4,7 @@
 #include "AppReqs.hpp"
 #include "DebugOut.hpp"
 
-namespace AppReqs {
+namespace App {
 
 	Label string2Label(const std::string& str) {
 		if( str == "NONE" || str == "-" || str.empty() ) {
@@ -29,7 +29,7 @@ namespace AppReqs {
 
 	SemiCrf::FeatureFunction createFeatureFunction()
 	{
-		SemiCrf::FeatureFunction ff0(new Simple());
+		SemiCrf::FeatureFunction ff0(new AppReqF0());
 		return ff0;
 	}
 
@@ -44,49 +44,4 @@ namespace AppReqs {
 		return labels;
 	}
 
-	double Simple::operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i)
-	{
-		int ret = 0;
-		int yval = static_cast<int>(y);
-		int ydval = static_cast<int>(yd);
-
-		// y2x
-		if( k < 100 ) {
-
-			int col = k % 5;
-			int row = k % 10;
-			int xval = boost::lexical_cast<int>(x->getStrs()->at(0).at(j+col));
-
-			if( col <= i-j && col == xval ) {
-
-				if( ( yval == 0 &&  row < 5  )
- 				 || ( yval == 1 &&  5 <= row ) ) {
-
-					ret = 1;
-				}
-
-			} else {
-
-				ret = 0;
-			}
-
-		// y2y
-		} else {
-
-			int index = k - 100;
-			int col = index % 5;
-			int row = ( index - 5 ) / 5;
-
-			if( yval == row && ydval == col ) {
-
-				ret = 1;
-
-			} else {
-
-				ret = 0;
-			}
-		}
-
-		return ret;
-	}
 }

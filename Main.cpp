@@ -4,7 +4,8 @@
 #include <sstream>
 #include <boost/lexical_cast.hpp>
 #include "SemiCrf.hpp"
-#include "AppReqs.hpp"
+//#include "AppReqs.hpp"
+#include "AppTest.hpp"
 #include "DebugOut.hpp"
 #include "Error.hpp"
 
@@ -106,8 +107,8 @@ int main(int argc, char *argv[])
 		SemiCrf::Algorithm algorithm;
 		createAlgorithm(options, algorithm, file);
 
-		SemiCrf::FeatureFunction ff = AppReqs::createFeatureFunction();
-		SemiCrf::Labels labels = AppReqs::createLabels();
+		SemiCrf::FeatureFunction ff = App::createFeatureFunction();
+		SemiCrf::Labels labels = App::createLabels();
 		algorithm->setFeatureFunction(ff);
 		algorithm->setLabels(labels);
 		algorithm->preProcess(options.weights_file);

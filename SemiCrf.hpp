@@ -10,7 +10,7 @@
 #include <vector>
 #include "Error.hpp"
 
-namespace AppReqs {
+namespace App {
 
 	// ラベル
 	enum class Label : int;
@@ -35,14 +35,14 @@ namespace SemiCrf {
 	}
 
 	// ラベル集合
-	class Labels_ : public std::vector<AppReqs::Label> {};
+	class Labels_ : public std::vector<App::Label> {};
 	typedef std::shared_ptr<Labels_> Labels;
 	Labels	createLabels();
 
 	// セグメント 
 	class Segment_ {
 	public:
-		Segment_(int start_, int end_, AppReqs::Label label_)
+		Segment_(int start_, int end_, App::Label label_)
 			: start(start_), end(end_), label(label_) {}
 
 		int getStart() const { return start; }
@@ -51,17 +51,17 @@ namespace SemiCrf {
 		int getEnd() const { return end; }
 		void setEnd(int arg) { end = arg; }
 
-		AppReqs::Label getLabel() const { return label; } // const?
-		void setLabel(AppReqs::Label arg) { label = arg; }
+		App::Label getLabel() const { return label; } // const?
+		void setLabel(App::Label arg) { label = arg; }
 		
 	private:
 		int start;
 		int end;
-		AppReqs::Label label;
+		App::Label label;
 	};
 
 	typedef std::shared_ptr<Segment_> Segment;
-	Segment createSegment(int start, int end, AppReqs::Label label);
+	Segment createSegment(int start, int end, App::Label label);
 
 	// セグメント集合
 	class Segments_ : public std::vector<Segment> {};
@@ -139,7 +139,7 @@ namespace SemiCrf {
 	public:
 		FeatureFunction_();
 		virtual ~FeatureFunction_();
-		virtual double operator() (int k, AppReqs::Label y, AppReqs::Label yd, Data x, int j, int i) = 0;
+		virtual double operator() (int k, App::Label y, App::Label yd, Data x, int j, int i) = 0;
 		virtual void read() = 0;
 		virtual void write() = 0;
 	};
@@ -172,7 +172,7 @@ namespace SemiCrf {
 		virtual void postProcess(const std::string& wfile) = 0;
 
 	protected:
-		double computeWG(AppReqs::Label y, AppReqs::Label yd, int i, int d);
+		double computeWG(App::Label y, App::Label yd, int i, int d);
 
 		Labels labels;
 		FeatureFunction ff;
@@ -205,8 +205,8 @@ namespace SemiCrf {
 		double computeZ();
 		std::vector<double> computeG();
 		std::vector<double> computeGm(double Z);
-		double alpha(int i, AppReqs::Label y);
-		double eta(int i, AppReqs::Label y, int k);
+		double alpha(int i, App::Label y);
+		double eta(int i, App::Label y, int k);
 	};
 
 	Algorithm createLearner();
@@ -222,7 +222,7 @@ namespace SemiCrf {
 		virtual void postProcess(const std::string& wfile);
 		
 	private:
-		double V(int i, AppReqs::Label y, int& maxd);
+		double V(int i, App::Label y, int& maxd);
 	};
 
 	Algorithm createPridector();
