@@ -18,7 +18,13 @@ namespace App {
 	}
 
 	std::string label2String(Label label) {
-		return std::move( std::string("NONE") ); // T.B.D.
+		if( label == Label::ZERO ) {
+			return std::move(std::string("0"));
+		} else if( label == Label::ONE ) {
+			return std::move(std::string("1"));
+		} else {
+			throw Error("warning: unknown label");
+		}
 	}
 
 	SemiCrf::FeatureFunction createFeatureFunction()
@@ -30,54 +36,60 @@ namespace App {
 	SemiCrf::Labels createLabels()
 	{
 		SemiCrf::Labels labels = SemiCrf::createLabels();
-
 		labels->push_back(Label::ZERO);
 		labels->push_back(Label::ONE);
-
 		return labels;
 	}
 
 	double Simple::operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i)
 	{
 		int ret = 0;
-		int yval = static_cast<int>(y);
-		int ydval = static_cast<int>(yd);
 
-		// y2x
-		if( k < 100 ) {
+		try {
 
-			int col = k % 5;
-			int row = k % 10;
-			int xval = boost::lexical_cast<int>(x->getStrs()->at(0).at(j+col));
+			int yval = static_cast<int>(y);
+			int ydval = static_cast<int>(yd);
 
-			if( col <= i-j && col == xval ) {
+			// y2x
+			if( k < 100 ) {
 
-				if( ( yval == 0 &&  row < 5  )
- 				 || ( yval == 1 &&  5 <= row ) ) {
+				int col = k % 5;
+				int row = k % 10;
+				int xval = boost::lexical_cast<int>(x->getStrs()->at(0).at(j+col));
 
-					ret = 1;
+				if( col <= i-j && col == xval ) {
+
+					if( ( yval == 0 &&  row < 5  )
+					 || ( yval == 1 &&  5 <= row ) ) {
+
+						ret = 1;
+					}
+
+				} else {
+
+					ret = 0;
 				}
 
+			// y2y
 			} else {
 
-				ret = 0;
+				int index = k - 100;
+				int col = index % 5;
+				int row = ( index - 5 ) / 5;
+
+				if( yval == row && ydval == col ) {
+
+					ret = 1;
+
+				} else {
+
+					ret = 0;
+				}
 			}
 
-		// y2y
-		} else {
+		} catch (...) {
 
-			int index = k - 100;
-			int col = index % 5;
-			int row = ( index - 5 ) / 5;
-
-			if( yval == row && ydval == col ) {
-
-				ret = 1;
-
-			} else {
-
-				ret = 0;
-			}
+			throw Error("Simple::operator(): unexpected exception");
 		}
 
 		return ret;
