@@ -488,12 +488,9 @@ namespace SemiCrf {
 		Debug::out() << "Learner::compute()" << std::endl;
 		int l = labels->size();
 
-		std::vector<double> dL(dim, 1.0);
+		std::vector<double> dL(dim, 0.0);
 
-		while( !isConv(dL) ) {
-
-			dL.clear();
-			auto pdL = dL.begin();
+		do {
 
 			for( auto data : *datas ) {
 
@@ -507,21 +504,21 @@ namespace SemiCrf {
 				auto Gs = computeG();
 				auto Gms = computeGm(Z);
 
-				for( int k = 0; k < weights->size(); k++ ) {
-					(*pdL) += Gs[k] - Gms[k];
+				auto idL = dL.begin();
+				for( int k = 0; k < dim; k++, idL++ ) {
+					(*idL) += Gs[k] - Gms[k];
 				}
-
-				pdL++;
 			}
 
 			assert( weights->size() == dL.size() );
 
-			auto wi = weights->begin();
 			auto dLi = dL.begin();
+			auto wi = weights->begin();
 			for( ; wi != weights->end(); wi++, dLi++ ) {
 				(*wi) = (*wi) + e0 * (*dLi);
 			}
-		}
+
+		} while( !isConv(dL) );
 	}
 
 	bool Learner::isConv(const std::vector<double>& dL)
