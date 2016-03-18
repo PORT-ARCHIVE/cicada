@@ -519,7 +519,7 @@ namespace SemiCrf {
 
 			auto dLi = dL.begin();
 			auto wi = weights->begin();
-			for( int k = 0; wi != weights->end(); wi++, dLi++, k++ ) {
+			for( int k = 0; k < dim; wi++, dLi++, k++ ) {
 				(*wi) = (*wi) + e0 * (*dLi);
 				Debug::out() << "W(" << k << ")=" << *wi << std::endl;
 			}
