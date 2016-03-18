@@ -119,6 +119,9 @@ int main(int argc, char *argv[])
 		SemiCrf::open(ifs, file);
 		SemiCrf::Datas datas = algorithm->createDatas();
 		datas->read(ifs);
+		if( options.debug ) {
+			datas->write(std::cout);
+		}
 		algorithm->setDatas(datas);
 
 		algorithm->setMaxLength(options.maxLength);

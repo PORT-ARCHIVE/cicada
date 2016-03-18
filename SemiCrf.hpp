@@ -82,7 +82,7 @@ namespace SemiCrf {
 		Data_();
 		virtual ~Data_();
 		virtual void read();
-		virtual void write() const;
+		virtual void write(std::ostream& output) const;
 		Strs getStrs() { return strs; }
 		Segments getSegments() { return segs; }
 		void setSegments(Segments arg) { segs = arg; }
@@ -99,7 +99,7 @@ namespace SemiCrf {
 		Datas_();
 		virtual ~Datas_();
 		virtual void read(std::istream& input) = 0;
-		virtual void write() const;
+		virtual void write(std::ostream& output) const;
 	};
 
 	typedef std::shared_ptr<Datas_> Datas;

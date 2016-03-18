@@ -51,12 +51,12 @@ namespace SemiCrf {
 
 	void Data_::read()
 	{
-		Debug::out() << "TrainingData::read()" << std::endl;
+		Debug::out() << "Data_::read()" << std::endl;
 	}
 
-	void Data_::write() const
+	void Data_::write(std::ostream& output) const
 	{
-		Debug::out() << "PridectionData::write()" << std::endl;
+		Debug::out() << "Data_::write()" << std::endl;
 
 		for( auto s : *segs ){
 
@@ -66,25 +66,25 @@ namespace SemiCrf {
 
 			for( int i = start; i <= end; i++ ) {
 
-				std::cout << strs->at(0).at(i);
+				output << strs->at(i).at(0);
 
 				if( i == start ) {
 
-					std::cout << "\tS\t";
+					output << "\tS\t";
 
 				} else if( start < i && i < end ) {
 
-					std::cout << "\tM\t";
+					output << "\tM\t";
 
 				} else if( i == end ) {
 
-					std::cout << "\tE\t";
+					output << "\tE\t";
 
 				} else {
 					// T.B.D.
 				}
 
-				std::cout << label2String(l) << std::endl;
+				output << label2String(l) << std::endl;
 			}
 		}
 	}
@@ -100,15 +100,15 @@ namespace SemiCrf {
 		Debug::out() << "~Datas_()" << std::endl;
 	};
 
-	void Datas_::write() const {
+	void Datas_::write(std::ostream& output)  const {
 		Debug::out() << "Datas_::write()" << std::endl;
 
 		for( auto d : *this ) {
 
-			std::cout << "# BEGIN" << std::endl;
-		 	d->write();
-			std::cout << "# END" << std::endl;
-			std::cout << std::endl;
+			output << "# BEGIN" << std::endl;
+		 	d->write(output);
+			output << "# END" << std::endl;
+			output << std::endl;
 		}
 	}
 
@@ -707,7 +707,9 @@ namespace SemiCrf {
 
 	void Pridector::postProcess(const std::string& wfile)
 	{
-		datas->write();
+		std::ofstream ofs; // 出力
+		open(ofs, wfile);
+		datas->write(ofs);
 	}
 
 	void Pridector::compute()
