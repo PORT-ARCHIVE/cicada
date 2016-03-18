@@ -662,9 +662,9 @@ namespace SemiCrf {
 
 			for( auto yd : *labels ) {
 
-				double e0 = (*ff)(k, y, yd, current_data, 1, 1);
+				double e0 = (*ff)(k, y, yd, current_data, 1, 0);
 				double e1 = computeWG(y, yd, 0, 1);
-				v = e0*exp(e1);
+				v += e0*exp(e1);
 			}
 
 		} else {
