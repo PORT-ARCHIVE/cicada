@@ -429,6 +429,11 @@ namespace SemiCrf {
 		weights = arg;
 	}
 
+	void Algorithm_::setDimension(int arg)
+	{
+		dim = arg;
+	}
+
 	double Algorithm_::computeWG(App::Label y, App::Label yd, int i, int d)
 	{
 		double v = 0.0;
@@ -467,7 +472,6 @@ namespace SemiCrf {
 
 	void Learner::preProcess(const std::string& wfile)
 	{
-		int dim = App::getFeatureDimention();
 		SemiCrf::Weights weights = SemiCrf::createWeights(dim);
 		setWeights(weights);
 	}
@@ -484,7 +488,7 @@ namespace SemiCrf {
 		Debug::out() << "Learner::compute()" << std::endl;
 		int l = labels->size();
 
-		std::vector<double> dL(datas->size(), 1.0); // ivalid size <- bug
+		std::vector<double> dL(dim, 1.0);
 
 		while( !isConv(dL) ) {
 
@@ -696,7 +700,6 @@ namespace SemiCrf {
 
 	void Pridector::preProcess(const std::string& wfile)
 	{
-		int dim = App::getFeatureDimention();
 		SemiCrf::Weights weights = SemiCrf::createWeights(dim);
 		std::ifstream ifs; // 入力
 		open(ifs, wfile);

@@ -170,6 +170,7 @@ namespace SemiCrf {
 		virtual void setDatas(Datas arg);
 		virtual void setFeatureFunction(FeatureFunction arg);
 		virtual void setWeights(Weights arg);
+		virtual void setDimension(int arg);
 		virtual void compute() = 0;
 		virtual Datas createDatas() = 0;
 		virtual void preProcess(const std::string& wfile) = 0;
@@ -178,6 +179,7 @@ namespace SemiCrf {
 	protected:
 		double computeWG(App::Label y, App::Label yd, int i, int d);
 
+		int dim;
 		Labels labels;
 		FeatureFunction ff;
 		Weights weights;
