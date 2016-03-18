@@ -60,17 +60,13 @@ namespace App {
 
 				int col = k % 5;
 				int row = k < 5 ? 0 : 1;
+				int d = i - j + 1;
 
-				for( int k = 0; k < i-j+1; k++ ) {
+				for( int k = 0; k < d; k++ ) {
 
 					int xval = boost::lexical_cast<int>(x->getStrs()->at(0).at(j+k));
-					if( col < i-j+1 && col == xval ) {
-
-						if( ( yval == 0 && row == 0 )
-						 || ( yval == 1 && row == 1 ) ) {
-
-							ret += 1;
-						}
+					if( yval == row && xval == col && col < d ) {
+						ret += 1;
 					}
 				}
 
@@ -80,9 +76,7 @@ namespace App {
 				int index = k - 10;
 				int col = index % 5;
 				int row = ( index - col ) / 5;
-
 				if( yval == row && ydval == col ) {
-
 					ret = 1;
 				}
 			}
