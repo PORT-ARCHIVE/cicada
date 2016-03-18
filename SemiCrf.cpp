@@ -752,7 +752,7 @@ namespace SemiCrf {
 
 	double Pridector::V(int i, App::Label y, int& maxd)
 	{
-		Debug::out() << "i=" << i << ", y=" << int(y) << std::endl;
+		Debug::out() << "V(i=" << i << ", y=" << int(y) << ")" << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
 		auto& tp = current_vctab->at(idx);
@@ -767,7 +767,7 @@ namespace SemiCrf {
 		
 		if( 0 < i ) {
 
-			for( int d = 1; d <= std::min(maxLength, i+1); d++ ) { // セグメントの最後の位置がiならセグメント長は最大i+1
+			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
 				for( auto yd : *labels ) {
 
 					int tmp = -1;
@@ -790,7 +790,7 @@ namespace SemiCrf {
 			maxV = 0.0;
 
 		} else {
-			assert( 0 <= i );
+			assert( 0 < i );
 		}
 
 		std::get<0>(tp) = true;
