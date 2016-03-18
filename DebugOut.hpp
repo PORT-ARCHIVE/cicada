@@ -3,6 +3,7 @@
 #ifndef DEBUG_OUT__H
 #define DEBUG_OUT__H
 
+#include <iostream>
 #include <fstream>
 
 class Debug {
