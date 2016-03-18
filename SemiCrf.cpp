@@ -437,7 +437,6 @@ namespace SemiCrf {
 	double Algorithm_::computeWG(App::Label y, App::Label yd, int i, int d)
 	{
 		double v = 0.0;
-		//auto w = weights->begin();
 
 		int k = 0;
 		for( auto w : *weights ) {
