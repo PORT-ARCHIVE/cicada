@@ -487,9 +487,10 @@ namespace SemiCrf {
 		Debug::out() << "Learner::compute()" << std::endl;
 		int l = labels->size();
 
-		std::vector<double> dL(dim, 0.0);
+		while(1) {
 
-		do {
+			double L = 0.0;
+			std::vector<double> dL(dim, 0.0);
 
 			for( auto data : *datas ) {
 
@@ -501,11 +502,14 @@ namespace SemiCrf {
 
 				double Z = computeZ();
 				Debug::out() << "Z=" << Z << std::endl;
-				auto Gs = computeG();
+				double WG = 0.0;
+				auto Gs = computeG(WG);
+				L += WG - log(Z);
 				auto Gms = computeGm(Z);
 
 				auto idL = dL.begin();
-				for( int k = 0; k < dim; k++, idL++ ) {
+				auto iw = weights->begin();
+				for( int k = 0; k < dim; k++, idL++, iw++ ) {
 					(*idL) += Gs[k] - Gms[k];
 					Debug::out() << "dL(" << k << ")=" << *idL << std::endl;
 				}
@@ -520,7 +524,12 @@ namespace SemiCrf {
 				Debug::out() << "W(" << k << ")=" << *wi << std::endl;
 			}
 
-		} while( !isConv(dL) );
+			Debug::out() << "L=" << L << std::endl;
+
+			if( isConv(dL) ) {
+				break;
+			}
+		}
 	}
 
 	bool Learner::isConv(const std::vector<double>& dL)
@@ -535,13 +544,14 @@ namespace SemiCrf {
 		return (tdl < e1);
 	}
 
-	std::vector<double> Learner::computeG()
+	std::vector<double> Learner::computeG(double& WG)
 	{
 		std::vector<double> Gs;
 		auto segments = current_data->getSegments();
 		assert( 0 < segments->size() );
 
-		for( int k = 0; k < dim; k++ ) {
+		auto iw = weights->begin();
+		for( int k = 0; k < dim; k++, iw++ ) {
 
 			double G = 0.0;
 			auto sj = segments->begin();
@@ -558,6 +568,7 @@ namespace SemiCrf {
 
 			Gs.push_back(G);
 			Debug::out() << "G(" << k << ")=" << G << std::endl;
+			WG += (*iw)*G;
 		}
 
 		return(std::move(Gs));

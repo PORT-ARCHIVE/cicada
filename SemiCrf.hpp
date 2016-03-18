@@ -209,7 +209,7 @@ namespace SemiCrf {
 	private:
 		bool isConv(const std::vector<double>& dL);
 		double computeZ();
-		std::vector<double> computeG();
+		std::vector<double> computeG(double& WG);
 		std::vector<double> computeGm(double Z);
 		double alpha(int i, App::Label y);
 		double eta(int i, App::Label y, int k);
