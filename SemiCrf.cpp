@@ -590,15 +590,16 @@ namespace SemiCrf {
 	{
 		std::vector<double> Gms;
 		int size = current_data->getStrs()->size();
-		double Gm = 0.0;
 
-		for( int k = 0; k < weights->size(); k++ ) {
+		for( int k = 0; k < dim; k++ ) {
+
+			double Gmk = 0.0;
 			for( auto y : *labels ) {
-				Gm += eta(size-1, y, k);
+				Gmk += eta(size-1, y, k);
 			}
 
-			Gms.push_back(Gm/Z);
-			Debug::out() << "Gm(" << k << ")=" << Gm/Z << std::endl;
+			Gms.push_back(Gmk/Z);
+			Debug::out() << "Gm(" << k << ")=" << Gmk/Z << std::endl;
 		}
 
 		return(std::move(Gms));
