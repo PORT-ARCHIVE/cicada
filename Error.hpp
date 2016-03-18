@@ -7,8 +7,8 @@
 
 class Error {
 public:
-	Error(const std::string& arg) : msg(arg) {}
-	const std::string& what() { return msg; }
+	Error(const std::string& arg);
+	const std::string& what() { return std::move(msg); }
 private:
 	std::string msg;
 };

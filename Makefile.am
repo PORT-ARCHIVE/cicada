@@ -6,6 +6,6 @@ bin_PROGRAMS = semicrf
 semicrf_LDFLAGS = -L/usr/local/lib
 semicrf_LDADD = -lmecab -lstdc++
 # ソースコード
-semicrf_SOURCES = Main.cpp SemiCrf.hpp SemiCrf.cpp AppTest.cpp DebugOut.cpp MultiByteTokenizer.cpp
+semicrf_SOURCES = Main.cpp SemiCrf.hpp SemiCrf.cpp AppTest.cpp DebugOut.cpp MultiByteTokenizer.cpp Error.cpp
 #semicrf_SOURCES = Main.cpp SemiCrf.hpp SemiCrf.cpp AppReqs.cpp DebugOut.cpp MultiByteTokenizer.cpp
 
