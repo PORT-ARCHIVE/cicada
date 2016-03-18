@@ -501,12 +501,14 @@ namespace SemiCrf {
 				current_ectab = createCheckTable(capacity);
 
 				double Z = computeZ();
+				Debug::out() << "Z=" << Z << std::endl;
 				auto Gs = computeG();
 				auto Gms = computeGm(Z);
 
 				auto idL = dL.begin();
 				for( int k = 0; k < dim; k++, idL++ ) {
 					(*idL) += Gs[k] - Gms[k];
+					Debug::out() << "dL(" << k << ")=" << *idL << std::endl;
 				}
 			}
 
@@ -514,8 +516,9 @@ namespace SemiCrf {
 
 			auto dLi = dL.begin();
 			auto wi = weights->begin();
-			for( ; wi != weights->end(); wi++, dLi++ ) {
+			for( int k = 0; wi != weights->end(); wi++, dLi++, k++ ) {
 				(*wi) = (*wi) + e0 * (*dLi);
+				Debug::out() << "W(" << k << ")=" << *wi << std::endl;
 			}
 
 		} while( !isConv(dL) );
