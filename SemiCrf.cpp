@@ -542,8 +542,7 @@ namespace SemiCrf {
 		auto segments = current_data->getSegments();
 		assert( 0 < segments->size() );
 
-		int k = 0;
-		for( auto w : *weights ) {
+		for( int k = 0; k < dim; k++ ) {
 
 			double G = 0.0;
 			auto sj = segments->begin();
@@ -559,7 +558,6 @@ namespace SemiCrf {
 			}
 
 			Gs.push_back(G);
-			k++;
 		}
 
 		return(std::move(Gs));
