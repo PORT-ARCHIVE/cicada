@@ -548,7 +548,7 @@ namespace SemiCrf {
 			auto sj = segments->begin();
 			auto si = segments->begin(); si++;
 
-			for( ; si != segments->end(); si++, sj++ ){
+			for( ; si != segments->end(); si++, sj++ ){ // 最初のセグメントが抜けている
 
 				auto y = (*si)->getLabel();
 				auto y1 = (*sj)->getLabel();
@@ -619,8 +619,8 @@ namespace SemiCrf {
 
 			for( auto yd : *labels ) {
 
-				double e = computeWG(y, yd, 0, 1);
-				v = exp(e);
+				double e = computeWG(y, yd, 0, 1); // ydの位置は-1 
+				v += exp(e);
 			}
 
 		} else {
