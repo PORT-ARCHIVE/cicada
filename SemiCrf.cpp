@@ -635,7 +635,7 @@ namespace SemiCrf {
 
 	double Learner::eta(int i, App::Label y, int k)
 	{
-		Debug::out() << "i=" << i << ", y=" << int(y) << std::endl;
+		Debug::out() << "eta(i=" << i << ", y=" << int(y) << ")" << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
 		auto& tp = current_ectab->at(idx);
@@ -645,9 +645,9 @@ namespace SemiCrf {
 
 		double v = 0;
 
-		if( 1 < i ) {
+		if( 0 < i ) {
 
-			for( int d = 1; d <= std::min(maxLength, i+1); d++ ) { // セグメントの最後の位置がiならセグメント長は最大i+1
+			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
 				for( auto yd : *labels ) {
 
 					double e0 = eta(i-d, yd, k) + alpha(i-d, yd) * (*ff)(k, y, yd, current_data, i-d+1, i);
@@ -656,12 +656,12 @@ namespace SemiCrf {
 				}
 			}
 
-		} else if( i == 1 ) {
+		} else if( i == 0 ) {
 
 			for( auto yd : *labels ) {
 
 				double e0 = (*ff)(k, y, yd, current_data, 1, 1);
-				double e1 = computeWG(y, yd, 1, 1);
+				double e1 = computeWG(y, yd, 0, 1);
 				v = e0*exp(e1);
 			}
 
