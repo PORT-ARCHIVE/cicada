@@ -624,7 +624,7 @@ namespace SemiCrf {
 			}
 
 		} else {
-			assert( 0 < i );
+			assert( 0 <= i );
 		}
 
 		std::get<0>(tp) = true;
@@ -792,7 +792,7 @@ namespace SemiCrf {
 			maxV = 0.0;
 
 		} else {
-			assert( 0 < i );
+			assert( 0 <= i );
 		}
 
 		std::get<0>(tp) = true;
