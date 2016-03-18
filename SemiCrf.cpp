@@ -25,6 +25,17 @@ namespace SemiCrf {
 	Segments createSegments() { return Segments( new Segments_() ); }
 	CheckTable createCheckTable(int capacity) { return CheckTable( new CheckTable_(capacity, CheckTuple()) ); }
 
+	// Labels
+	Labels_::Labels_()
+	{
+		Debug::out() << "Labels_()" << std::endl;
+	}
+
+	Labels_::~Labels_()
+	{
+		Debug::out() << "Labels_()" << std::endl;
+	}
+
 	// Data_ ctr
 	Data_::Data_()
 		: strs( new Strs_() )
@@ -33,15 +44,18 @@ namespace SemiCrf {
 		Debug::out() << "Data_()" << std::endl;
 	}
 
-	Data_::~Data_() {
+	Data_::~Data_()
+	{
 		Debug::out() << "~Data_()" << std::endl;
 	}
 
-	void Data_::read() {
+	void Data_::read()
+	{
 		Debug::out() << "TrainingData::read()" << std::endl;
 	}
 
-	void Data_::write() const {
+	void Data_::write() const
+	{
 		Debug::out() << "PridectionData::write()" << std::endl;
 
 		for( auto s : *segs ){
@@ -291,12 +305,12 @@ namespace SemiCrf {
 	Weights_::Weights_(int dim)
 		: std::vector<double>(dim)
 	{
-		Debug::out() << "Weights()" << std::endl;
+		Debug::out() << "Weights_()" << std::endl;
 	}
 
 	Weights_::~Weights_()
 	{
-		Debug::out() << "~Weights()" << std::endl;
+		Debug::out() << "~Weights_()" << std::endl;
 	}
 
 	void Weights_::read(std::ifstream& ifs)
@@ -470,7 +484,7 @@ namespace SemiCrf {
 		Debug::out() << "Learner::compute()" << std::endl;
 		int l = labels->size();
 
-		std::vector<double> dL(datas->size(), 1.0);
+		std::vector<double> dL(datas->size(), 1.0); // ivalid size <- bug
 
 		while( !isConv(dL) ) {
 

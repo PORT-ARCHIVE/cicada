@@ -19,7 +19,7 @@ namespace App {
 	Label string2Label(const std::string& str);
 
 	// ラベル→文字列
-	std::string  label2String(Label label);
+	std::string label2String(Label label);
 }
 
 namespace SemiCrf {
@@ -35,7 +35,11 @@ namespace SemiCrf {
 	}
 
 	// ラベル集合
-	class Labels_ : public std::vector<App::Label> {};
+	class Labels_ : public std::vector<App::Label> {
+	public:
+		Labels_();
+		virtual ~Labels_();
+	};
 	typedef std::shared_ptr<Labels_> Labels;
 	Labels	createLabels();
 
