@@ -558,6 +558,7 @@ namespace SemiCrf {
 			}
 
 			Gs.push_back(G);
+			Debug::out() << "G(" << k << ")=" << G << std::endl;
 		}
 
 		return(std::move(Gs));
@@ -587,6 +588,7 @@ namespace SemiCrf {
 			}
 
 			Gms.push_back(Gm/Z);
+			Debug::out() << "Gm(" << k << ")=" << Gm/Z << std::endl;
 		}
 
 		return(std::move(Gms));
