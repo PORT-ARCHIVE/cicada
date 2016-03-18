@@ -61,6 +61,7 @@ namespace App {
 				int col = k % 5;
 				int row = k < 5 ? 0 : 1;
 				int d = i - j + 1;
+				// T.B.D. should warn if d < 1 || maxlength < d
 
 				for( int l = 0; l < d; l++ ) {
 
