@@ -608,7 +608,7 @@ namespace SemiCrf {
 
 		if( 1 < i ) {
 
-			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
+			for( int d = 1; d <= std::min(maxLength, i+1); d++ ) { // セグメントの最後の位置がiならセグメント長は最大i+1
 				for( auto yd : *labels ) {
 
 					double e0 = alpha(i-d, yd);
@@ -649,7 +649,7 @@ namespace SemiCrf {
 
 		if( 1 < i ) {
 
-			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
+			for( int d = 1; d <= std::min(maxLength, i+1); d++ ) { // セグメントの最後の位置がiならセグメント長は最大i+1
 				for( auto yd : *labels ) {
 
 					double e0 = eta(i-d, yd, k) + alpha(i-d, yd) * (*ff)(k, y, yd, current_data, i-d+1, i);
@@ -769,7 +769,7 @@ namespace SemiCrf {
 		
 		if( 0 < i ) {
 
-			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
+			for( int d = 1; d <= std::min(maxLength, i+1); d++ ) { // セグメントの最後の位置がiならセグメント長は最大i+1
 				for( auto yd : *labels ) {
 
 					int tmp = -1;
