@@ -523,7 +523,7 @@ namespace SemiCrf {
 				Debug::out(2) << "W(" << k << ")=" << *wi << std::endl;
 			}
 
-			Debug::out(2) << "L=" << L << std::endl;
+			Debug::out(1) << "L=" << L << std::endl;
 
 			if( isConv(dL) ) {
 				break;
