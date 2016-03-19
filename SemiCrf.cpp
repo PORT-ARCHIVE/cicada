@@ -498,7 +498,6 @@ namespace SemiCrf {
 				int s = current_data->getStrs()->size();
 				int capacity = l*s;
 				current_actab = createCheckTable(capacity);
-				current_ectab = createCheckTable(capacity);
 
 				double Z = computeZ();
 				Debug::out(2) << "Z=" << Z << std::endl;
@@ -589,17 +588,23 @@ namespace SemiCrf {
 	std::vector<double> Learner::computeGm(double Z)
 	{
 		std::vector<double> Gms;
-		int size = current_data->getStrs()->size();
+
+		int l = labels->size();
+		int s = current_data->getStrs()->size();
+		int capacity = l*s;
 
 		for( int k = 0; k < dim; k++ ) {
 
 			double Gmk = 0.0;
+			current_ectab = createCheckTable(capacity);
+
 			for( auto y : *labels ) {
-				Gmk += eta(size-1, y, k);
+				Gmk += eta(s-1, y, k);
 			}
 
-			Gms.push_back(Gmk/Z);
-			Debug::out(2) << "Gm(" << k << ")=" << Gmk/Z << std::endl;
+			Gmk /= Z;
+			Gms.push_back(Gmk);
+			Debug::out(2) << "Gm(" << k << ")=" << Gmk << std::endl;
 		}
 
 		return(std::move(Gms));
