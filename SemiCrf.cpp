@@ -576,10 +576,10 @@ namespace SemiCrf {
 	double Learner::computeZ()
 	{
 		double Z = 0;
-		int size = current_data->getStrs()->size();
+		int s = current_data->getStrs()->size();
 
 		for( auto y : *labels ) {
-			Z += alpha(size-1, y);
+			Z += alpha(s-1, y);
 		}
 
 		return Z;
