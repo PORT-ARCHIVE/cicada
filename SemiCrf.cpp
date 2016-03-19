@@ -517,19 +517,16 @@ namespace SemiCrf {
 			auto dLi = dL.begin();
 			auto wi = weights->begin();
 			for( int k = 0; k < dim; wi++, dLi++, k++ ) {
-				(*wi) = (*wi) + e0 * (*dLi);
-				Debug::out(2) << "W(" << k << ")=" << *wi << std::endl;
+				(*wi) += e0 * (*dLi); Debug::out(2) << "W(" << k << ")=" << *wi << std::endl;
 			}
 
-			Debug::out(1) << "L=" << L << std::endl;
-
-			if( isConv(dL) ) {
+			if( isConv(L, dL) ) {
 				break;
 			}
 		}
 	}
 
-	bool Learner::isConv(const std::vector<double>& dL)
+	bool Learner::isConv(double L, const std::vector<double>& dL)
 	{
 		double tdl = 0.0;
 
@@ -537,7 +534,7 @@ namespace SemiCrf {
 			tdl += dl*dl;
 		}
 
-		tdl = sqrt(tdl);
+		tdl = sqrt(tdl); Debug::out(1) << "L=" << L << " |dl|=" << tdl << std::endl;
 		return (tdl < e1);
 	}
 
