@@ -5,21 +5,32 @@
 
 static Debug* debug = nullptr;
 
-Debug& Debug::out()
+Debug& Debug::out(int level)
 {
 	if( !debug ) {
 		debug = new Debug();
 	}
 
+	debug->setLLevel(level);
+
 	return *debug;
 }
 
-void Debug::on()
+void Debug::setLevel(int level)
 {
-	out().flg = true;
+	if( !debug ) {
+		debug = new Debug();
+	}
+
+	debug->setGLevel(level);
 }
 
-void Debug::off()
-{
-	out().flg = false;
-}
+// void Debug::on()
+// {
+// 	out().flg = true;
+// }
+
+// void Debug::off()
+// {
+// 	out().flg = false;
+// }

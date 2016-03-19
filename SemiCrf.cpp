@@ -28,12 +28,12 @@ namespace SemiCrf {
 	// Labels
 	Labels_::Labels_()
 	{
-		Debug::out() << "Labels_()" << std::endl;
+		Debug::out(2) << "Labels_()" << std::endl;
 	}
 
 	Labels_::~Labels_()
 	{
-		Debug::out() << "Labels_()" << std::endl;
+		Debug::out(2) << "Labels_()" << std::endl;
 	}
 
 	// Data_ ctr
@@ -41,22 +41,22 @@ namespace SemiCrf {
 		: strs( new Strs_() )
 		, segs( new Segments_() )
 	{
-		Debug::out() << "Data_()" << std::endl;
+		Debug::out(2) << "Data_()" << std::endl;
 	}
 
 	Data_::~Data_()
 	{
-		Debug::out() << "~Data_()" << std::endl;
+		Debug::out(2) << "~Data_()" << std::endl;
 	}
 
 	void Data_::read()
 	{
-		Debug::out() << "Data_::read()" << std::endl;
+		Debug::out(2) << "Data_::read()" << std::endl;
 	}
 
 	void Data_::write(std::ostream& output) const
 	{
-		Debug::out() << "Data_::write()" << std::endl;
+		Debug::out(2) << "Data_::write()" << std::endl;
 
 		for( auto s : *segs ){
 
@@ -92,16 +92,16 @@ namespace SemiCrf {
 	// Datas ctr
 	Datas_::Datas_()
 	{
-		Debug::out() << "Datas_()" << std::endl;
+		Debug::out(2) << "Datas_()" << std::endl;
 	};
 
 	Datas_::~Datas_()
 	{
-		Debug::out() << "~Datas_()" << std::endl;
+		Debug::out(2) << "~Datas_()" << std::endl;
 	};
 
 	void Datas_::write(std::ostream& output)  const {
-		Debug::out() << "Datas_::write()" << std::endl;
+		Debug::out(2) << "Datas_::write()" << std::endl;
 
 		for( auto d : *this ) {
 
@@ -115,17 +115,17 @@ namespace SemiCrf {
 	// TrainingDatas ctr
 	TrainingDatas_::TrainingDatas_()
 	{
-		Debug::out() << "TrainingDatas_()" << std::endl;
+		Debug::out(2) << "TrainingDatas_()" << std::endl;
 	}
 
 	TrainingDatas_::~TrainingDatas_()
 	{
-		Debug::out() << "~TrainingDatas_()" << std::endl;
+		Debug::out(2) << "~TrainingDatas_()" << std::endl;
 	}
 
 	void TrainingDatas_::read(std::istream& strm)
 	{
-		Debug::out() << "TrainingDatas_::read()" << std::endl;
+		Debug::out(2) << "TrainingDatas_::read()" << std::endl;
 
 		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D
 
@@ -145,10 +145,10 @@ namespace SemiCrf {
 				if( line == "# BEGIN" ) {
 					data = Data( new Data_() );
 					counter = -1;
-					Debug::out() << "BEGIN : data was created." << std::endl;
+					Debug::out(2) << "BEGIN : data was created." << std::endl;
 				} else if( line == "# END" ) {
 					push_back(data);
-					Debug::out() << "END : data was pushed." << std::endl;
+					Debug::out(2) << "END : data was pushed." << std::endl;
 				}
 				continue;
 			}
@@ -160,7 +160,7 @@ namespace SemiCrf {
 			if( word.empty() ) {
 				// T.B.D.
 			} else {
-				Debug::out() << word << std::endl;
+				Debug::out(2) << word << std::endl;
 				std::vector<std::string> vs;
 				vs.push_back(word);
 				data->getStrs()->push_back(vs);
@@ -170,7 +170,7 @@ namespace SemiCrf {
 			if( descriptor.empty() ) {
 				// T.B.D.
 			} else {
-				Debug::out() << descriptor << std::endl;
+				Debug::out(2) << descriptor << std::endl;
 			}
 
 			std::string label = tokenizer.get();
@@ -178,7 +178,7 @@ namespace SemiCrf {
 				// T.B.D.
 
 			} else {
-				Debug::out() << label << std::endl;
+				Debug::out(2) << label << std::endl;
 
 				App::Label l = App::string2Label(label);
 
@@ -202,7 +202,7 @@ namespace SemiCrf {
 
 				} else {
 
-					Debug::out() << "warning: unknown descriptor" << std::endl;
+					Debug::out(2) << "warning: unknown descriptor" << std::endl;
 				}
 			}
 
@@ -216,17 +216,17 @@ namespace SemiCrf {
 	// PridectionDatas ctr
 	PridectionDatas_::PridectionDatas_()
 	{
-		Debug::out() << "PridectionDatas_()" << std::endl;
+		Debug::out(2) << "PridectionDatas_()" << std::endl;
 	}
 
 	PridectionDatas_::~PridectionDatas_()
 	{
-		Debug::out() << "~PridectionDatas_()" << std::endl;
+		Debug::out(2) << "~PridectionDatas_()" << std::endl;
 	}
 
 	void PridectionDatas_::read(std::istream& strm)
 	{
-		Debug::out() << "PridectionDatas_::read()" << std::endl;
+		Debug::out(2) << "PridectionDatas_::read()" << std::endl;
 		typedef std::shared_ptr<MeCab::Tagger> Tagger;
 
 		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
@@ -246,7 +246,7 @@ namespace SemiCrf {
 				if( line == "# BEGIN" ) {
 					data = Data( new Data_() );
 					input = "";
-					Debug::out() << "BEGIN : data was created." << std::endl;
+					Debug::out(2) << "BEGIN : data was created." << std::endl;
 
 				} else if( line == "# END" ) {
 
@@ -256,7 +256,7 @@ namespace SemiCrf {
 					for( ; node ; node = node->next ) {
 
 						std::string cppstr = node->feature;
-						Debug::out() << cppstr << std::endl;
+						Debug::out(2) << cppstr << std::endl;
 						if( cppstr.find("BOS") == 0 ) { // T.B.D.
 							continue;
 						}
@@ -271,13 +271,13 @@ namespace SemiCrf {
 						}
 
 						vs.push_back(word);
-						Debug::out() << word << std::endl;
+						Debug::out(2) << word << std::endl;
 
 						MultiByteTokenizer tok(cppstr);
 						std::string t = tok.get();
 
 						while( !t.empty() ) {
-							Debug::out() << t << std::endl;
+							Debug::out(2) << t << std::endl;
 							vs.push_back(t);
 							t = tok.get();
 						}
@@ -286,7 +286,7 @@ namespace SemiCrf {
 					}
 
 					push_back(data);
-					Debug::out() << "END : data was pushed." << std::endl;
+					Debug::out(2) << "END : data was pushed." << std::endl;
 				}
 
 				continue;
@@ -305,17 +305,17 @@ namespace SemiCrf {
 	Weights_::Weights_(int dim)
 		: std::vector<double>(dim)
 	{
-		Debug::out() << "Weights_()" << std::endl;
+		Debug::out(2) << "Weights_()" << std::endl;
 	}
 
 	Weights_::~Weights_()
 	{
-		Debug::out() << "~Weights_()" << std::endl;
+		Debug::out(2) << "~Weights_()" << std::endl;
 	}
 
 	void Weights_::read(std::ifstream& ifs)
 	{
-		Debug::out() << "Weights_::read()" << std::endl;
+		Debug::out(2) << "Weights_::read()" << std::endl;
 
 		bool state = false;
 
@@ -352,7 +352,7 @@ namespace SemiCrf {
 
 	void Weights_::write(std::ofstream& ofs)
 	{
-		Debug::out() << "Weights_::write()" << std::endl;
+		Debug::out(2) << "Weights_::write()" << std::endl;
 
 		ofs << "# Semi-CRF Weights" << std::endl;
 		ofs << std::endl;
@@ -367,12 +367,12 @@ namespace SemiCrf {
 
 	FeatureFunction_::FeatureFunction_()
 	{
-		Debug::out() << "FeatureFunction_()" << std::endl;
+		Debug::out(2) << "FeatureFunction_()" << std::endl;
 	}
 
 	FeatureFunction_::~FeatureFunction_()
 	{
-		Debug::out() << "~FeatureFunction_()" << std::endl;
+		Debug::out(2) << "~FeatureFunction_()" << std::endl;
 	}
 
 	//// Algorithm ////
@@ -386,12 +386,12 @@ namespace SemiCrf {
 		, e0(1.0e-5)
 		, e1(1.0e-5)
 	{
-		Debug::out() << "Algorithm_()" << std::endl;
+		Debug::out(2) << "Algorithm_()" << std::endl;
 	}
 
 	Algorithm_::~Algorithm_()
 	{
-		Debug::out() << "~Algorithm_()" << std::endl;
+		Debug::out(2) << "~Algorithm_()" << std::endl;
 	}
 
 	void Algorithm_::setLabels(Labels arg)
@@ -456,12 +456,12 @@ namespace SemiCrf {
 
 	Learner::Learner()
 	{
-		Debug::out() << "Learner()" << std::endl;
+		Debug::out(2) << "Learner()" << std::endl;
 	}
 
 	Learner::~Learner()
 	{
-		Debug::out() << "~Learner()" << std::endl;
+		Debug::out(2) << "~Learner()" << std::endl;
 	}
 
 	Datas Learner::createDatas()
@@ -484,7 +484,7 @@ namespace SemiCrf {
 
 	void Learner::compute()
 	{
-		Debug::out() << "Learner::compute()" << std::endl;
+		Debug::out(2) << "Learner::compute()" << std::endl;
 		int l = labels->size();
 
 		while(1) {
@@ -501,7 +501,7 @@ namespace SemiCrf {
 				current_ectab = createCheckTable(capacity);
 
 				double Z = computeZ();
-				Debug::out() << "Z=" << Z << std::endl;
+				Debug::out(2) << "Z=" << Z << std::endl;
 				double WG = 0.0;
 				auto Gs = computeG(WG);
 				L += WG - log(Z);
@@ -511,7 +511,7 @@ namespace SemiCrf {
 				auto iw = weights->begin();
 				for( int k = 0; k < dim; k++, idL++, iw++ ) {
 					(*idL) += Gs[k] - Gms[k];
-					Debug::out() << "dL(" << k << ")=" << *idL << std::endl;
+					Debug::out(2) << "dL(" << k << ")=" << *idL << std::endl;
 				}
 			}
 
@@ -521,10 +521,10 @@ namespace SemiCrf {
 			auto wi = weights->begin();
 			for( int k = 0; k < dim; wi++, dLi++, k++ ) {
 				(*wi) = (*wi) + e0 * (*dLi);
-				Debug::out() << "W(" << k << ")=" << *wi << std::endl;
+				Debug::out(2) << "W(" << k << ")=" << *wi << std::endl;
 			}
 
-			Debug::out() << "L=" << L << std::endl;
+			Debug::out(2) << "L=" << L << std::endl;
 
 			if( isConv(dL) ) {
 				break;
@@ -567,7 +567,7 @@ namespace SemiCrf {
 			}
 
 			Gs.push_back(G);
-			Debug::out() << "G(" << k << ")=" << G << std::endl;
+			Debug::out(2) << "G(" << k << ")=" << G << std::endl;
 			WG += (*iw)*G;
 		}
 
@@ -599,7 +599,7 @@ namespace SemiCrf {
 			}
 
 			Gms.push_back(Gmk/Z);
-			Debug::out() << "Gm(" << k << ")=" << Gmk/Z << std::endl;
+			Debug::out(2) << "Gm(" << k << ")=" << Gmk/Z << std::endl;
 		}
 
 		return(std::move(Gms));
@@ -607,7 +607,7 @@ namespace SemiCrf {
 
 	double Learner::alpha(int i, App::Label y)
 	{
-		Debug::out() << "alpha(i=" << i << ", y=" << int(y) << ")" << std::endl;
+		Debug::out(2) << "alpha(i=" << i << ", y=" << int(y) << ")" << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
 		auto& tp = current_actab->at(idx);
@@ -648,7 +648,7 @@ namespace SemiCrf {
 
 	double Learner::eta(int i, App::Label y, int k)
 	{
-		Debug::out() << "eta(i=" << i << ", y=" << int(y) << ")" << std::endl;
+		Debug::out(2) << "eta(i=" << i << ", y=" << int(y) << ")" << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
 		auto& tp = current_ectab->at(idx);
@@ -697,11 +697,11 @@ namespace SemiCrf {
 
 	Pridector::Pridector()
 	{
-		Debug::out() << "Pridector()" << std::endl;
+		Debug::out(2) << "Pridector()" << std::endl;
 	}
 
 	Pridector::~Pridector() {
-		Debug::out() << "~Pridector()" << std::endl;
+		Debug::out(2) << "~Pridector()" << std::endl;
 	}
 
 	Datas Pridector::createDatas()
@@ -727,7 +727,7 @@ namespace SemiCrf {
 
 	void Pridector::compute()
 	{
-		Debug::out() << "Pridector::compute()" << std::endl;
+		Debug::out(2) << "Pridector::compute()" << std::endl;
 
 		for( auto data : *datas ) {
 
@@ -767,7 +767,7 @@ namespace SemiCrf {
 
 	double Pridector::V(int i, App::Label y, int& maxd)
 	{
-		Debug::out() << "V(i=" << i << ", y=" << int(y) << ")" << std::endl;
+		Debug::out(2) << "V(i=" << i << ", y=" << int(y) << ")" << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
 		auto& tp = current_vctab->at(idx);

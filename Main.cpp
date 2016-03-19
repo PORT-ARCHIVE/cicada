@@ -18,7 +18,7 @@ public:
 		, maxLength(5)
 		, e0(1.0e-5)
 		, e1(1.0e-5)
-		, debug(false) {};
+		, debug_level(0) {};
 	void parse(int argc, char *argv[]);
 public:
 	std::string training_data_file;
@@ -27,12 +27,13 @@ public:
 	int maxLength;
 	double e0;
 	double e1;
-	bool debug;
+	int debug_level;
 };
 
 void Options::parse(int argc, char *argv[])
 {
 	try {
+
 		for( int i = 1; i < argc; i++ ) {
 			std::string arg = argv[i];
 			if( arg == "-t" ) {
@@ -47,10 +48,9 @@ void Options::parse(int argc, char *argv[])
 				e1 = boost::lexical_cast<double>(argv[++i]);
 			} else if( arg == "-w" ) {
 				weights_file = argv[++i];
-			} else if( arg == "--debug" ) {
-				debug = true;
+			} else if( arg == "--debug-level" ) {
+				debug_level = boost::lexical_cast<int>(argv[++i]);
 			} else {
-
 				std::stringstream ss;
 				ss << "error: unknown option specified";
 				throw Error(ss.str());
@@ -96,12 +96,7 @@ int main(int argc, char *argv[])
 
 		Options options;
 		options.parse(argc, argv);
-
-		if( options.debug ) {
-			Debug::on();
-		} else {
-			Debug::off();
-		}
+		Debug::setLevel(options.debug_level);
 
 		std::string file;
 		SemiCrf::Algorithm algorithm;
@@ -119,11 +114,8 @@ int main(int argc, char *argv[])
 		SemiCrf::open(ifs, file);
 		SemiCrf::Datas datas = algorithm->createDatas();
 		datas->read(ifs);
-		if( options.debug ) {
-			datas->write(std::cout);
-		}
+		datas->write(Debug::out(2) << "");
 		algorithm->setDatas(datas);
-
 		algorithm->setMaxLength(options.maxLength);
 		algorithm->setE0(options.e0);
 		algorithm->setE1(options.e1);
