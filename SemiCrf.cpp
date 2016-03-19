@@ -607,7 +607,7 @@ namespace SemiCrf {
 
 	double Learner::alpha(int i, App::Label y)
 	{
-		Debug::out(2) << "alpha(i=" << i << ", y=" << int(y) << ")" << std::endl;
+		Debug::out(3) << "alpha(i=" << i << ", y=" << int(y) << ")" << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
 		auto& tp = current_actab->at(idx);
@@ -648,7 +648,7 @@ namespace SemiCrf {
 
 	double Learner::eta(int i, App::Label y, int k)
 	{
-		Debug::out(2) << "eta(i=" << i << ", y=" << int(y) << ")" << std::endl;
+		Debug::out(3) << "eta(i=" << i << ", y=" << int(y) << ")" << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
 		auto& tp = current_ectab->at(idx);
@@ -767,7 +767,7 @@ namespace SemiCrf {
 
 	double Pridector::V(int i, App::Label y, int& maxd)
 	{
-		Debug::out(2) << "V(i=" << i << ", y=" << int(y) << ")" << std::endl;
+		Debug::out(3) << "V(i=" << i << ", y=" << int(y) << ")" << std::endl;
 		int idx = (i*labels->size()) + (static_cast<int>(y));
 
 		auto& tp = current_vctab->at(idx);
