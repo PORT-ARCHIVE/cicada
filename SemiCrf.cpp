@@ -499,18 +499,16 @@ namespace SemiCrf {
 				int capacity = l*s;
 				current_actab = createCheckTable(capacity);
 
-				double Z = computeZ();
-				Debug::out(2) << "Z=" << Z << std::endl;
 				double WG = 0.0;
+				double Z = computeZ(); Debug::out(2) << "Z=" << Z << std::endl;
 				auto Gs = computeG(WG);
-				L += WG - log(Z);
 				auto Gms = computeGm(Z);
 
+				L += WG - log(Z);
+
 				auto idL = dL.begin();
-				auto iw = weights->begin();
-				for( int k = 0; k < dim; k++, idL++, iw++ ) {
-					(*idL) += Gs[k] - Gms[k];
-					Debug::out(2) << "dL(" << k << ")=" << *idL << std::endl;
+				for( int k = 0; k < dim; k++, idL++ ) {
+					(*idL) += Gs[k] - Gms[k]; Debug::out(2) << "dL(" << k << ")=" << *idL << std::endl;
 				}
 			}
 
@@ -565,8 +563,7 @@ namespace SemiCrf {
 				G += (*ff)(k, y, y1, current_data, ti, ui);
 			}
 
-			Gs.push_back(G);
-			Debug::out(2) << "G(" << k << ")=" << G << std::endl;
+			Gs.push_back(G); Debug::out(2) << "G(" << k << ")=" << G << std::endl;
 			WG += (*iw)*G;
 		}
 
@@ -613,8 +610,8 @@ namespace SemiCrf {
 	double Learner::alpha(int i, App::Label y)
 	{
 		Debug::out(3) << "alpha(i=" << i << ", y=" << int(y) << ")" << std::endl;
-		int idx = (i*labels->size()) + (static_cast<int>(y));
 
+		int idx = (i*labels->size()) + (static_cast<int>(y));
 		auto& tp = current_actab->at(idx);
 		if( std::get<0>(tp) ) {
 			return std::get<1>(tp);
@@ -654,8 +651,8 @@ namespace SemiCrf {
 	double Learner::eta(int i, App::Label y, int k)
 	{
 		Debug::out(3) << "eta(i=" << i << ", y=" << int(y) << ")" << std::endl;
-		int idx = (i*labels->size()) + (static_cast<int>(y));
 
+		int idx = (i*labels->size()) + (static_cast<int>(y));
 		auto& tp = current_ectab->at(idx);
 		if( std::get<0>(tp) ) {
 			return std::get<1>(tp);
@@ -773,8 +770,8 @@ namespace SemiCrf {
 	double Pridector::V(int i, App::Label y, int& maxd)
 	{
 		Debug::out(3) << "V(i=" << i << ", y=" << int(y) << ")" << std::endl;
-		int idx = (i*labels->size()) + (static_cast<int>(y));
 
+		int idx = (i*labels->size()) + (static_cast<int>(y));
 		auto& tp = current_vctab->at(idx);
 		if( std::get<0>(tp) ) {
 			maxd = std::get<2>(tp);
