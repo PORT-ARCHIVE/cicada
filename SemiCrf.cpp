@@ -612,19 +612,21 @@ namespace SemiCrf {
 
 	double Learner::alpha(int i, App::Label y)
 	{
-		Debug::out(3) << "alpha(i=" << i << ", y=" << int(y) << ")" << std::endl;
-
-		int idx = (i*labels->size()) + (static_cast<int>(y));
-		auto& tp = current_actab->at(idx);
-		if( std::get<0>(tp) ) {
-			return std::get<1>(tp);
-		}
-
 		double v = 0;
 
-		if( 0 < i ) {
+		if( -1 < i ) {
+			int idx = (i*labels->size()) + (static_cast<int>(y));
+			auto& tp = current_actab->at(idx);
+			if( std::get<0>(tp) ) {
+				v = std::get<1>(tp);
+				Debug::out(3) << "*alpha(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
+				return v;
+			}
+		}
 
-			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
+		if( -1 < i ) {
+
+			for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
 				for( auto yd : *labels ) {
 
 					double e0 = alpha(i-d, yd);
@@ -633,39 +635,42 @@ namespace SemiCrf {
 				}
 			}
 
-		} else if( i == 0 ) {
+		} else if( i == -1 ) {
 
-			for( auto yd : *labels ) {
-
-				double e = computeWG(y, yd, 0, 1); // ydの位置は-1 
-				v += exp(e);
-			}
+			v = 1.0;
 
 		} else {
-			assert( 0 <= i );
+			assert( -2 < i );
 		}
 
-		std::get<0>(tp) = true;
-		std::get<1>(tp) = v;
+		if( -1 < i ) {
+			int idx = (i*labels->size()) + (static_cast<int>(y));
+			auto& tp = current_actab->at(idx);
+			std::get<0>(tp) = true;
+			std::get<1>(tp) = v;
+			Debug::out(3) << "alpha(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
+		}
 
 		return v;
 	}
 
 	double Learner::eta(int i, App::Label y, int k)
 	{
-		Debug::out(3) << "eta(i=" << i << ", y=" << int(y) << ")" << std::endl;
-
-		int idx = (i*labels->size()) + (static_cast<int>(y));
-		auto& tp = current_ectab->at(idx);
-		if( std::get<0>(tp) ) {
-			return std::get<1>(tp);
-		}
-
 		double v = 0;
 
-		if( 0 < i ) {
+		if( -1 < i ) {
+			int idx = (i*labels->size()) + (static_cast<int>(y));
+			auto& tp = current_ectab->at(idx);
+			if( std::get<0>(tp) ) {
+				v = std::get<1>(tp);
+				Debug::out(3) << "*eta(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
+				return v;
+			}
+		}
 
-			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
+		if( -1 < i ) {
+
+			for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
 				for( auto yd : *labels ) {
 
 					double e0 = eta(i-d, yd, k) + alpha(i-d, yd) * (*ff)(k, y, yd, current_data, i-d+1, i);
@@ -674,21 +679,21 @@ namespace SemiCrf {
 				}
 			}
 
-		} else if( i == 0 ) {
+		} else if( i == -1 ) {
 
-			for( auto yd : *labels ) {
-
-				double e0 = (*ff)(k, y, yd, current_data, 1, 0); // ydの位置は-1
-				double e1 = computeWG(y, yd, 0, 1); // ydの位置は-1
-				v += e0*exp(e1);
-			}
+			v = 0.0;
 
 		} else {
-			assert( 0 <= i );
+			assert( -2 < i );
 		}
 
-		std::get<0>(tp) = true;
-		std::get<1>(tp) = v;
+		if( -1 < i ) {
+			int idx = (i*labels->size()) + (static_cast<int>(y));
+			auto& tp = current_actab->at(idx);
+			std::get<0>(tp) = true;
+			std::get<1>(tp) = v;
+			Debug::out(3) << "eta(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
+		}
 
 		return v;
 	}
