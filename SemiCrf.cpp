@@ -534,7 +534,7 @@ namespace SemiCrf {
 			tdl += dl*dl;
 		}
 
-		tdl = sqrt(tdl); Debug::out(1) << "L=" << L << " |dl|=" << tdl << std::endl;
+		tdl = sqrt(tdl); Debug::out(1) << "L=" << L << " |dL|=" << tdl << std::endl;
 		return (tdl < e1);
 	}
 
