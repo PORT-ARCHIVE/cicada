@@ -200,6 +200,11 @@ namespace SemiCrf {
 					seg	= createSegment(seg_start, counter, l);
 					data->getSegments()->push_back(seg);
 
+				} else if( descriptor == "S/E" ) {
+
+					seg	= createSegment(counter, counter, l);
+					data->getSegments()->push_back(seg);
+
 				} else {
 
 					Debug::out(2) << "warning: unknown descriptor" << std::endl;
