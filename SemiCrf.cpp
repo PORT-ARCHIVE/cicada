@@ -553,16 +553,17 @@ namespace SemiCrf {
 		for( int k = 0; k < dim; k++, iw++ ) {
 
 			double G = 0.0;
-			auto sj = segments->begin();
-			auto si = segments->begin(); si++;
+			auto sj = segments->begin(); // !!!!
+			auto si = segments->begin();
 
-			for( ; si != segments->end(); si++, sj++ ){ // 最初のセグメントが抜けている
+			for( ; si != segments->end(); si++ ){
 
 				auto y = (*si)->getLabel();
 				auto y1 = (*sj)->getLabel();
 				int ti = (*si)->getStart();
 				int ui = (*si)->getEnd();
 				G += (*ff)(k, y, y1, current_data, ti, ui);
+				sj = si;
 			}
 
 			Gs.push_back(G); Debug::out(2) << "G(" << k << ")=" << G << std::endl;
