@@ -694,10 +694,10 @@ namespace SemiCrf {
 
 		if( -1 < i ) {
 			int idx = (i*labels->size()) + (static_cast<int>(y));
-			auto& tp = current_actab->at(idx);
+			auto& tp = current_ectab->at(idx);
 			std::get<0>(tp) = true;
 			std::get<1>(tp) = v;
-			Debug::out(3) << "eta(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
+			Debug::out(3) << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
 		}
 
 		return v;
