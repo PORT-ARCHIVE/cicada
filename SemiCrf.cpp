@@ -509,7 +509,7 @@ namespace SemiCrf {
 				current_actab = createCheckTable(capacity);
 
 				double WG = 0.0;
-				double Z = computeZ(); Debug::out(2) << "Z=" << Z << std::endl;
+				double Z = computeZ();
 				auto Gs = computeG(WG);
 				auto Gms = computeGm(Z);
 
@@ -586,6 +586,7 @@ namespace SemiCrf {
 			Z += alpha(s-1, y);
 		}
 
+		Debug::out(2) << "Z=" << Z << std::endl;
 		return Z;
 	}
 
@@ -641,7 +642,7 @@ namespace SemiCrf {
 
 		} else if( i == -1 ) {
 
-			v = 1.0;
+			v = 1.0; Debug::out(3) << "alpha(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
 
 		} else {
 			assert( -2 < i );
@@ -667,7 +668,7 @@ namespace SemiCrf {
 			auto& tp = current_ectab->at(idx);
 			if( std::get<0>(tp) ) {
 				v = std::get<1>(tp);
-				Debug::out(3) << "*eta(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
+				Debug::out(3) << "*eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
 				return v;
 			}
 		}
@@ -685,7 +686,7 @@ namespace SemiCrf {
 
 		} else if( i == -1 ) {
 
-			v = 0.0;
+			v = 0.0; Debug::out(3) << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
 
 		} else {
 			assert( -2 < i );
