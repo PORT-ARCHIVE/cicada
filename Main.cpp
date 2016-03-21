@@ -16,6 +16,7 @@ public:
 		, inference_data_file("")
 		, weights_file("weights.txt")
 		, maxLength(5)
+		, maxIteration(1024)
 		, e0(1.0e-5)
 		, e1(1.0e-5)
 		, debug_level(0) {};
@@ -25,6 +26,7 @@ public:
 	std::string inference_data_file;
 	std::string weights_file;
 	int maxLength;
+	int maxIteration;
 	double e0;
 	double e1;
 	int debug_level;
@@ -42,6 +44,8 @@ void Options::parse(int argc, char *argv[])
 				inference_data_file = argv[++i];
 			} else if( arg == "-l" || arg == "--max-length") {
 				maxLength = boost::lexical_cast<int>(argv[++i]);
+			} else if( arg == "-r" || arg == "--max-iteration") {
+				maxIteration = boost::lexical_cast<int>(argv[++i]);
 			} else if( arg == "-e0" ) {
 				e0 = boost::lexical_cast<double>(argv[++i]);
 			} else if( arg == "-e1" ) {
@@ -117,6 +121,7 @@ int main(int argc, char *argv[])
 		datas->write(Debug::out(2) << "");
 		algorithm->setDatas(datas);
 		algorithm->setMaxLength(options.maxLength);
+		algorithm->setMaxIteration(options.maxIteration);
 		algorithm->setE0(options.e0);
 		algorithm->setE1(options.e1);
 		algorithm->compute();

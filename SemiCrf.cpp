@@ -392,6 +392,7 @@ namespace SemiCrf {
 		, weights( nullptr )
 		, datas( nullptr )
 		, maxLength(5)
+		, maxIteration(1024)
 		, e0(1.0e-5)
 		, e1(1.0e-5)
 	{
@@ -411,6 +412,11 @@ namespace SemiCrf {
 	void Algorithm_::setMaxLength(int arg)
 	{
 		maxLength = arg;
+	}
+
+	void Algorithm_::setMaxIteration(int arg)
+	{
+		maxIteration = arg;
 	}
 
 	void Algorithm_::setE0(double arg)
@@ -496,7 +502,9 @@ namespace SemiCrf {
 		Debug::out(2) << "Learner::compute()" << std::endl;
 		int l = labels->size();
 
-		while(1) {
+		int itr = 0;
+
+		while( itr < maxIteration ) {
 
 			double L = 0.0;
 			std::vector<double> dL(dim, 0.0);
@@ -532,6 +540,8 @@ namespace SemiCrf {
 			if( isConv(L, dL) ) {
 				break;
 			}
+
+			itr++;
 		}
 	}
 
