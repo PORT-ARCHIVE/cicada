@@ -70,7 +70,11 @@ namespace SemiCrf {
 
 				if( i == start ) {
 
-					output << "\tS\t";
+					if( i == end ) {
+						output << "\tS/E\t";
+					} else {
+						output << "\tS\t";
+					}
 
 				} else if( start < i && i < end ) {
 
