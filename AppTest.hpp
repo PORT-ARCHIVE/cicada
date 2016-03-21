@@ -18,15 +18,8 @@ namespace App {
 
 		Simple(){ Debug::out(2) << "Simple()" << std::endl; };
 		virtual ~Simple() { Debug::out(2) << "~Simple()" << std::endl; };
-
-		virtual void read() {
-			Debug::out(2) << "Simple::read()" << std::endl;
-		};
-
-		virtual void write() {
-			Debug::out(2) << "Simple::write()" << std::endl;
-		};
-
+		virtual void read() { Debug::out(2) << "Simple::read()" << std::endl; };
+		virtual void write() { Debug::out(2) << "Simple::write()" << std::endl; };
 		virtual double operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i);
 	};
 
@@ -34,6 +27,15 @@ namespace App {
 	int getFeatureDimention();
 
 	SemiCrf::Labels createLabels();
+
+	// 推論用数字データ集合
+	class PridectionDigitDatas_ : public SemiCrf::Datas_ {
+	public:
+		PridectionDigitDatas_(){};
+		virtual ~PridectionDigitDatas_(){};
+		virtual void read(std::istream& input);
+	};
+
 }
 
 #endif // APP_TEST__H

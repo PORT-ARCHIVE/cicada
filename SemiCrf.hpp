@@ -110,7 +110,6 @@ namespace SemiCrf {
 		TrainingDatas_();
 		virtual ~TrainingDatas_();
 		virtual void read(std::istream& input);
-		//virtual void write() const;
 	};
 
 	Datas createTrainingDatas();
@@ -121,7 +120,6 @@ namespace SemiCrf {
 		PridectionDatas_();
 		virtual ~PridectionDatas_();
 		virtual void read(std::istream& input);
-		//virtual void write() const;
 	};
 
 	Datas createPridectionDatas();
@@ -173,7 +171,6 @@ namespace SemiCrf {
 		virtual void setWeights(Weights arg);
 		virtual void setDimension(int arg);
 		virtual void compute() = 0;
-		virtual Datas createDatas() = 0;
 		virtual void preProcess(const std::string& wfile) = 0;
 		virtual void postProcess(const std::string& wfile) = 0;
 
@@ -204,7 +201,6 @@ namespace SemiCrf {
 		Learner();
 		virtual ~Learner();
 		virtual void compute();
-		virtual Datas createDatas();
 		virtual void preProcess(const std::string& wfile);
 		virtual void postProcess(const std::string& wfile);
 
@@ -225,7 +221,6 @@ namespace SemiCrf {
 		Pridector();
 		virtual ~Pridector();
 		virtual void compute();
-		virtual Datas createDatas();
 		virtual void preProcess(const std::string& wfile);
 		virtual void postProcess(const std::string& wfile);
 		

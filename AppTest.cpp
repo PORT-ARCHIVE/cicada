@@ -4,6 +4,7 @@
 #include "AppTest.hpp"
 #include "DebugOut.hpp"
 #include "Error.hpp"
+#include "MultiByteTokenizer.hpp"
 
 namespace App {
 
@@ -123,5 +124,50 @@ namespace App {
 		}
 
 		return ret;
+	}
+
+	void PridectionDigitDatas_::read(std::istream& strm)
+	{
+		Debug::out(2) << "PridectionDigitDatas_::read()" << std::endl;
+
+		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
+
+		SemiCrf::Data data;
+		std::string line;
+
+		while( std::getline(strm, line) ) {
+
+			if( line == "" ) {
+				continue;
+			}
+
+			if( line[0] == '#' ) {
+				if( line == "# BEGIN" ) {
+					data = SemiCrf::Data( new SemiCrf::Data_() );
+					Debug::out(2) << "BEGIN : data was created." << std::endl;
+				} else if( line == "# END" ) {
+					push_back(data);
+					Debug::out(2) << "END : data was pushed." << std::endl;
+				}
+				continue;
+			}
+
+			MultiByteTokenizer tokenizer(line);
+
+			std::string word = tokenizer.get();
+			if( word.empty() ) {
+				// T.B.D.
+			} else {
+				Debug::out(2) << word << std::endl;
+				std::vector<std::string> vs;
+				vs.push_back(word);
+				data->getStrs()->push_back(vs);
+			}
+
+			std::string remains = tokenizer.get();
+			if( !remains.empty() ) {
+				// T.B.D.
+			}
+		}
 	}
 }

@@ -14,6 +14,7 @@ public:
 	Options()
 		: training_data_file("")
 		, inference_data_file("")
+		, format("digit")
 		, weights_file("weights.txt")
 		, maxLength(5)
 		, maxIteration(1024)
@@ -24,6 +25,7 @@ public:
 public:
 	std::string training_data_file;
 	std::string inference_data_file;
+	std::string format;
 	std::string weights_file;
 	int maxLength;
 	int maxIteration;
@@ -42,6 +44,8 @@ void Options::parse(int argc, char *argv[])
 				training_data_file = argv[++i];
 			} else if( arg == "-i" ) {
 				inference_data_file = argv[++i];
+			} else if( arg == "-f" ) {
+				format = argv[++i];
 			} else if( arg == "-l" || arg == "--max-length") {
 				maxLength = boost::lexical_cast<int>(argv[++i]);
 			} else if( arg == "-r" || arg == "--max-iteration") {
@@ -73,7 +77,7 @@ void Options::parse(int argc, char *argv[])
 	}
 }
 
-void createAlgorithm(Options& options, SemiCrf::Algorithm& algorithm, std::string& file)
+void createAlgorithm(const Options& options, SemiCrf::Algorithm& algorithm, std::string& file)
 {
 	if( !options.training_data_file.empty() ) {
 
@@ -85,6 +89,34 @@ void createAlgorithm(Options& options, SemiCrf::Algorithm& algorithm, std::strin
 		file = options.inference_data_file;
 		algorithm = SemiCrf::createPridector();
 
+	} else {
+		std::stringstream ss;
+		ss << "error: no input file specified";
+		throw Error(ss.str());
+	}
+}
+
+SemiCrf::Datas createDatas(const Options& options)
+{
+	if( !options.training_data_file.empty() ) {
+
+		return SemiCrf::Datas( new SemiCrf::TrainingDatas_() );
+
+	} else if( !options.inference_data_file.empty() ) {
+
+		if( options.format == "digit" ) {
+
+			return SemiCrf::Datas( new App::PridectionDigitDatas_() );
+
+		} else if( options.format == "jpn" ) {
+
+			return SemiCrf::Datas( new SemiCrf::PridectionDatas_() );
+
+		} else {
+			std::stringstream ss;
+			ss << "error: unsupported format specified";
+			throw Error(ss.str());
+		}
 	} else {
 		std::stringstream ss;
 		ss << "error: no input file specified";
@@ -116,7 +148,7 @@ int main(int argc, char *argv[])
 
 		std::ifstream ifs;
 		SemiCrf::open(ifs, file);
-		SemiCrf::Datas datas = algorithm->createDatas();
+		SemiCrf::Datas datas = createDatas(options);
 		datas->read(ifs);
 		datas->write(Debug::out(2) << "");
 		algorithm->setDatas(datas);

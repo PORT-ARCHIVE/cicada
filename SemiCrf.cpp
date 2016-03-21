@@ -58,7 +58,7 @@ namespace SemiCrf {
 	{
 		Debug::out(2) << "Data_::write()" << std::endl;
 
-		for( auto s : *segs ){
+		for( auto s : *segs ) {
 
 			int start = s->getStart();
 			int end = s->getEnd();
@@ -89,6 +89,15 @@ namespace SemiCrf {
 				}
 
 				output << label2String(l) << std::endl;
+			}
+		}
+
+		if( segs->empty() ) {
+			for( auto str : *strs ) {
+				for( auto s : str ) {
+					output << s << "\t";
+				}
+				output << std::endl;
 			}
 		}
 	}
@@ -216,7 +225,7 @@ namespace SemiCrf {
 			}
 
 			std::string remains = tokenizer.get();
-			while( !remains.empty() ) {
+			if( !remains.empty() ) {
 				// T.B.D.
 			}
 		}
@@ -479,11 +488,6 @@ namespace SemiCrf {
 		Debug::out(2) << "~Learner()" << std::endl;
 	}
 
-	Datas Learner::createDatas()
-	{
-		return Datas( new TrainingDatas_() );
-	}
-
 	void Learner::preProcess(const std::string& wfile)
 	{
 		SemiCrf::Weights weights = SemiCrf::createWeights(dim);
@@ -715,11 +719,6 @@ namespace SemiCrf {
 
 	Pridector::~Pridector() {
 		Debug::out(2) << "~Pridector()" << std::endl;
-	}
-
-	Datas Pridector::createDatas()
-	{
-		return Datas( new PridectionDatas_() );
 	}
 
 	void Pridector::preProcess(const std::string& wfile)
