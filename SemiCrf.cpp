@@ -723,7 +723,7 @@ namespace SemiCrf {
 
 	void Pridector::preProcess(const std::string& wfile)
 	{
-		SemiCrf::Weights weights = SemiCrf::createWeights(dim);
+		SemiCrf::Weights weights = SemiCrf::createWeights();
 		std::ifstream ifs; // 入力
 		open(ifs, wfile);
 		weights->read(ifs);

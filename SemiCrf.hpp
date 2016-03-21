@@ -134,7 +134,7 @@ namespace SemiCrf {
 	};
 
 	typedef std::shared_ptr<Weights_> Weights;
-	Weights createWeights(int dim);
+	Weights createWeights(int dim = 0);
 
 	// 素性関数
 	class FeatureFunction_ {
