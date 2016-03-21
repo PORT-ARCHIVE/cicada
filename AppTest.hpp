@@ -17,7 +17,7 @@ namespace App {
 	public:
 
 		Simple(){ Debug::out(2) << "Simple()" << std::endl; };
-		virtual ~Simple() { Debug::out(1) << "~Simple()" << std::endl; };
+		virtual ~Simple() { Debug::out(2) << "~Simple()" << std::endl; };
 
 		virtual void read() {
 			Debug::out(2) << "Simple::read()" << std::endl;
