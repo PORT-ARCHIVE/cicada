@@ -781,20 +781,22 @@ namespace SemiCrf {
 	{
 		Debug::out(3) << "V(i=" << i << ", y=" << int(y) << ")" << std::endl;
 
-		int idx = (i*labels->size()) + (static_cast<int>(y));
-		auto& tp = current_vctab->at(idx);
-		if( std::get<0>(tp) ) {
-			maxd = std::get<2>(tp);
-			return std::get<1>(tp);
-		}
-
-		maxd = -1;
-		App::Label maxyd;
 		double maxV = std::numeric_limits<double>::min();
-		
-		if( 0 < i ) {
 
-			for( int d = 1; d <= std::min(maxLength, i); d++ ) {
+		if( -1 < i ) {
+
+			int idx = (i*labels->size()) + (static_cast<int>(y));
+			auto& tp = current_vctab->at(idx);
+			if( std::get<0>(tp) ) {
+				maxd = std::get<2>(tp);
+				maxV = std::get<1>(tp);
+				return maxV;
+			}
+
+			maxd = -1;
+			App::Label maxyd;
+
+			for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
 				for( auto yd : *labels ) {
 
 					int tmp = -1;
@@ -811,18 +813,20 @@ namespace SemiCrf {
 
 			assert( 0 < maxd );
 			Segment seg = createSegment(i-maxd+1, i, maxyd);
-			segs->push_back(seg);
+			//segs->push_back(seg);
+			current_data->getSegments()->push_back(seg);
 
-		} else if( i == 0 ) {
+			std::get<0>(tp) = true;
+			std::get<1>(tp) = maxV;
+			std::get<2>(tp) = maxd;
+
+		} else if( i == -1 ) {
+
 			maxV = 0.0;
 
 		} else {
-			assert( 0 <= i );
+			assert( -2 < i );
 		}
-
-		std::get<0>(tp) = true;
-		std::get<1>(tp) = maxV;
-		std::get<2>(tp) = maxd;
 
 		return maxV;
 	}

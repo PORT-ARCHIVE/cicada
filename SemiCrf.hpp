@@ -187,7 +187,6 @@ namespace SemiCrf {
 		double e0;
 		double e1;
 		Data current_data;
-		Segments segs;
 		CheckTable current_vctab;
 		CheckTable current_actab;
 		CheckTable current_ectab;
