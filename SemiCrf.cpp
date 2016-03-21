@@ -630,6 +630,7 @@ namespace SemiCrf {
 		double v = 0;
 
 		if( -1 < i ) {
+
 			int idx = (i*labels->size()) + (static_cast<int>(y));
 			auto& tp = current_actab->at(idx);
 			if( std::get<0>(tp) ) {
@@ -637,9 +638,6 @@ namespace SemiCrf {
 				Debug::out(3) << "*alpha(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
 				return v;
 			}
-		}
-
-		if( -1 < i ) {
 
 			for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
 				for( auto yd : *labels ) {
@@ -650,20 +648,16 @@ namespace SemiCrf {
 				}
 			}
 
+			std::get<0>(tp) = true;
+			std::get<1>(tp) = v;
+			Debug::out(3) << "alpha(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
+
 		} else if( i == -1 ) {
 
 			v = 1.0; Debug::out(3) << "alpha(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
 
 		} else {
 			assert( -2 < i );
-		}
-
-		if( -1 < i ) {
-			int idx = (i*labels->size()) + (static_cast<int>(y));
-			auto& tp = current_actab->at(idx);
-			std::get<0>(tp) = true;
-			std::get<1>(tp) = v;
-			Debug::out(3) << "alpha(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
 		}
 
 		return v;
@@ -674,6 +668,7 @@ namespace SemiCrf {
 		double v = 0;
 
 		if( -1 < i ) {
+
 			int idx = (i*labels->size()) + (static_cast<int>(y));
 			auto& tp = current_ectab->at(idx);
 			if( std::get<0>(tp) ) {
@@ -681,9 +676,6 @@ namespace SemiCrf {
 				Debug::out(3) << "*eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
 				return v;
 			}
-		}
-
-		if( -1 < i ) {
 
 			for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
 				for( auto yd : *labels ) {
@@ -694,20 +686,16 @@ namespace SemiCrf {
 				}
 			}
 
+			std::get<0>(tp) = true;
+			std::get<1>(tp) = v;
+			Debug::out(3) << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
+
 		} else if( i == -1 ) {
 
 			v = 0.0; Debug::out(3) << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
 
 		} else {
 			assert( -2 < i );
-		}
-
-		if( -1 < i ) {
-			int idx = (i*labels->size()) + (static_cast<int>(y));
-			auto& tp = current_ectab->at(idx);
-			std::get<0>(tp) = true;
-			std::get<1>(tp) = v;
-			Debug::out(3) << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
 		}
 
 		return v;
