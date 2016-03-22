@@ -21,10 +21,25 @@
 namespace SemiCrf {
 
 	// ctr
-	Labels	createLabels() { return Labels( new Labels_() ); }
-	Segment createSegment(int start, int end, App::Label label) { return Segment( new Segment_(start, end, label) ); }
-	Segments createSegments() { return Segments( new Segments_() ); }
-	CheckTable createCheckTable(int capacity) { return CheckTable( new CheckTable_(capacity, CheckTuple()) ); }
+	Labels	createLabels()
+	{
+		return Labels( new Labels_() );
+	}
+
+	Segment createSegment(int start, int end, App::Label label)
+	{
+		return Segment( new Segment_(start, end, label) );
+	}
+
+	Segments createSegments()
+	{
+		return Segments( new Segments_() );
+	}
+
+	CheckTable createCheckTable(int capacity)
+	{
+		return CheckTable( new CheckTable_(capacity, CheckTuple()) );
+	}
 
 	// Labels
 	Labels_::Labels_()
