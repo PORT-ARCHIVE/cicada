@@ -151,7 +151,7 @@ namespace SemiCrf {
 	FeatureFunction createFeatureFunction();
 
 	// チェックテーブル
-	typedef std::tuple<bool,double,int> CheckTuple;
+	typedef std::tuple<bool,double,int,App::Label> CheckTuple;
 	typedef std::vector<CheckTuple> CheckTable_;
 	typedef std::shared_ptr<CheckTable_> CheckTable;
 	CheckTable createCheckTable(int capacity);
@@ -225,6 +225,7 @@ namespace SemiCrf {
 		
 	private:
 		double V(int i, App::Label y, int& maxd);
+		void backtrack(App::Label maxy, int maxd);
 	};
 
 	Algorithm createPridector();

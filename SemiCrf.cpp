@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <list>
 #include <boost/lexical_cast.hpp>
 #include <cassert>
 #include <cmath>
@@ -775,63 +776,86 @@ namespace SemiCrf {
 			}
 
 			assert( 0 < maxd );
-			Segment seg = createSegment(s-maxd, s-1, maxy);
-			maxsegs->push_back(seg);
-			current_data->setSegments(maxsegs);
+			backtrack(maxy, maxd);
 		}
 	}
 
 	double Pridector::V(int i, App::Label y, int& maxd)
 	{
-		Debug::out(3) << "V(i=" << i << ", y=" << int(y) << ")" << std::endl;
-
 		double maxV = std::numeric_limits<double>::min();
 
 		if( -1 < i ) {
 
 			int idx = (i*labels->size()) + (static_cast<int>(y));
 			auto& tp = current_vctab->at(idx);
+
 			if( std::get<0>(tp) ) {
+
 				maxd = std::get<2>(tp);
 				maxV = std::get<1>(tp);
-				return maxV;
-			}
 
-			maxd = -1;
-			App::Label maxyd;
+			} else {
 
-			for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
-				for( auto yd : *labels ) {
+				maxd = -1;
+				App::Label maxyd;
 
-					int tmp = -1;
-					double v = V(i-d, yd, tmp);
-					v += computeWG(y, yd, i, d);
+				for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
+					for( auto yd : *labels ) {
+
+						int tmp = -1;
+						double v = V(i-d, yd, tmp);
+						v += computeWG(y, yd, i, d);
 					
-					if( maxV < v ) {
-						maxV = v;						
-						maxd = d;
-						maxyd = yd;
+						if( maxV < v ) {
+							maxV = v;
+							maxd = d;
+							maxyd = yd;
+						}
 					}
 				}
+
+				assert( 0 < maxd );
+				std::get<0>(tp) = true;
+				std::get<1>(tp) = maxV;
+				std::get<2>(tp) = maxd;
+				std::get<3>(tp) = maxyd;
 			}
-
-			assert( 0 < maxd );
-			Segment seg = createSegment(i-maxd+1, i, maxyd);
-			//segs->push_back(seg);
-			current_data->getSegments()->push_back(seg);
-
-			std::get<0>(tp) = true;
-			std::get<1>(tp) = maxV;
-			std::get<2>(tp) = maxd;
 
 		} else if( i == -1 ) {
 
 			maxV = 0.0;
 
 		} else {
-			assert( -2 < i );
+			assert( -2 < i ); // T.B.D.
 		}
 
+		Debug::out(3) << "V(i=" << i << ", y=" << int(y) << ")=" << maxV << std::endl;
 		return maxV;
+	}
+
+	void Pridector::backtrack(App::Label maxy, int maxd)
+	{
+		int l = labels->size();
+		int s = current_data->getStrs()->size();
+		int i = s-1;
+		int idx = i*l + (int)maxy;
+
+		std::list<Segment> ls;
+
+		while( -1 < idx ) {
+
+			Segment seg = createSegment(i-maxd+1, i, maxy);
+			ls.push_front(seg);
+
+			auto& tp = current_vctab->at(idx);
+			maxd = std::get<2>(tp);
+			maxy = std::get<3>(tp);
+			i -= maxd;
+			idx = i*l + (int)maxy;
+		}
+
+		for( auto s : ls ) {
+			current_data->getSegments()->push_back(s);
+		}
 	}
 }
