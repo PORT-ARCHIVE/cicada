@@ -790,7 +790,7 @@ namespace SemiCrf {
 			for( auto y : *labels ) {
 
 				int d = -1;
-				Segments segs = createSegments();
+				//Segments segs = createSegments();
 				double v = V(s-1, y, d);
 
 				if( maxV < v ) {
