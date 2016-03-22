@@ -1,0 +1,5 @@
+# BEGIN
+1	S/E	0
+0	S/E	1
+# END
+
