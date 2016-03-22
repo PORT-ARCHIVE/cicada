@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 
 		Options options;
 		options.parse(argc, argv);
-		Debug::setLevel(options.debug_level);
+		Logger::setLevel(options.debug_level);
 
 		std::string file;
 		SemiCrf::Algorithm algorithm;
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 		SemiCrf::open(ifs, file);
 		SemiCrf::Datas datas = createDatas(options);
 		datas->read(ifs);
-		datas->write(Debug::out(2) << "");
+		datas->write(Logger::out(2) << "");
 		algorithm->setDatas(datas);
 		algorithm->setMaxLength(options.maxLength);
 		algorithm->setMaxIteration(options.maxIteration);

@@ -10,22 +10,22 @@ namespace App {
 
 	Simple::Simple()
 	{
-		Debug::out(2) << "Simple()" << std::endl;
+		Logger::out(2) << "Simple()" << std::endl;
 	}
 
 	Simple::~Simple()
 	{
-		Debug::out(2) << "~Simple()" << std::endl;
+		Logger::out(2) << "~Simple()" << std::endl;
 	}
 
 	void Simple::read()
 	{
-		Debug::out(2) << "Simple::read()" << std::endl;
+		Logger::out(2) << "Simple::read()" << std::endl;
 	}
 
 	void Simple::write()
 	{
-		Debug::out(2) << "Simple::write()" << std::endl;
+		Logger::out(2) << "Simple::write()" << std::endl;
 	}
 
 	Label string2Label(const std::string& str) {
@@ -148,7 +148,7 @@ namespace App {
 
 	void PridectionDigitDatas_::read(std::istream& strm)
 	{
-		Debug::out(2) << "PridectionDigitDatas_::read()" << std::endl;
+		Logger::out(2) << "PridectionDigitDatas_::read()" << std::endl;
 
 		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
 
@@ -164,10 +164,10 @@ namespace App {
 			if( line[0] == '#' ) {
 				if( line == "# BEGIN" ) {
 					data = SemiCrf::Data( new SemiCrf::Data_() );
-					Debug::out(2) << "BEGIN : data was created." << std::endl;
+					Logger::out(2) << "BEGIN : data was created." << std::endl;
 				} else if( line == "# END" ) {
 					push_back(data);
-					Debug::out(2) << "END : data was pushed." << std::endl;
+					Logger::out(2) << "END : data was pushed." << std::endl;
 				}
 				continue;
 			}
@@ -178,7 +178,7 @@ namespace App {
 			if( word.empty() ) {
 				// T.B.D.
 			} else {
-				Debug::out(2) << word << std::endl;
+				Logger::out(2) << word << std::endl;
 				std::vector<std::string> vs;
 				vs.push_back(word);
 				data->getStrs()->push_back(vs);

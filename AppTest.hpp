@@ -4,7 +4,6 @@
 #define APP_TEST__H
 
 #include "SemiCrf.hpp"
-#include "DebugOut.hpp"
 
 namespace App {
 

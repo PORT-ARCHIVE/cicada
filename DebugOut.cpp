@@ -3,34 +3,34 @@
 #include <iostream>
 #include <DebugOut.hpp>
 
-static Debug* debug = nullptr;
+static Logger* logger = nullptr;
 
-Debug& Debug::out(int level)
+Logger& Logger::out(int level)
 {
-	if( !debug ) {
-		debug = new Debug();
+	if( !logger ) {
+		logger = new Logger();
 	}
 
-	debug->setLLevel(level);
+	logger->setLLevel(level);
 
-	return *debug;
+	return *logger;
 }
 
-void Debug::setLevel(int level)
+void Logger::setLevel(int level)
 {
-	if( !debug ) {
-		debug = new Debug();
+	if( !logger ) {
+		logger = new Logger();
 	}
 
-	debug->setGLevel(level);
+	logger->setGLevel(level);
 }
 
-// void Debug::on()
+// void Logger::on()
 // {
 // 	out().flg = true;
 // }
 
-// void Debug::off()
+// void Logger::off()
 // {
 // 	out().flg = false;
 // }

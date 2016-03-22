@@ -1,14 +1,14 @@
 // © 2016 PORT INC.
 
-#ifndef DEBUG_OUT__H
-#define DEBUG_OUT__H
+#ifndef LOGGER_OUT__H
+#define LOGGER_OUT__H
 
 #include <iostream>
 #include <fstream>
 
-class Debug {
+class Logger {
 public:
-	static Debug& out(int level = 0);
+	static Logger& out(int level = 0);
 	static void setLevel(int level = 0);
 	std::ofstream& getDevNull() { return dev_null; }
 	void setLLevel(int arg) { llevel = arg; }
@@ -16,17 +16,17 @@ public:
 	int getLLevel() { return llevel; }
 	int getGLevel() { return glevel; }
 private:
-	Debug() : dev_null("/dev/null") {};
+	Logger() : dev_null("/dev/null") {};
 	std::ofstream dev_null;
 	int llevel;
 	int glevel;
 };
 
 template< class T >
-std::ostream& operator<<(Debug& debug, T& in)
+std::ostream& operator<<(Logger& logger, T& in)
 {
-	int local = debug.getLLevel();
-	int global = debug.getGLevel();
+	int local = logger.getLLevel();
+	int global = logger.getGLevel();
 	if( local <= global ) {
 		if( local <= 0 ) {
 			std::cout << in;
@@ -36,8 +36,8 @@ std::ostream& operator<<(Debug& debug, T& in)
 			return std::cerr;
 		}
 	} else {
-		return debug.getDevNull();
+		return logger.getDevNull();
 	}
 }
 
-#endif // DEBUG_OUT__H
+#endif // LOGGER_OUT__H

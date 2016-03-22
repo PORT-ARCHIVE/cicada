@@ -18,7 +18,7 @@ namespace App {
 		} else if( str == "LOCATION" ) {
 			return Label::LOCATION;
 		} else {
-			Debug::out() << "warning: unknown label" << std::endl; // T.B.D.
+			Logger::out() << "warning: unknown label" << std::endl; // T.B.D.
 			return Label::NONE;
 		}
 	}
