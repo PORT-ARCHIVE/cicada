@@ -866,19 +866,28 @@ namespace SemiCrf {
 		int s = current_data->getStrs()->size();
 		int i = s-1;
 		int idx = i*l + (int)maxy;
+		auto& tp0 = current_vctab->at(idx);
+		maxd = std::get<2>(tp0);
+		App::Label maxyd = std::get<3>(tp0);
 
 		std::list<Segment> ls;
 
-		while( -1 < idx ) {
+		while(1) {
 
 			Segment seg = createSegment(i-maxd+1, i, maxy);
 			ls.push_front(seg);
 
-			auto& tp = current_vctab->at(idx);
-			maxd = std::get<2>(tp);
-			maxy = std::get<3>(tp);
 			i -= maxd;
-			idx = i*l + (int)maxy;
+			if( i < 0 ) {
+				assert( i == -1 );
+				break;
+			}
+
+			idx = i*l + (int)maxyd;
+			auto& tp = current_vctab->at(idx);
+			maxy = maxyd;
+			maxd = std::get<2>(tp);
+			maxyd = std::get<3>(tp);
 		}
 
 		for( auto s : ls ) {
