@@ -42,6 +42,15 @@ all:
 	@echo "###### TEST 11 ######"
 	@$(SEMICRF) -i test11.txt -w answer/weight10.txt --debug-level 0 --max-length 1 1> result11.txt 2>&1 && echo "OK" || echo "ERROR"
 	@diff answer/result11.txt result11.txt && echo "OK" || echo "ERROR"
+# 12
+	@echo "###### TEST 12 ######"
+	@$(SEMICRF) -t test12.txt -w weight12.txt --debug-level 0 --max-length 2 -e0 1.0e-1 -e1 1.0e-2 1> result12.txt 2>&1 && echo "OK" || echo "ERROR"
+	@diff answer/result12.txt result12.txt && echo "OK" || echo "ERROR"
+	@diff answer/weight12.txt weight12.txt && echo "OK" || echo "ERROR"
+# 13
+	@echo "###### TEST 13 ######"
+	@$(SEMICRF) -i test13.txt -w answer/weight12.txt --debug-level 0 --max-length 2 1> result13.txt 2>&1 && echo "OK" || echo "ERROR"
+	@diff answer/result13.txt result13.txt && echo "OK" || echo "ERROR"
 
 update:
 	cp result*.txt weight*.txt answer
