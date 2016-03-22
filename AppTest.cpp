@@ -8,6 +8,26 @@
 
 namespace App {
 
+	Simple::Simple()
+	{
+		Debug::out(2) << "Simple()" << std::endl;
+	}
+
+	Simple::~Simple()
+	{
+		Debug::out(2) << "~Simple()" << std::endl;
+	}
+
+	void Simple::read()
+	{
+		Debug::out(2) << "Simple::read()" << std::endl;
+	}
+
+	void Simple::write()
+	{
+		Debug::out(2) << "Simple::write()" << std::endl;
+	}
+
 	Label string2Label(const std::string& str) {
 		if( str == "0" ) {
 			return Label::ZERO;

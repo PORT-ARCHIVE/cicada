@@ -16,10 +16,10 @@ namespace App {
 	class Simple : public SemiCrf::FeatureFunction_ {
 	public:
 
-		Simple(){ Debug::out(2) << "Simple()" << std::endl; };
-		virtual ~Simple() { Debug::out(2) << "~Simple()" << std::endl; };
-		virtual void read() { Debug::out(2) << "Simple::read()" << std::endl; };
-		virtual void write() { Debug::out(2) << "Simple::write()" << std::endl; };
+		Simple();
+		virtual ~Simple();
+		virtual void read();
+		virtual void write();
 		virtual double operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i);
 	};
 
