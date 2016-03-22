@@ -7,6 +7,7 @@
 #include <sstream>
 #include <list>
 #include <boost/lexical_cast.hpp>
+#include <boost/format.hpp>
 #include <cassert>
 #include <cmath>
 #include <clocale>
@@ -581,7 +582,7 @@ namespace SemiCrf {
 		}
 
 		double rerr = tdl/tdl0;
-		Logger::out(1) << "L=" << L << " |dL|=" << rerr << std::endl;
+		Logger::out(1) << boost::format("L= %10.6e |dL|= %10.6e") % L % rerr << std::endl;
 		return (rerr < e1);
 	}
 
