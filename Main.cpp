@@ -6,7 +6,7 @@
 #include "SemiCrf.hpp"
 //#include "AppReqs.hpp"
 #include "AppTest.hpp"
-#include "DebugOut.hpp"
+#include "Logger.hpp"
 #include "Error.hpp"
 
 class Options {

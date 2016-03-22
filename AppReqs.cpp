@@ -2,7 +2,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include "AppReqs.hpp"
-#include "DebugOut.hpp"
+#include "Logger.hpp"
 
 namespace App {
 

@@ -15,7 +15,7 @@
 //#include "AppReqs.hpp"
 #include "AppTest.hpp"
 #include "MultiByteTokenizer.hpp"
-#include "DebugOut.hpp"
+#include "Logger.hpp"
 #include "Error.hpp"
 
 namespace SemiCrf {

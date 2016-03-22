@@ -2,7 +2,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include "AppTest.hpp"
-#include "DebugOut.hpp"
+#include "Logger.hpp"
 #include "Error.hpp"
 #include "MultiByteTokenizer.hpp"
 

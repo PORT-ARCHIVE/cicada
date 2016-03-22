@@ -4,7 +4,7 @@
 #define APP_REQS__H
 
 #include "SemiCrf.hpp"
-#include "DebugOut.hpp"
+#include "Logger.hpp"
 
 namespace App {
 

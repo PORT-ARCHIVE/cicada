@@ -1,7 +1,7 @@
 // © 2016 PORT INC.
 
 #include <iostream>
-#include <DebugOut.hpp>
+#include <Logger.hpp>
 
 static Logger* logger = nullptr;
 
