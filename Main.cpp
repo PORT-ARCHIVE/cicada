@@ -44,7 +44,7 @@ void Options::parse(int argc, char *argv[])
 				training_data_file = argv[++i];
 			} else if( arg == "-i" ) {
 				inference_data_file = argv[++i];
-			} else if( arg == "-f" ) {
+			} else if( arg == "-f" || arg == "--input-file-format" ) {
 				format = argv[++i];
 			} else if( arg == "-l" || arg == "--max-length") {
 				maxLength = boost::lexical_cast<int>(argv[++i]);
