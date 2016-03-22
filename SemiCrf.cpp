@@ -637,33 +637,35 @@ namespace SemiCrf {
 
 			int idx = (i*labels->size()) + (static_cast<int>(y));
 			auto& tp = current_actab->at(idx);
+
 			if( std::get<0>(tp) ) {
+
 				v = std::get<1>(tp);
-				Debug::out(3) << "*alpha(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
-				return v;
-			}
 
-			for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
-				for( auto yd : *labels ) {
+			} else {
 
-					double e0 = alpha(i-d, yd);
-					double e1 = computeWG(y, yd, i, d);
-					v += e0*exp(e1);
+				for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
+					for( auto yd : *labels ) {
+
+						double alp = alpha(i-d, yd);
+						double wg = computeWG(y, yd, i, d);
+						v += alp*exp(wg);
+					}
 				}
-			}
 
-			std::get<0>(tp) = true;
-			std::get<1>(tp) = v;
-			Debug::out(3) << "alpha(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
+				std::get<0>(tp) = true;
+				std::get<1>(tp) = v;
+			}
 
 		} else if( i == -1 ) {
 
-			v = 1.0; Debug::out(3) << "alpha(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
+			v = 1.0;
 
 		} else {
-			assert( -2 < i );
+			assert( -2 < i ); // T.B.D.
 		}
 
+		Debug::out(3) << "alpha(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
 		return v;
 	}
 
@@ -675,33 +677,35 @@ namespace SemiCrf {
 
 			int idx = (i*labels->size()) + (static_cast<int>(y));
 			auto& tp = current_ectab->at(idx);
+
 			if( std::get<0>(tp) ) {
+
 				v = std::get<1>(tp);
-				Debug::out(3) << "*eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
-				return v;
-			}
 
-			for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
-				for( auto yd : *labels ) {
+			} else {
 
-					double e0 = eta(i-d, yd, k) + alpha(i-d, yd) * (*ff)(k, y, yd, current_data, i-d+1, i);
-					double e1 = computeWG(y, yd, i, d);
-					v += e0*exp(e1);
+				for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
+					for( auto yd : *labels ) {
+
+						double cof = eta(i-d, yd, k) + alpha(i-d, yd) * (*ff)(k, y, yd, current_data, i-d+1, i);
+						double wg = computeWG(y, yd, i, d);
+						v += cof*exp(wg);
+					}
 				}
-			}
 
-			std::get<0>(tp) = true;
-			std::get<1>(tp) = v;
-			Debug::out(3) << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
+				std::get<0>(tp) = true;
+				std::get<1>(tp) = v;
+			}
 
 		} else if( i == -1 ) {
 
-			v = 0.0; Debug::out(3) << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
+			v = 0.0;
 
 		} else {
-			assert( -2 < i );
+			assert( -2 < i ); // T.B.D.
 		}
 
+		Debug::out(3) << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
 		return v;
 	}
 
