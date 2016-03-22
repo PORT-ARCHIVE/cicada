@@ -507,6 +507,8 @@ namespace SemiCrf {
 		Debug::out(2) << "Learner::compute()" << std::endl;
 
 		int itr = 0;
+		double tdl0 = 0.0;
+		bool isfirst = true;
 
 		while( itr < maxIteration ) {
 
@@ -538,7 +540,7 @@ namespace SemiCrf {
 				(*wi) += e0 * (*dLi); Debug::out(2) << "W(" << k << ")=" << *wi << std::endl;
 			}
 
-			if( isConv(L, dL) ) {
+			if( isConv(L, dL, tdl0, isfirst) ) {
 				break;
 			}
 
@@ -546,16 +548,26 @@ namespace SemiCrf {
 		}
 	}
 
-	bool Learner::isConv(double L, const std::vector<double>& dL)
+	bool Learner::isConv(double L, const std::vector<double>& dL, double& tdl0, bool& isfirst)
 	{
 		double tdl = 0.0;
 
 		for( auto dl : dL ) {
-			tdl += dl*dl;
+			double t = e0*dl;
+			tdl += t*t;
 		}
 
-		tdl = sqrt(tdl); Debug::out(1) << "L=" << L << " |dL|=" << tdl << std::endl;
-		return (tdl < e1);
+		tdl = sqrt(tdl);
+
+		if( isfirst ) {
+			tdl0 = tdl;
+			isfirst = false;
+			return false;
+		}
+
+		double rerr = tdl/tdl0;
+		Debug::out(1) << "L=" << L << " |dL|=" << rerr << std::endl;
+		return (rerr < e1);
 	}
 
 	std::vector<double> Learner::computeG(double& WG)

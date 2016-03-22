@@ -13,8 +13,12 @@ all:
 	diff answer/result5.txt result5.txt && echo "OK" || echo "ERROR"
 	diff answer/weight5.txt weight5.txt && echo "OK" || echo "ERROR"
 #
-	$(SEMICRF) -i test6.txt -w weight4.txt --debug-level 0 --max-length 1 1> result6.txt 2>&1 && echo "OK" || echo "ERROR"
+	$(SEMICRF) -i test6.txt -w answer/weight4.txt --debug-level 0 --max-length 1 1> result6.txt 2>&1 && echo "OK" || echo "ERROR"
 	diff answer/result6.txt result6.txt && echo "OK" || echo "ERROR"
+#
+	$(SEMICRF) -t test4.txt -w weight7.txt --debug-level 1 --max-length 1 -e0 1.0e-1 -e1 0.5e-1 --max-iteration 1024 1> result7.txt 2>&1 && echo "OK" || echo "ERROR"
+	diff answer/result7.txt result7.txt && echo "OK" || echo "ERROR"
+	diff answer/weight7.txt weight7.txt && echo "OK" || echo "ERROR"
 
 update:
 #	cp result0.txt answer/result0.txt
@@ -27,3 +31,10 @@ update:
 	cp weight5.txt answer/weight5.txt
 #
 	cp result6.txt answer/result6.txt
+#
+	cp result7.txt answer/result7.txt
+	cp weight7.txt answer/weight7.txt
+
+clean:
+	rm -f result*.txt weight*.txt
+
