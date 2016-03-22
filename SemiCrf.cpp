@@ -504,7 +504,6 @@ namespace SemiCrf {
 	void Learner::compute()
 	{
 		Debug::out(2) << "Learner::compute()" << std::endl;
-		int l = labels->size();
 
 		int itr = 0;
 
@@ -516,9 +515,6 @@ namespace SemiCrf {
 			for( auto data : *datas ) {
 
 				current_data = data;
-				int s = current_data->getStrs()->size();
-				int capacity = l*s;
-				current_actab = createCheckTable(capacity);
 
 				double WG = 0.0;
 				double Z = computeZ();
@@ -594,7 +590,11 @@ namespace SemiCrf {
 	double Learner::computeZ()
 	{
 		double Z = 0;
+
+		int l = labels->size();
 		int s = current_data->getStrs()->size();
+		int capacity = l*s;
+		current_actab = createCheckTable(capacity);
 
 		for( auto y : *labels ) {
 			Z += alpha(s-1, y);
