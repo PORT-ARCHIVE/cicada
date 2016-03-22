@@ -27,6 +27,7 @@ std::ostream& operator<<(Logger& logger, T& in)
 {
 	int local = logger.getLLevel();
 	int global = logger.getGLevel();
+
 	if( local <= global ) {
 		if( local <= 0 ) {
 			std::cout << in;
@@ -35,9 +36,9 @@ std::ostream& operator<<(Logger& logger, T& in)
 			std::cerr << in;
 			return std::cerr;
 		}
-	} else {
-		return logger.getDevNull();
 	}
+
+	return logger.getDevNull();
 }
 
 #endif // LOGGER_OUT__H
