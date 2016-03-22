@@ -737,9 +737,7 @@ namespace SemiCrf {
 
 	void Pridector::postProcess(const std::string& wfile)
 	{
-		std::ofstream ofs; // 出力
-		open(ofs, wfile);
-		datas->write(ofs);
+		datas->write(Debug::out(0) << "");
 	}
 
 	void Pridector::compute()
