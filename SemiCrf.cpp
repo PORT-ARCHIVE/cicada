@@ -784,7 +784,7 @@ namespace SemiCrf {
 			int maxd = - 1;
 			App::Label maxy;
 			Segments maxsegs = createSegments();
-			double maxV = std::numeric_limits<double>::min();
+			double maxV = - std::numeric_limits<double>::max();
 
 			for( auto y : *labels ) {
 
@@ -807,7 +807,7 @@ namespace SemiCrf {
 
 	double Pridector::V(int i, App::Label y, int& maxd)
 	{
-		double maxV = std::numeric_limits<double>::min();
+		double maxV = - std::numeric_limits<double>::max();
 
 		if( -1 < i ) {
 
