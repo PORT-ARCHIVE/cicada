@@ -750,7 +750,8 @@ namespace SemiCrf {
 		Logger::out(2) << "Pridector()" << std::endl;
 	}
 
-	Pridector::~Pridector() {
+	Pridector::~Pridector()
+	{
 		Logger::out(2) << "~Pridector()" << std::endl;
 	}
 

@@ -24,13 +24,3 @@ void Logger::setLevel(int level)
 
 	logger->setGLevel(level);
 }
-
-// void Logger::on()
-// {
-// 	out().flg = true;
-// }
-
-// void Logger::off()
-// {
-// 	out().flg = false;
-// }
