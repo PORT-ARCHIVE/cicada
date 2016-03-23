@@ -64,6 +64,12 @@ all:
 update:
 	cp result*.txt weight*.txt answer
 
+gen:
+	../gen -s 1 -r 2 -l 16 > test16.txt
+	../gen -s 2 -r 4 -l 32 > test17.txt
+	../gen -s 3 -r 8 -l 64 > test18.txt
+	../gen -s 4 -r 16 -l 64 > test19.txt
+
 clean:
 	rm -f result*.txt weight*.txt
 
