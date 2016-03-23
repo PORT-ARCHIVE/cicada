@@ -60,7 +60,7 @@ void Options::parse(int argc, char *argv[])
 				debug_level = boost::lexical_cast<int>(argv[++i]);
 			} else {
 				std::stringstream ss;
-				ss << "error: unknown option specified";
+				ss << "unknown option specified";
 				throw Error(ss.str());
 			}
 		}
@@ -91,7 +91,7 @@ void createAlgorithm(const Options& options, SemiCrf::Algorithm& algorithm, std:
 
 	} else {
 		std::stringstream ss;
-		ss << "error: no input file specified";
+		ss << "no input file specified";
 		throw Error(ss.str());
 	}
 }
@@ -114,12 +114,12 @@ SemiCrf::Datas createDatas(const Options& options)
 
 		} else {
 			std::stringstream ss;
-			ss << "error: unsupported format specified";
+			ss << "unsupported format specified";
 			throw Error(ss.str());
 		}
 	} else {
 		std::stringstream ss;
-		ss << "error: no input file specified";
+		ss << "no input file specified";
 		throw Error(ss.str());
 	}
 }
@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
 
 	} catch(Error& e) {
 
-		std::cerr << e.what() << std::endl;
+		std::cerr << "error: " << e.what() << std::endl;
 		ret = 0x1;
 
 	} catch(...) {
