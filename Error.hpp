@@ -4,11 +4,13 @@
 #define ERROR__H
 
 #include <string>
+#include "Logger.hpp"
 
 class Error {
 public:
 	Error(const std::string& arg);
-	const std::string& what() { return std::move(msg); }
+	virtual ~Error();
+	std::string what();
 private:
 	std::string msg;
 };

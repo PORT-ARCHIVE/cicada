@@ -1,7 +1,9 @@
 // © 2016 PORT INC.
 
 #include <iostream>
+#include <boost/lexical_cast.hpp>
 #include <boost/random.hpp>
+#include "Error.hpp"
 
 using namespace boost;
 
@@ -76,6 +78,74 @@ int f_y2y(int y, double r)
 		}
 	}
 	return i;
+}
+
+class Options {
+public:
+	Options()
+		: training_data_file("")
+		, inference_data_file("")
+		, format("digit")
+		, weights_file("weights.txt")
+		, maxLength(5)
+		, maxIteration(1024)
+		, e0(1.0e-5)
+		, e1(1.0e-5)
+		, debug_level(0) {};
+	void parse(int argc, char *argv[]);
+public:
+	std::string training_data_file;
+	std::string inference_data_file;
+	std::string format;
+	std::string weights_file;
+	int maxLength;
+	int maxIteration;
+	double e0;
+	double e1;
+	int debug_level;
+};
+
+void Options::parse(int argc, char *argv[])
+{
+	try {
+
+		for( int i = 1; i < argc; i++ ) {
+			std::string arg = argv[i];
+			if( arg == "-t" ) {
+				training_data_file = argv[++i];
+			} else if( arg == "-i" ) {
+				inference_data_file = argv[++i];
+			} else if( arg == "-f" || arg == "--input-file-format" ) {
+				format = argv[++i];
+			} else if( arg == "-l" || arg == "--max-length") {
+				maxLength = boost::lexical_cast<int>(argv[++i]);
+			} else if( arg == "-r" || arg == "--max-iteration") {
+				maxIteration = boost::lexical_cast<int>(argv[++i]);
+			} else if( arg == "-e0" ) {
+				e0 = boost::lexical_cast<double>(argv[++i]);
+			} else if( arg == "-e1" ) {
+				e1 = boost::lexical_cast<double>(argv[++i]);
+			} else if( arg == "-w" ) {
+				weights_file = argv[++i];
+			} else if( arg == "--debug-level" ) {
+				debug_level = boost::lexical_cast<int>(argv[++i]);
+			} else {
+				std::stringstream ss;
+				ss << "error: unknown option specified";
+				throw Error(ss.str());
+			}
+		}
+
+	} catch(Error& e) {
+
+		throw e;
+
+	} catch(...) {
+
+		std::stringstream ss;
+		ss << "error: invalid option specified";
+		throw Error(ss.str());
+	}
 }
 
 int main(int argc, char *argv[])
