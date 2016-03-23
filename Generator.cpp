@@ -5,55 +5,56 @@
 #include <vector>
 #include <sstream>
 #include <boost/lexical_cast.hpp>
-#include <boost/random.hpp>
+//#include <boost/random.hpp>
+#include <random>
 #include "Logger.hpp"
 #include "Error.hpp"
 
 using namespace boost;
 using namespace std;
 
-vector<vector<double>> y2x_ =
+vector<vector<double>> y2x =
 {
 	{ 0.3125, 0.0937, 0.2188, 0.3125, 0.0625 },
 	{ 0.2206, 0.4412, 0.1176, 0.1471, 0.0735 }
 };
 
-vector<vector<double>> a_y2x_;
+vector<vector<double>> a_y2x;
 
-vector<vector<double>> y2y_ =
+vector<vector<double>> y2y =
 {
 	{ 0.7999, 0.1999 },
 	{ 0.0999, 0.8999 }
 };
 
-vector<vector<double>> a_y2y_;
+vector<vector<double>> a_y2y;
 
 void preProcess()
 {
-	for( int i = 0; i < y2x_.size(); i++ ) {
-		a_y2x_.push_back(vector<double>(y2x_.at(i).size()));
+	for( int i = 0; i < y2x.size(); i++ ) {
+		a_y2x.push_back(vector<double>(y2x.at(i).size()));
 	}
 
-	for( int i = 0; i < y2x_.size(); i++ ) {
-		for( int j = 0; j < y2x_.at(i).size(); j++ ) {
+	for( int i = 0; i < y2x.size(); i++ ) {
+		for( int j = 0; j < y2x.at(i).size(); j++ ) {
 			if( 0 < j ) {
-				a_y2x_.at(i).at(j) = a_y2x_.at(i).at(j-1) + y2x_.at(i).at(j);
+				a_y2x.at(i).at(j) = a_y2x.at(i).at(j-1) + y2x.at(i).at(j);
 			} else {
-				a_y2x_.at(i).at(j) = y2x_.at(i).at(j);
+				a_y2x.at(i).at(j) = y2x.at(i).at(j);
 			}
 		}
 	}
 
-	for( int i = 0; i < y2y_.size(); i++ ) {
-		a_y2y_.push_back(vector<double>(y2y_.at(i).size()));
+	for( int i = 0; i < y2y.size(); i++ ) {
+		a_y2y.push_back(vector<double>(y2y.at(i).size()));
 	}
 
-	for( int i = 0; i < y2y_.size(); i++ ) {
-		for( int j = 0; j < y2y_.at(i).size(); j++ ) {
+	for( int i = 0; i < y2y.size(); i++ ) {
+		for( int j = 0; j < y2y.at(i).size(); j++ ) {
 			if( 0 < j ) {
-				a_y2y_.at(i).at(j) = a_y2y_.at(i).at(j-1) + y2y_.at(i).at(j);
+				a_y2y.at(i).at(j) = a_y2y.at(i).at(j-1) + y2y.at(i).at(j);
 			} else {
-				a_y2y_.at(i).at(j) = y2y_.at(i).at(j);
+				a_y2y.at(i).at(j) = y2y.at(i).at(j);
 			}
 		}
 	}	
@@ -62,16 +63,16 @@ void preProcess()
 int f_y2x(int y, double r)
 {
 	int i;
-	assert ( 0 < a_y2x_.size() );
-	for( i = 0; i < a_y2x_.at(y).size(); i++ ) {
-		if( i == 0 && 0                           <= r && r < a_y2x_.at(y).at(i) ) {
+	assert ( 0 < a_y2x.size() );
+	for( i = 0; i < a_y2x.at(y).size(); i++ ) {
+		if( i == 0 && 0                          <= r && r < a_y2x.at(y).at(i) ) {
 			break;
-		} else if(  0 < i && a_y2x_.at(y).at(i-1) <= r && r < a_y2x_.at(y).at(i) ) {
+		} else if(  0 < i && a_y2x.at(y).at(i-1) <= r && r < a_y2x.at(y).at(i) ) {
 			break;
 		}
 	}
-	if( !(i < a_y2x_.at(y).size()) ){
-		Logger::out(1) << "warrning: r=" << r << ", ay2x(" << y << ")=" << a_y2x_.at(y).at(i-1) << endl;
+	if( !(i < a_y2x.at(y).size()) ){
+		Logger::out(1) << "warrning: r=" << r << ", ay2x(" << y << ")=" << a_y2x.at(y).at(i-1) << endl;
 		--i;
 	}
 	return i;
@@ -80,16 +81,16 @@ int f_y2x(int y, double r)
 int f_y2y(int y, double r)
 {
 	int i;
-	assert ( 0 < a_y2y_.size() );
-	for( i = 0; i < a_y2y_.at(y).size(); i++ ) {
-		if( i == 0 && 0                           <= r && r < a_y2y_.at(y).at(i) ) {
+	assert ( 0 < a_y2y.size() );
+	for( i = 0; i < a_y2y.at(y).size(); i++ ) {
+		if( i == 0 && 0                          <= r && r < a_y2y.at(y).at(i) ) {
 			break;
-		} else if(  0 < i && a_y2y_.at(y).at(i-1) <= r && r < a_y2y_.at(y).at(i) ) {
+		} else if(  0 < i && a_y2y.at(y).at(i-1) <= r && r < a_y2y.at(y).at(i) ) {
 			break;
 		}
 	}
-	if( !(i < a_y2y_.size()) ) {
-		Logger::out(1) << "warrning: r=" << r << ", ay2y(" << y << ")=" << a_y2y_.at(y).at(i-1) << endl;
+	if( !(i < a_y2y.size()) ) {
+		Logger::out(1) << "warrning: r=" << r << ", ay2y(" << y << ")=" << a_y2y.at(y).at(i-1) << endl;
 		--i;
 	}
 	return i;
@@ -158,9 +159,8 @@ int main(int argc, char *argv[])
 
 		preProcess();
 	
-		minstd_rand gen( options.seed );
-		uniform_real<> dst( 0, 1 );
-		variate_generator<minstd_rand&, uniform_real<> > rand( gen, dst );
+		mt19937 mt(options.seed);
+		uniform_real_distribution<double> score(0.0,1.0);
 
 		for( int j = 0; j < options.iteration; j++ ) {
 
@@ -168,9 +168,11 @@ int main(int argc, char *argv[])
 
 			vector<int> y;
 			vector<int> x;
+			int py = 0;
 			for( int i = 0; i < options.length; i++ ) {
-				int yi = f_y2y(yi, rand()); y.push_back(yi);
-				int xi = f_y2x(yi, rand());	x.push_back(xi);
+				int yi = f_y2y(py, score(mt)); y.push_back(py);
+				int xi = f_y2x(py, score(mt)); x.push_back(xi);
+				py = yi;
 			}
 
 			auto xi = x.begin();
