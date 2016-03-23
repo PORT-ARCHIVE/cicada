@@ -131,18 +131,18 @@ void Options::parse(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	int ret = 0x0;
-	
-	Options options;
-	options.parse(argc, argv);
-	Logger::setLevel(options.logLevel);
-
-	if( options.length < 3 ) {
-		std::stringstream ss;
-		ss << "length must be greater than 2";
-		throw Error(ss.str());
-	}
 
 	try {
+
+		Options options;
+		options.parse(argc, argv);
+		Logger::setLevel(options.logLevel);
+
+		if( options.length < 3 ) {
+			std::stringstream ss;
+			ss << "length must be greater than 2";
+			throw Error(ss.str());
+		}
 
 		preProcess();
 	
