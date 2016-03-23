@@ -226,6 +226,7 @@ namespace SemiCrf {
 	private:
 		double V(int i, App::Label y, int& maxd);
 		void backtrack(App::Label maxy, int maxd);
+		void printV();
 	};
 
 	Algorithm createPridector();

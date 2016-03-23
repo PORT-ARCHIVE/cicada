@@ -801,6 +801,7 @@ namespace SemiCrf {
 
 			assert( 0 < maxd );
 			backtrack(maxy, maxd);
+			printV();
 		}
 	}
 
@@ -891,6 +892,29 @@ namespace SemiCrf {
 
 		for( auto s : ls ) {
 			current_data->getSegments()->push_back(s);
+		}
+	}
+
+	void Pridector::printV()
+	{
+		if( 2 < Logger::getLevel() ) {
+			Logger::out(3) << "Pridector::oprintV()" << std::endl;
+
+			int l = labels->size();
+			int s = current_data->getStrs()->size();
+
+			for( auto y : *labels ) {
+				for( int i = 0; i < s; i++ ) {
+
+					int idx = (i*labels->size()) + (static_cast<int>(y));
+					auto& tp = current_vctab->at(idx);
+					double maxV = std::get<1>(tp);
+					int maxd = std::get<2>(tp);
+					App::Label maxyd = std::get<3>(tp);
+					Logger::out(3) << boost::format("(%+5.2e %2d %2d)") % maxV % maxd % (int)maxyd << " ";
+				}
+				Logger::out(3) << "" << std::endl;
+			}
 		}
 	}
 }

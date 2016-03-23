@@ -1,7 +1,7 @@
 // © 2016 PORT INC.
 
-#ifndef LOGGER_OUT__H
-#define LOGGER_OUT__H
+#ifndef LOGGER__H
+#define LOGGER__H
 
 #include <iostream>
 #include <fstream>
@@ -10,9 +10,11 @@ class Logger {
 public:
 	static Logger& out(int level = 0);
 	static void setLevel(int level = 0);
+	static int getLevel();
 	template < class T >
 	friend std::ostream& operator<<(Logger& logger, T& in);
 private:
+	static Logger* getLogger();
 	std::ofstream& getDevNull() { return dev_null; }
 	void setLLevel(int arg) { llevel = arg; }
 	void setGLevel(int arg) { glevel = arg; }
@@ -48,4 +50,4 @@ std::ostream& operator<<(Logger& logger, T& in)
 	return logger.getDevNull();
 }
 
-#endif // LOGGER_OUT__H
+#endif // LOGGER__H

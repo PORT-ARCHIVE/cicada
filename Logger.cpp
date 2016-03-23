@@ -5,22 +5,30 @@
 
 static Logger* logger = nullptr;
 
-Logger& Logger::out(int level)
+Logger* Logger::getLogger()
 {
 	if( !logger ) {
 		logger = new Logger();
 	}
 
-	logger->setLLevel(level);
+	return logger;
+}
 
-	return *logger;
+Logger& Logger::out(int level)
+{
+	Logger* l = getLogger();
+	l->setLLevel(level);
+	return *l;
 }
 
 void Logger::setLevel(int level)
 {
-	if( !logger ) {
-		logger = new Logger();
-	}
+	Logger* l = getLogger();
+	l->setGLevel(level);
+}
 
-	logger->setGLevel(level);
+int Logger::getLevel()
+{
+	Logger* l = getLogger();
+	return (l->getGLevel());
 }
