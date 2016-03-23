@@ -1,5 +1,6 @@
 // © 2016 PORT INC.
 
+#include <cassert>
 #include <iostream>
 #include <vector>
 #include <sstream>
@@ -9,49 +10,50 @@
 #include "Error.hpp"
 
 using namespace boost;
+using namespace std;
 
-const double y2x[2][5] =
+vector<vector<double>> y2x_ =
 {
 	{ 0.3125, 0.0937, 0.2188, 0.3125, 0.0625 },
 	{ 0.2206, 0.4412, 0.1176, 0.1471, 0.0735 }
 };
 
-double a_y2x[2][4] =
+vector<vector<double>> a_y2x_;
+
+vector<vector<double>> y2y_ =
 {
-	{ 0.0, 0.0, 0.0, 0.0 },
-	{ 0.0, 0.0, 0.0, 0.0 }
+	{ 0.7999, 0.1999 },
+	{ 0.0999, 0.8999 }
 };
 
-const double y2y[2][2] =
-{
-	{ 0.4, 0.05 },
-	{ 0.1, 0.45 }
-};
-
-double a_y2y[2][1] =
-{
-	{0.0},
-	{0.0}
-};
+vector<vector<double>> a_y2y_;
 
 void preProcess()
 {
-	for( int i = 0; i < 4; i++ ) {
-		for( int j = 0; j < 4; j++ ) {
+	for( int i = 0; i < y2x_.size(); i++ ) {
+		a_y2x_.push_back(vector<double>(y2x_.at(i).size()));
+	}
+
+	for( int i = 0; i < y2x_.size(); i++ ) {
+		for( int j = 0; j < y2x_.at(i).size(); j++ ) {
 			if( 0 < j ) {
-				a_y2x[i][j] = a_y2x[i][j-1] + y2x[i][j];
+				a_y2x_.at(i).at(j) = a_y2x_.at(i).at(j-1) + y2x_.at(i).at(j);
 			} else {
-				a_y2x[i][j] = y2x[i][j];
+				a_y2x_.at(i).at(j) = y2x_.at(i).at(j);
 			}
 		}
 	}
 
-	for( int i = 0; i < 2; i++ ) {
-		for( int j = 0; j < 2; j++ ) {
+	for( int i = 0; i < y2y_.size(); i++ ) {
+		a_y2y_.push_back(vector<double>(y2y_.at(i).size()));
+	}
+
+	for( int i = 0; i < y2y_.size(); i++ ) {
+		for( int j = 0; j < y2y_.at(i).size(); j++ ) {
 			if( 0 < j ) {
-				a_y2y[i][j] = a_y2y[i][j-1] + y2y[i][j];
+				a_y2y_.at(i).at(j) = a_y2y_.at(i).at(j-1) + y2y_.at(i).at(j);
 			} else {
-				a_y2y[i][j] = y2y[i][j];
+				a_y2y_.at(i).at(j) = y2y_.at(i).at(j);
 			}
 		}
 	}	
@@ -60,12 +62,17 @@ void preProcess()
 int f_y2x(int y, double r)
 {
 	int i;
-	for( i = 0; i < 4; i++ ) {
-		if(                  0             <= r && r < a_y2x[y][i] ) {
+	assert ( 0 < a_y2x_.size() );
+	for( i = 0; i < a_y2x_.at(y).size(); i++ ) {
+		if( i == 0 && 0                           <= r && r < a_y2x_.at(y).at(i) ) {
 			break;
-		} else if(  0 < i && a_y2x[y][i-1] <= r && r < a_y2x[y][i] ) {
+		} else if(  0 < i && a_y2x_.at(y).at(i-1) <= r && r < a_y2x_.at(y).at(i) ) {
 			break;
 		}
+	}
+	if( !(i < a_y2x_.at(y).size()) ){
+		Logger::out(1) << "warrning: r=" << r << ", ay2x(" << y << ")=" << a_y2x_.at(y).at(i-1) << endl;
+		--i;
 	}
 	return i;
 }
@@ -73,12 +80,17 @@ int f_y2x(int y, double r)
 int f_y2y(int y, double r)
 {
 	int i;
-	for( i = 0; i < 1; i++ ) {
-		if(                  0             <= r && r < a_y2y[y][i] ) {
+	assert ( 0 < a_y2y_.size() );
+	for( i = 0; i < a_y2y_.at(y).size(); i++ ) {
+		if( i == 0 && 0                           <= r && r < a_y2y_.at(y).at(i) ) {
 			break;
-		} else if(  0 < i && a_y2y[y][i-1] <= r && r < a_y2y[y][i] ) {
+		} else if(  0 < i && a_y2y_.at(y).at(i-1) <= r && r < a_y2y_.at(y).at(i) ) {
 			break;
 		}
+	}
+	if( !(i < a_y2y_.size()) ) {
+		Logger::out(1) << "warrning: r=" << r << ", ay2y(" << y << ")=" << a_y2y_.at(y).at(i-1) << endl;
+		--i;
 	}
 	return i;
 }
@@ -103,7 +115,7 @@ void Options::parse(int argc, char *argv[])
 	try {
 
 		for( int i = 1; i < argc; i++ ) {
-			std::string arg = argv[i];
+			string arg = argv[i];
 			if( arg == "-l" || arg == "--length") {
 				length = lexical_cast<int>(argv[++i]);
 			} else if( arg == "-r" || arg == "--iteration") {
@@ -113,7 +125,7 @@ void Options::parse(int argc, char *argv[])
 			} else if( arg == "--log-level" ) {
 				logLevel = lexical_cast<int>(argv[++i]);
 			} else {
-				std::stringstream ss;
+				stringstream ss;
 				ss << "unknown option specified";
 				throw Error(ss.str());
 			}
@@ -122,7 +134,7 @@ void Options::parse(int argc, char *argv[])
 	} catch(Error& e) {
 		throw e;
 	} catch(...) {
-		std::stringstream ss;
+		stringstream ss;
 		ss << "invalid option specified";
 		throw Error(ss.str());
 	}
@@ -139,7 +151,7 @@ int main(int argc, char *argv[])
 		Logger::setLevel(options.logLevel);
 
 		if( options.length < 3 ) {
-			std::stringstream ss;
+			stringstream ss;
 			ss << "length must be greater than 2";
 			throw Error(ss.str());
 		}
@@ -152,10 +164,10 @@ int main(int argc, char *argv[])
 
 		for( int j = 0; j < options.iteration; j++ ) {
 
-			Logger::out(0) << "# BEGIN" << std::endl;
+			Logger::out(0) << "# BEGIN" << endl;
 
-			std::vector<int> y;
-			std::vector<int> x;
+			vector<int> y;
+			vector<int> x;
 			for( int i = 0; i < options.length; i++ ) {
 				int yi = f_y2y(yi, rand()); y.push_back(yi);
 				int xi = f_y2x(yi, rand());	x.push_back(xi);
@@ -174,7 +186,7 @@ int main(int argc, char *argv[])
 				Logger::out(0) << "S/E\t";
 			}
 
-			Logger::out(0) << *yi << std::endl;
+			Logger::out(0) << *yi << endl;
 
 			++xi;
 			for( ; yk != y.end(); ++xi, ++yi, ++yj, ++yk ) {
@@ -190,7 +202,7 @@ int main(int argc, char *argv[])
 				} else {
 					assert(0);
 				}
-				Logger::out(0) << *yj << std::endl;
+				Logger::out(0) << *yj << endl;
 			}
 
 			Logger::out(0) << *xi;
@@ -203,18 +215,18 @@ int main(int argc, char *argv[])
 				assert(0);
 			}
 
-			Logger::out(0) << *yj << std::endl;
-			Logger::out(0) << "# END" << std::endl;
+			Logger::out(0) << *yj << endl;
+			Logger::out(0) << "# END" << endl;
 		}
 
 	} catch(Error& e) {
 
-		std::cerr << "error: " << e.what() << std::endl;
+		cerr << "error: " << e.what() << endl;
 		ret = 0x1;
 		
 	} catch(...) {
 
-		std::cerr << "error: unexpected exception" << std::endl;
+		cerr << "error: unexpected exception" << endl;
 		ret = 0x2;
 	}
 
