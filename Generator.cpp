@@ -114,7 +114,7 @@ void Options::parse(int argc, char *argv[])
 				logLevel = lexical_cast<int>(argv[++i]);
 			} else {
 				std::stringstream ss;
-				ss << "error: unknown option specified";
+				ss << "unknown option specified";
 				throw Error(ss.str());
 			}
 		}
@@ -123,7 +123,7 @@ void Options::parse(int argc, char *argv[])
 		throw e;
 	} catch(...) {
 		std::stringstream ss;
-		ss << "error: invalid option specified";
+		ss << "invalid option specified";
 		throw Error(ss.str());
 	}
 }
