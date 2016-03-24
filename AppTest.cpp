@@ -64,6 +64,9 @@ namespace App {
 
 	double Simple::operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i)
 	{
+		assert(0 < xDim);
+		assert(0 < yDim);
+
 		int ret = 0;
 
 		try {
@@ -71,11 +74,14 @@ namespace App {
 			int yval = static_cast<int>(y);
 			int ydval = static_cast<int>(yd);
 
-			// y2x
-			if( k < 4 ) {
+			int dim0 = yDim * xDim;
+			int dim1 = yDim * ( xDim + yDim );
 
-				int col = k % 2;
-				int row = k < 2 ? 0 : 1;
+			// y2x
+			if( k < dim0 ) {
+
+				int col = k % xDim;
+				int row = k / xDim;
 				int d = i - j + 1;
 
 				for( int l = 0; l < d; l++ ) {
@@ -89,51 +95,21 @@ namespace App {
 				}
 
 			// y2y
-			} else if( 4 <= k && k < 8 ) {
+			} else if( dim0 <= k && k < dim1 ) {
 
-				int index = k - 4;
-				int col = index % 4;
-				int row = ( index - col ) / 2;
+				int index = k - dim0;
+				int col = index % yDim;
+				int row = index / yDim;
 
 				if( ydval == row && yval == col ) {
 					ret = 1;
 				}
 
 			} else {
-				assert( k < 8 );
+				throw Error("Simple::operator(): invalid dimension specife");
 			}
-#if 0
-			// y2x
-			if( k < 10 ) {
-
-				int col = k % 5;
-				int row = k < 5 ? 0 : 1;
-				int d = i - j + 1;
-				// T.B.D. should warn if d < 1 || maxlength < d
-
-				for( int l = 0; l < d; l++ ) {
-
-					std::string str = x->getStrs()->at(j+l).at(0);
-					int xval = boost::lexical_cast<int>(str);
-					if( yval == row && xval == col && col < d ) {
-						ret += 1;
-					}
-				}
-
-			// y2y
-			} else {
-
-				int index = k - 10;
-				int col = index % 5;
-				int row = ( index - col ) / 5;
-				if( yval == row && ydval == col ) {
-					ret = 1;
-				}
-			}
-#endif
 
 		} catch (...) {
-
 			throw Error("Simple::operator(): unexpected exception");
 		}
 
