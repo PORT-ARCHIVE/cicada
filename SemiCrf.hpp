@@ -140,6 +140,13 @@ namespace SemiCrf {
 		virtual ~Weights_();
 		void read(std::ifstream& ifs);
 		void write(std::ofstream& ofs);
+		void setXDim(int arg) { xDim = arg; }
+		void setYDim(int arg) { yDim = arg; }
+		int getXDim() { return xDim; }
+		int getYDim() { return yDim; }
+	protected:
+		int xDim;
+		int yDim;
 	};
 
 	typedef std::shared_ptr<Weights_> Weights;
@@ -155,7 +162,7 @@ namespace SemiCrf {
 		virtual void write() = 0;
 		void setXDim(int arg) { xDim = arg; }
 		void setYDim(int arg) { yDim = arg; }
-	private:
+	protected:
 		int xDim;
 		int yDim;
 	};

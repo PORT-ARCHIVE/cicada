@@ -378,12 +378,31 @@ namespace SemiCrf {
 				continue;
 			}
 
+			MultiByteTokenizer tokenizer(line);
+
 			if( line[0] == '#' ) {
 				if( line == "# BEGIN" ) {
 					state = true;
 				} else if( line == "# END" ) {
 					state = false;
 					break;
+				} else {
+					tokenizer.get(); // # を捨てる
+					std::string tok = tokenizer.get();
+					if( tok == "DIMENSION" ) {
+						tok = tokenizer.get();
+						if( !tok.empty() ) {
+							xDim = boost::lexical_cast<int>(tok);
+						}
+						tok = tokenizer.get();
+						if( !tok.empty() ) {
+							yDim = boost::lexical_cast<int>(tok);
+						}
+						tok = tokenizer.get();
+						if( !tok.empty() ) {
+							// T.B.D.
+						}
+					}
 				}
 				continue;
 			}
@@ -408,6 +427,8 @@ namespace SemiCrf {
 
 		ofs << "# Semi-CRF Weights" << std::endl;
 		ofs << std::endl;
+		ofs << "# DIMENSION" << " " << xDim << " " << yDim << std::endl;
+		ofs << std::endl;
 		ofs << "# BEGIN" << std::endl;
 
 		for( auto w : *this ) {
@@ -418,6 +439,8 @@ namespace SemiCrf {
 	}
 
 	FeatureFunction_::FeatureFunction_()
+		: xDim(-1)
+		, yDim(-1)
 	{
 		Logger::out(2) << "FeatureFunction_()" << std::endl;
 	}
@@ -535,6 +558,8 @@ namespace SemiCrf {
 	{
 		std::ofstream ofs; // 出力
 		open(ofs, wfile);
+		weights->setXDim(datas->getXDim());
+		weights->setYDim(datas->getYDim());
 		weights->write(ofs);
 	}
 

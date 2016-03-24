@@ -1,5 +1,7 @@
 # Semi-CRF Weights
 
+# DIMENSION 2 2
+
 # BEGIN
 1.15616
 -2.09134
