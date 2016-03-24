@@ -504,8 +504,6 @@ namespace SemiCrf {
 	void Algorithm_::setFeatureFunction(FeatureFunction arg)
 	{
 		ff = arg;
-		ff->setXDim(datas->getXDim());
-		ff->setYDim(datas->getYDim());
 	}
 
 	void Algorithm_::setWeights(Weights arg)
@@ -552,6 +550,8 @@ namespace SemiCrf {
 	{
 		SemiCrf::Weights weights = SemiCrf::createWeights(dim);
 		setWeights(weights);
+		ff->setXDim(datas->getXDim());
+		ff->setYDim(datas->getYDim());
 	}
 
 	void Learner::postProcess(const std::string& wfile)
@@ -807,6 +807,8 @@ namespace SemiCrf {
 		open(ifs, wfile);
 		weights->read(ifs);
 		setWeights(weights);
+		ff->setXDim(weights->getXDim());
+		ff->setYDim(weights->getYDim());
 	}
 
 	void Pridector::postProcess(const std::string& wfile)
