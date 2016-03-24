@@ -54,12 +54,6 @@ namespace App {
 		return ff;
 	}
 
-	int getFeatureDimention()
-	{
-		// return (35);
-		return (8);
-	}
-
 	SemiCrf::Labels createLabels()
 	{
 		SemiCrf::Labels labels = SemiCrf::createLabels();

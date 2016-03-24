@@ -171,6 +171,9 @@ namespace SemiCrf {
 				continue;
 			}
 
+			MultiByteTokenizer tokenizer(line);
+			counter++;
+
 			if( line[0] == '#' ) {
 				if( line == "# BEGIN" ) {
 					data = Data( new Data_() );
@@ -179,12 +182,26 @@ namespace SemiCrf {
 				} else if( line == "# END" ) {
 					push_back(data);
 					Logger::out(2) << "END : data was pushed." << std::endl;
+				} else {
+					tokenizer.get(); // # を捨てる
+					std::string tok = tokenizer.get();
+					if( tok == "DIMENSION" ) {
+						tok = tokenizer.get();
+						if( !tok.empty() ) {
+							xDim = boost::lexical_cast<int>(tok);
+						}
+						tok = tokenizer.get();
+						if( !tok.empty() ) {
+							yDim = boost::lexical_cast<int>(tok);
+						}
+						tok = tokenizer.get();
+						if( !tok.empty() ) {
+							// T.B.D.
+						}
+					}
 				}
 				continue;
 			}
-
-			MultiByteTokenizer tokenizer(line);
-			counter++;
 
 			std::string word = tokenizer.get();
 			if( word.empty() ) {
@@ -458,6 +475,7 @@ namespace SemiCrf {
 	void Algorithm_::setDatas(Datas arg)
 	{
 		datas = arg;
+		dim = arg->getDim();
 	}
 
 	void Algorithm_::setFeatureFunction(FeatureFunction arg)

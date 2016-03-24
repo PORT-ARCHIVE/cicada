@@ -100,6 +100,9 @@ namespace SemiCrf {
 		virtual ~Datas_();
 		virtual void read(std::istream& input) = 0;
 		virtual void write(std::ostream& output) const;
+		virtual int getDim() { return (-1); }
+		virtual int getXDim() { return (-1); }
+		virtual int getYDim() { return (-1); }
 	};
 
 	typedef std::shared_ptr<Datas_> Datas;
@@ -110,6 +113,12 @@ namespace SemiCrf {
 		TrainingDatas_();
 		virtual ~TrainingDatas_();
 		virtual void read(std::istream& input);
+		virtual int getDim() { return (( xDim + yDim ) * yDim); }
+		virtual int getXDim() { return xDim; }
+		virtual int getYDim() { return yDim; }
+	protected:
+		int xDim;
+		int yDim;
 	};
 
 	Datas createTrainingDatas();
@@ -178,6 +187,8 @@ namespace SemiCrf {
 		double computeWG(App::Label y, App::Label yd, int i, int d);
 
 		int dim;
+		int y2xDim;
+		int y2yDim;
 		Labels labels;
 		FeatureFunction ff;
 		Weights weights;

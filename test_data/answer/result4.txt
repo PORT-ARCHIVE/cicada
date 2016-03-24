@@ -3,7 +3,6 @@ Learner()
 FeatureFunction_()
 Simple()
 Labels_()
-Weights_()
 Datas_()
 TrainingDatas_()
 TrainingDatas_::read()
@@ -23,6 +22,7 @@ Data_::write()
 1	S/E	1
 # END
 
+Weights_()
 Learner::compute()
 Z=8
 G(0)=1
