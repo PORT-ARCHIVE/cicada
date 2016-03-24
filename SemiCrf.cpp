@@ -475,12 +475,14 @@ namespace SemiCrf {
 	void Algorithm_::setDatas(Datas arg)
 	{
 		datas = arg;
-		dim = arg->getDim();
+		dim = datas->getDim();
 	}
 
 	void Algorithm_::setFeatureFunction(FeatureFunction arg)
 	{
 		ff = arg;
+		ff->setXDim(datas->getXDim());
+		ff->setYDim(datas->getYDim());
 	}
 
 	void Algorithm_::setWeights(Weights arg)

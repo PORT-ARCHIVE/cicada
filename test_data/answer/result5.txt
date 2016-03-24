@@ -1,8 +1,5 @@
 Algorithm_()
 Learner()
-FeatureFunction_()
-Simple()
-Labels_()
 Datas_()
 TrainingDatas_()
 TrainingDatas_::read()
@@ -22,6 +19,9 @@ Data_::write()
 1	S/E	1
 # END
 
+Labels_()
+FeatureFunction_()
+Simple()
 Weights_()
 Learner::compute()
 Z=12

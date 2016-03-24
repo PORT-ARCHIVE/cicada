@@ -138,17 +138,16 @@ int main(int argc, char *argv[])
 		SemiCrf::Algorithm algorithm;
 		createAlgorithm(options, algorithm, file);
 
-		SemiCrf::FeatureFunction ff = App::createFeatureFunction();
-		SemiCrf::Labels labels = App::createLabels();
-		algorithm->setFeatureFunction(ff);
-		algorithm->setLabels(labels);
-
 		std::ifstream ifs;
 		SemiCrf::open(ifs, file);
 		SemiCrf::Datas datas = createDatas(options);
 		datas->read(ifs);
 		datas->write(Logger::out(2) << "");
 		algorithm->setDatas(datas);
+		SemiCrf::Labels labels = App::createLabels();
+		SemiCrf::FeatureFunction ff = App::createFeatureFunction();
+		algorithm->setLabels(labels);
+		algorithm->setFeatureFunction(ff);
 		algorithm->preProcess(options.weights_file);
 		algorithm->setMaxLength(options.maxLength);
 		algorithm->setMaxIteration(options.maxIteration);

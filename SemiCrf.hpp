@@ -153,6 +153,11 @@ namespace SemiCrf {
 		virtual double operator() (int k, App::Label y, App::Label yd, Data x, int j, int i) = 0;
 		virtual void read() = 0;
 		virtual void write() = 0;
+		void setXDim(int arg) { xDim = arg; }
+		void setYDim(int arg) { yDim = arg; }
+	private:
+		int xDim;
+		int yDim;
 	};
 
 	typedef std::shared_ptr<FeatureFunction_> FeatureFunction;
