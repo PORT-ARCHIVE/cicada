@@ -4,29 +4,31 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 #include <boost/lexical_cast.hpp>
-//#include <boost/random.hpp>
 #include <random>
+#include "ujson.hpp"
 #include "Logger.hpp"
 #include "Error.hpp"
 
 using namespace boost;
 using namespace std;
 
-vector<vector<double>> y2x =
-{
-	{ 0.3125, 0.0937, 0.2188, 0.3125, 0.0625 },
-	{ 0.2206, 0.4412, 0.1176, 0.1471, 0.0735 }
-};
+vector<vector<double>> y2x;
+// =
+// {
+// 	{ 0.3125, 0.0937, 0.2188, 0.3125, 0.0625 },
+// 	{ 0.2206, 0.4412, 0.1176, 0.1471, 0.0735 }
+// };
+
+vector<vector<double>> y2y;
+// =
+// {
+// 	{ 0.7999, 0.1999 },
+// 	{ 0.0999, 0.8999 }
+// };
 
 vector<vector<double>> a_y2x;
-
-vector<vector<double>> y2y =
-{
-	{ 0.7999, 0.1999 },
-	{ 0.0999, 0.8999 }
-};
-
 vector<vector<double>> a_y2y;
 
 void preProcess()
@@ -102,13 +104,16 @@ public:
 		: length(16)
 		, iteration(16)
 		, seed(42)
-		, logLevel(0) {};
+		, logLevel(0)
+		, file("")
+		{};
 	void parse(int argc, char *argv[]);
 public:
 	int length;
 	int iteration;
 	int seed;
 	int logLevel;
+	string file;
 };
 
 void Options::parse(int argc, char *argv[])
@@ -121,6 +126,8 @@ void Options::parse(int argc, char *argv[])
 				length = lexical_cast<int>(argv[++i]);
 			} else if( arg == "-r" || arg == "--iteration") {
 				iteration = lexical_cast<int>(argv[++i]);
+			} else if( arg == "-i" || arg == "--input-file") {
+				file = lexical_cast<string>(argv[++i]);
 			} else if( arg == "-s" ) {
 				seed = lexical_cast<int>(argv[++i]);
 			} else if( arg == "--log-level" ) {
@@ -141,6 +148,66 @@ void Options::parse(int argc, char *argv[])
 	}
 }
 
+template <class T>
+void open(T& strm, const std::string& arg) {
+	strm.open( arg.c_str() );
+	if( strm.fail() ) {
+		std::stringstream ss;
+		ss << "error: connot open such file: " << arg;
+		throw Error(ss.str());
+	}
+}
+
+void make_array(const ujson::object::const_iterator& it, vector<vector<double>>& vec)
+{
+	std::vector<ujson::value> array0 = array_cast(std::move(it->second));
+
+	vec.resize(array0.size());
+	int p = 0;
+
+    for( auto i = array0.begin(); i != array0.end(); ++i, ++p ) {
+
+		if( !i->is_array() ) {
+			throw std::invalid_argument("invalid format");
+		}
+
+		std::vector<ujson::value> array1 = array_cast(std::move(*i));
+		for( auto j = array1.begin(); j != array1.end(); ++j ) {
+
+			if( !j->is_number() ) {
+				throw std::invalid_argument("invalid format");
+			}
+
+			double v = double_cast(std::move(*j));
+			vec.at(p).push_back(v);
+		}
+	}
+}
+
+void make_arrays(ujson::value v)
+{
+	if( !v.is_object() ) {
+		throw std::invalid_argument("object expected for make_book");
+	}
+
+	std::vector<std::pair<std::string, ujson::value>> object = object_cast(std::move(v));
+
+	{
+		auto it = find(object, "y2x");
+		if( it == object.end() || !it->second.is_array() ) {
+			throw std::invalid_argument("'y2x' with type array not found");
+		}
+		make_array(it, y2x);
+	}
+	{
+		auto it = find(object, "y2y");
+		if( it == object.end() || !it->second.is_array() ) {
+			throw std::invalid_argument("'y2y' with type array not found");
+		}
+		make_array(it, y2y);
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	int ret = 0x0;
@@ -156,6 +223,22 @@ int main(int argc, char *argv[])
 			ss << "length must be greater than 2";
 			throw Error(ss.str());
 		}
+
+		if( options.file.empty() ) {
+			stringstream ss;
+			ss << "no input file specifed";
+			throw Error(ss.str());
+		}
+
+		std::ifstream ifs; // 入力
+		open(ifs, options.file);
+		std::string jsonfile;
+		std::string line;
+		while( std::getline(ifs, line) ) {
+			jsonfile += line;
+		}
+		auto v = ujson::parse(jsonfile);
+		make_arrays(v);
 
 		preProcess();
 	
