@@ -191,11 +191,32 @@ void make_array(const ujson::object::const_iterator& it, vector<vector<double>>&
 	}
 
 	if( nomalize ) {
-		for( auto& i : vec ) { // nomalize
+
+		for( auto& i : vec ) {
 			for( auto& j : i ) {
 				j /= total;
 			}
 		}
+
+		for( auto& i : vec ) {
+			double row_wize_total = 0.0;
+			for( auto& j : i ) {
+				row_wize_total += j;
+			}
+			for( auto& j : i ) {
+				j /= row_wize_total;
+			}
+		}
+
+		Logger::out(1) << "{" << std::endl;
+		for( auto& i : vec ) {
+			Logger::out(1) << "{ ";
+			for( auto& j : i ) {
+				Logger::out(1) << j << " ";
+			}
+			Logger::out(1) << "}" << std::endl;
+		}
+		Logger::out(1) << "}" << std::endl;
 	}
 }
 
