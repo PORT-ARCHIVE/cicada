@@ -106,6 +106,7 @@ public:
 		, seed(42)
 		, logLevel(0)
 		, file("")
+		, nomalize(false)
 		{};
 	void parse(int argc, char *argv[]);
 public:
@@ -114,6 +115,7 @@ public:
 	int seed;
 	int logLevel;
 	string file;
+	bool nomalize;
 };
 
 void Options::parse(int argc, char *argv[])
@@ -132,6 +134,8 @@ void Options::parse(int argc, char *argv[])
 				seed = lexical_cast<int>(argv[++i]);
 			} else if( arg == "--log-level" ) {
 				logLevel = lexical_cast<int>(argv[++i]);
+			} else if( arg == "-n" || arg == "--nomalize") {
+				nomalize = true;
 			} else {
 				stringstream ss;
 				ss << "unknown option specified";
@@ -158,8 +162,10 @@ void open(T& strm, const std::string& arg) {
 	}
 }
 
-void make_array(const ujson::object::const_iterator& it, vector<vector<double>>& vec)
+void make_array(const ujson::object::const_iterator& it, vector<vector<double>>& vec, bool nomalize = false)
 {
+	double total = 0.0;
+
 	std::vector<ujson::value> array0 = array_cast(std::move(it->second));
 
 	vec.resize(array0.size());
@@ -179,12 +185,21 @@ void make_array(const ujson::object::const_iterator& it, vector<vector<double>>&
 			}
 
 			double v = double_cast(std::move(*j));
+			total += v;
 			vec.at(p).push_back(v);
+		}
+	}
+
+	if( nomalize ) {
+		for( auto& i : vec ) { // nomalize
+			for( auto& j : i ) {
+				j /= total;
+			}
 		}
 	}
 }
 
-void make_arrays(ujson::value v)
+void make_arrays(ujson::value v, bool nomalize = false)
 {
 	if( !v.is_object() ) {
 		throw std::invalid_argument("object expected for make_book");
@@ -197,14 +212,14 @@ void make_arrays(ujson::value v)
 		if( it == object.end() || !it->second.is_array() ) {
 			throw std::invalid_argument("'y2x' with type array not found");
 		}
-		make_array(it, y2x);
+		make_array(it, y2x, nomalize);
 	}
 	{
 		auto it = find(object, "y2y");
 		if( it == object.end() || !it->second.is_array() ) {
 			throw std::invalid_argument("'y2y' with type array not found");
 		}
-		make_array(it, y2y);
+		make_array(it, y2y, nomalize);
 	}
 }
 
@@ -238,7 +253,7 @@ int main(int argc, char *argv[])
 			jsonfile += line;
 		}
 		auto v = ujson::parse(jsonfile);
-		make_arrays(v);
+		make_arrays(v, options.nomalize);
 
 		preProcess();
 	
