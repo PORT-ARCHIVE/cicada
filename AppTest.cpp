@@ -44,7 +44,7 @@ namespace App {
 		} else if( label == Label::ONE ) {
 			return std::move(std::string("1"));
 		} else {
-			throw Error("warning: unknown label");
+			throw Error("unknown label");
 		}
 	}
 
@@ -146,7 +146,7 @@ namespace App {
 
 			std::string word = tokenizer.get();
 			if( word.empty() ) {
-				// T.B.D.
+				throw Error("invalid format"); // T.B.D.
 			} else {
 				Logger::out(2) << word << std::endl;
 				std::vector<std::string> vs;
@@ -156,8 +156,12 @@ namespace App {
 
 			std::string remains = tokenizer.get();
 			if( !remains.empty() ) {
-				// T.B.D.
+				throw Error("invalid format"); // T.B.D.
 			}
+		}
+
+		if( data->getStrs()->empty() ) {
+			throw Error("empty input file"); // T.B.D.
 		}
 	}
 }
