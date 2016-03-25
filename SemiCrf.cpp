@@ -603,11 +603,11 @@ namespace SemiCrf {
 
 			auto dLi = dL.begin();
 			auto wi = weights->begin();
+			double e = e0;
+			if( !(flg & DISABLE_ADAGRAD) ) {
+				e /= rerr;
+			}
 			for( int k = 0; k < dim; wi++, dLi++, k++ ) {
-				double e = e0;
-				if( !(flg & DISABLE_ADAGRAD) ) {
-					e /= rerr;
-				}
 				(*wi) += e * (*dLi); Logger::out(2) << "W(" << k << ")=" << *wi << std::endl;
 			}
 
