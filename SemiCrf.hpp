@@ -33,7 +33,7 @@ namespace SemiCrf {
 		strm.open( arg.c_str() );
 		if( strm.fail() ) {
 			std::stringstream ss;
-			ss << "error: connot open such file: " << arg;
+			ss << "cannot open such file: " << arg;
 			throw Error(ss.str());
 		}
 	}
