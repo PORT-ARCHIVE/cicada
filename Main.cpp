@@ -20,7 +20,9 @@ public:
 		, maxIteration(1024)
 		, e0(1.0e-5)
 		, e1(1.0e-5)
-		, debug_level(0) {};
+		, debug_level(0)
+		, flg(0)
+		{};
 	void parse(int argc, char *argv[]);
 public:
 	std::string training_data_file;
@@ -32,6 +34,7 @@ public:
 	double e0;
 	double e1;
 	int debug_level;
+	int flg;
 };
 
 void Options::parse(int argc, char *argv[])
@@ -56,6 +59,8 @@ void Options::parse(int argc, char *argv[])
 				e1 = boost::lexical_cast<double>(argv[++i]);
 			} else if( arg == "-w" ) {
 				weights_file = argv[++i];
+			} else if( arg == "--disable-adagrad" ) {
+				flg |= SemiCrf::DISABLE_ADAGRAD;
 			} else if( arg == "--debug-level" ) {
 				debug_level = boost::lexical_cast<int>(argv[++i]);
 			} else {
@@ -139,6 +144,7 @@ int main(int argc, char *argv[])
 		std::string file;
 		SemiCrf::Algorithm algorithm;
 		createAlgorithm(options, algorithm, file);
+		algorithm->setFlg(options.flg);
 
 		std::ifstream ifs;
 		SemiCrf::open(ifs, file);

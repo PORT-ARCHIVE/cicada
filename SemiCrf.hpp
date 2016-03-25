@@ -24,6 +24,10 @@ namespace App {
 
 namespace SemiCrf {
 
+	enum {
+		DISABLE_ADAGRAD = 0x1
+	};
+
 	template <class T>
 	void open(T& strm, const std::string& arg) {
 		strm.open( arg.c_str() );
@@ -193,6 +197,7 @@ namespace SemiCrf {
 		virtual void compute() = 0;
 		virtual void preProcess(const std::string& wfile) = 0;
 		virtual void postProcess(const std::string& wfile) = 0;
+		void setFlg(int flg);
 
 	protected:
 		double computeWG(App::Label y, App::Label yd, int i, int d);
@@ -212,6 +217,7 @@ namespace SemiCrf {
 		CheckTable current_vctab;
 		CheckTable current_actab;
 		CheckTable current_ectab;
+		int flg;
 	};
 
 	typedef std::shared_ptr<Algorithm_> Algorithm;
@@ -226,7 +232,7 @@ namespace SemiCrf {
 		virtual void postProcess(const std::string& wfile);
 
 	private:
-		bool isConv(double L, const std::vector<double>& dL, double& tdl0, bool& isfirst);
+		bool isConv(double L, const std::vector<double>& dL, double& tdl0, double& rerr, bool& isfirst);
 		double computeZ();
 		std::vector<double> computeG(double& WG);
 		std::vector<double> computeGm(double Z);

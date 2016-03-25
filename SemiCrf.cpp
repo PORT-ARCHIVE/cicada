@@ -529,6 +529,11 @@ namespace SemiCrf {
 		return v;
 	}
 
+	void Algorithm_::setFlg(int arg)
+	{
+		flg = arg;
+	}
+
 	//// Learner ////
 
 	Algorithm createLearner()
@@ -569,6 +574,7 @@ namespace SemiCrf {
 
 		int itr = 0;
 		double tdl0 = 0.0;
+		double rerr = 1.0;
 		bool isfirst = true;
 
 		while( itr < maxIteration ) {
@@ -598,10 +604,14 @@ namespace SemiCrf {
 			auto dLi = dL.begin();
 			auto wi = weights->begin();
 			for( int k = 0; k < dim; wi++, dLi++, k++ ) {
-				(*wi) += e0 * (*dLi); Logger::out(2) << "W(" << k << ")=" << *wi << std::endl;
+				double e = e0;
+				if( !(flg & DISABLE_ADAGRAD) ) {
+					e /= rerr;
+				}
+				(*wi) += e * (*dLi); Logger::out(2) << "W(" << k << ")=" << *wi << std::endl;
 			}
 
-			if( isConv(L, dL, tdl0, isfirst) ) {
+			if( isConv(L, dL, tdl0, rerr, isfirst) ) {
 				break;
 			}
 
@@ -609,7 +619,7 @@ namespace SemiCrf {
 		}
 	}
 
-	bool Learner::isConv(double L, const std::vector<double>& dL, double& tdl0, bool& isfirst)
+	bool Learner::isConv(double L, const std::vector<double>& dL, double& tdl0, double& rerr, bool& isfirst)
 	{
 		double tdl = 0.0;
 
@@ -625,7 +635,7 @@ namespace SemiCrf {
 			return false;
 		}
 
-		double rerr = tdl/tdl0;
+		rerr = tdl/tdl0;
 		Logger::out(1) << boost::format("L= %10.6e |dL|= %10.6e") % L % rerr << std::endl;
 		return (rerr < e1);
 	}

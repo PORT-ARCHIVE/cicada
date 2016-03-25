@@ -7,12 +7,12 @@ all:
 #	$(SEMICRF) -i test1.txt --debug > result1.txt && diff answer/result1.txt result1.txt && echo "OK" || echo "ERROR"
 # 4
 	@echo "###### TEST 4 ######"
-	@$(SEMICRF) -t test4.txt -w weight4.txt --debug-level 2 --max-length 1 -e0 1.0e-1 --max-iteration 10 1> result4.txt 2>&1 && echo "OK" || echo "ERROR"
+	@$(SEMICRF) -t test4.txt -w weight4.txt --debug-level 2 --max-length 1 -e0 1.0e-1 --max-iteration 10 --disable-adagrad 1> result4.txt 2>&1 && echo "OK" || echo "ERROR"
 	@diff answer/result4.txt result4.txt && echo "OK" || echo "ERROR"
 	@diff answer/weight4.txt weight4.txt && echo "OK" || echo "ERROR"
 # 5
 	@echo "###### TEST 5 ######"
-	@$(SEMICRF) -t test4.txt -w weight5.txt --debug-level 2 --max-length 2 -e0 1.0e-1 --max-iteration 5  1> result5.txt 2>&1 && echo "OK" || echo "ERROR"
+	@$(SEMICRF) -t test4.txt -w weight5.txt --debug-level 2 --max-length 2 -e0 1.0e-1 --max-iteration 5 --disable-adagrad 1> result5.txt 2>&1 && echo "OK" || echo "ERROR"
 	@diff answer/result5.txt result5.txt && echo "OK" || echo "ERROR"
 	@diff answer/weight5.txt weight5.txt && echo "OK" || echo "ERROR"
 # 6
@@ -21,12 +21,12 @@ all:
 	@diff answer/result6.txt result6.txt && echo "OK" || echo "ERROR"
 # 7
 	@echo "###### TEST 7 ######"
-	@$(SEMICRF) -t test4.txt -w weight7.txt --debug-level 1 --max-length 1 -e0 1.0e-1 -e1 0.5e-1 --max-iteration 1024 1> result7.txt 2>&1 && echo "OK" || echo "ERROR"
+	@$(SEMICRF) -t test4.txt -w weight7.txt --debug-level 1 --max-length 1 -e0 1.0e-1 -e1 0.5e-1 --max-iteration 1024 --disable-adagrad 1> result7.txt 2>&1 && echo "OK" || echo "ERROR"
 	@diff answer/result7.txt result7.txt && echo "OK" || echo "ERROR"
 	@diff answer/weight7.txt weight7.txt && echo "OK" || echo "ERROR"
 # 8
 	@echo "###### TEST 8 ######"
-	@$(SEMICRF) -t test8.txt -w weight8.txt --debug-level 1 --max-length 2 -e0 1.0e-1 -e1 1.0e-2 1> result8.txt 2>&1 && echo "OK" || echo "ERROR"
+	@$(SEMICRF) -t test8.txt -w weight8.txt --debug-level 1 --max-length 2 -e0 1.0e-1 -e1 1.0e-2 --disable-adagrad 1> result8.txt 2>&1 && echo "OK" || echo "ERROR"
 	@diff answer/result8.txt result8.txt && echo "OK" || echo "ERROR"
 	@diff answer/weight8.txt weight8.txt && echo "OK" || echo "ERROR"
 # 9
@@ -35,7 +35,7 @@ all:
 	@diff answer/result9.txt result9.txt && echo "OK" || echo "ERROR"
 # 10
 	@echo "###### TEST 10 ######"
-	@$(SEMICRF) -t test10.txt -w weight10.txt --debug-level 0 --max-length 1 -e0 1.0e-1 -e1 1.0e-2 1> result10.txt 2>&1 && echo "OK" || echo "ERROR"
+	@$(SEMICRF) -t test10.txt -w weight10.txt --debug-level 0 --max-length 1 -e0 1.0e-1 -e1 1.0e-2 --disable-adagrad 1> result10.txt 2>&1 && echo "OK" || echo "ERROR"
 	@diff answer/result10.txt result10.txt && echo "OK" || echo "ERROR"
 	@diff answer/weight10.txt weight10.txt && echo "OK" || echo "ERROR"
 # 11
@@ -44,7 +44,7 @@ all:
 	@diff answer/result11.txt result11.txt && echo "OK" || echo "ERROR"
 # 12
 	@echo "###### TEST 12 ######"
-	@$(SEMICRF) -t test12.txt -w weight12.txt --debug-level 0 --max-length 2 -e0 1.0e-1 -e1 1.0e-2 1> result12.txt 2>&1 && echo "OK" || echo "ERROR"
+	@$(SEMICRF) -t test12.txt -w weight12.txt --debug-level 0 --max-length 2 -e0 1.0e-1 -e1 1.0e-2 --disable-adagrad 1> result12.txt 2>&1 && echo "OK" || echo "ERROR"
 	@diff answer/result12.txt result12.txt && echo "OK" || echo "ERROR"
 	@diff answer/weight12.txt weight12.txt && echo "OK" || echo "ERROR"
 # 13
@@ -53,7 +53,7 @@ all:
 	@diff answer/result13.txt result13.txt && echo "OK" || echo "ERROR"
 # 14
 	@echo "###### TEST 14 ######"
-	@$(SEMICRF) -t test14.txt -w weight14.txt --debug-level 0 --max-length 2 -e0 1.0e-1 -e1 1.0e-2 1> result14.txt 2>&1 && echo "OK" || echo "ERROR"
+	@$(SEMICRF) -t test14.txt -w weight14.txt --debug-level 0 --max-length 2 -e0 1.0e-1 -e1 1.0e-2 --disable-adagrad 1> result14.txt 2>&1 && echo "OK" || echo "ERROR"
 	@diff answer/result14.txt result14.txt && echo "OK" || echo "ERROR"
 	@diff answer/weight14.txt weight14.txt && echo "OK" || echo "ERROR"
 # 15
@@ -69,7 +69,7 @@ all:
 	@$(SEMICRF) -i test17.txt -w answer/weight17.txt --debug-level 2 --max-length 32 1> result17.txt 2>&1 && echo "OK" || echo "ERROR"
 	@diff answer/result17.txt result17.txt && echo "OK" || echo "ERROR"
 # 18
-	@echo "###### TEST 18 ######"
+	@echo "###### TEST 17 ######"
 	@$(SEMICRF) -i test18.txt -w answer/weight18.txt --debug-level 2 --max-length 32 1> result18.txt 2>&1 && echo "OK" || echo "ERROR"
 	@diff answer/result18.txt result18.txt && echo "OK" || echo "ERROR"
 
