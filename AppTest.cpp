@@ -118,6 +118,8 @@ namespace App {
 
 	void PridectionDigitDatas_::read(std::istream& strm)
 	{
+		int warningsLimit = 5;
+		int numOfWarnings = 0;
 		Logger::out(2) << "PridectionDigitDatas_::read()" << std::endl;
 
 		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
@@ -156,7 +158,13 @@ namespace App {
 
 			std::string remains = tokenizer.get();
 			if( !remains.empty() ) {
-				throw Error("invalid format"); // T.B.D.
+				if( numOfWarnings < warningsLimit ) {
+					Logger::out(1) << "warning: Extra data has been detected." << std::endl;
+					if( numOfWarnings == warningsLimit-1 ) {
+						Logger::out(1) << "warning: repeated warnings suppressesed." << std::endl;
+					}
+				}
+				++numOfWarnings;
 			}
 		}
 

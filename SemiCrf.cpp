@@ -50,7 +50,7 @@ namespace SemiCrf {
 
 	Labels_::~Labels_()
 	{
-		Logger::out(2) << "Labels_()" << std::endl;
+		Logger::out(2) << "~Labels_()" << std::endl;
 	}
 
 	// Data_ ctr
