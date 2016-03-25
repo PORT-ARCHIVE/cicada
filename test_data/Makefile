@@ -5,10 +5,6 @@ all:
 # 0,1,2,3
 #	$(SEMICRF) -t test0.txt --debug > result0.txt && diff answer/result0.txt result0.txt && echo "OK" || echo "ERROR"
 #	$(SEMICRF) -i test1.txt --debug > result1.txt && diff answer/result1.txt result1.txt && echo "OK" || echo "ERROR"
-# 16
-	@echo "###### TEST 16 ######"
-	@$(SEMICRF) -i test17.txt -w answer/weight17.txt --debug-level 2 --max-length 32 1> result16.txt 2>&1 && echo "OK" || echo "ERROR"
-	@diff answer/result16.txt result16.txt && echo "OK" || echo "ERROR"
 # 4
 	@echo "###### TEST 4 ######"
 	@$(SEMICRF) -t test4.txt -w weight4.txt --debug-level 2 --max-length 1 -e0 1.0e-1 --max-iteration 10 1> result4.txt 2>&1 && echo "OK" || echo "ERROR"
@@ -64,6 +60,14 @@ all:
 	@echo "###### TEST 15 ######"
 	@$(SEMICRF) -i test15.txt -w answer/weight14.txt --debug-level 0 --max-length 2 1> result15.txt 2>&1 && echo "OK" || echo "ERROR"
 	@diff answer/result15.txt result15.txt && echo "OK" || echo "ERROR"
+# 16
+	@echo "###### TEST 16 ######"
+	@echo "skipped"
+# 17
+	@echo "###### TEST 17 ######"
+	@$(SEMICRF) -i test17.txt -w answer/weight17.txt --debug-level 2 --max-length 32 1> result17.txt 2>&1 && echo "OK" || echo "ERROR"
+	@diff answer/result17.txt result17.txt && echo "OK" || echo "ERROR"
+
 
 gen_test: gen
 # 1
