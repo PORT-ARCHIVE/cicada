@@ -68,6 +68,11 @@ all:
 	@echo "###### TEST 17 ######"
 	@$(SEMICRF) -i test17.txt -w answer/weight17.txt --debug-level 2 --max-length 32 1> result17.txt 2>&1 && echo "OK" || echo "ERROR"
 	@diff answer/result17.txt result17.txt && echo "OK" || echo "ERROR"
+# 18
+	@echo "###### TEST 18 ######"
+	@$(SEMICRF) -i test18.txt -w answer/weight18.txt --debug-level 2 --max-length 32 1> result18.txt 2>&1 && echo "OK" || echo "ERROR"
+	@diff answer/result18.txt result18.txt && echo "OK" || echo "ERROR"
+
 
 
 gen_test: gen
