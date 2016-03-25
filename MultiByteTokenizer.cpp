@@ -55,6 +55,7 @@ std::string MultiByteTokenizer::get()
 {
 	while( strcmp(itr, " ") == 0 ||
 		   strcmp(itr, "　") == 0 ||
+		   strcmp(itr, "\t") == 0 ||
 		   strcmp(itr, ",") == 0 ) {
 		++itr;
 	}
@@ -62,6 +63,7 @@ std::string MultiByteTokenizer::get()
 	std::string token;
 	while( strcmp(itr, " ") != 0 &&
 		   strcmp(itr, "　") != 0 &&
+		   strcmp(itr, "\t") != 0 &&
 		   strcmp(itr, ",") != 0 &&
 		   strcmp(itr, "\0") != 0 ) {
 
