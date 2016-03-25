@@ -61,8 +61,26 @@ all:
 	@$(SEMICRF) -i test15.txt -w answer/weight14.txt --debug-level 0 --max-length 2 1> result15.txt 2>&1 && echo "OK" || echo "ERROR"
 	@diff answer/result15.txt result15.txt && echo "OK" || echo "ERROR"
 
+gen_test: gen
+# 1
+	@echo "###### GEN TEST 1 ######"
+	@diff answer/test16.txt test16.txt && echo "OK" || echo "ERROR"
+# 2
+	@echo "###### GEN TEST 2 ######"
+	@diff answer/test17.txt test17.txt && echo "OK" || echo "ERROR"
+# 3
+	@echo "###### GEN TEST 3 ######"
+	@diff answer/test18.txt test18.txt && echo "OK" || echo "ERROR"
+# 4
+	@echo "###### GEN TEST 4 ######"
+	@diff answer/test19.txt test19.txt && echo "OK" || echo "ERROR"
+
 update:
-	cp result*.txt weight*.txt answer
+	-cp result*.txt weight*.txt answer
+	-cp test16.txt answer/test16.txt
+	-cp test17.txt answer/test17.txt
+	-cp test18.txt answer/test18.txt
+	-cp test19.txt answer/test19.txt
 
 gen:
 	../gen -i p0.json -s 1 -r 2 -l 16 > test16.txt
