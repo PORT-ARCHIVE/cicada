@@ -1,7 +1,7 @@
+# DIMENSION 2 2
 # BEGIN
 1	S	0
 1	E	0
 0	S	1
 0	E	1
 # END
-

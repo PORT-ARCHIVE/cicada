@@ -14,12 +14,12 @@ S/E
 1
 END : data was pushed.
 Datas_::write()
+# DIMENSION 2 2
 # BEGIN
 Data_::write()
 0	S/E	0
 1	S/E	1
 # END
-
 Labels_()
 FeatureFunction_()
 Simple()

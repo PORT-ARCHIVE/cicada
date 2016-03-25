@@ -100,9 +100,14 @@ namespace SemiCrf {
 		virtual ~Datas_();
 		virtual void read(std::istream& input) = 0;
 		virtual void write(std::ostream& output) const;
-		virtual int getDim() { return (-1); }
-		virtual int getXDim() { return (-1); }
-		virtual int getYDim() { return (-1); }
+		virtual int getDim() { return (( xDim + yDim ) * yDim); }
+		virtual int getXDim() { return xDim; }
+		virtual int getYDim() { return yDim; }
+		virtual void setXDim(int arg) { xDim = arg; }
+		virtual void setYDim(int arg) { yDim = arg; }
+	protected:
+		int xDim;
+		int yDim;
 	};
 
 	typedef std::shared_ptr<Datas_> Datas;
@@ -113,12 +118,6 @@ namespace SemiCrf {
 		TrainingDatas_();
 		virtual ~TrainingDatas_();
 		virtual void read(std::istream& input);
-		virtual int getDim() { return (( xDim + yDim ) * yDim); }
-		virtual int getXDim() { return xDim; }
-		virtual int getYDim() { return yDim; }
-	protected:
-		int xDim;
-		int yDim;
 	};
 
 	Datas createTrainingDatas();

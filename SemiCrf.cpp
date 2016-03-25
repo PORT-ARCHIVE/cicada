@@ -133,12 +133,12 @@ namespace SemiCrf {
 	void Datas_::write(std::ostream& output)  const {
 		Logger::out(2) << "Datas_::write()" << std::endl;
 
+		output << "# DIMENSION" << " " << xDim << " " << yDim << std::endl;
 		for( auto d : *this ) {
 
 			output << "# BEGIN" << std::endl;
 		 	d->write(output);
 			output << "# END" << std::endl;
-			output << std::endl;
 		}
 	}
 
@@ -809,6 +809,8 @@ namespace SemiCrf {
 		setWeights(weights);
 		ff->setXDim(weights->getXDim());
 		ff->setYDim(weights->getYDim());
+		datas->setXDim(weights->getXDim());
+		datas->setYDim(weights->getYDim());
 	}
 
 	void Pridector::postProcess(const std::string& wfile)
