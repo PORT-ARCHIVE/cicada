@@ -106,7 +106,7 @@ namespace App {
 				}
 
 			} else {
-				throw Error("Simple::operator(): invalid dimension specife");
+				throw Error("Simple::operator(): invalid dimension specified");
 			}
 
 		} catch (...) {
