@@ -277,6 +277,10 @@ int main(int argc, char *argv[])
 		make_arrays(v, options.nomalize);
 
 		preProcess();
+
+		Logger::out(0) << "# DIMENSION";
+		Logger::out(0) << " " << y2x.at(0).size();
+		Logger::out(0) << " " << y2y.size() << endl;
 	
 		mt19937 mt(options.seed);
 		uniform_real_distribution<double> score(0.0,1.0);
