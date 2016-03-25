@@ -141,7 +141,13 @@ int main(int argc, char *argv[])
 		std::ifstream ifs;
 		SemiCrf::open(ifs, file);
 		SemiCrf::Datas datas = createDatas(options);
-		datas->read(ifs);
+		try {
+			datas->read(ifs);
+		} catch(Error& e) {
+			std::stringstream ss;
+			ss << "failed to read " << file << ": " << e.what();
+			throw Error(ss.str());
+		}
 		datas->write(Logger::out(2) << "");
 		algorithm->setDatas(datas);
 		SemiCrf::Labels labels = App::createLabels();
