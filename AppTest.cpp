@@ -28,24 +28,26 @@ namespace App {
 		Logger::out(2) << "Simple::write()" << std::endl;
 	}
 
-	Label string2Label(const std::string& str) {
-		if( str == "0" ) {
-			return Label::ZERO;
-		} else if( str == "1" ) {
-			return Label::ONE;
-		} else {
-			throw Error("warning: unknown label");
+	Label string2Label(const std::string& str)
+	{
+		int val;
+		try {
+			val = boost::lexical_cast<int>(str);
+		} catch(...) {
+			throw Error("unknown label");
 		}
+		return ( static_cast<Label>(val) );
 	}
 
 	std::string label2String(Label label) {
-		if( label == Label::ZERO ) {
-			return std::move(std::string("0"));
-		} else if( label == Label::ONE ) {
-			return std::move(std::string("1"));
-		} else {
+		int val = static_cast<int>(label);
+		std::string str;
+		try {
+			str = boost::lexical_cast<std::string>(val);
+		} catch(...) {
 			throw Error("unknown label");
 		}
+		return ( std::move(str) );
 	}
 
 	SemiCrf::FeatureFunction createFeatureFunction()
