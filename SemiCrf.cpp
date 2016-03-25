@@ -121,6 +121,8 @@ namespace SemiCrf {
 
 	// Datas ctr
 	Datas_::Datas_()
+		: xDim(0)
+		, yDim(0)
 	{
 		Logger::out(2) << "Datas_()" << std::endl;
 	};
