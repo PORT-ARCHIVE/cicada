@@ -135,6 +135,8 @@ namespace App {
 				continue;
 			}
 
+			MultiByteTokenizer tokenizer(line);
+
 			if( line[0] == '#' ) {
 				if( line == "# BEGIN" ) {
 					data = SemiCrf::Data( new SemiCrf::Data_() );
@@ -142,11 +144,26 @@ namespace App {
 				} else if( line == "# END" ) {
 					push_back(data);
 					Logger::out(2) << "END : data was pushed." << std::endl;
+				} else {
+					tokenizer.get(); // # を捨てる
+					std::string tok = tokenizer.get();
+					if( tok == "DIMENSION" ) {
+						tok = tokenizer.get();
+						if( !tok.empty() ) {
+							xDim = boost::lexical_cast<int>(tok);
+						}
+						tok = tokenizer.get();
+						if( !tok.empty() ) {
+							yDim = boost::lexical_cast<int>(tok);
+						}
+						tok = tokenizer.get();
+						if( !tok.empty() ) {
+							// T.B.D.
+						}
+					}
 				}
 				continue;
 			}
-
-			MultiByteTokenizer tokenizer(line);
 
 			std::string word = tokenizer.get();
 			if( word.empty() ) {
