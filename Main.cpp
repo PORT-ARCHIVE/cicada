@@ -134,6 +134,8 @@ int main(int argc, char *argv[])
 		options.parse(argc, argv);
 		Logger::setLevel(options.debug_level);
 
+		Logger::out(1) << "#### Semi-CRF Start ####" << std::endl;
+
 		std::string file;
 		SemiCrf::Algorithm algorithm;
 		createAlgorithm(options, algorithm, file);
@@ -161,6 +163,8 @@ int main(int argc, char *argv[])
 		algorithm->setE1(options.e1);
 		algorithm->compute();
 		algorithm->postProcess(options.weights_file);
+
+		Logger::out(1) << "#### Semi-CRF nomarly end ####" << std::endl;
 
 	} catch(Error& e) {
 
