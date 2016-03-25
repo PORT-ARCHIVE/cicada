@@ -150,7 +150,7 @@ BEGIN : data was created.
 3
 END : data was pushed.
 Datas_::write()
-# DIMENSION 0 0
+# DIMENSION 5 2
 # BEGIN
 Data_::write()
 3	
