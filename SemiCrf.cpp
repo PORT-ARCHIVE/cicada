@@ -614,8 +614,7 @@ namespace SemiCrf {
 		double tdl = 0.0;
 
 		for( auto dl : dL ) {
-			double t = e0*dl;
-			tdl += t*t;
+			tdl += dl*dl;
 		}
 
 		tdl = sqrt(tdl);
