@@ -62,7 +62,8 @@ all:
 	@diff answer/result15.txt result15.txt && echo "OK" || echo "ERROR"
 # 16
 	@echo "###### TEST 16 ######"
-	@echo "skipped"
+	@$(SEMICRF) -i test16.txt -w answer/weight16.txt --debug-level 0 --max-length 2 1> result16.txt 2>&1 && echo "OK" || echo "ERROR"
+	@diff answer/result16.txt result16.txt && echo "OK" || echo "ERROR"
 # 17
 	@echo "###### TEST 17 ######"
 	@$(SEMICRF) -i test17.txt -w answer/weight17.txt --debug-level 2 --max-length 32 1> result17.txt 2>&1 && echo "OK" || echo "ERROR"
