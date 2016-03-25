@@ -1,3 +1,4 @@
+#### Semi-CRF Start ####
 Algorithm_()
 Learner()
 Datas_()
@@ -364,6 +365,7 @@ W(6)=-0.405789
 W(7)=-0.338259
 L= -1.030293e+00 |dL|= 5.517193e-01
 Weights_::write()
+#### Semi-CRF nomarly end ####
 ~Learner()
 ~Algorithm_()
 ~TrainingDatas_()
