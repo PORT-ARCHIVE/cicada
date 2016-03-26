@@ -4,7 +4,6 @@
 #include <sstream>
 #include <boost/lexical_cast.hpp>
 #include "SemiCrf.hpp"
-//#include "AppReqs.hpp"
 #include "AppTest.hpp"
 #include "Logger.hpp"
 #include "Error.hpp"
@@ -20,7 +19,7 @@ public:
 		, maxIteration(1024)
 		, e0(1.0e-5)
 		, e1(1.0e-5)
-		, debug_level(0)
+		, debugLevel(0)
 		, flg(0)
 		{};
 	void parse(int argc, char *argv[]);
@@ -33,7 +32,7 @@ public:
 	int maxIteration;
 	double e0;
 	double e1;
-	int debug_level;
+	int debugLevel;
 	int flg;
 };
 
@@ -61,8 +60,8 @@ void Options::parse(int argc, char *argv[])
 				weights_file = argv[++i];
 			} else if( arg == "--disable-adagrad" ) {
 				flg |= SemiCrf::DISABLE_ADAGRAD;
-			} else if( arg == "--debug-level" ) {
-				debug_level = boost::lexical_cast<int>(argv[++i]);
+			} else if( arg == "--log-level" ) {
+				debugLevel = boost::lexical_cast<int>(argv[++i]);
 			} else {
 				std::stringstream ss;
 				ss << "unknown option specified";
@@ -137,7 +136,7 @@ int main(int argc, char *argv[])
 
 		Options options;
 		options.parse(argc, argv);
-		Logger::setLevel(options.debug_level);
+		Logger::setLevel(options.debugLevel);
 
 		Logger::out(1) << "#### Semi-CRF Start ####" << std::endl;
 
