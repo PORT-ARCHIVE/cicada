@@ -7,6 +7,7 @@
 #include "AppTest.hpp"
 #include "Logger.hpp"
 #include "Error.hpp"
+#include "FileIO.hpp"
 
 class Options {
 public:
@@ -81,51 +82,64 @@ void Options::parse(int argc, char *argv[])
 	}
 }
 
-void createAlgorithm(const Options& options, SemiCrf::Algorithm& algorithm, std::string& file)
+SemiCrf::Algorithm createAlgorithm(const Options& options)
 {
+	std::string file;
+	SemiCrf::Algorithm alg;
+	SemiCrf::Datas datas;
+
 	if( !options.training_data_file.empty() ) {
 
 		file = options.training_data_file;
-		algorithm = SemiCrf::createLearner();
+		alg = SemiCrf::createLearner();
+		datas = SemiCrf::Datas( new SemiCrf::TrainingDatas_() );
 
 	} else if( !options.inference_data_file.empty() ) {
 
 		file = options.inference_data_file;
-		algorithm = SemiCrf::createPridector();
-
-	} else {
-		std::stringstream ss;
-		ss << "no input file specified";
-		throw Error(ss.str());
-	}
-}
-
-SemiCrf::Datas createDatas(const Options& options)
-{
-	if( !options.training_data_file.empty() ) {
-
-		return SemiCrf::Datas( new SemiCrf::TrainingDatas_() );
-
-	} else if( !options.inference_data_file.empty() ) {
+		alg = SemiCrf::createPridector();
 
 		if( options.format == "digit" ) {
 
-			return SemiCrf::Datas( new App::PridectionDigitDatas_() );
+			datas = SemiCrf::Datas( new App::PridectionDigitDatas_() );
 
 		} else if( options.format == "jpn" ) {
 
-			return SemiCrf::Datas( new SemiCrf::PridectionDatas_() );
+			datas = SemiCrf::Datas( new SemiCrf::PridectionDatas_() );
 
 		} else {
 			std::stringstream ss;
 			ss << "unsupported format specified";
 			throw Error(ss.str());
 		}
+
 	} else {
 		std::stringstream ss;
 		ss << "no input file specified";
 		throw Error(ss.str());
 	}
+
+	std::ifstream ifs;
+	open(ifs, file);
+
+	try {
+		datas->read(ifs);
+	} catch(Error& e) {
+		std::stringstream ss;
+		ss << "failed to read " << file << ": " << e.what();
+		throw Error(ss.str());
+	}
+
+	datas->write(Logger::out(2) << "");
+
+	alg->setDatas(datas);
+	alg->setFlg(options.flg);
+	alg->setMaxLength(options.maxLength);
+	alg->setMaxIteration(options.maxIteration);
+	alg->setE0(options.e0);
+	alg->setE1(options.e1);
+
+	return alg;
 }
 
 int main(int argc, char *argv[])
@@ -140,34 +154,16 @@ int main(int argc, char *argv[])
 
 		Logger::out(1) << "#### Semi-CRF Start ####" << std::endl;
 
-		std::string file;
-		SemiCrf::Algorithm algorithm;
-		createAlgorithm(options, algorithm, file);
-		algorithm->setFlg(options.flg);
-
-		std::ifstream ifs;
-		SemiCrf::open(ifs, file);
-		SemiCrf::Datas datas = createDatas(options);
-		try {
-			datas->read(ifs);
-		} catch(Error& e) {
-			std::stringstream ss;
-			ss << "failed to read " << file << ": " << e.what();
-			throw Error(ss.str());
-		}
-		datas->write(Logger::out(2) << "");
-		algorithm->setDatas(datas);
+		SemiCrf::Algorithm alg = createAlgorithm(options);
 		SemiCrf::Labels labels = App::createLabels();
 		SemiCrf::FeatureFunction ff = App::createFeatureFunction();
-		algorithm->setLabels(labels);
-		algorithm->setFeatureFunction(ff);
-		algorithm->preProcess(options.weights_file);
-		algorithm->setMaxLength(options.maxLength);
-		algorithm->setMaxIteration(options.maxIteration);
-		algorithm->setE0(options.e0);
-		algorithm->setE1(options.e1);
-		algorithm->compute();
-		algorithm->postProcess(options.weights_file);
+
+		alg->setLabels(labels);
+		alg->setFeatureFunction(ff);
+
+		alg->preProcess(options.weights_file);
+		alg->compute();
+		alg->postProcess(options.weights_file);
 
 		Logger::out(1) << "#### Semi-CRF nomarly end ####" << std::endl;
 

@@ -13,7 +13,6 @@
 #include <clocale>
 #include <mecab.h>
 #include "SemiCrf.hpp"
-//#include "AppReqs.hpp"
 #include "AppTest.hpp"
 #include "MultiByteTokenizer.hpp"
 #include "Logger.hpp"

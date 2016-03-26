@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include "Error.hpp"
+#include "FileIO.hpp"
 
 namespace App {
 
@@ -28,15 +29,15 @@ namespace SemiCrf {
 		DISABLE_ADAGRAD = 0x1
 	};
 
-	template <class T>
-	void open(T& strm, const std::string& arg) {
-		strm.open( arg.c_str() );
-		if( strm.fail() ) {
-			std::stringstream ss;
-			ss << "cannot open such file: " << arg;
-			throw Error(ss.str());
-		}
-	}
+	// template <class T>
+	// void open(T& strm, const std::string& arg) {
+	// 	strm.open( arg.c_str() );
+	// 	if( strm.fail() ) {
+	// 		std::stringstream ss;
+	// 		ss << "cannot open such file: " << arg;
+	// 		throw Error(ss.str());
+	// 	}
+	// }
 
 	// ラベル集合
 	class Labels_ : public std::vector<App::Label> {
