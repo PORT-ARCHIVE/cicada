@@ -12,10 +12,10 @@
 class Options {
 public:
 	Options()
-		: training_data_file("")
-		, inference_data_file("")
+		: trainingDataFile("")
+		, inferenceDataFile("")
 		, format("digit")
-		, weights_file("weights.txt")
+		, weightsFile("weights.txt")
 		, maxLength(5)
 		, maxIteration(1024)
 		, e0(1.0e-5)
@@ -25,10 +25,10 @@ public:
 		{};
 	void parse(int argc, char *argv[]);
 public:
-	std::string training_data_file;
-	std::string inference_data_file;
+	std::string trainingDataFile;
+	std::string inferenceDataFile;
 	std::string format;
-	std::string weights_file;
+	std::string weightsFile;
 	int maxLength;
 	int maxIteration;
 	double e0;
@@ -44,9 +44,9 @@ void Options::parse(int argc, char *argv[])
 		for( int i = 1; i < argc; i++ ) {
 			std::string arg = argv[i];
 			if( arg == "-t" ) {
-				training_data_file = argv[++i];
+				trainingDataFile = argv[++i];
 			} else if( arg == "-i" ) {
-				inference_data_file = argv[++i];
+				inferenceDataFile = argv[++i];
 			} else if( arg == "-f" || arg == "--input-file-format" ) {
 				format = argv[++i];
 			} else if( arg == "-l" || arg == "--max-length") {
@@ -58,7 +58,7 @@ void Options::parse(int argc, char *argv[])
 			} else if( arg == "-e1" ) {
 				e1 = boost::lexical_cast<double>(argv[++i]);
 			} else if( arg == "-w" ) {
-				weights_file = argv[++i];
+				weightsFile = argv[++i];
 			} else if( arg == "--disable-adagrad" ) {
 				flg |= SemiCrf::DISABLE_ADAGRAD;
 			} else if( arg == "--disable-date-version" ) {
@@ -89,15 +89,15 @@ SemiCrf::Algorithm createAlgorithm(const Options& options)
 	SemiCrf::Algorithm alg;
 	SemiCrf::Datas datas;
 
-	if( !options.training_data_file.empty() ) {
+	if( !options.trainingDataFile.empty() ) {
 
-		file = options.training_data_file;
+		file = options.trainingDataFile;
 		alg = SemiCrf::createLearner(options.flg);
 		datas = SemiCrf::Datas( new SemiCrf::TrainingDatas_() );
 
-	} else if( !options.inference_data_file.empty() ) {
+	} else if( !options.inferenceDataFile.empty() ) {
 
-		file = options.inference_data_file;
+		file = options.inferenceDataFile;
 		alg = SemiCrf::createPridector(options.flg);
 
 		if( options.format == "digit" ) {
@@ -159,9 +159,9 @@ int main(int argc, char *argv[])
 		alg->setLabels(labels);
 		alg->setFeatureFunction(ff);
 
-		alg->preProcess(options.weights_file);
+		alg->preProcess(options.weightsFile);
 		alg->compute();
-		alg->postProcess(options.weights_file);
+		alg->postProcess(options.weightsFile);
 
 	} catch(Error& e) {
 
