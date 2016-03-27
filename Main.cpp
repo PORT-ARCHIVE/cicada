@@ -20,7 +20,7 @@ public:
 		, maxIteration(1024)
 		, e0(1.0e-5)
 		, e1(1.0e-5)
-		, debugLevel(0)
+		, logLevel(0)
 		, flg(0)
 		{};
 	void parse(int argc, char *argv[]);
@@ -33,7 +33,7 @@ public:
 	int maxIteration;
 	double e0;
 	double e1;
-	int debugLevel;
+	int logLevel;
 	int flg;
 };
 
@@ -61,8 +61,10 @@ void Options::parse(int argc, char *argv[])
 				weights_file = argv[++i];
 			} else if( arg == "--disable-adagrad" ) {
 				flg |= SemiCrf::DISABLE_ADAGRAD;
+			} else if( arg == "--disable-date-version" ) {
+				flg |= SemiCrf::DISABLE_DATE_VERSION;
 			} else if( arg == "--log-level" ) {
-				debugLevel = boost::lexical_cast<int>(argv[++i]);
+				logLevel = boost::lexical_cast<int>(argv[++i]);
 			} else {
 				std::stringstream ss;
 				ss << "unknown option specified";
@@ -75,7 +77,6 @@ void Options::parse(int argc, char *argv[])
 		throw e;
 
 	} catch(...) {
-
 		std::stringstream ss;
 		ss << "error: invalid option specified";
 		throw Error(ss.str());
@@ -91,13 +92,13 @@ SemiCrf::Algorithm createAlgorithm(const Options& options)
 	if( !options.training_data_file.empty() ) {
 
 		file = options.training_data_file;
-		alg = SemiCrf::createLearner();
+		alg = SemiCrf::createLearner(options.flg);
 		datas = SemiCrf::Datas( new SemiCrf::TrainingDatas_() );
 
 	} else if( !options.inference_data_file.empty() ) {
 
 		file = options.inference_data_file;
-		alg = SemiCrf::createPridector();
+		alg = SemiCrf::createPridector(options.flg);
 
 		if( options.format == "digit" ) {
 
@@ -133,7 +134,6 @@ SemiCrf::Algorithm createAlgorithm(const Options& options)
 	datas->write(Logger::out(2) << "");
 
 	alg->setDatas(datas);
-	alg->setFlg(options.flg);
 	alg->setMaxLength(options.maxLength);
 	alg->setMaxIteration(options.maxIteration);
 	alg->setE0(options.e0);
@@ -150,9 +150,7 @@ int main(int argc, char *argv[])
 
 		Options options;
 		options.parse(argc, argv);
-		Logger::setLevel(options.debugLevel);
-
-		Logger::out(1) << "#### Semi-CRF Start ####" << std::endl;
+		Logger::setLevel(options.logLevel);
 
 		SemiCrf::Algorithm alg = createAlgorithm(options);
 		SemiCrf::Labels labels = App::createLabels();
@@ -164,8 +162,6 @@ int main(int argc, char *argv[])
 		alg->preProcess(options.weights_file);
 		alg->compute();
 		alg->postProcess(options.weights_file);
-
-		Logger::out(1) << "#### Semi-CRF nomarly end ####" << std::endl;
 
 	} catch(Error& e) {
 

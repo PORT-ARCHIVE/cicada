@@ -20,6 +20,14 @@
 
 namespace SemiCrf {
 
+	std::string date() {
+        time_t t = time(0);
+        char *s,*p;
+        p = s = asctime(localtime(&t));
+        while(*s != '\0') { if (*s == '\n') {*s = '\0'; break;} else {s++;}}
+        return std::move(std::string(p));
+    }
+
 	// ctr
 	Labels	createLabels()
 	{
@@ -228,6 +236,7 @@ namespace SemiCrf {
 			} else {
 				Logger::out(2) << label << std::endl;
 
+
 				App::Label l = App::string2Label(label);
 
 				if( descriptor == "N" ) {
@@ -247,6 +256,7 @@ namespace SemiCrf {
 
 					seg	= createSegment(seg_start, counter, l);
 					data->getSegments()->push_back(seg);
+					// record (l - counter + 1)
 
 				} else if( descriptor == "S/E" ) {
 
@@ -453,7 +463,7 @@ namespace SemiCrf {
 
 	//// Algorithm ////
 
-	Algorithm_::Algorithm_()
+	Algorithm_::Algorithm_(int arg)
 		: labels( nullptr )
 		, ff( nullptr )
 		, weights( nullptr )
@@ -462,6 +472,7 @@ namespace SemiCrf {
 		, maxIteration(1024)
 		, e0(1.0e-5)
 		, e1(1.0e-5)
+		, flg(arg)
 	{
 		Logger::out(2) << "Algorithm_()" << std::endl;
 	}
@@ -537,19 +548,29 @@ namespace SemiCrf {
 
 	//// Learner ////
 
-	Algorithm createLearner()
+	Algorithm createLearner(int arg)
 	{
-		return std::shared_ptr<Learner>(new Learner());
+		return std::shared_ptr<Learner>(new Learner(arg));
 	}
 
-	Learner::Learner()
+	Learner::Learner(int arg)
+		: Algorithm_(arg)
 	{
 		Logger::out(2) << "Learner()" << std::endl;
+		Logger::out(1) << "Semi-CRF";
+		if( flg & DISABLE_DATE_VERSION ) {
+			Logger::out(1) << "" << std::endl;
+		} else {
+			Logger::out(1) << " 0.0.1" << std::endl;
+			Logger::out(1) << "" << date() << std::endl;
+		}
+		Logger::out(1) << "Learning ..." << std::endl;
 	}
 
 	Learner::~Learner()
 	{
 		Logger::out(2) << "~Learner()" << std::endl;
+		Logger::out(1) << "OK" << std::endl;
 	}
 
 	void Learner::preProcess(const std::string& wfile)
@@ -795,19 +816,29 @@ namespace SemiCrf {
 
 	//// Pridector ////
 
-	Algorithm createPridector()
+	Algorithm createPridector(int arg)
 	{
-		return std::shared_ptr<Pridector>(new Pridector());
+		return std::shared_ptr<Pridector>(new Pridector(arg));
 	}
 
-	Pridector::Pridector()
+	Pridector::Pridector(int arg)
+		: Algorithm_(arg)
 	{
 		Logger::out(2) << "Pridector()" << std::endl;
+		Logger::out(1) << "Semi-CRF";
+		if( flg & DISABLE_DATE_VERSION ) {
+			Logger::out(1) << "" << std::endl;
+		} else {
+			Logger::out(1) << " 0.0.1" << std::endl;
+			Logger::out(1) << "" << date() << std::endl;
+		}
+		Logger::out(1) << "Pridection ..." << std::endl;
 	}
 
 	Pridector::~Pridector()
 	{
 		Logger::out(2) << "~Pridector()" << std::endl;
+		Logger::out(1) << "OK" << std::endl;
 	}
 
 	void Pridector::preProcess(const std::string& wfile)

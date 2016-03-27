@@ -26,18 +26,9 @@ namespace App {
 namespace SemiCrf {
 
 	enum {
-		DISABLE_ADAGRAD = 0x1
+		DISABLE_ADAGRAD = 0x1,
+		DISABLE_DATE_VERSION = (0x1 << 1)
 	};
-
-	// template <class T>
-	// void open(T& strm, const std::string& arg) {
-	// 	strm.open( arg.c_str() );
-	// 	if( strm.fail() ) {
-	// 		std::stringstream ss;
-	// 		ss << "cannot open such file: " << arg;
-	// 		throw Error(ss.str());
-	// 	}
-	// }
 
 	// ラベル集合
 	class Labels_ : public std::vector<App::Label> {
@@ -184,7 +175,7 @@ namespace SemiCrf {
 	// 抽象アルゴリズム
 	class Algorithm_ {
 	public:
-		Algorithm_();
+		Algorithm_(int arg);
 		virtual ~Algorithm_();
 		virtual void setLabels(Labels arg);
 		virtual void setMaxLength(int arg);
@@ -226,7 +217,7 @@ namespace SemiCrf {
 	// 学習器
 	class Learner : public Algorithm_ {
 	public:
-		Learner();
+		Learner(int arg);
 		virtual ~Learner();
 		virtual void compute();
 		virtual void preProcess(const std::string& wfile);
@@ -241,12 +232,12 @@ namespace SemiCrf {
 		double eta(int i, App::Label y, int k);
 	};
 
-	Algorithm createLearner();
+	Algorithm createLearner(int arg);
 
 	// 推論器
 	class Pridector : public Algorithm_ {
 	public:
-		Pridector();
+		Pridector(int arg);
 		virtual ~Pridector();
 		virtual void compute();
 		virtual void preProcess(const std::string& wfile);
@@ -258,7 +249,7 @@ namespace SemiCrf {
 		void printV();
 	};
 
-	Algorithm createPridector();
+	Algorithm createPridector(int arg);
 }
 
 #endif // SEMI_CRF__H

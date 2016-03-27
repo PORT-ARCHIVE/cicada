@@ -1,6 +1,8 @@
-#### Semi-CRF Start ####
 Algorithm_()
 Pridector()
+Semi-CRF 0.0.1
+Sun Mar 27 19:09:07 2016
+Pridection ...
 Datas_()
 PridectionDigitDatas_::read()
 Data_()
@@ -439,8 +441,8 @@ Data_::write()
 1	M	1
 3	E	1
 # END
-#### Semi-CRF nomarly end ####
 ~Pridector()
+OK
 ~Algorithm_()
 ~Datas_()
 ~Data_()
