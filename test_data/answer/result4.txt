@@ -1,7 +1,6 @@
 Algorithm_()
 Learner()
-Semi-CRF 0.0.1
-Sun Mar 27 19:09:04 2016
+Semi-CRF
 Learning ...
 Datas_()
 TrainingDatas_()
