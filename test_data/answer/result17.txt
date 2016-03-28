@@ -1,7 +1,7 @@
 Algorithm_()
-Pridector()
+Predictor()
 Semi-CRF
-Pridection ...
+Prediction ...
 Datas_()
 PridectionDigitDatas_::read()
 Data_()
@@ -297,7 +297,7 @@ FeatureFunction_()
 Simple()
 Weights_()
 Weights_::read()
-Pridector::compute()
+Predictor::compute()
 Datas_::write()
 # DIMENSION 5 2
 # BEGIN
@@ -440,7 +440,7 @@ Data_::write()
 1	M	1
 3	E	1
 # END
-~Pridector()
+~Predictor()
 OK
 ~Algorithm_()
 ~Datas_()
