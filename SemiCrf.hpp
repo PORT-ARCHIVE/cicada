@@ -119,14 +119,14 @@ namespace SemiCrf {
 	Datas createTrainingDatas();
 
 	// 推論データ集合
-	class PridectionDatas_ : public Datas_ {
+	class PredictionDatas_ : public Datas_ {
 	public:
-		PridectionDatas_();
-		virtual ~PridectionDatas_();
+		PredictionDatas_();
+		virtual ~PredictionDatas_();
 		virtual void read(std::istream& input);
 	};
 
-	Datas createPridectionDatas();
+	Datas createPredictionDatas();
   
 	// 重みベクトル
 	class Weights_ : public std::vector<double> {
@@ -235,10 +235,10 @@ namespace SemiCrf {
 	Algorithm createLearner(int arg);
 
 	// 推論器
-	class Pridector : public Algorithm_ {
+	class Predictor : public Algorithm_ {
 	public:
-		Pridector(int arg);
-		virtual ~Pridector();
+		Predictor(int arg);
+		virtual ~Predictor();
 		virtual void compute();
 		virtual void preProcess(const std::string& wfile);
 		virtual void postProcess(const std::string& wfile);
@@ -249,7 +249,7 @@ namespace SemiCrf {
 		void printV();
 	};
 
-	Algorithm createPridector(int arg);
+	Algorithm createPredictor(int arg);
 }
 
 #endif // SEMI_CRF__H

@@ -276,20 +276,20 @@ namespace SemiCrf {
 		}
 	}
 
-	// PridectionDatas ctr
-	PridectionDatas_::PridectionDatas_()
+	// PredictionDatas ctr
+	PredictionDatas_::PredictionDatas_()
 	{
-		Logger::out(2) << "PridectionDatas_()" << std::endl;
+		Logger::out(2) << "PredictionDatas_()" << std::endl;
 	}
 
-	PridectionDatas_::~PridectionDatas_()
+	PredictionDatas_::~PredictionDatas_()
 	{
-		Logger::out(2) << "~PridectionDatas_()" << std::endl;
+		Logger::out(2) << "~PredictionDatas_()" << std::endl;
 	}
 
-	void PridectionDatas_::read(std::istream& strm)
+	void PredictionDatas_::read(std::istream& strm)
 	{
-		Logger::out(2) << "PridectionDatas_::read()" << std::endl;
+		Logger::out(2) << "PredictionDatas_::read()" << std::endl;
 		typedef std::shared_ptr<MeCab::Tagger> Tagger;
 
 		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
@@ -444,6 +444,7 @@ namespace SemiCrf {
 
 		for( auto w : *this ) {
 			ofs << w << std::endl;
+			//ofs << boost::format("%14.8e") % w << std::endl;
 		}
 
 		ofs << "# END" << std::endl;
@@ -814,17 +815,17 @@ namespace SemiCrf {
 		return v;
 	}
 
-	//// Pridector ////
+	//// Predictor ////
 
-	Algorithm createPridector(int arg)
+	Algorithm createPredictor(int arg)
 	{
-		return std::shared_ptr<Pridector>(new Pridector(arg));
+		return std::shared_ptr<Predictor>(new Predictor(arg));
 	}
 
-	Pridector::Pridector(int arg)
+	Predictor::Predictor(int arg)
 		: Algorithm_(arg)
 	{
-		Logger::out(2) << "Pridector()" << std::endl;
+		Logger::out(2) << "Predictor()" << std::endl;
 		Logger::out(1) << "Semi-CRF";
 		if( flg & DISABLE_DATE_VERSION ) {
 			Logger::out(1) << "" << std::endl;
@@ -832,16 +833,16 @@ namespace SemiCrf {
 			Logger::out(1) << " 0.0.1" << std::endl;
 			Logger::out(1) << "" << date() << std::endl;
 		}
-		Logger::out(1) << "Pridection ..." << std::endl;
+		Logger::out(1) << "Prediction ..." << std::endl;
 	}
 
-	Pridector::~Pridector()
+	Predictor::~Predictor()
 	{
-		Logger::out(2) << "~Pridector()" << std::endl;
+		Logger::out(2) << "~Predictor()" << std::endl;
 		Logger::out(1) << "OK" << std::endl;
 	}
 
-	void Pridector::preProcess(const std::string& wfile)
+	void Predictor::preProcess(const std::string& wfile)
 	{
 		SemiCrf::Weights weights = SemiCrf::createWeights();
 		std::ifstream ifs; // 入力
@@ -854,14 +855,14 @@ namespace SemiCrf {
 		datas->setYDim(weights->getYDim());
 	}
 
-	void Pridector::postProcess(const std::string& wfile)
+	void Predictor::postProcess(const std::string& wfile)
 	{
 		datas->write(Logger::out(0) << "");
 	}
 
-	void Pridector::compute()
+	void Predictor::compute()
 	{
-		Logger::out(2) << "Pridector::compute()" << std::endl;
+		Logger::out(2) << "Predictor::compute()" << std::endl;
 
 		for( auto data : *datas ) {
 
@@ -895,7 +896,7 @@ namespace SemiCrf {
 		}
 	}
 
-	double Pridector::V(int i, App::Label y, int& maxd)
+	double Predictor::V(int i, App::Label y, int& maxd)
 	{
 		double maxV = - std::numeric_limits<double>::max();
 
@@ -948,9 +949,9 @@ namespace SemiCrf {
 		return maxV;
 	}
 
-	void Pridector::backtrack(App::Label maxy, int maxd)
+	void Predictor::backtrack(App::Label maxy, int maxd)
 	{
-		Logger::out(3) << "Pridector::backtrack()" << std::endl;
+		Logger::out(3) << "Predictor::backtrack()" << std::endl;
 
 		int l = labels->size();
 		int s = current_data->getStrs()->size();
@@ -985,10 +986,10 @@ namespace SemiCrf {
 		}
 	}
 
-	void Pridector::printV()
+	void Predictor::printV()
 	{
 		if( 2 < Logger::getLevel() ) {
-			Logger::out(3) << "Pridector::oprintV()" << std::endl;
+			Logger::out(3) << "Predictor::oprintV()" << std::endl;
 
 			int l = labels->size();
 			int s = current_data->getStrs()->size();

@@ -98,7 +98,7 @@ SemiCrf::Algorithm createAlgorithm(const Options& options)
 	} else if( !options.inferenceDataFile.empty() ) {
 
 		file = options.inferenceDataFile;
-		alg = SemiCrf::createPridector(options.flg);
+		alg = SemiCrf::createPredictor(options.flg);
 
 		if( options.format == "digit" ) {
 
@@ -106,7 +106,7 @@ SemiCrf::Algorithm createAlgorithm(const Options& options)
 
 		} else if( options.format == "jpn" ) {
 
-			datas = SemiCrf::Datas( new SemiCrf::PridectionDatas_() );
+			datas = SemiCrf::Datas( new SemiCrf::PredictionDatas_() );
 
 		} else {
 			std::stringstream ss;
