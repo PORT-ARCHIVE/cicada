@@ -443,8 +443,7 @@ namespace SemiCrf {
 		ofs << "# BEGIN" << std::endl;
 
 		for( auto w : *this ) {
-			ofs << w << std::endl;
-			//ofs << boost::format("%14.8e") % w << std::endl;
+			ofs << boost::format("%14.8e") % w << std::endl;
 		}
 
 		ofs << "# END" << std::endl;
