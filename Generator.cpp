@@ -273,8 +273,12 @@ int main(int argc, char *argv[])
 		while( std::getline(ifs, line) ) {
 			jsonfile += line;
 		}
-		auto v = ujson::parse(jsonfile);
-		make_arrays(v, options.nomalize);
+		try {
+			auto v = ujson::parse(jsonfile);
+			make_arrays(v, options.nomalize);
+		} catch(...) {
+			throw Error("json parse error");
+		}
 
 		preProcess();
 
