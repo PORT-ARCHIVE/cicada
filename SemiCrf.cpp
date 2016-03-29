@@ -29,7 +29,7 @@ namespace SemiCrf {
     }
 
 	// ctr
-	Labels	createLabels()
+	Labels createLabels()
 	{
 		return Labels( new Labels_() );
 	}
@@ -430,6 +430,11 @@ namespace SemiCrf {
 				}
 			}
 		}
+
+		int s = size();
+		if( s != yDim*(yDim+xDim) ) {
+			throw Error("dimension mismatch");
+		}
 	}
 
 	void Weights_::write(std::ofstream& ofs)
@@ -564,7 +569,9 @@ namespace SemiCrf {
 			Logger::out(1) << " 0.0.1" << std::endl;
 			Logger::out(1) << "" << date() << std::endl;
 		}
-		Logger::out(1) << "Learning ..." << std::endl;
+		if( !(flg & ENABLE_LIKELIHOOD_ONLY) ) {
+			Logger::out(1) << "Learning ..." << std::endl;
+		}
 	}
 
 	Learner::~Learner()
@@ -573,21 +580,31 @@ namespace SemiCrf {
 		Logger::out(1) << "OK" << std::endl;
 	}
 
-	void Learner::preProcess(const std::string& wfile)
+	void Learner::preProcess(const std::string& wfile, const std::string& w0file)
 	{
 		SemiCrf::Weights weights = SemiCrf::createWeights(dim);
 		setWeights(weights);
+
+		if( !w0file.empty() ) {
+			std::ifstream ifs; // 入力
+			open(ifs, w0file);
+			weights->resize(0);
+			weights->read(ifs);
+		}
+
 		ff->setXDim(datas->getXDim());
 		ff->setYDim(datas->getYDim());
 	}
 
 	void Learner::postProcess(const std::string& wfile)
 	{
-		std::ofstream ofs; // 出力
-		open(ofs, wfile);
-		weights->setXDim(datas->getXDim());
-		weights->setYDim(datas->getYDim());
-		weights->write(ofs);
+		if( !(flg & ENABLE_LIKELIHOOD_ONLY) ) {
+			std::ofstream ofs; // 出力
+			open(ofs, wfile);
+			weights->setXDim(datas->getXDim());
+			weights->setYDim(datas->getYDim());
+			weights->write(ofs);
+		}
 	}
 
 	void Learner::compute()
@@ -654,6 +671,10 @@ namespace SemiCrf {
 		if( isfirst ) {
 			tdl0 = tdl;
 			isfirst = false;
+			if( flg & ENABLE_LIKELIHOOD_ONLY ) {
+				Logger::out(1) << boost::format("L= %10.6e") % L << std::endl;
+				return true;
+			}
 			return false;
 		}
 
@@ -841,7 +862,7 @@ namespace SemiCrf {
 		Logger::out(1) << "OK" << std::endl;
 	}
 
-	void Predictor::preProcess(const std::string& wfile)
+	void Predictor::preProcess(const std::string& wfile, const std::string& w0file)
 	{
 		SemiCrf::Weights weights = SemiCrf::createWeights();
 		std::ifstream ifs; // 入力

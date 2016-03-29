@@ -16,6 +16,7 @@ public:
 		, inferenceDataFile("")
 		, format("digit")
 		, weightsFile("weights.txt")
+		, initWeightsFile("")
 		, maxLength(5)
 		, maxIteration(1024)
 		, e0(1.0e-5)
@@ -29,6 +30,7 @@ public:
 	std::string inferenceDataFile;
 	std::string format;
 	std::string weightsFile;
+	std::string initWeightsFile;
 	int maxLength;
 	int maxIteration;
 	double e0;
@@ -59,6 +61,10 @@ void Options::parse(int argc, char *argv[])
 				e1 = boost::lexical_cast<double>(argv[++i]);
 			} else if( arg == "-w" ) {
 				weightsFile = argv[++i];
+			} else if( arg == "-w0" ) {
+				initWeightsFile = argv[++i];
+			} else if( arg == "--enable-likelihood-only" ) {
+				flg |= SemiCrf::ENABLE_LIKELIHOOD_ONLY;
 			} else if( arg == "--disable-adagrad" ) {
 				flg |= SemiCrf::DISABLE_ADAGRAD;
 			} else if( arg == "--disable-date-version" ) {
@@ -159,7 +165,7 @@ int main(int argc, char *argv[])
 		alg->setLabels(labels);
 		alg->setFeatureFunction(ff);
 
-		alg->preProcess(options.weightsFile);
+		alg->preProcess(options.weightsFile, options.initWeightsFile);
 		alg->compute();
 		alg->postProcess(options.weightsFile);
 

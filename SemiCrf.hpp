@@ -27,7 +27,8 @@ namespace SemiCrf {
 
 	enum {
 		DISABLE_ADAGRAD = 0x1,
-		DISABLE_DATE_VERSION = (0x1 << 1)
+		DISABLE_DATE_VERSION = (0x1 << 1),
+		ENABLE_LIKELIHOOD_ONLY = (0x1 << 2)
 	};
 
 	// ラベル集合
@@ -187,7 +188,7 @@ namespace SemiCrf {
 		virtual void setWeights(Weights arg);
 		virtual void setDimension(int arg);
 		virtual void compute() = 0;
-		virtual void preProcess(const std::string& wfile) = 0;
+		virtual void preProcess(const std::string& wfile, const std::string& w0file) = 0;
 		virtual void postProcess(const std::string& wfile) = 0;
 		void setFlg(int flg);
 
@@ -220,7 +221,7 @@ namespace SemiCrf {
 		Learner(int arg);
 		virtual ~Learner();
 		virtual void compute();
-		virtual void preProcess(const std::string& wfile);
+		virtual void preProcess(const std::string& wfile, const std::string& w0file);
 		virtual void postProcess(const std::string& wfile);
 
 	private:
@@ -240,7 +241,7 @@ namespace SemiCrf {
 		Predictor(int arg);
 		virtual ~Predictor();
 		virtual void compute();
-		virtual void preProcess(const std::string& wfile);
+		virtual void preProcess(const std::string& wfile, const std::string& w0file);
 		virtual void postProcess(const std::string& wfile);
 		
 	private:
