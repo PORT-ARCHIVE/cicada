@@ -631,6 +631,9 @@ namespace SemiCrf {
 				auto Gms = computeGm(Z);
 
 				L += WG - log(Z);
+				if( flg & ENABLE_LIKELIHOOD_ONLY ) {
+					Logger::out(1) << boost::format("L= %10.6e WG= %10.6e logZ= %10.6e") % L % WG % log(Z) << std::endl;
+				}
 
 				auto idL = dL.begin();
 				for( int k = 0; k < dim; k++, idL++ ) {
@@ -672,7 +675,6 @@ namespace SemiCrf {
 			tdl0 = tdl;
 			isfirst = false;
 			if( flg & ENABLE_LIKELIHOOD_ONLY ) {
-				Logger::out(1) << boost::format("L= %10.6e") % L << std::endl;
 				return true;
 			}
 			return false;
