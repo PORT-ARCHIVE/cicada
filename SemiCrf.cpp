@@ -942,7 +942,9 @@ namespace SemiCrf {
 				}
 			}
 
-			//Logger::out(1) << boost::format("WG(maxV)= %10.6e") % maxV << std::endl;
+			if( flg & ENABLE_LIKELIHOOD_ONLY ) {
+				Logger::out(1) << boost::format("WG(maxV)= %10.6e") % maxV << std::endl;
+			}
 			assert( 0 < maxd );
 			backtrack(maxy, maxd);
 			printV();
@@ -1041,23 +1043,21 @@ namespace SemiCrf {
 
 	void Predictor::printV()
 	{
-		if( 2 < Logger::getLevel() ) {
-			Logger::out(3) << "Predictor::oprintV()" << std::endl;
+		if( flg & ENABLE_LIKELIHOOD_ONLY ) {
 
 			int l = labels->size();
 			int s = current_data->getStrs()->size();
-
 			for( auto y : *labels ) {
 				for( int i = 0; i < s; i++ ) {
 
-					int idx = (i*labels->size()) + (static_cast<int>(y));
+					int idx = i*l + (static_cast<int>(y));
 					auto& tp = current_vctab->at(idx);
 					double maxV = std::get<1>(tp);
 					int maxd = std::get<2>(tp);
 					App::Label maxyd = std::get<3>(tp);
-					Logger::out(3) << boost::format("(%+5.2e %2d %2d)") % maxV % maxd % (int)maxyd << " ";
+					Logger::out(1) << boost::format("(%+5.2e %2d %2d)") % maxV % maxd % (int)maxyd << " ";
 				}
-				Logger::out(3) << "" << std::endl;
+				Logger::out(1) << "" << std::endl;
 			}
 		}
 	}
