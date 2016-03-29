@@ -76,7 +76,7 @@ void Options::parse(int argc, char *argv[])
 			}
 		}
 
-		if( weightsFile.empty() ) {
+		if( weightsFile.empty() && !(flg & SemiCrf::ENABLE_LIKELIHOOD_ONLY) ) {
 			throw Error("no weights file specified");
 		}
 
