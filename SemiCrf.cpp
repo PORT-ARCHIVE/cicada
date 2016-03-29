@@ -1055,7 +1055,7 @@ namespace SemiCrf {
 					double maxV = std::get<1>(tp);
 					int maxd = std::get<2>(tp);
 					App::Label maxyd = std::get<3>(tp);
-					Logger::out(1) << boost::format("(%+5.2e %2d %2d)") % maxV % maxd % (int)maxyd << " ";
+					Logger::out(1) << boost::format("(%+10.6e %2d %2d)") % maxV % maxd % (int)maxyd << " ";
 				}
 				Logger::out(1) << "" << std::endl;
 			}
