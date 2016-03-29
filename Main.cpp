@@ -76,16 +76,18 @@ void Options::parse(int argc, char *argv[])
 			}
 		}
 
-		if( weightsFile.empty() && !(flg & SemiCrf::ENABLE_LIKELIHOOD_ONLY) ) {
-			throw Error("no weights file specified");
-		}
-
 		if( trainingDataFile.empty() && inferenceDataFile.empty() ) {
 			throw Error("neither training data file nor inference data file specified");
 		}
 
 		if( !trainingDataFile.empty() && !inferenceDataFile.empty() ) {
 			throw Error("both training data file and inference data file specified");
+		}
+
+		if( weightsFile.empty() && (
+				(!(flg & SemiCrf::ENABLE_LIKELIHOOD_ONLY) && !(trainingDataFile.empty())) ||
+				(!(inferenceDataFile.empty()))) ) {
+			throw Error("no weights file specified");
 		}
 
 	} catch(Error& e) {
