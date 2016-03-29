@@ -15,7 +15,7 @@ public:
 		: trainingDataFile("")
 		, inferenceDataFile("")
 		, format("digit")
-		, weightsFile("weights.txt")
+		, weightsFile("")
 		, initWeightsFile("")
 		, maxLength(5)
 		, maxIteration(1024)
@@ -72,10 +72,20 @@ void Options::parse(int argc, char *argv[])
 			} else if( arg == "--log-level" ) {
 				logLevel = boost::lexical_cast<int>(argv[++i]);
 			} else {
-				std::stringstream ss;
-				ss << "unknown option specified";
-				throw Error(ss.str());
+				throw Error("unknown option specified");
 			}
+		}
+
+		if( weightsFile.empty() ) {
+			throw Error("no weights file specified");
+		}
+
+		if( trainingDataFile.empty() && inferenceDataFile.empty() ) {
+			throw Error("neither training data file nor inference data file specified");
+		}
+
+		if( !trainingDataFile.empty() && !inferenceDataFile.empty() ) {
+			throw Error("both training data file and inference data file specified");
 		}
 
 	} catch(Error& e) {
@@ -83,9 +93,7 @@ void Options::parse(int argc, char *argv[])
 		throw e;
 
 	} catch(...) {
-		std::stringstream ss;
-		ss << "error: invalid option specified";
-		throw Error(ss.str());
+		throw Error("invalid option specified");
 	}
 }
 
