@@ -632,7 +632,7 @@ namespace SemiCrf {
 
 				L += WG - log(Z);
 				if( flg & ENABLE_LIKELIHOOD_ONLY ) {
-					Logger::out(1) << boost::format("L= %10.6e WG= %10.6e logZ= %10.6e") % L % WG % log(Z) << std::endl;
+					Logger::out(1) << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z) << std::endl;
 				}
 
 				auto idL = dL.begin();
@@ -709,7 +709,37 @@ namespace SemiCrf {
 			}
 
 			Gs.push_back(G); Logger::out(2) << "G(" << k << ")=" << G << std::endl;
-			WG += (*iw)*G;
+			double w = *iw;
+			WG += w*G;
+		}
+
+		if( flg & ENABLE_LIKELIHOOD_ONLY ) {
+
+			auto sj = segments->begin(); // !!!!
+			auto si = segments->begin();
+			double awg = 0.0;
+
+			for( ; si != segments->end(); si++ ){
+
+				double wg = 0.0;
+				auto y = (*si)->getLabel();
+				auto y1 = (*sj)->getLabel();
+				int ti = (*si)->getStart();
+				int ui = (*si)->getEnd();
+
+				auto iw = weights->begin();
+				for( int k = 0; k < dim; k++, iw++ ) {
+					double g = (*ff)(k, y, y1, current_data, ti, ui);
+					double w = *iw;
+					wg += w*g;
+				}
+
+				sj = si;
+				awg += wg;
+
+				Logger::out(1) << "(" << ti << "," << ui << ")";
+				Logger::out(1) << boost::format(" WG= %+10.6e AWG= %+10.6e") % wg % awg << std::endl;
+			}
 		}
 
 		return(std::move(Gs));
@@ -912,6 +942,7 @@ namespace SemiCrf {
 				}
 			}
 
+			//Logger::out(1) << boost::format("WG(maxV)= %10.6e") % maxV << std::endl;
 			assert( 0 < maxd );
 			backtrack(maxy, maxd);
 			printV();
