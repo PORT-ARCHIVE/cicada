@@ -101,7 +101,10 @@ gen:
 	../gen -i p0.json -s 2 -r 4 -l 32 > test17.txt
 	../gen -i p0.json -s 3 -r 8 -l 64 > test18.txt
 	../gen -i p0.json -s 4 -r 16 -l 64 > test19.txt
+	../gen -i p1.json -r 1 -l 12 -n > test_RES-146
 
 clean:
 	rm -f result*.txt weight*.txt
+
+
 
