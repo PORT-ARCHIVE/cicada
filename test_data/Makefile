@@ -73,7 +73,23 @@ all:
 	@$(SEMICRF) -i test18.txt -w answer/weight18.txt --log-level 2 --max-length 32 --disable-date-version 1> result18.txt 2>&1 && echo "OK" || echo "ERROR"
 	@diff answer/result18.txt result18.txt && echo "OK" || echo "ERROR"
 
+FILES=\
+	check1 \
+	check2 \
+	check3 \
+	check4
 
+check:
+	@for file in $(FILES); do \
+		echo "###### $$file ######"; \
+		echo "$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 1.0e-2 -e1 1.0e-2 --max-iteration 100000"; \
+		$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 1.0e-2 -e1 1.0e-2 --max-iteration 100000 && echo "OK" || echo "ERROR"; \
+		echo "$(SEMICRF) -i $$file -w tmp1 --log-level 0"; \
+		$(SEMICRF) -i $$file -w tmp1 --log-level 0 > tmp2 && echo "OK" || echo "ERROR"; \
+		echo "diff -c $$file tmp2"; \
+		diff -c $$file tmp2 && echo "OK" || echo "ERROR"; \
+		rm tmp1 tmp2; \
+	done;
 
 gen_test: gen
 # 1
@@ -105,6 +121,3 @@ gen:
 
 clean:
 	rm -f result*.txt weight*.txt
-
-
-
