@@ -803,6 +803,10 @@ namespace SemiCrf {
 				for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
 					for( auto yd : *labels ) {
 
+						if( i == 0 && yd != App::Label::ZERO ) {
+							continue;
+						}
+
 						double alp = alpha(i-d, yd);
 						double wg = computeWG(y, yd, i, d);
 						v += alp*exp(wg);
@@ -842,6 +846,10 @@ namespace SemiCrf {
 
 				for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
 					for( auto yd : *labels ) {
+
+						if( i == 0 && yd != App::Label::ZERO ) {
+							continue;
+						}
 
 						double cof = eta(i-d, yd, k) + alpha(i-d, yd) * (*ff)(k, y, yd, current_data, i-d+1, i);
 						double wg = computeWG(y, yd, i, d);
@@ -970,6 +978,10 @@ namespace SemiCrf {
 
 				for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
 					for( auto yd : *labels ) {
+
+						if( i == 0 && yd != App::Label::ZERO ) {
+							continue;
+						}
 
 						int tmp = -1;
 						double v = V(i-d, yd, tmp);
