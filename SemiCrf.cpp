@@ -695,17 +695,16 @@ namespace SemiCrf {
 		for( int k = 0; k < dim; k++, iw++ ) {
 
 			double G = 0.0;
-			auto sj = segments->begin(); // !!!!
 			auto si = segments->begin();
 
+			auto y1 = App::Label::ZERO;
 			for( ; si != segments->end(); si++ ){
 
 				auto y = (*si)->getLabel();
-				auto y1 = (*sj)->getLabel();
 				int ti = (*si)->getStart();
 				int ui = (*si)->getEnd();
 				G += (*ff)(k, y, y1, current_data, ti, ui);
-				sj = si;
+				y1 = y;
 			}
 
 			Gs.push_back(G); Logger::out(2) << "G(" << k << ")=" << G << std::endl;
@@ -715,15 +714,14 @@ namespace SemiCrf {
 
 		if( flg & ENABLE_LIKELIHOOD_ONLY ) {
 
-			auto sj = segments->begin(); // !!!!
 			auto si = segments->begin();
 			double awg = 0.0;
 
+			auto y1 = App::Label::ZERO;
 			for( ; si != segments->end(); si++ ){
 
 				double wg = 0.0;
 				auto y = (*si)->getLabel();
-				auto y1 = (*sj)->getLabel();
 				int ti = (*si)->getStart();
 				int ui = (*si)->getEnd();
 
@@ -734,7 +732,7 @@ namespace SemiCrf {
 					wg += w*g;
 				}
 
-				sj = si;
+				y1 = y;
 				awg += wg;
 
 				Logger::out(1) << "(" << ti << "," << ui << ")";
