@@ -103,8 +103,13 @@ namespace App {
 				int col = index % yDim;
 				int row = index / yDim;
 
-				if( ydval == row && yval == col ) {
-					ret = 1;
+				if( row == col && row == yval ) {
+
+					ret = 1; // Sum of this value equals to the number of segments whose label is yval.
+
+				} else if( ydval == row && yval == col ) {
+
+					ret = 1; // Sum of this value equals to the number of transitions from ydval to yval
 				}
 
 			} else {
