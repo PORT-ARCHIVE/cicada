@@ -379,6 +379,9 @@ namespace SemiCrf {
 
 	Weights_::Weights_(int dim)
 		: std::vector<double>(dim)
+		, xDim(-1)
+		, yDim(-1)
+		, maxLength(-1)
 	{
 		Logger::out(2) << "Weights_()" << std::endl;
 	}
@@ -425,6 +428,13 @@ namespace SemiCrf {
 						if( !tok.empty() ) {
 							// T.B.D.
 						}
+					} else if( tok == "MAXLENGTH" ) {
+						tok = tokenizer.get();
+						if( !tok.empty() ) {
+							maxLength = boost::lexical_cast<int>(tok);
+						} else {
+							// T.B.D.
+						}
 					}
 				}
 				continue;
@@ -460,6 +470,8 @@ namespace SemiCrf {
 		ofs << "# Semi-CRF Weights" << std::endl;
 		ofs << std::endl;
 		ofs << "# DIMENSION" << " " << xDim << " " << yDim << std::endl;
+		ofs << std::endl;
+		ofs << "# MAXLENGTH" << " " << maxLength << std::endl;
 		ofs << std::endl;
 		ofs << "# BEGIN" << std::endl;
 
@@ -619,6 +631,7 @@ namespace SemiCrf {
 			open(ofs, wfile);
 			weights->setXDim(datas->getXDim());
 			weights->setYDim(datas->getYDim());
+			weights->setMaxLength(maxLength);
 			weights->write(ofs);
 		}
 	}
@@ -923,6 +936,14 @@ namespace SemiCrf {
 		open(ifs, wfile);
 		weights->read(ifs);
 		setWeights(weights);
+		if( maxLength < 1 ) {
+			int ml = weights->getMaxLength();
+			if( 0 < ml ) {
+				setMaxLength(ml);
+			} else {
+				throw Error("could not determine maxLength");
+			}
+		}
 		ff->setXDim(weights->getXDim());
 		ff->setYDim(weights->getYDim());
 		datas->setXDim(weights->getXDim());

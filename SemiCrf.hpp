@@ -142,9 +142,12 @@ namespace SemiCrf {
 		void setYDim(int arg) { yDim = arg; }
 		int getXDim() { return xDim; }
 		int getYDim() { return yDim; }
+		int getMaxLength() { return maxLength; }
+		void setMaxLength(int arg) { maxLength = arg; }
 	protected:
 		int xDim;
 		int yDim;
+		int maxLength;
 	};
 
 	typedef std::shared_ptr<Weights_> Weights;
