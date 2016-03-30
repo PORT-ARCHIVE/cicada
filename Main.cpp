@@ -173,12 +173,9 @@ int main(int argc, char *argv[])
 		Logger::setLevel(options.logLevel);
 
 		SemiCrf::Algorithm alg = createAlgorithm(options);
-		SemiCrf::Labels labels = App::createLabels();
 		SemiCrf::FeatureFunction ff = App::createFeatureFunction();
 
-		alg->setLabels(labels);
 		alg->setFeatureFunction(ff);
-
 		alg->preProcess(options.weightsFile, options.initWeightsFile);
 		alg->compute();
 		alg->postProcess(options.weightsFile);

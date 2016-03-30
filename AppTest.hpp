@@ -7,10 +7,7 @@
 
 namespace App {
 
-	enum class Label : int {
-		ZERO = 0,
-		ONE = 1
-	};
+	const int ZERO = 0;
 
 	class Simple : public SemiCrf::FeatureFunction_ {
 	public:
@@ -23,8 +20,6 @@ namespace App {
 	};
 
 	SemiCrf::FeatureFunction createFeatureFunction();
-
-	SemiCrf::Labels createLabels();
 
 	// 推論用数字データ集合
 	class PridectionDigitDatas_ : public SemiCrf::Datas_ {

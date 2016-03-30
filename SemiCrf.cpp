@@ -29,9 +29,9 @@ namespace SemiCrf {
     }
 
 	// ctr
-	Labels createLabels()
+	Labels createLabels(int size =0)
 	{
-		return Labels( new Labels_() );
+		return Labels( new Labels_(size) );
 	}
 
 	Segment createSegment(int start, int end, App::Label label)
@@ -50,9 +50,12 @@ namespace SemiCrf {
 	}
 
 	// Labels
-	Labels_::Labels_()
+	Labels_::Labels_(int size)
 	{
 		Logger::out(2) << "Labels_()" << std::endl;
+		for( int i = 0; i < size; i++ ) {
+			push_back(i);
+		}
 	}
 
 	Labels_::~Labels_()
@@ -112,7 +115,7 @@ namespace SemiCrf {
 					// T.B.D.
 				}
 
-				output << label2String(l) << std::endl;
+				output << App::label2String(l) << std::endl;
 			}
 		}
 
@@ -623,8 +626,12 @@ namespace SemiCrf {
 			weights->read(ifs);
 		}
 
-		ff->setXDim(datas->getXDim());
-		ff->setYDim(datas->getYDim());
+		int xdim = datas->getXDim();
+		int ydim = datas->getYDim();
+		ff->setXDim(xdim);
+		ff->setYDim(ydim);
+		Labels labels = createLabels(ydim);
+		setLabels(labels);
 	}
 
 	void Learner::postProcess(const std::string& wfile)
@@ -729,7 +736,7 @@ namespace SemiCrf {
 			double G = 0.0;
 			auto si = segments->begin();
 
-			auto y1 = App::Label::ZERO;
+			auto y1 = App::ZERO;
 			for( ; si != segments->end(); si++ ){
 
 				auto y = (*si)->getLabel();
@@ -749,7 +756,7 @@ namespace SemiCrf {
 			auto si = segments->begin();
 			double awg = 0.0;
 
-			auto y1 = App::Label::ZERO;
+			auto y1 = App::ZERO;
 			for( ; si != segments->end(); si++ ){
 
 				double wg = 0.0;
@@ -835,7 +842,7 @@ namespace SemiCrf {
 				for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
 					for( auto yd : *labels ) {
 
-						if( i == 0 && yd != App::Label::ZERO ) {
+						if( i == 0 && yd != App::ZERO ) {
 							continue;
 						}
 
@@ -879,7 +886,7 @@ namespace SemiCrf {
 				for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
 					for( auto yd : *labels ) {
 
-						if( i == 0 && yd != App::Label::ZERO ) {
+						if( i == 0 && yd != App::ZERO ) {
 							continue;
 						}
 
@@ -947,10 +954,14 @@ namespace SemiCrf {
 				throw Error("could not determine maxLength");
 			}
 		}
-		ff->setXDim(weights->getXDim());
-		ff->setYDim(weights->getYDim());
-		datas->setXDim(weights->getXDim());
-		datas->setYDim(weights->getYDim());
+		int xdim = weights->getXDim();
+		int ydim = weights->getYDim();
+		ff->setXDim(xdim);
+		ff->setYDim(ydim);
+		datas->setXDim(xdim);
+		datas->setYDim(ydim);
+		Labels labels = createLabels(ydim);
+		setLabels(labels);
 	}
 
 	void Predictor::postProcess(const std::string& wfile)
@@ -1019,7 +1030,7 @@ namespace SemiCrf {
 				for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
 					for( auto yd : *labels ) {
 
-						if( i == 0 && yd != App::Label::ZERO ) {
+						if( i == 0 && yd != App::ZERO ) {
 							continue;
 						}
 

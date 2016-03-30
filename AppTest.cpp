@@ -40,10 +40,9 @@ namespace App {
 	}
 
 	std::string label2String(Label label) {
-		int val = static_cast<int>(label);
 		std::string str;
 		try {
-			str = boost::lexical_cast<std::string>(val);
+			str = boost::lexical_cast<std::string>(label);
 		} catch(...) {
 			throw Error("unknown label");
 		}
@@ -54,14 +53,6 @@ namespace App {
 	{
 		SemiCrf::FeatureFunction ff(new Simple());
 		return ff;
-	}
-
-	SemiCrf::Labels createLabels()
-	{
-		SemiCrf::Labels labels = SemiCrf::createLabels();
-		labels->push_back(Label::ZERO);
-		labels->push_back(Label::ONE);
-		return labels;
 	}
 
 	double Simple::operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i)
