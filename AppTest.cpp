@@ -187,8 +187,8 @@ namespace App {
 			}
 		}
 
-		if( data->getStrs()->empty() ) {
-			throw Error("empty input file"); // T.B.D.
+		if( empty() ) {
+			throw Error("empty inference data file"); // T.B.D.
 		}
 	}
 }

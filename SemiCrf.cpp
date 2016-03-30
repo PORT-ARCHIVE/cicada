@@ -278,6 +278,10 @@ namespace SemiCrf {
 				// T.B.D.
 			}
 		}
+
+		if( empty() ) {
+			throw Error("empty training data file"); // T.B.D.
+		}
 	}
 
 	// PredictionDatas ctr
@@ -361,6 +365,10 @@ namespace SemiCrf {
 
 			input += line;
 		}
+
+		if( empty() ) {
+			throw Error("empty inference data file"); // T.B.D.
+		}
 	}
 
 	// Weights ctr
@@ -437,7 +445,11 @@ namespace SemiCrf {
 
 		int s = size();
 		if( s != yDim*(yDim+xDim) ) {
-			throw Error("dimension mismatch");
+			throw Error("dimension mismatch"); // T.B.D.
+		}
+
+		if( empty() ) {
+			throw Error("empty weights file"); // T.B.D.
 		}
 	}
 
