@@ -102,9 +102,11 @@ namespace SemiCrf {
 		virtual int getYDim() { return yDim; }
 		virtual void setXDim(int arg) { xDim = arg; }
 		virtual void setYDim(int arg) { yDim = arg; }
+		virtual int getMaxLength() { return maxLength; }
 	protected:
 		int xDim;
 		int yDim;
+		int maxLength;
 	};
 
 	typedef std::shared_ptr<Datas_> Datas;

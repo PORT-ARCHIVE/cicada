@@ -130,6 +130,7 @@ namespace SemiCrf {
 	Datas_::Datas_()
 		: xDim(0)
 		, yDim(0)
+		, maxLength(-std::numeric_limits<double>::max())
 	{
 		Logger::out(2) << "Datas_()" << std::endl;
 	};
@@ -256,7 +257,10 @@ namespace SemiCrf {
 
 					seg	= createSegment(seg_start, counter, l);
 					data->getSegments()->push_back(seg);
-					// record (l - counter + 1)
+					int length = counter - seg_start + 1;
+					if( maxLength < length ) {
+						maxLength = length;
+					}
 
 				} else if( descriptor == "S/E" ) {
 

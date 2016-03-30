@@ -17,7 +17,7 @@ public:
 		, format("digit")
 		, weightsFile("")
 		, initWeightsFile("")
-		, maxLength(5)
+		, maxLength(0)
 		, maxIteration(1024)
 		, e0(1.0e-5)
 		, e1(1.0e-5)
@@ -150,7 +150,11 @@ SemiCrf::Algorithm createAlgorithm(const Options& options)
 	datas->write(Logger::out(2) << "");
 
 	alg->setDatas(datas);
-	alg->setMaxLength(options.maxLength);
+	if( 0 < options.maxLength ) {
+		alg->setMaxLength(options.maxLength);
+	} else {
+		alg->setMaxLength(datas->getMaxLength());
+	}
 	alg->setMaxIteration(options.maxIteration);
 	alg->setE0(options.e0);
 	alg->setE1(options.e1);
