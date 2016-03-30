@@ -266,6 +266,9 @@ namespace SemiCrf {
 
 					seg	= createSegment(counter, counter, l);
 					data->getSegments()->push_back(seg);
+					if( maxLength < 1 ) {
+						maxLength = 1;
+					}
 
 				} else {
 
