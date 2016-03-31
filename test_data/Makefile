@@ -78,13 +78,13 @@ FILES0=\
 	check2 \
 	check3 \
 	check4 \
-	test16.txt
+	check5
 
 check:
 	@for file in $(FILES0); do \
 		echo "###### $$file ######"; \
-		echo "$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 1.0e-2 -e1 1.0e-2 --max-iteration 100000"; \
-		$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 1.0e-2 -e1 1.0e-2 --max-iteration 100000 && echo "OK" || echo "ERROR"; \
+		echo "$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 2.0 -e1 1.0e-2 --max-iteration 100000"; \
+		$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 2.0 -e1 1.0e-2 --max-iteration 100000 && echo "OK" || echo "ERROR"; \
 		echo "$(SEMICRF) -i $$file -w tmp1 --log-level 0"; \
 		$(SEMICRF) -i $$file -w tmp1 --log-level 0 > tmp2 && echo "OK" || echo "ERROR"; \
 		echo "diff -c $$file tmp2"; \
