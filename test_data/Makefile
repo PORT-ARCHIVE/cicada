@@ -73,14 +73,15 @@ all:
 	@$(SEMICRF) -i test18.txt -w answer/weight18.txt --log-level 2 --max-length 32 --disable-date-version 1> result18.txt 2>&1 && echo "OK" || echo "ERROR"
 	@diff answer/result18.txt result18.txt && echo "OK" || echo "ERROR"
 
-FILES=\
+FILES0=\
 	check1 \
 	check2 \
 	check3 \
-	check4
+	check4 \
+	test16.txt
 
 check:
-	@for file in $(FILES); do \
+	@for file in $(FILES0); do \
 		echo "###### $$file ######"; \
 		echo "$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 1.0e-2 -e1 1.0e-2 --max-iteration 100000"; \
 		$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 1.0e-2 -e1 1.0e-2 --max-iteration 100000 && echo "OK" || echo "ERROR"; \
@@ -88,8 +89,27 @@ check:
 		$(SEMICRF) -i $$file -w tmp1 --log-level 0 > tmp2 && echo "OK" || echo "ERROR"; \
 		echo "diff -c $$file tmp2"; \
 		diff -c $$file tmp2 && echo "OK" || echo "ERROR"; \
+		grep -v "^#" $$file | awk '{ print $$3 }' > a; \
+		grep -v "^#" tmp2 | awk '{ print $$3 }' > b; \
+		paste a b | awk '{ if( $$1 == $$2 ) count++; total++; } END{ print count/total*100,"%"; }'; \
 		rm tmp1 tmp2; \
 	done;
+
+learn:
+	../gen -i p0.json -r 32 -l 16 > tmp1
+	$(SEMICRF) -t tmp1 -w tmp2 --log-level 1 -e0 1.0e-3 -e1 1.0e-2 --max-iteration 100000 --disable-adagrad && echo "OK" || echo "ERROR"
+
+infer:
+	@rm -f tmp5;
+	@for SEED in {1..32}; do \
+		../gen -i p0.json -s $$SEED -r 32 -l 16 > tmp3; \
+		$(SEMICRF) -i tmp3 -w tmp2 --log-level 0 > tmp4 || echo "ERROR"; \
+		grep -v "^#" tmp3 | awk '{ print $$3 }' > a; \
+		grep -v "^#" tmp4 | awk '{ print $$3 }' > b; \
+		paste a b | awk '{ if( $$1 == $$2 ) count++; total++; } END{ print count/total*100; }' | tee -a tmp5; \
+		rm a b; \
+	done;
+	@awk '{ sum += $$1; count++; } END{ print "Accuracy:", sum/count, "%" }' tmp5
 
 gen_test: gen
 # 1
@@ -117,7 +137,6 @@ gen:
 	../gen -i p0.json -s 2 -r 4 -l 32 > test17.txt
 	../gen -i p0.json -s 3 -r 8 -l 64 > test18.txt
 	../gen -i p0.json -s 4 -r 16 -l 64 > test19.txt
-	../gen -i p1.json -r 1 -l 12 -n > test_RES-146
 
 clean:
 	rm -f result*.txt weight*.txt
