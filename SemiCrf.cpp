@@ -133,7 +133,7 @@ namespace SemiCrf {
 	Datas_::Datas_()
 		: xDim(0)
 		, yDim(0)
-		, maxLength(-std::numeric_limits<double>::max())
+		, maxLength(-std::numeric_limits<int>::max())
 	{
 		Logger::out(2) << "Datas_()" << std::endl;
 	};
