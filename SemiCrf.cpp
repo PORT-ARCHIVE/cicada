@@ -654,6 +654,7 @@ namespace SemiCrf {
 		double tdl0 = 0.0;
 		double rerr = 1.0;
 		bool isfirst = true;
+		std::vector<double> adagrad(dim, 0.0);
 
 		while( itr < maxIteration ) {
 
@@ -684,15 +685,16 @@ namespace SemiCrf {
 
 			auto dLi = dL.begin();
 			auto wi = weights->begin();
-			double e = e0;
-			if( !(flg & DISABLE_ADAGRAD) ) {
-				e /= rerr;
-			}
-			for( int k = 0; k < dim; wi++, dLi++, k++ ) {
+			auto ad = adagrad.begin();
+			for( int k = 0; k < dim; wi++, dLi++, k++, ad++ ) {
+				double e = e0;
+				if( !(flg & DISABLE_ADAGRAD) ) {
+				 	e /= (1.0+sqrt((*ad))); // AdaGrad
+				}
 				(*wi) += e * (*dLi); Logger::out(2) << "W(" << k << ")=" << *wi << std::endl;
 			}
 
-			if( isConv(L, dL, tdl0, rerr, isfirst) ) {
+			if( isConv(L, dL, adagrad, tdl0, rerr, isfirst) ) {
 				break;
 			}
 
@@ -700,12 +702,16 @@ namespace SemiCrf {
 		}
 	}
 
-	bool Learner::isConv(double L, const std::vector<double>& dL, double& tdl0, double& rerr, bool& isfirst)
+	bool Learner::isConv(double L, const std::vector<double>& dL, std::vector<double>& adagrad, double& tdl0, double& rerr, bool& isfirst)
 	{
 		double tdl = 0.0;
 
+		auto ad = adagrad.begin();
 		for( auto dl : dL ) {
-			tdl += dl*dl;
+			double v = dl*dl;
+			tdl += v;
+			(*ad) += v;
+			ad++;
 		}
 
 		tdl = sqrt(tdl);
