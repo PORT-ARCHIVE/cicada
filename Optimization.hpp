@@ -25,11 +25,11 @@ namespace Optimization {
 
 	typedef std::shared_ptr<ObjectFunction_> ObjectFunction;
 
-	class QuasiNewton {
+	class QuasiNewton_ {
 	public:
 
-		QuasiNewton(int dim, ObjectFunction ofunc);
-		virtual ~QuasiNewton();
+		QuasiNewton_(int dim, ObjectFunction ofunc);
+		virtual ~QuasiNewton_();
 		void iterate();
 		void setAe(double ae);
 		void setRe(double re);
@@ -59,12 +59,15 @@ namespace Optimization {
 		matrix H1;
 	};
 
-	class Bfgs : public QuasiNewton {
+	typedef std::shared_ptr<QuasiNewton_> QuasiNewton;
+
+	class Bfgs : public QuasiNewton_ {
 	public:
 		Bfgs(int dim, ObjectFunction ofunc);
 	protected:
 		virtual void updateDx();
 	};
+
 }
 
 #endif // OPTIMIZATION__HPP

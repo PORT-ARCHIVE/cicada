@@ -6,7 +6,7 @@ namespace Optimization {
 
 	using namespace boost::numeric::ublas;
 
-	QuasiNewton::QuasiNewton(int d, ObjectFunction f)
+	QuasiNewton_::QuasiNewton_(int d, ObjectFunction f)
 		: first(true)
 		, dim(d)
 		, ofunc(f)
@@ -21,26 +21,26 @@ namespace Optimization {
 	{
 	}
 
-	QuasiNewton::~QuasiNewton()
+	QuasiNewton_::~QuasiNewton_()
 	{
 	}
 
-	void QuasiNewton::setAe(double arg)
+	void QuasiNewton_::setAe(double arg)
 	{
 		ae = arg;
 	}
 
-	void QuasiNewton::setRe(double arg)
+	void QuasiNewton_::setRe(double arg)
 	{
 		re = arg;
 	}
 
-	void QuasiNewton::setMaxIteration(int arg)
+	void QuasiNewton_::setMaxIteration(int arg)
 	{
 		maxIteration = arg;
 	}
 
-	void QuasiNewton::iterate()
+	void QuasiNewton_::iterate()
 	{
 		ofunc->preProcess();
 
@@ -73,7 +73,7 @@ namespace Optimization {
 		ofunc->postProcess();
 	}
 
-	bool QuasiNewton::isConv()
+	bool QuasiNewton_::isConv()
 	{
 		bool flg = false;
 		double r = sqrt(inner_prod(dx, dx));
@@ -93,7 +93,7 @@ namespace Optimization {
 	}
 
 	Bfgs::Bfgs(int dim, ObjectFunction ofunc)
-		: QuasiNewton(dim, ofunc)
+		: QuasiNewton_(dim, ofunc)
 	{
 	}
 
@@ -109,7 +109,7 @@ namespace Optimization {
 			auto A = outer_prod(dx, dx)/p;
 			auto B = I - outer_prod(y, dx)/p;
 			H1 = prod(B, matrix(prod(H0, B))) + A;
-			dx = prod(H1, g0);
+			dx = alpha * prod(H1, g0);
 		}
 	}
 }
