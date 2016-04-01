@@ -231,6 +231,7 @@ namespace SemiCrf {
 
 	private:
 		bool isConv(double L, const std::vector<double>& dL, std::vector<double>& adagrad, double& tdl0, double& rerr, bool& isfirst);
+		void computeGrad(double& L, std::vector<double>& dL);
 		double computeZ();
 		std::vector<double> computeG(double& WG);
 		std::vector<double> computeGm(double Z);

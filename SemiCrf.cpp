@@ -18,6 +18,7 @@
 #include "Logger.hpp"
 #include "Error.hpp"
 
+
 namespace SemiCrf {
 
 	std::string date() {
@@ -661,26 +662,7 @@ namespace SemiCrf {
 			double L = 0.0;
 			std::vector<double> dL(dim, 0.0);
 
-			for( auto data : *datas ) {
-
-				current_data = data;
-
-				double WG = 0.0;
-				double Z = computeZ();
-				auto Gs = computeG(WG);
-				auto Gms = computeGm(Z);
-
-				L += WG - log(Z);
-				if( flg & ENABLE_LIKELIHOOD_ONLY ) {
-					Logger::out(1) << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z) << std::endl;
-				}
-
-				auto idL = dL.begin();
-				for( int k = 0; k < dim; k++, idL++ ) {
-					(*idL) += Gs[k] - Gms[k]; Logger::out(2) << "dL(" << k << ")=" << *idL << std::endl;
-				}
-			}
-
+			computeGrad(L, dL);
 			assert( weights->size() == dL.size() );
 
 			auto dLi = dL.begin();
@@ -699,6 +681,29 @@ namespace SemiCrf {
 			}
 
 			itr++;
+		}
+	}
+
+	void Learner::computeGrad(double& L, std::vector<double>& dL)
+	{
+		for( auto data : *datas ) {
+
+			current_data = data;
+
+			double WG = 0.0;
+			double Z = computeZ();
+			auto Gs = computeG(WG);
+			auto Gms = computeGm(Z);
+
+			L += WG - log(Z);
+			if( flg & ENABLE_LIKELIHOOD_ONLY ) {
+				Logger::out(1) << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z) << std::endl;
+			}
+
+			auto idL = dL.begin();
+			for( int k = 0; k < dim; k++, idL++ ) {
+				(*idL) += Gs[k] - Gms[k]; Logger::out(2) << "dL(" << k << ")=" << *idL << std::endl;
+			}
 		}
 	}
 
