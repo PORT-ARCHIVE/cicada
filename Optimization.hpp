@@ -68,6 +68,8 @@ namespace Optimization {
 		virtual void updateDx();
 	};
 
+	QuasiNewton createBfgs(int dim, ObjectFunction ofunc) { return std::shared_ptr<QuasiNewton_>( new Bfgs(dim, ofunc) ); }
+
 }
 
 #endif // OPTIMIZATION__HPP
