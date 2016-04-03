@@ -14,13 +14,13 @@ namespace Optimization {
 
 	class ObjectFunction_ {
 	public:
-		ObjectFunction_();
-		virtual ~ObjectFunction_();
-		virtual double value() = 0;
-		virtual vector grad() = 0;
+		ObjectFunction_(){};
+		virtual ~ObjectFunction_(){};
+		virtual double value(vector& x) = 0;
+		virtual vector grad(vector& x) = 0;
 		virtual void update(const vector& dx) = 0;
-		virtual void preProcess() = 0;
-		virtual void postProcess() = 0;
+		virtual void preProcess(vector& x) = 0;
+		virtual void postProcess(vector& x) = 0;
 	};
 
 	typedef std::shared_ptr<ObjectFunction_> ObjectFunction;
@@ -34,15 +34,16 @@ namespace Optimization {
 		void setAe(double ae);
 		void setRe(double re);
 		void setMaxIteration(int limit);
-
-	protected:
-
 		virtual void updateDx() = 0;
-		virtual bool isConv();
 
 	protected:
 
-		bool first;
+		virtual bool isConv();
+		virtual double linearSearch(vector& g);
+
+	protected:
+
+		int itr;
 		int dim;
 		ObjectFunction ofunc;
 		double alpha;
@@ -50,6 +51,7 @@ namespace Optimization {
 		double ae;
 		double r0;
 		int maxIteration;
+		vector x;
 		vector dx;
 		vector g0;
 		vector g1;
@@ -57,6 +59,9 @@ namespace Optimization {
 		identity_matrix<double> I;
 		matrix H0;
 		matrix H1;
+		matrix tH;
+		matrix A;
+		matrix B;
 	};
 
 	typedef std::shared_ptr<QuasiNewton_> QuasiNewton;
@@ -64,11 +69,12 @@ namespace Optimization {
 	class Bfgs : public QuasiNewton_ {
 	public:
 		Bfgs(int dim, ObjectFunction ofunc);
-	protected:
 		virtual void updateDx();
 	};
 
-	QuasiNewton createBfgs(int dim, ObjectFunction ofunc) { return std::shared_ptr<QuasiNewton_>( new Bfgs(dim, ofunc) ); }
+	QuasiNewton createBfgs(int dim, ObjectFunction ofunc);
+
+	void test();
 
 }
 
