@@ -18,7 +18,6 @@ namespace Optimization {
 		virtual ~ObjectFunction_(){};
 		virtual double value(vector& x) = 0;
 		virtual vector grad(vector& x) = 0;
-		virtual void update(const vector& dx) = 0;
 		virtual void preProcess(vector& x) = 0;
 		virtual void postProcess(vector& x) = 0;
 	};
@@ -30,7 +29,7 @@ namespace Optimization {
 
 		QuasiNewton_(int dim, ObjectFunction ofunc);
 		virtual ~QuasiNewton_();
-		void iterate();
+		void optimize();
 		void setAe(double ae);
 		void setRe(double re);
 		void setMaxIteration(int limit);
@@ -46,7 +45,6 @@ namespace Optimization {
 		int itr;
 		int dim;
 		ObjectFunction ofunc;
-		double alpha;
 		double re;
 		double ae;
 		double r0;
@@ -59,7 +57,6 @@ namespace Optimization {
 		identity_matrix<double> I;
 		matrix H0;
 		matrix H1;
-		matrix tH;
 		matrix A;
 		matrix B;
 	};
