@@ -138,7 +138,8 @@ namespace Optimization {
 		}
 
 		double alpha = linearSearch(d);
-		dx = alpha * d;                                   Logger::out(2) << "dx=" << dx << std::endl;			}
+		dx = alpha * d;                                   Logger::out(2) << "dx=" << dx << std::endl;
+	}
 
 	class Obj_ : public ObjectFunction_ {
 	public:
