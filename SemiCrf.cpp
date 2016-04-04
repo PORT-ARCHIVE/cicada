@@ -682,10 +682,13 @@ namespace SemiCrf {
 
 			itr++;
 		}
-#if 0
+#else
 		{
 			Optimizer::ObjectiveFunction ofunc = createLikelihood(this);
 			Optimizer::QuasiNewton optimizer = createBfgs(dim, ofunc);
+			optimizer->setRe(e1);
+			optimizer->setAe(e1);
+			optimizer->setMaxIteration(maxIteration);
 			optimizer->optimize();
 		}
 #endif
