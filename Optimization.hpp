@@ -12,22 +12,23 @@ namespace Optimization {
     typedef boost::numeric::ublas::vector<double> vector;
     typedef boost::numeric::ublas::matrix<double> matrix;
 
-	class ObjectFunction_ {
+	class ObjectiveFunction_ {
 	public:
-		ObjectFunction_(){};
-		virtual ~ObjectFunction_(){};
+		ObjectiveFunction_(){};
+		virtual ~ObjectiveFunction_(){};
 		virtual double value(vector& x) = 0;
 		virtual vector grad(vector& x) = 0;
 		virtual void preProcess(vector& x) = 0;
+		virtual void midProcess(vector& x) = 0;
 		virtual void postProcess(vector& x) = 0;
 	};
 
-	typedef std::shared_ptr<ObjectFunction_> ObjectFunction;
+	typedef std::shared_ptr<ObjectiveFunction_> ObjectiveFunction;
 
 	class QuasiNewton_ {
 	public:
 
-		QuasiNewton_(int dim, ObjectFunction ofunc);
+		QuasiNewton_(int dim, ObjectiveFunction ofunc);
 		virtual ~QuasiNewton_(){};
 		void optimize();
 		void setAe(double arg) { ae = arg; };
@@ -48,7 +49,7 @@ namespace Optimization {
 		int dim;
 		int itr;
 		int maxIteration;
-		ObjectFunction ofunc;
+		ObjectiveFunction ofunc;
 		double re;
 		double ae;
 		double beta;
@@ -72,11 +73,11 @@ namespace Optimization {
 
 	class Bfgs : public QuasiNewton_ {
 	public:
-		Bfgs(int dim, ObjectFunction ofunc);
+		Bfgs(int dim, ObjectiveFunction ofunc);
 		virtual void updateMatrix();
 	};
 
-	QuasiNewton createBfgs(int dim, ObjectFunction ofunc);
+	QuasiNewton createBfgs(int dim, ObjectiveFunction ofunc);
 
 	void test();
 

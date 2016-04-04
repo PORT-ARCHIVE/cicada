@@ -9,7 +9,7 @@ namespace Optimization {
 
 	using namespace boost::numeric::ublas;
 
-	QuasiNewton_::QuasiNewton_(int d, ObjectFunction f)
+	QuasiNewton_::QuasiNewton_(int d, ObjectiveFunction f)
 		: dim(d)
 		, itr(0)
 		, maxIteration(256)
@@ -47,6 +47,7 @@ namespace Optimization {
 			alpha = linearSearch(d);         Logger::out(2) << "alpha=" << alpha << std::endl;
 			dx = alpha * d;                  Logger::out(2) << "dx=" << dx << std::endl;
 			x = x + dx;                      Logger::out(2) << "x=" << x << std::endl;
+			ofunc->midProcess(x);
 			if( isConv() ) break;
 			g1 = ofunc->grad(x);             Logger::out(2) << "g1=" << g1 << std::endl;
 			y = g1 - g0;                     Logger::out(2) << "y=" << y << std::endl;
@@ -70,7 +71,7 @@ namespace Optimization {
 		vector x1 = x + beta*d;
 		double f1 = ofunc->value(x1);
 
-		while( xi*beta*gd < f1 - f0 ) {
+		while( xi*beta*gd < f1 - f0 ) { // Armijo's rule
 			beta *= tau;
 			x1 = x + beta*d;
 			f1 = ofunc->value(x1);
@@ -103,12 +104,12 @@ namespace Optimization {
 		return flg;
 	}
 
-	QuasiNewton createBfgs(int dim, ObjectFunction ofunc)
+	QuasiNewton createBfgs(int dim, ObjectiveFunction ofunc)
 	{
 		return std::shared_ptr<QuasiNewton_>( new Bfgs(dim, ofunc) );
 	}
 
-	Bfgs::Bfgs(int dim, ObjectFunction ofunc)
+	Bfgs::Bfgs(int dim, ObjectiveFunction ofunc)
 		: QuasiNewton_(dim, ofunc)
 	{
 	}
@@ -122,10 +123,10 @@ namespace Optimization {
 		H0 = H1;
 	}
 
-	class Obj_ : public ObjectFunction_ {
+	class test1 : public ObjectiveFunction_ {
 	public:
-		Obj_(){}
-		virtual ~Obj_(){}
+		test1(){}
+		virtual ~test1(){}
 		virtual double value(vector& x){
 			double a = (x[0]-x[1]*x[1]);
 			double b = (x[1]-2);
@@ -141,15 +142,49 @@ namespace Optimization {
 		virtual void preProcess(vector& x){
 			x[0] = 0;
 			x[1] = 0;
+			std::cout << " " << x[0] << " " << x[1] << std::endl;
 		}
+		virtual void midProcess(vector& x){}
 		virtual void postProcess(vector& x){}
 	private:
 		double x0;
 		double x1;
 	};
 
+	class test2 : public ObjectiveFunction_ {
+	public:
+		test2(){}
+		virtual ~test2(){}
+		virtual double value(vector& x){
+			double a = (x[1]-x[0]*x[0]);
+			double b = (1-x[0]);
+			return ( 100*a*a + b*b );
+		}
+		virtual vector grad(vector& x){
+			vector g(2);
+			g(0) = -400*(x[1]-x[0]*x[0])*x[0] - 2*(1-x[0]);
+			g(1) = 200*(x[1]-x[0]*x[0]);
+			return std::move(g);
+		}
+		virtual void preProcess(vector& x){
+			x[0] = -1.9;
+			x[1] = 2;
+			std::cout << " " << x[0] << " " << x[1] << std::endl;
+		}
+		virtual void midProcess(vector& x){
+			std::cout << " " << x[0] << " " << x[1] << std::endl;
+		}
+		virtual void postProcess(vector& x){
+			std::cout << " " << x[0] << " " << x[1] << std::endl;
+		}
+	private:
+		double x0;
+		double x1;
+	};
+
 	void test() {
-		QuasiNewton qn = createBfgs(2, std::shared_ptr<ObjectFunction_>(new Obj_()) );
+		//QuasiNewton qn = createBfgs(2, std::shared_ptr<ObjectiveFunction_>(new test1()) );
+		QuasiNewton qn = createBfgs(2, std::shared_ptr<ObjectiveFunction_>(new test2()) );
 		qn->setRe(1.0e-4);
 		qn->setAe(1.0e-4);
 		qn->setMaxIteration(10000);
