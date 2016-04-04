@@ -10,6 +10,7 @@
 #include <vector>
 #include "Error.hpp"
 #include "FileIO.hpp"
+#include "Optimizer.hpp"
 
 namespace App {
 
@@ -221,17 +222,18 @@ namespace SemiCrf {
 	typedef std::shared_ptr<Algorithm_> Algorithm;
 
 	// 学習器
-	class Learner : public Algorithm_ {
+	class Learner_ : public Algorithm_ {
 	public:
-		Learner(int arg);
-		virtual ~Learner();
+		friend class Likelihood_;
+		Learner_(int arg);
+		virtual ~Learner_();
 		virtual void compute();
 		virtual void preProcess(const std::string& wfile, const std::string& w0file);
 		virtual void postProcess(const std::string& wfile);
 
 	private:
 		bool isConv(double L, const std::vector<double>& dL, std::vector<double>& adagrad, double& tdl0, double& rerr, bool& isfirst);
-		void computeGrad(double& L, std::vector<double>& dL);
+		void computeGrad(double& L, std::vector<double>& dL, bool grad=true);
 		double computeZ();
 		std::vector<double> computeG(double& WG);
 		std::vector<double> computeGm(double Z);
@@ -239,13 +241,36 @@ namespace SemiCrf {
 		double eta(int i, App::Label y, int k);
 	};
 
+	typedef std::shared_ptr<Learner_> Learner;
+
 	Algorithm createLearner(int arg);
 
-	// 推論器
-	class Predictor : public Algorithm_ {
+	class Likelihood_ : public Optimizer::ObjectiveFunction_ {
 	public:
-		Predictor(int arg);
-		virtual ~Predictor();
+		Likelihood_(Learner_* arg)
+			: learner(arg)
+			{};
+		virtual ~Likelihood_(){};
+		virtual double value(Optimizer::vector& x);
+		virtual Optimizer::vector grad(Optimizer::vector& x);
+		virtual void preProcess(Optimizer::vector& x);
+		virtual void beginLoopProcess(Optimizer::vector& x);
+		virtual void afterUpdateXProcess(Optimizer::vector& x);
+		virtual void endLoopProcess(Optimizer::vector& x);
+		virtual void postProcess(Optimizer::vector& x);
+	private:
+		Learner_* learner;
+	};
+
+	typedef std::shared_ptr<Likelihood_> Likelihood;
+
+	Optimizer::ObjectiveFunction createLikelihood(Learner_* learner);
+
+	// 推論器
+	class Predictor_ : public Algorithm_ {
+	public:
+		Predictor_(int arg);
+		virtual ~Predictor_();
 		virtual void compute();
 		virtual void preProcess(const std::string& wfile, const std::string& w0file);
 		virtual void postProcess(const std::string& wfile);
@@ -255,6 +280,8 @@ namespace SemiCrf {
 		void backtrack(App::Label maxy, int maxd);
 		void printV();
 	};
+
+	typedef std::shared_ptr<Predictor_> Predictor;
 
 	Algorithm createPredictor(int arg);
 }

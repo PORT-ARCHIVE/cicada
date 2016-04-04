@@ -6,7 +6,7 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
-namespace Optimization {
+namespace Optimizer {
 
 	using namespace boost::numeric::ublas;
     typedef boost::numeric::ublas::vector<double> vector;
@@ -19,7 +19,9 @@ namespace Optimization {
 		virtual double value(vector& x) = 0;
 		virtual vector grad(vector& x) = 0;
 		virtual void preProcess(vector& x) = 0;
-		virtual void midProcess(vector& x) = 0;
+		virtual void beginLoopProcess(vector& x) = 0;
+		virtual void afterUpdateXProcess(vector& x) = 0;
+		virtual void endLoopProcess(vector& x) = 0;
 		virtual void postProcess(vector& x) = 0;
 	};
 

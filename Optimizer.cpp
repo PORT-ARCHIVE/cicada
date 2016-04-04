@@ -1,11 +1,11 @@
 // © 2016 PORT INC.
 
 #include <boost/numeric/ublas/io.hpp>
-#include "Optimization.hpp"
+#include "Optimizer.hpp"
 #include "Error.hpp"
 #include "Logger.hpp"
 
-namespace Optimization {
+namespace Optimizer {
 
 	using namespace boost::numeric::ublas;
 
@@ -43,16 +43,20 @@ namespace Optimization {
 
 		while(1) {
 
+			ofunc->beginLoopProcess(x);
+
 			d = - prod(H0, g0);              Logger::out(2) << "d=" << d << std::endl;
 			alpha = linearSearch(d);         Logger::out(2) << "alpha=" << alpha << std::endl;
 			dx = alpha * d;                  Logger::out(2) << "dx=" << dx << std::endl;
 			x = x + dx;                      Logger::out(2) << "x=" << x << std::endl;
-			ofunc->midProcess(x);
+			ofunc->afterUpdateXProcess(x);
 			if( isConv() ) break;
 			g1 = ofunc->grad(x);             Logger::out(2) << "g1=" << g1 << std::endl;
 			y = g1 - g0;                     Logger::out(2) << "y=" << y << std::endl;
 			g0 = g1;
 			updateMatrix();                  Logger::out(2) << "H=" << H0 << std::endl;
+
+			ofunc->endLoopProcess(x);
 
 			++itr;
 		}
@@ -144,7 +148,9 @@ namespace Optimization {
 			x[1] = 0;
 			Logger::out(1) << " " << x[0] << " " << x[1] << std::endl;
 		}
-		virtual void midProcess(vector& x){}
+		virtual void beginLoopProcess(vector& x){}
+		virtual void afterUpdateXProcess(vector& x){}
+		virtual void endLoopProcess(vector& x){}
 		virtual void postProcess(vector& x){}
 	private:
 		double x0;
@@ -171,9 +177,11 @@ namespace Optimization {
 			x[1] = 2;
 			Logger::out(1) << " " << x[0] << " " << x[1] << std::endl;
 		}
-		virtual void midProcess(vector& x){
+		virtual void beginLoopProcess(vector& x){}
+		virtual void afterUpdateXProcess(vector& x){
 			Logger::out(1) << " " << x[0] << " " << x[1] << std::endl;
 		}
+		virtual void endLoopProcess(vector& x){}
 		virtual void postProcess(vector& x){
 			Logger::out(1) << " " << x[0] << " " << x[1] << std::endl;
 		}

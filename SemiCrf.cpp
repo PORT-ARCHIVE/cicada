@@ -590,13 +590,13 @@ namespace SemiCrf {
 
 	Algorithm createLearner(int arg)
 	{
-		return std::shared_ptr<Learner>(new Learner(arg));
+		return Learner(new Learner_(arg));
 	}
 
-	Learner::Learner(int arg)
+	Learner_::Learner_(int arg)
 		: Algorithm_(arg)
 	{
-		Logger::out(2) << "Learner()" << std::endl;
+		Logger::out(2) << "Learner_()" << std::endl;
 		Logger::out(1) << "Semi-CRF";
 		if( flg & DISABLE_DATE_VERSION ) {
 			Logger::out(1) << "" << std::endl;
@@ -609,13 +609,13 @@ namespace SemiCrf {
 		}
 	}
 
-	Learner::~Learner()
+	Learner_::~Learner_()
 	{
-		Logger::out(2) << "~Learner()" << std::endl;
+		Logger::out(2) << "~Learner_()" << std::endl;
 		Logger::out(1) << "OK" << std::endl;
 	}
 
-	void Learner::preProcess(const std::string& wfile, const std::string& w0file)
+	void Learner_::preProcess(const std::string& wfile, const std::string& w0file)
 	{
 		SemiCrf::Weights weights = SemiCrf::createWeights(dim);
 		setWeights(weights);
@@ -635,7 +635,7 @@ namespace SemiCrf {
 		setLabels(labels);
 	}
 
-	void Learner::postProcess(const std::string& wfile)
+	void Learner_::postProcess(const std::string& wfile)
 	{
 		if( !(flg & ENABLE_LIKELIHOOD_ONLY) ) {
 			std::ofstream ofs; // 出力
@@ -647,9 +647,9 @@ namespace SemiCrf {
 		}
 	}
 
-	void Learner::compute()
+	void Learner_::compute()
 	{
-		Logger::out(2) << "Learner::compute()" << std::endl;
+		Logger::out(2) << "Learner_::compute()" << std::endl;
 
 		int itr = 0;
 		double tdl0 = 0.0;
@@ -682,9 +682,16 @@ namespace SemiCrf {
 
 			itr++;
 		}
+#if 0
+		{
+			Optimizer::ObjectiveFunction ofunc = createLikelihood(this);
+			Optimizer::QuasiNewton optimizer = createBfgs(dim, ofunc);
+			optimizer->optimize();
+		}
+#endif
 	}
 
-	void Learner::computeGrad(double& L, std::vector<double>& dL)
+	void Learner_::computeGrad(double& L, std::vector<double>& dL, bool grad)
 	{
 		for( auto data : *datas ) {
 
@@ -693,21 +700,24 @@ namespace SemiCrf {
 			double WG = 0.0;
 			double Z = computeZ();
 			auto Gs = computeG(WG);
-			auto Gms = computeGm(Z);
 
 			L += WG - log(Z);
 			if( flg & ENABLE_LIKELIHOOD_ONLY ) {
 				Logger::out(1) << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z) << std::endl;
 			}
 
-			auto idL = dL.begin();
-			for( int k = 0; k < dim; k++, idL++ ) {
-				(*idL) += Gs[k] - Gms[k]; Logger::out(2) << "dL(" << k << ")=" << *idL << std::endl;
+			if( grad ) {
+
+				auto Gms = computeGm(Z);
+				auto idL = dL.begin();
+				for( int k = 0; k < dim; k++, idL++ ) {
+					(*idL) += Gs[k] - Gms[k]; Logger::out(2) << "dL(" << k << ")=" << *idL << std::endl;
+				}
 			}
 		}
 	}
 
-	bool Learner::isConv(double L, const std::vector<double>& dL, std::vector<double>& adagrad, double& tdl0, double& rerr, bool& isfirst)
+	bool Learner_::isConv(double L, const std::vector<double>& dL, std::vector<double>& adagrad, double& tdl0, double& rerr, bool& isfirst)
 	{
 		double tdl = 0.0;
 
@@ -735,7 +745,7 @@ namespace SemiCrf {
 		return (rerr < e1);
 	}
 
-	std::vector<double> Learner::computeG(double& WG)
+	std::vector<double> Learner_::computeG(double& WG)
 	{
 		std::vector<double> Gs;
 		auto segments = current_data->getSegments();
@@ -793,7 +803,7 @@ namespace SemiCrf {
 		return(std::move(Gs));
 	}
 
-	double Learner::computeZ()
+	double Learner_::computeZ()
 	{
 		double Z = 0;
 
@@ -810,7 +820,7 @@ namespace SemiCrf {
 		return Z;
 	}
 
-	std::vector<double> Learner::computeGm(double Z)
+	std::vector<double> Learner_::computeGm(double Z)
 	{
 		std::vector<double> Gms;
 
@@ -835,7 +845,7 @@ namespace SemiCrf {
 		return(std::move(Gms));
 	}
 
-	double Learner::alpha(int i, App::Label y)
+	double Learner_::alpha(int i, App::Label y)
 	{
 		double v = 0;
 
@@ -879,7 +889,7 @@ namespace SemiCrf {
 		return v;
 	}
 
-	double Learner::eta(int i, App::Label y, int k)
+	double Learner_::eta(int i, App::Label y, int k)
 	{
 		double v = 0;
 
@@ -923,17 +933,89 @@ namespace SemiCrf {
 		return v;
 	}
 
+	//// Likilihood class ////
+
+	Optimizer::ObjectiveFunction createLikelihood(Learner_* learner)
+	{
+	 	return Optimizer::ObjectiveFunction(new Likelihood_(learner));
+	}
+
+	double Likelihood_::value(Optimizer::vector& x)
+	{
+		int i = 0;
+		for( auto& w : *(learner->weights) ) {
+			w = x[i++];
+		}
+
+		double L;
+		std::vector<double> dL;
+		learner->computeGrad(L, dL, false);
+
+		return L;
+	}
+
+	Optimizer::vector Likelihood_::grad(Optimizer::vector& x)
+	{
+		int i;
+
+		i = 0;
+		for( auto& w : *(learner->weights) ) {
+			w = x[i++];
+		}
+
+		double L;
+		std::vector<double> dL;
+		learner->computeGrad(L, dL, true);
+
+		Optimizer::vector g(learner->dim);
+
+		i = 0;
+		for( auto& idL : dL ) {
+			g(i++) = idL;
+		}
+
+		return std::move(g);
+	}
+
+	void Likelihood_::preProcess(Optimizer::vector& x)
+	{
+		int i = 0;
+		for( auto& w : *(learner->weights) ) {
+			x[i++] = w;
+		}
+	}
+
+	void Likelihood_::beginLoopProcess(Optimizer::vector& x)
+	{
+	}
+
+	void Likelihood_::afterUpdateXProcess(Optimizer::vector& x)
+	{
+	}
+
+	void Likelihood_::endLoopProcess(Optimizer::vector& x)
+	{
+	}
+
+	void Likelihood_::postProcess(Optimizer::vector& x)
+	{
+		int i = 0;
+		for( auto& w : *(learner->weights) ) {
+			w = x[i++];
+		}
+	}
+
 	//// Predictor ////
 
 	Algorithm createPredictor(int arg)
 	{
-		return std::shared_ptr<Predictor>(new Predictor(arg));
+		return Predictor(new Predictor_(arg));
 	}
 
-	Predictor::Predictor(int arg)
+	Predictor_::Predictor_(int arg)
 		: Algorithm_(arg)
 	{
-		Logger::out(2) << "Predictor()" << std::endl;
+		Logger::out(2) << "Predictor_()" << std::endl;
 		Logger::out(1) << "Semi-CRF";
 		if( flg & DISABLE_DATE_VERSION ) {
 			Logger::out(1) << "" << std::endl;
@@ -944,13 +1026,13 @@ namespace SemiCrf {
 		Logger::out(1) << "Prediction ..." << std::endl;
 	}
 
-	Predictor::~Predictor()
+	Predictor_::~Predictor_()
 	{
-		Logger::out(2) << "~Predictor()" << std::endl;
+		Logger::out(2) << "~Predictor_()" << std::endl;
 		Logger::out(1) << "OK" << std::endl;
 	}
 
-	void Predictor::preProcess(const std::string& wfile, const std::string& w0file)
+	void Predictor_::preProcess(const std::string& wfile, const std::string& w0file)
 	{
 		SemiCrf::Weights weights = SemiCrf::createWeights();
 		std::ifstream ifs; // 入力
@@ -975,14 +1057,14 @@ namespace SemiCrf {
 		setLabels(labels);
 	}
 
-	void Predictor::postProcess(const std::string& wfile)
+	void Predictor_::postProcess(const std::string& wfile)
 	{
 		datas->write(Logger::out(0) << "");
 	}
 
-	void Predictor::compute()
+	void Predictor_::compute()
 	{
-		Logger::out(2) << "Predictor::compute()" << std::endl;
+		Logger::out(2) << "Predictor_::compute()" << std::endl;
 
 		for( auto data : *datas ) {
 
@@ -1019,7 +1101,7 @@ namespace SemiCrf {
 		}
 	}
 
-	double Predictor::V(int i, App::Label y, int& maxd)
+	double Predictor_::V(int i, App::Label y, int& maxd)
 	{
 		double maxV = - std::numeric_limits<double>::max();
 
@@ -1076,9 +1158,9 @@ namespace SemiCrf {
 		return maxV;
 	}
 
-	void Predictor::backtrack(App::Label maxy, int maxd)
+	void Predictor_::backtrack(App::Label maxy, int maxd)
 	{
-		Logger::out(3) << "Predictor::backtrack()" << std::endl;
+		Logger::out(3) << "Predictor_::backtrack()" << std::endl;
 
 		int l = labels->size();
 		int s = current_data->getStrs()->size();
@@ -1113,7 +1195,7 @@ namespace SemiCrf {
 		}
 	}
 
-	void Predictor::printV()
+	void Predictor_::printV()
 	{
 		if( flg & ENABLE_LIKELIHOOD_ONLY ) {
 
