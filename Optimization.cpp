@@ -142,7 +142,7 @@ namespace Optimization {
 		virtual void preProcess(vector& x){
 			x[0] = 0;
 			x[1] = 0;
-			std::cout << " " << x[0] << " " << x[1] << std::endl;
+			Logger::out(1) << " " << x[0] << " " << x[1] << std::endl;
 		}
 		virtual void midProcess(vector& x){}
 		virtual void postProcess(vector& x){}
@@ -169,13 +169,13 @@ namespace Optimization {
 		virtual void preProcess(vector& x){
 			x[0] = -1.9;
 			x[1] = 2;
-			std::cout << " " << x[0] << " " << x[1] << std::endl;
+			Logger::out(1) << " " << x[0] << " " << x[1] << std::endl;
 		}
 		virtual void midProcess(vector& x){
-			std::cout << " " << x[0] << " " << x[1] << std::endl;
+			Logger::out(1) << " " << x[0] << " " << x[1] << std::endl;
 		}
 		virtual void postProcess(vector& x){
-			std::cout << " " << x[0] << " " << x[1] << std::endl;
+			Logger::out(1) << " " << x[0] << " " << x[1] << std::endl;
 		}
 	private:
 		double x0;
