@@ -27,24 +27,16 @@ namespace Optimizer {
 
 	typedef std::shared_ptr<ObjectiveFunction_> ObjectiveFunction;
 
-	class QuasiNewton_ {
+	class UnconstrainedNLP_ {
+
 	public:
 
-		QuasiNewton_(int dim, ObjectiveFunction ofunc);
-		virtual ~QuasiNewton_(){};
-		void optimize();
+		UnconstrainedNLP_(int dim, ObjectiveFunction ofunc);
+		virtual ~UnconstrainedNLP_(){};
+		virtual void optimize() = 0;
 		void setAe(double arg) { ae = arg; };
 		void setRe(double arg) { re = arg; };
-		void setBeta(double arg) { beta = arg; };
-		void setXi(double arg) { xi = arg; };
-		void setTau(double arg) { tau = arg; };
 		void setMaxIteration(int arg) { maxIteration = arg; };
-
-	protected:
-
-		virtual double linearSearch(vector& g);
-		virtual bool isConv();
-		virtual void updateMatrix() = 0;
 
 	protected:
 
@@ -54,6 +46,42 @@ namespace Optimizer {
 		ObjectiveFunction ofunc;
 		double re;
 		double ae;
+	};
+
+	class SteepestDescent_ : public UnconstrainedNLP_ {
+
+	public:
+
+		SteepestDescent_(int dim, ObjectiveFunction ofunc);
+		virtual ~SteepestDescent_(){};
+		virtual void optimize();
+
+	protected:
+
+		// T.B.D.
+		// virtual double linearSearch(vector& g);
+		// virtual bool isConv();
+	};
+
+	class QuasiNewton_ : public UnconstrainedNLP_ {
+
+	public:
+
+		QuasiNewton_(int dim, ObjectiveFunction ofunc);
+		virtual ~QuasiNewton_(){};
+		virtual void optimize();
+		void setBeta(double arg) { beta = arg; };
+		void setXi(double arg) { xi = arg; };
+		void setTau(double arg) { tau = arg; };
+
+	protected:
+
+		virtual double linearSearch(vector& g);
+		virtual bool isConv();
+		virtual void updateMatrix() = 0;
+
+	protected:
+
 		double beta;
 		double minBeta;
 		double xi;

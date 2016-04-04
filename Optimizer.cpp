@@ -9,13 +9,28 @@ namespace Optimizer {
 
 	using namespace boost::numeric::ublas;
 
-	QuasiNewton_::QuasiNewton_(int d, ObjectiveFunction f)
+	UnconstrainedNLP_::UnconstrainedNLP_(int d, ObjectiveFunction f)
 		: dim(d)
 		, itr(0)
 		, maxIteration(256)
 		, ofunc(f)
 		, re(1.0e-6)
 		, ae(1.0e-6)
+	{
+	}
+
+	SteepestDescent_::SteepestDescent_(int d, ObjectiveFunction f)
+		: UnconstrainedNLP_(d, f)
+	{
+	}
+
+	void SteepestDescent_::optimize()
+	{
+		// T.B.D.
+	}
+
+	QuasiNewton_::QuasiNewton_(int d, ObjectiveFunction f)
+		: UnconstrainedNLP_(d, f)
 		, beta(1.0)
 		, minBeta(1.0e-2) // T.B.D.
 		, xi(0.5)

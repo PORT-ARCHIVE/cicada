@@ -650,7 +650,7 @@ namespace SemiCrf {
 	void Learner_::compute()
 	{
 		Logger::out(2) << "Learner_::compute()" << std::endl;
-#if 1
+#if 0
 		int itr = 0;
 		double tdl0 = 0.0;
 		double rerr = 1.0;
