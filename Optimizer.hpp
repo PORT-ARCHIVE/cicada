@@ -55,6 +55,7 @@ namespace Optimizer {
 		double re;
 		double ae;
 		double beta;
+		double minBeta;
 		double xi;
 		double tau;
 		double r0;

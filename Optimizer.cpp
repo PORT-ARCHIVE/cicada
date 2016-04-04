@@ -17,6 +17,7 @@ namespace Optimizer {
 		, re(1.0e-6)
 		, ae(1.0e-6)
 		, beta(1.0)
+		, minBeta(1.0e-2) // T.B.D.
 		, xi(0.5)
 		, tau(0.5)
 		, r0(0.0)
@@ -79,6 +80,9 @@ namespace Optimizer {
 			beta *= tau;
 			x1 = x + beta*d;
 			f1 = ofunc->value(x1);
+			if( beta < minBeta ) {
+				break;
+			}
 		}
 
 		return beta;
