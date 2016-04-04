@@ -10,14 +10,21 @@ namespace Optimization {
 	using namespace boost::numeric::ublas;
 
 	QuasiNewton_::QuasiNewton_(int d, ObjectFunction f)
-		: itr(0)
-		, dim(d)
+		: dim(d)
+		, itr(0)
+		, maxIteration(256)
 		, ofunc(f)
+		, re(1.0e-6)
+		, ae(1.0e-6)
+		, beta(1.0)
+		, xi(0.5)
+		, tau(0.5)
 		, r0(0.0)
 		, x(dim)
 		, dx(dim)
 		, g0(dim)
 		, g1(dim)
+		, y(dim)
 		, I(dim)
 		, H0(dim, dim)
 		, H1(dim, dim)
@@ -26,47 +33,50 @@ namespace Optimization {
 	{
 	}
 
-	QuasiNewton_::~QuasiNewton_()
-	{
-	}
-
-	void QuasiNewton_::setAe(double arg)
-	{
-		ae = arg;
-	}
-
-	void QuasiNewton_::setRe(double arg)
-	{
-		re = arg;
-	}
-
-	void QuasiNewton_::setMaxIteration(int arg)
-	{
-		maxIteration = arg;
-	}
-
 	void QuasiNewton_::optimize()
 	{
 		ofunc->preProcess(x);
 
 		H0 = I;
-		g0 = ofunc->grad(x);
+		g0 = ofunc->grad(x);                 Logger::out(2) << "g0=" << g0 << std::endl;
+		double alpha = 1.0;
 
-		do {
+		while(1) {
 
-			updateDx();
-			x = x + dx;          Logger::out(2) << "x=" << x << std::endl;
-			g1 = ofunc->grad(x); Logger::out(2) << "g1=" << g1 << std::endl;
-			y = g1 - g0;         Logger::out(2) << "y=" << y << std::endl;
+			d = - prod(H0, g0);              Logger::out(2) << "d=" << d << std::endl;
+			alpha = linearSearch(d);         Logger::out(2) << "alpha=" << alpha << std::endl;
+			dx = alpha * d;                  Logger::out(2) << "dx=" << dx << std::endl;
+			x = x + dx;                      Logger::out(2) << "x=" << x << std::endl;
+			if( isConv() ) break;
+			g1 = ofunc->grad(x);             Logger::out(2) << "g1=" << g1 << std::endl;
+			y = g1 - g0;                     Logger::out(2) << "y=" << y << std::endl;
 			g0 = g1;
+			updateMatrix();                  Logger::out(2) << "H=" << H0 << std::endl;
 
-			if( maxIteration == itr ) {
-				throw Error("iteration limit");
-			}
-
-		} while( !isConv() );
+			++itr;
+		}
 
 		ofunc->postProcess(x);
+	}
+
+	double QuasiNewton_::linearSearch(vector& d)
+	{
+		double beta = 1.0;
+		double xi = 0.5;
+		double tau = 0.5;
+
+		double gd = inner_prod(g0, d);
+		double f0 = ofunc->value(x);
+		vector x1 = x + beta*d;
+		double f1 = ofunc->value(x1);
+
+		while( xi*beta*gd < f1 - f0 ) {
+			beta *= tau;
+			x1 = x + beta*d;
+			f1 = ofunc->value(x1);
+		}
+
+		return beta;
 	}
 
 	bool QuasiNewton_::isConv()
@@ -74,7 +84,7 @@ namespace Optimization {
 		bool flg = false;
 		double r = sqrt(inner_prod(dx, dx));
 
-		if( itr++ == 0 ) {
+		if( itr == 0 ) {
 
 			r0 = r;
 
@@ -86,27 +96,11 @@ namespace Optimization {
 			Logger::out(1) << "f=" << f << " err=" << err << std::endl;
 		}
 
-		return flg;
-	}
-
-	double QuasiNewton_::linearSearch(vector& d)
-	{
-		double beta = 1.0;
-		double phy = 0.8;
-		double tau = 0.3;
-
-		double gd = inner_prod(g0, d);
-		double f0 = ofunc->value(x);
-		vector x1 = x + beta*d;
-		double f1 = ofunc->value(x1);
-
-		while( phy*beta*gd < f1 - f0 ) {
-			beta *= tau;
-			x1 = x + beta*d;
-			f1 = ofunc->value(x1);
+		if( !flg && itr == maxIteration ) {
+			throw Error("iteration limit");
 		}
 
-		return beta;
+		return flg;
 	}
 
 	QuasiNewton createBfgs(int dim, ObjectFunction ofunc)
@@ -119,26 +113,13 @@ namespace Optimization {
 	{
 	}
 
-	void Bfgs::updateDx()
+	void Bfgs::updateMatrix()
 	{
-		vector d(dim);
-
-		if( itr == 0 ) {
-
-			d = - g0;
-
-		} else {
-
-			double p = inner_prod(y, dx);                 Logger::out(2) << "p=" << p << std::endl;
-			A = outer_prod(dx, dx)/p; 	                  Logger::out(2) << "A=" << A << std::endl;
-			B = I - outer_prod(y, dx)/p;                  Logger::out(2) << "B=" << B << std::endl;
-			H1 = prod(trans(B), matrix(prod(H0, B))) + A; Logger::out(2) << "H=" << H1 << std::endl;
-			H0 = H1;
-			d = - prod(H1, g0);
-		}
-
-		double alpha = linearSearch(d);
-		dx = alpha * d;                                   Logger::out(2) << "dx=" << dx << std::endl;
+		double p = inner_prod(y, dx);                     Logger::out(3) << "p=" << p << std::endl;
+		A = outer_prod(dx, dx)/p; 	                      Logger::out(3) << "A=" << A << std::endl;
+		B = I - outer_prod(y, dx)/p;                      Logger::out(3) << "B=" << B << std::endl;
+		H1 = prod(trans(B), matrix(prod(H0, B))) + A;     Logger::out(3) << "H=" << H1 << std::endl;
+		H0 = H1;
 	}
 
 	class Obj_ : public ObjectFunction_ {
@@ -169,8 +150,8 @@ namespace Optimization {
 
 	void test() {
 		QuasiNewton qn = createBfgs(2, std::shared_ptr<ObjectFunction_>(new Obj_()) );
-		qn->setRe(1.0e-8);
-		qn->setAe(1.0e-8);
+		qn->setRe(1.0e-4);
+		qn->setAe(1.0e-4);
 		qn->setMaxIteration(10000);
 		qn->optimize();
 	}

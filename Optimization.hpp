@@ -28,31 +28,38 @@ namespace Optimization {
 	public:
 
 		QuasiNewton_(int dim, ObjectFunction ofunc);
-		virtual ~QuasiNewton_();
+		virtual ~QuasiNewton_(){};
 		void optimize();
-		void setAe(double ae);
-		void setRe(double re);
-		void setMaxIteration(int limit);
-		virtual void updateDx() = 0;
+		void setAe(double arg) { ae = arg; };
+		void setRe(double arg) { re = arg; };
+		void setBeta(double arg) { beta = arg; };
+		void setXi(double arg) { xi = arg; };
+		void setTau(double arg) { tau = arg; };
+		void setMaxIteration(int arg) { maxIteration = arg; };
 
 	protected:
 
-		virtual bool isConv();
 		virtual double linearSearch(vector& g);
+		virtual bool isConv();
+		virtual void updateMatrix() = 0;
 
 	protected:
 
-		int itr;
 		int dim;
+		int itr;
+		int maxIteration;
 		ObjectFunction ofunc;
 		double re;
 		double ae;
+		double beta;
+		double xi;
+		double tau;
 		double r0;
-		int maxIteration;
 		vector x;
 		vector dx;
 		vector g0;
 		vector g1;
+		vector d;
 		vector y;
 		identity_matrix<double> I;
 		matrix H0;
@@ -66,7 +73,7 @@ namespace Optimization {
 	class Bfgs : public QuasiNewton_ {
 	public:
 		Bfgs(int dim, ObjectFunction ofunc);
-		virtual void updateDx();
+		virtual void updateMatrix();
 	};
 
 	QuasiNewton createBfgs(int dim, ObjectFunction ofunc);
