@@ -948,10 +948,10 @@ namespace SemiCrf {
 		}
 
 		double L;
-		std::vector<double> dL;
+		std::vector<double> dL(learner->dim);
 		learner->computeGrad(L, dL, false);
 
-		return L;
+		return (-L); //
 	}
 
 	Optimizer::vector Likelihood_::grad(Optimizer::vector& x)
@@ -964,14 +964,14 @@ namespace SemiCrf {
 		}
 
 		double L;
-		std::vector<double> dL;
+		std::vector<double> dL(learner->dim);
 		learner->computeGrad(L, dL, true);
 
 		Optimizer::vector g(learner->dim);
 
 		i = 0;
 		for( auto& idL : dL ) {
-			g(i++) = idL;
+			g(i++) = (-idL); //
 		}
 
 		return std::move(g);
