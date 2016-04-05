@@ -35,10 +35,6 @@ namespace Optimizer {
 
 	double UnconstrainedNLP_::linearSearch(vector& d)
 	{
-		double beta = 1.0;
-		double xi = 0.5;
-		double tau = 0.5;
-
 		double gd = inner_prod(g0, d);
 		double f0 = ofunc->value(x);
 		vector x1 = x + beta*d;
