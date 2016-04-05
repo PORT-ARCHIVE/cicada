@@ -1,6 +1,7 @@
 // © 2016 PORT INC.
 
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/format.hpp>
 #include "Optimizer.hpp"
 #include "Error.hpp"
 #include "Logger.hpp"
@@ -67,7 +68,7 @@ namespace Optimizer {
 			double err = r/(r0*re + ae);
 			flg = ( err < 1.0 );
 			double f = ofunc->value(x);
-			Logger::out(1) << "f=" << f << " err=" << err << std::endl;
+			Logger::out(1) << boost::format("f= %10.6e |∇f|= %10.6e") % f % err << std::endl;
 		}
 
 		if( !flg && itr == maxIteration ) {
@@ -143,7 +144,7 @@ namespace Optimizer {
 			double err = r/(r0*re + ae);
 			flg = ( err < 1.0 );
 			double f = ofunc->savedValue();
-			Logger::out(1) << "f=" << f << " err=" << err << std::endl;
+			Logger::out(1) << boost::format("f= %10.6e |∇f|= %10.6e") % f % err << std::endl;
 		}
 
 		if( !flg && itr == maxIteration ) {
@@ -212,7 +213,7 @@ namespace Optimizer {
 			double err = r/(r0*re + ae);
 			flg = ( err < 1.0 );
 			double f = ofunc->savedValue();
-			Logger::out(1) << "f=" << f << " err=" << err << std::endl;
+			Logger::out(1) << boost::format("f= %10.6e |∇f|= %10.6e") % f % err << std::endl;
 		}
 
 		if( !flg && itr == maxIteration ) {
