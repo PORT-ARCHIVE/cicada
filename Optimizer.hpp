@@ -34,9 +34,11 @@ namespace Optimizer {
 		UnconstrainedNLP_(int dim, ObjectiveFunction ofunc);
 		virtual ~UnconstrainedNLP_(){};
 		virtual void optimize() = 0;
+		virtual bool isConv();
 		void setAe(double arg) { ae = arg; };
 		void setRe(double arg) { re = arg; };
 		void setMaxIteration(int arg) { maxIteration = arg; };
+		virtual double linearSearch(vector& g);
 
 	protected:
 
@@ -44,8 +46,18 @@ namespace Optimizer {
 		int itr;
 		int maxIteration;
 		ObjectiveFunction ofunc;
+		double beta;
+		double minBeta;
+		double xi;
+		double tau;
+		double r0;
 		double re;
 		double ae;
+		vector x;
+		vector dx;
+		vector g0;
+		vector g1;
+		vector d;
 	};
 
 	class SteepestDescent_ : public UnconstrainedNLP_ {
@@ -76,22 +88,12 @@ namespace Optimizer {
 
 	protected:
 
-		virtual double linearSearch(vector& g);
-		virtual bool isConv();
+		// virtual double linearSearch(vector& g);
+		// virtual bool isConv();
 		virtual void updateMatrix() = 0;
 
 	protected:
 
-		double beta;
-		double minBeta;
-		double xi;
-		double tau;
-		double r0;
-		vector x;
-		vector dx;
-		vector g0;
-		vector g1;
-		vector d;
 		vector y;
 		identity_matrix<double> I;
 		matrix H0;

@@ -14,9 +14,66 @@ namespace Optimizer {
 		, itr(0)
 		, maxIteration(256)
 		, ofunc(f)
+		, beta(1.0)
+		, minBeta(1.0e-2)
+		, xi(0.5)
+		, tau(0.5)
+		, r0(0.0)
 		, re(1.0e-6)
 		, ae(1.0e-6)
+		, x(dim)
+		, dx(dim)
+		, g0(dim)
+		, g1(dim)
+		, d(dim)
 	{
+	}
+
+	double UnconstrainedNLP_::linearSearch(vector& d)
+	{
+		double beta = 1.0;
+		double xi = 0.5;
+		double tau = 0.5;
+
+		double gd = inner_prod(g0, d);
+		double f0 = ofunc->value(x);
+		vector x1 = x + beta*d;
+		double f1 = ofunc->value(x1);
+
+		while( xi*beta*gd < f1 - f0 ) { // Armijo's rule
+			beta *= tau;
+			x1 = x + beta*d;
+			f1 = ofunc->value(x1);
+			if( beta < minBeta ) {
+				break;
+			}
+		}
+
+		return beta;
+	}
+
+	bool UnconstrainedNLP_::isConv()
+	{
+		bool flg = false;
+		double r = sqrt(inner_prod(dx, dx));
+
+		if( itr == 0 ) {
+
+			r0 = r;
+
+		} else {
+
+			double err = r/(r0*re + ae);
+			flg = ( err < 1.0 );
+			double f = ofunc->value(x);
+			Logger::out(1) << "f=" << f << " err=" << err << std::endl;
+		}
+
+		if( !flg && itr == maxIteration ) {
+			throw Error("iteration limit");
+		}
+
+		return flg;
 	}
 
 	SteepestDescent_::SteepestDescent_(int d, ObjectiveFunction f)
@@ -26,20 +83,33 @@ namespace Optimizer {
 
 	void SteepestDescent_::optimize()
 	{
-		// T.B.D.
+		ofunc->preProcess(x);
+
+		g0 = ofunc->grad(x);                 Logger::out(2) << "g0=" << g0 << std::endl;
+		double alpha = 1.0;
+
+		while(1) {
+
+			ofunc->beginLoopProcess(x);
+
+			d = - g0;                        Logger::out(2) << "d=" << d << std::endl;
+			alpha = linearSearch(d);         Logger::out(2) << "alpha=" << alpha << std::endl;
+			dx = alpha * d;                  Logger::out(2) << "dx=" << dx << std::endl;
+			x = x + dx;                      Logger::out(2) << "x=" << x << std::endl;
+			ofunc->afterUpdateXProcess(x);
+			if( isConv() ) break;
+			g0 = ofunc->grad(x);             Logger::out(2) << "g0=" << g0 << std::endl;
+
+			ofunc->endLoopProcess(x);
+
+			++itr;
+		}
+
+		ofunc->postProcess(x);
 	}
 
 	QuasiNewton_::QuasiNewton_(int d, ObjectiveFunction f)
 		: UnconstrainedNLP_(d, f)
-		, beta(1.0)
-		, minBeta(1.0e-2) // T.B.D.
-		, xi(0.5)
-		, tau(0.5)
-		, r0(0.0)
-		, x(dim)
-		, dx(dim)
-		, g0(dim)
-		, g1(dim)
 		, y(dim)
 		, I(dim)
 		, H0(dim, dim)
@@ -78,53 +148,6 @@ namespace Optimizer {
 		}
 
 		ofunc->postProcess(x);
-	}
-
-	double QuasiNewton_::linearSearch(vector& d)
-	{
-		double beta = 1.0;
-		double xi = 0.5;
-		double tau = 0.5;
-
-		double gd = inner_prod(g0, d);
-		double f0 = ofunc->value(x);
-		vector x1 = x + beta*d;
-		double f1 = ofunc->value(x1);
-
-		while( xi*beta*gd < f1 - f0 ) { // Armijo's rule
-			beta *= tau;
-			x1 = x + beta*d;
-			f1 = ofunc->value(x1);
-			if( beta < minBeta ) {
-				break;
-			}
-		}
-
-		return beta;
-	}
-
-	bool QuasiNewton_::isConv()
-	{
-		bool flg = false;
-		double r = sqrt(inner_prod(dx, dx));
-
-		if( itr == 0 ) {
-
-			r0 = r;
-
-		} else {
-
-			double err = r/(r0*re + ae);
-			flg = ( err < 1.0 );
-			double f = ofunc->value(x);
-			Logger::out(1) << "f=" << f << " err=" << err << std::endl;
-		}
-
-		if( !flg && itr == maxIteration ) {
-			throw Error("iteration limit");
-		}
-
-		return flg;
 	}
 
 	QuasiNewton createBfgs(int dim, ObjectiveFunction ofunc)
