@@ -513,6 +513,7 @@ namespace SemiCrf {
 		, e0(1.0e-5)
 		, e1(1.0e-5)
 		, flg(arg)
+		, method("bfgs")
 	{
 		Logger::out(2) << "Algorithm_()" << std::endl;
 	}
@@ -545,6 +546,11 @@ namespace SemiCrf {
 	void Algorithm_::setE1(double arg)
 	{
 		e1 = arg;
+	}
+
+	void Algorithm_::setMethod(std::string arg)
+	{
+		method = arg;
 	}
 
 	void Algorithm_::setDatas(Datas arg)
@@ -685,7 +691,21 @@ namespace SemiCrf {
 #else
 		{
 			Optimizer::ObjectiveFunction ofunc = createLikelihood(this);
-			Optimizer::QuasiNewton optimizer = createBfgs(dim, ofunc);
+
+			Optimizer::UnconstrainedNLP optimizer;
+			if( method == "bfgs" ) {
+				optimizer = createBfgs(dim, ofunc);
+			} else if( method == "steepest_decent" ) {
+				optimizer = createSteepestDescent(dim, ofunc);
+			}
+
+			int f = 0x0;
+			if( !(DISABLE_ADAGRAD & flg) ){
+				f |= Optimizer::ENABLE_ADAGRAD;
+			}
+
+			optimizer->setFlg(f);
+			optimizer->setE0(e0);
 			optimizer->setRe(e1);
 			optimizer->setAe(e1);
 			optimizer->setMaxIteration(maxIteration);
@@ -950,10 +970,15 @@ namespace SemiCrf {
 			w = x[i++];
 		}
 
-		double L;
+		L = 0.0;
 		std::vector<double> dL(learner->dim);
 		learner->computeGrad(L, dL, false);
 
+		return (-L); //
+	}
+
+	double Likelihood_::savedValue()
+	{
 		return (-L); //
 	}
 
@@ -966,7 +991,7 @@ namespace SemiCrf {
 			w = x[i++];
 		}
 
-		double L;
+		L = 0.0;
 		std::vector<double> dL(learner->dim);
 		learner->computeGrad(L, dL, true);
 

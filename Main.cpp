@@ -23,6 +23,7 @@ public:
 		, e1(1.0e-5)
 		, logLevel(0)
 		, flg(0)
+		, method("bfgs")
 		{};
 	void parse(int argc, char *argv[]);
 public:
@@ -37,6 +38,7 @@ public:
 	double e1;
 	int logLevel;
 	int flg;
+	std::string method;
 };
 
 void Options::parse(int argc, char *argv[])
@@ -63,6 +65,8 @@ void Options::parse(int argc, char *argv[])
 				weightsFile = argv[++i];
 			} else if( arg == "-w0" ) {
 				initWeightsFile = argv[++i];
+			} else if( arg == "--set-optimizer" ) {
+				method = argv[++i];
 			} else if( arg == "--enable-likelihood-only" ) {
 				flg |= SemiCrf::ENABLE_LIKELIHOOD_ONLY;
 			} else if( arg == "--disable-adagrad" ) {
@@ -158,6 +162,7 @@ SemiCrf::Algorithm createAlgorithm(const Options& options)
 	alg->setMaxIteration(options.maxIteration);
 	alg->setE0(options.e0);
 	alg->setE1(options.e1);
+	alg->setMethod(options.method);
 
 	return alg;
 }

@@ -189,6 +189,7 @@ namespace SemiCrf {
 		virtual void setMaxIteration(int arg);
 		virtual void setE0(double arg);
 		virtual void setE1(double arg);
+		virtual void setMethod(std::string arg);
 		virtual void setDatas(Datas arg);
 		virtual void setFeatureFunction(FeatureFunction arg);
 		virtual void setWeights(Weights arg);
@@ -217,6 +218,7 @@ namespace SemiCrf {
 		CheckTable current_actab;
 		CheckTable current_ectab;
 		int flg;
+		std::string method;
 	};
 
 	typedef std::shared_ptr<Algorithm_> Algorithm;
@@ -249,9 +251,11 @@ namespace SemiCrf {
 	public:
 		Likelihood_(Learner_* arg)
 			: learner(arg)
+			, L(0.0)
 			{};
 		virtual ~Likelihood_(){};
 		virtual double value(Optimizer::vector& x);
+		virtual double savedValue();
 		virtual Optimizer::vector grad(Optimizer::vector& x);
 		virtual void preProcess(Optimizer::vector& x);
 		virtual void beginLoopProcess(Optimizer::vector& x);
@@ -260,6 +264,7 @@ namespace SemiCrf {
 		virtual void postProcess(Optimizer::vector& x);
 	private:
 		Learner_* learner;
+		double L;
 	};
 
 	typedef std::shared_ptr<Likelihood_> Likelihood;

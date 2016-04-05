@@ -9,11 +9,15 @@ namespace Optimizer {
 
 	using namespace boost::numeric::ublas;
 
+	////////
+
 	UnconstrainedNLP_::UnconstrainedNLP_(int d, ObjectiveFunction f)
-		: dim(d)
+		: flg(0x0)
+		, dim(d)
 		, itr(0)
 		, maxIteration(256)
 		, ofunc(f)
+		, e0(1.0e-2)
 		, beta(1.0)
 		, minBeta(1.0e-2)
 		, xi(0.5)
@@ -57,6 +61,7 @@ namespace Optimizer {
 		bool flg = false;
 		double r = sqrt(inner_prod(dx, dx));
 
+
 		if( itr == 0 ) {
 
 			r0 = r;
@@ -76,12 +81,20 @@ namespace Optimizer {
 		return flg;
 	}
 
-	SteepestDescent_::SteepestDescent_(int d, ObjectiveFunction f)
+	////////
+
+	SteepestDescent::SteepestDescent(int d, ObjectiveFunction f)
 		: UnconstrainedNLP_(d, f)
+		, adagrad(dim)
 	{
 	}
 
-	void SteepestDescent_::optimize()
+	UnconstrainedNLP createSteepestDescent(int dim, ObjectiveFunction ofunc)
+	{
+		return std::shared_ptr<SteepestDescent>( new SteepestDescent(dim, ofunc) );
+	}
+
+	void SteepestDescent::optimize()
 	{
 		ofunc->preProcess(x);
 
@@ -93,8 +106,18 @@ namespace Optimizer {
 			ofunc->beginLoopProcess(x);
 
 			d = - g0;                        Logger::out(2) << "d=" << d << std::endl;
-			alpha = linearSearch(d);         Logger::out(2) << "alpha=" << alpha << std::endl;
-			dx = alpha * d;                  Logger::out(2) << "dx=" << dx << std::endl;
+
+			if( flg & ENABLE_ADAGRAD ) {
+				auto iad = adagrad.begin();
+				auto id = d.begin();
+				for( auto& idx : dx ) {
+					idx = e0/(1.0+sqrt(*iad++))*(*id++);
+				}                            Logger::out(2) << "dx=" << dx << std::endl;
+			} else {
+				alpha = linearSearch(d);     Logger::out(2) << "alpha=" << alpha << std::endl;
+				dx = alpha * d;              Logger::out(2) << "dx=" << dx << std::endl;
+			}
+
 			x = x + dx;                      Logger::out(2) << "x=" << x << std::endl;
 			ofunc->afterUpdateXProcess(x);
 			if( isConv() ) break;
@@ -107,6 +130,34 @@ namespace Optimizer {
 
 		ofunc->postProcess(x);
 	}
+
+	bool SteepestDescent::isConv()
+	{
+		bool flg = false;
+		vector dx2 = element_prod(dx, dx);
+		double r = sqrt( sum( dx2 ) );
+		adagrad += dx2;
+
+		if( itr == 0 ) {
+
+			r0 = r;
+
+		} else {
+
+			double err = r/(r0*re + ae);
+			flg = ( err < 1.0 );
+			double f = ofunc->savedValue();
+			Logger::out(1) << "f=" << f << " err=" << err << std::endl;
+		}
+
+		if( !flg && itr == maxIteration ) {
+			throw Error("iteration limit");
+		}
+
+		return flg;
+	}
+
+	////////
 
 	QuasiNewton_::QuasiNewton_(int d, ObjectiveFunction f)
 		: UnconstrainedNLP_(d, f)
@@ -150,9 +201,36 @@ namespace Optimizer {
 		ofunc->postProcess(x);
 	}
 
-	QuasiNewton createBfgs(int dim, ObjectiveFunction ofunc)
+	bool QuasiNewton_::isConv()
 	{
-		return std::shared_ptr<QuasiNewton_>( new Bfgs(dim, ofunc) );
+		bool flg = false;
+		double r = sqrt(inner_prod(dx, dx));
+
+
+		if( itr == 0 ) {
+
+			r0 = r;
+
+		} else {
+
+			double err = r/(r0*re + ae);
+			flg = ( err < 1.0 );
+			double f = ofunc->savedValue();
+			Logger::out(1) << "f=" << f << " err=" << err << std::endl;
+		}
+
+		if( !flg && itr == maxIteration ) {
+			throw Error("iteration limit");
+		}
+
+		return flg;
+	}
+
+	////////
+
+	UnconstrainedNLP createBfgs(int dim, ObjectiveFunction ofunc)
+	{
+		return std::shared_ptr<UnconstrainedNLP_>( new Bfgs(dim, ofunc) );
 	}
 
 	Bfgs::Bfgs(int dim, ObjectiveFunction ofunc)
@@ -169,14 +247,20 @@ namespace Optimizer {
 		H0 = H1;
 	}
 
+	////////
+
 	class test1 : public ObjectiveFunction_ {
 	public:
 		test1(){}
 		virtual ~test1(){}
+		virtual double savedValue(){
+			return f;
+		}
 		virtual double value(vector& x){
 			double a = (x[0]-x[1]*x[1]);
 			double b = (x[1]-2);
-			return ( 0.5*a*a + 0.25*b*b*b*b );
+			f = ( 0.5*a*a + 0.25*b*b*b*b );
+			return f;
 		}
 		virtual vector grad(vector& x){
 			vector g(2);
@@ -197,16 +281,21 @@ namespace Optimizer {
 	private:
 		double x0;
 		double x1;
+		double f;
 	};
 
 	class test2 : public ObjectiveFunction_ {
 	public:
 		test2(){}
 		virtual ~test2(){}
+		virtual double savedValue(){
+			return f;
+		}
 		virtual double value(vector& x){
 			double a = (x[1]-x[0]*x[0]);
 			double b = (1-x[0]);
-			return ( 100*a*a + b*b );
+			f = ( 100*a*a + b*b );
+			return f;
 		}
 		virtual vector grad(vector& x){
 			vector g(2);
@@ -230,11 +319,11 @@ namespace Optimizer {
 	private:
 		double x0;
 		double x1;
+		double f;
 	};
 
 	void test() {
-		//QuasiNewton qn = createBfgs(2, std::shared_ptr<ObjectiveFunction_>(new test1()) );
-		QuasiNewton qn = createBfgs(2, std::shared_ptr<ObjectiveFunction_>(new test2()) );
+		UnconstrainedNLP qn = createBfgs(2, std::shared_ptr<ObjectiveFunction_>(new test2()) );
 		qn->setRe(1.0e-4);
 		qn->setAe(1.0e-4);
 		qn->setMaxIteration(10000);
