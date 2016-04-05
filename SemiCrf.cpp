@@ -656,43 +656,12 @@ namespace SemiCrf {
 	void Learner_::compute()
 	{
 		Logger::out(2) << "Learner_::compute()" << std::endl;
-#if 0
-		int itr = 0;
-		double tdl0 = 0.0;
-		double rerr = 1.0;
-		bool isfirst = true;
-		std::vector<double> adagrad(dim, 0.0);
 
-		while( itr < maxIteration ) {
+		if( !(flg & ENABLE_LIKELIHOOD_ONLY) ){
 
-			double L = 0.0;
-			std::vector<double> dL(dim, 0.0);
-
-			computeGrad(L, dL);
-			assert( weights->size() == dL.size() );
-
-			auto dLi = dL.begin();
-			auto wi = weights->begin();
-			auto ad = adagrad.begin();
-			for( int k = 0; k < dim; wi++, dLi++, k++, ad++ ) {
-				double e = e0;
-				if( !(flg & DISABLE_ADAGRAD) ) {
-				 	e /= (1.0+sqrt((*ad))); // AdaGrad
-				}
-				(*wi) += e * (*dLi); Logger::out(2) << "W(" << k << ")=" << *wi << std::endl;
-			}
-
-			if( isConv(L, dL, adagrad, tdl0, rerr, isfirst) ) {
-				break;
-			}
-
-			itr++;
-		}
-#else
-		{
 			Optimizer::ObjectiveFunction ofunc = createLikelihood(this);
-
 			Optimizer::UnconstrainedNLP optimizer;
+
 			if( method == "bfgs" ) {
 				optimizer = createBfgs(dim, ofunc);
 			} else if( method == "steepest_decent" ) {
@@ -710,8 +679,13 @@ namespace SemiCrf {
 			optimizer->setAe(e1);
 			optimizer->setMaxIteration(maxIteration);
 			optimizer->optimize();
+
+		} else {
+
+			double L = 0.0;
+			std::vector<double> dL(dim, 0.0);
+			computeGrad(L, dL);
 		}
-#endif
 	}
 
 	void Learner_::computeGrad(double& L, std::vector<double>& dL, bool grad)
@@ -738,34 +712,6 @@ namespace SemiCrf {
 				}
 			}
 		}
-	}
-
-	bool Learner_::isConv(double L, const std::vector<double>& dL, std::vector<double>& adagrad, double& tdl0, double& rerr, bool& isfirst)
-	{
-		double tdl = 0.0;
-
-		auto ad = adagrad.begin();
-		for( auto dl : dL ) {
-			double v = dl*dl;
-			tdl += v;
-			(*ad) += v;
-			ad++;
-		}
-
-		tdl = sqrt(tdl);
-
-		if( isfirst ) {
-			tdl0 = tdl;
-			isfirst = false;
-			if( flg & ENABLE_LIKELIHOOD_ONLY ) {
-				return true;
-			}
-			return false;
-		}
-
-		rerr = tdl/tdl0;
-		Logger::out(1) << boost::format("L= %10.6e |dL|= %10.6e") % L % rerr << std::endl;
-		return (rerr < e1);
 	}
 
 	std::vector<double> Learner_::computeG(double& WG)

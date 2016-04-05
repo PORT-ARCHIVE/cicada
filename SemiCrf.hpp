@@ -234,7 +234,6 @@ namespace SemiCrf {
 		virtual void postProcess(const std::string& wfile);
 
 	private:
-		bool isConv(double L, const std::vector<double>& dL, std::vector<double>& adagrad, double& tdl0, double& rerr, bool& isfirst);
 		void computeGrad(double& L, std::vector<double>& dL, bool grad=true);
 		double computeZ();
 		std::vector<double> computeG(double& WG);
