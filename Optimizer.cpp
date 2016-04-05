@@ -56,7 +56,7 @@ namespace Optimizer {
 	bool UnconstrainedNLP_::isConv()
 	{
 		bool flg = false;
-		double r = sqrt(inner_prod(dx, dx));
+		double r = sqrt(inner_prod(g0, g0));
 
 
 		if( itr == 0 ) {
@@ -131,9 +131,9 @@ namespace Optimizer {
 	bool SteepestDescent::isConv()
 	{
 		bool flg = false;
-		vector dx2 = element_prod(dx, dx);
-		double r = sqrt( sum( dx2 ) );
-		adagrad += dx2;
+		vector g02 = element_prod(g0, g0);
+		double r = sqrt( sum( g02 ) );
+		adagrad += g02;
 
 		if( itr == 0 ) {
 
@@ -201,7 +201,7 @@ namespace Optimizer {
 	bool QuasiNewton_::isConv()
 	{
 		bool flg = false;
-		double r = sqrt(inner_prod(dx, dx));
+		double r = sqrt(inner_prod(g0, g0));
 
 
 		if( itr == 0 ) {
