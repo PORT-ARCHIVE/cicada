@@ -764,7 +764,7 @@ namespace SemiCrf {
 				y1 = y;
 				awg += wg;
 
-				Logger::out(1) << "(" << ti << "," << ui << ")";
+				Logger::out(1) << boost::format( "(%3d,%3d)" ) % ti % ui;
 				Logger::out(1) << boost::format(" WG= %+10.6e AWG= %+10.6e") % wg % awg << std::endl;
 			}
 		}
@@ -1175,8 +1175,8 @@ namespace SemiCrf {
 
 			int l = labels->size();
 			int s = current_data->getStrs()->size();
-			for( auto y : *labels ) {
-				for( int i = 0; i < s; i++ ) {
+			for( int i = 0; i < s; i++ ) {
+				for( auto y : *labels ) {
 
 					int idx = i*l + (static_cast<int>(y));
 					auto& tp = current_vctab->at(idx);
