@@ -32,6 +32,7 @@ public:
 	std::string format;
 	std::string weightsFile;
 	std::string initWeightsFile;
+	std::string w2vMatrixFile;
 	int maxLength;
 	int maxIteration;
 	double e0;
@@ -65,6 +66,8 @@ void Options::parse(int argc, char *argv[])
 				weightsFile = argv[++i];
 			} else if( arg == "-w0" ) {
 				initWeightsFile = argv[++i];
+			} else if( arg == "--w2v-maxtirx" ) {
+				w2vMatrixFile = argv[++i];
 			} else if( arg == "--set-optimizer" ) {
 				method = argv[++i];
 			} else if( arg == "--enable-likelihood-only" ) {
