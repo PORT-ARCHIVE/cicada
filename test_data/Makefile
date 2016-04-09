@@ -139,4 +139,4 @@ gen:
 	../gen -i p0.json -s 4 -r 16 -l 64 > test19.txt
 
 clean:
-	rm -f result*.txt weight*.txt
+	rm -f result*.txt weight*.txt a b

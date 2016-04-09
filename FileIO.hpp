@@ -7,7 +7,7 @@
 
 template <class T>
 void open(T& strm, const std::string& arg) {
-	strm.open( arg.c_str() );
+	strm.open( arg );
 	if( strm.fail() ) {
 		std::stringstream ss;
 		ss << "cannot open such file: " << arg;
