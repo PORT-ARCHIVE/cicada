@@ -12,24 +12,24 @@ namespace App {
 
     typedef boost::numeric::ublas::vector<double> vector;
 
-	Simple::Simple()
+	Digit::Digit()
 	{
-		Logger::out(2) << "Simple()" << std::endl;
+		Logger::out(2) << "Digit()" << std::endl;
 	}
 
-	Simple::~Simple()
+	Digit::~Digit()
 	{
-		Logger::out(2) << "~Simple()" << std::endl;
+		Logger::out(2) << "~Digit()" << std::endl;
 	}
 
-	void Simple::read()
+	void Digit::read()
 	{
-		Logger::out(2) << "Simple::read()" << std::endl;
+		Logger::out(2) << "Digit::read()" << std::endl;
 	}
 
-	void Simple::write()
+	void Digit::write()
 	{
-		Logger::out(2) << "Simple::write()" << std::endl;
+		Logger::out(2) << "Digit::write()" << std::endl;
 	}
 
 	Label string2Label(const std::string& str)
@@ -55,11 +55,11 @@ namespace App {
 
 	SemiCrf::FeatureFunction createFeatureFunction()
 	{
-		SemiCrf::FeatureFunction ff(new Simple());
+		SemiCrf::FeatureFunction ff(new Digit());
 		return ff;
 	}
 
-	double Simple::operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i)
+	double Digit::operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i)
 	{
 		assert(0 < xDim);
 		assert(0 < yDim);
@@ -108,17 +108,17 @@ namespace App {
 				}
 
 			} else {
-				throw Error("Simple::operator(): invalid dimension specified");
+				throw Error("Digit::operator(): invalid dimension specified");
 			}
 
 		} catch (...) {
-			throw Error("Simple::operator(): unexpected exception");
+			throw Error("Digit::operator(): unexpected exception");
 		}
 
 		return ret;
 	}
 
-	double Simple::wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i)
+	double Digit::wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i)
 	{
 		assert(0 < xDim);
 		assert(0 < yDim);
@@ -161,7 +161,7 @@ namespace App {
 			}
 
 		} catch (...) {
-			throw Error("Simple::operator(): unexpected exception");
+			throw Error("Digit::operator(): unexpected exception");
 		}
 
 		return v;

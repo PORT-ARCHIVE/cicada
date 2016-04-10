@@ -10,10 +10,10 @@ namespace App {
 
 	const int ZERO = 0;
 
-	class Simple : public SemiCrf::FeatureFunction_ {
+	class Digit : public SemiCrf::FeatureFunction_ {
 	public:
-		Simple();
-		virtual ~Simple();
+		Digit();
+		virtual ~Digit();
 		virtual void read();
 		virtual void write();
 		virtual double operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i);
