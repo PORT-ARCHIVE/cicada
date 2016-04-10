@@ -18,7 +18,7 @@ namespace W2V {
  	{
         FILE* f = std::fopen(file.c_str(), "rb");
    	    if( f == NULL ) {
-			throw Error("cannot open such file");
+			throw Error("cannot open such file"); // T.B.D.
         }
 
         long long words;
@@ -54,8 +54,8 @@ namespace W2V {
 		 		v(j) = e;
 		 	}
 
-		 	double n = norm_2(v);
-		 	v = v/n;
+		 	// double n = norm_2(v);
+		 	// v = v/n;
 		}
 
         std::fclose(f);
