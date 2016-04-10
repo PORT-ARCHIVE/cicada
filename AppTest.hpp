@@ -3,6 +3,7 @@
 #ifndef APP_TEST__H
 #define APP_TEST__H
 
+#include <string>
 #include "SemiCrf.hpp"
 #include "W2V.hpp"
 
@@ -10,7 +11,7 @@ namespace App {
 
 	const int ZERO = 0;
 
-	SemiCrf::FeatureFunction createFeatureFunction();
+	SemiCrf::FeatureFunction createFeatureFunction(std::string feature);
 
 	class Digit : public SemiCrf::FeatureFunction_ {
 	public:

@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
 		Logger::setLevel(options.logLevel);
 
 		SemiCrf::Algorithm alg = createAlgorithm(options);
-		SemiCrf::FeatureFunction ff = App::createFeatureFunction();
+		SemiCrf::FeatureFunction ff = App::createFeatureFunction(options.w2vMatrixFile);
 
 		alg->setFeatureFunction(ff);
 		alg->preProcess(options.weightsFile, options.initWeightsFile);

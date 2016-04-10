@@ -12,24 +12,19 @@ namespace App {
 
     typedef boost::numeric::ublas::vector<double> vector;
 
-	Digit::Digit()
+	SemiCrf::FeatureFunction createFeatureFunction(std::string feature)
 	{
-		Logger::out(2) << "Digit()" << std::endl;
-	}
+		SemiCrf::FeatureFunction ff;
 
-	Digit::~Digit()
-	{
-		Logger::out(2) << "~Digit()" << std::endl;
-	}
+		if( feature.empty() ) {
+			SemiCrf::FeatureFunction digitFeature(new Digit());
+			ff = digitFeature;
+		} else {
+			SemiCrf::FeatureFunction jpnFeature(new Jpn());
+			ff = jpnFeature;
+		}
 
-	void Digit::read()
-	{
-		Logger::out(2) << "Digit::read()" << std::endl;
-	}
-
-	void Digit::write()
-	{
-		Logger::out(2) << "Digit::write()" << std::endl;
+		return ff;
 	}
 
 	Label string2Label(const std::string& str)
@@ -53,10 +48,26 @@ namespace App {
 		return ( std::move(str) );
 	}
 
-	SemiCrf::FeatureFunction createFeatureFunction()
+	///////////////
+
+	Digit::Digit()
 	{
-		SemiCrf::FeatureFunction ff(new Digit());
-		return ff;
+		Logger::out(2) << "Digit()" << std::endl;
+	}
+
+	Digit::~Digit()
+	{
+		Logger::out(2) << "~Digit()" << std::endl;
+	}
+
+	void Digit::read()
+	{
+		Logger::out(2) << "Digit::read()" << std::endl;
+	}
+
+	void Digit::write()
+	{
+		Logger::out(2) << "Digit::write()" << std::endl;
 	}
 
 	double Digit::operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i)
@@ -166,6 +177,138 @@ namespace App {
 
 		return v;
 	}
+
+	///////////////
+
+	Jpn::Jpn()
+	{
+		Logger::out(2) << "Jpn()" << std::endl;
+	}
+
+	Jpn::~Jpn()
+	{
+		Logger::out(2) << "~Jpn()" << std::endl;
+	}
+
+	void Jpn::read()
+	{
+		Logger::out(2) << "Jpn::read()" << std::endl;
+	}
+
+	void Jpn::write()
+	{
+		Logger::out(2) << "Jpn::write()" << std::endl;
+	}
+
+	double Jpn::operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i)
+	{
+		assert(0 < xDim);
+		assert(0 < yDim);
+
+		int ret = 0;
+
+		try {
+
+			int yval = static_cast<int>(y);
+			int ydval = static_cast<int>(yd);
+
+			int dim0 = yDim * xDim;
+			int dim1 = yDim * ( xDim + yDim );
+
+			// y2x
+			if( k < dim0 ) {
+
+				int col = k % xDim;
+				int row = k / xDim;
+				int d = i - j + 1;
+
+				for( int l = 0; l < d; l++ ) {
+
+					std::string str = x->getStrs()->at(j+l).at(0);
+					int xval = boost::lexical_cast<int>(str);
+
+					if( yval == row && xval == col ) {
+						ret += 1;
+					}
+				}
+
+			// y2y
+			} else if( dim0 <= k && k < dim1 ) {
+
+				int index = k - dim0;
+				int col = index % yDim;
+				int row = index / yDim;
+
+				if( row == col && row == yval ) {
+
+					ret = 1; // Sum of this value equals to the number of segments whose label is yval.
+
+				} else if( ydval == row && yval == col ) {
+
+					ret = 1; // Sum of this value equals to the number of transitions from ydval to yval
+				}
+
+			} else {
+				throw Error("Jpn::operator(): invalid dimension specified");
+			}
+
+		} catch (...) {
+			throw Error("Jpn::operator(): unexpected exception");
+		}
+
+		return ret;
+	}
+
+	double Jpn::wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i)
+	{
+		assert(0 < xDim);
+		assert(0 < yDim);
+
+		double v = 0.0;
+
+		try {
+
+			int dim0 = yDim * xDim;
+			int dim1 = dim0 + yDim * yDim;
+			int dim2 = dim2 + yDim * ws->getMaxLength();
+
+			int yval = static_cast<int>(y);
+			int ydval = static_cast<int>(yd);
+
+			vector fvec(dim2);
+
+			// y2x
+			int d = i - j + 1;
+			for( int l = 0; l < d; l++ ) { 
+
+				std::string str = x->getStrs()->at(j+l).at(0);
+				int xval = boost::lexical_cast<int>(str);
+				const vector& wvec = w2vmat.i2v(xval);
+
+				for( int k = 0; k < dim0; k++ ) {
+					fvec(k) += wvec(k);
+				}
+			}
+
+            // y2y
+			fvec(dim0+ydval*yDim+yval) += 1;
+
+            // y2l
+			fvec(dim1+d) += 1;
+
+			int k = 0;
+			for( auto w : *ws ) {
+				v += w*fvec(k++);
+			}
+
+		} catch (...) {
+			throw Error("Jpn::operator(): unexpected exception");
+		}
+
+		return v;
+	}
+
+    ///////////////
 
 	void PridectionDigitDatas_::read(std::istream& strm)
 	{
