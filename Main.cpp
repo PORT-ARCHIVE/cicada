@@ -13,8 +13,7 @@ class Options {
 public:
 	Options()
 		: trainingDataFile("")
-		, inferenceDataFile("")
-		, format("digit")
+		, predictionDataFile("")
 		, weightsFile("")
 		, initWeightsFile("")
 		, maxLength(0)
@@ -28,8 +27,7 @@ public:
 	void parse(int argc, char *argv[]);
 public:
 	std::string trainingDataFile;
-	std::string inferenceDataFile;
-	std::string format;
+	std::string predictionDataFile;
 	std::string weightsFile;
 	std::string initWeightsFile;
 	std::string w2vMatrixFile;
@@ -51,9 +49,7 @@ void Options::parse(int argc, char *argv[])
 			if( arg == "-t" ) {
 				trainingDataFile = argv[++i];
 			} else if( arg == "-i" ) {
-				inferenceDataFile = argv[++i];
-			} else if( arg == "-f" || arg == "--input-file-format" ) {
-				format = argv[++i];
+				predictionDataFile = argv[++i];
 			} else if( arg == "-l" || arg == "--max-length") {
 				maxLength = boost::lexical_cast<int>(argv[++i]);
 			} else if( arg == "-r" || arg == "--max-iteration") {
@@ -66,7 +62,7 @@ void Options::parse(int argc, char *argv[])
 				weightsFile = argv[++i];
 			} else if( arg == "-w0" ) {
 				initWeightsFile = argv[++i];
-			} else if( arg == "--w2v-maxtirx" ) {
+			} else if( arg == "-m" || arg == "--w2v-maxtirx" ) {
 				w2vMatrixFile = argv[++i];
 			} else if( arg == "--set-optimizer" ) {
 				method = argv[++i];
@@ -83,17 +79,17 @@ void Options::parse(int argc, char *argv[])
 			}
 		}
 
-		if( trainingDataFile.empty() && inferenceDataFile.empty() ) {
+		if( trainingDataFile.empty() && predictionDataFile.empty() ) {
 			throw Error("neither training data file nor inference data file specified");
 		}
 
-		if( !trainingDataFile.empty() && !inferenceDataFile.empty() ) {
+		if( !trainingDataFile.empty() && !predictionDataFile.empty() ) {
 			throw Error("both training data file and inference data file specified");
 		}
 
 		if( weightsFile.empty() && (
 				(!(flg & SemiCrf::ENABLE_LIKELIHOOD_ONLY) && !(trainingDataFile.empty())) ||
-				(!(inferenceDataFile.empty()))) ) {
+				(!(predictionDataFile.empty()))) ) {
 			throw Error("no weights file specified");
 		}
 
@@ -118,29 +114,14 @@ SemiCrf::Algorithm createAlgorithm(const Options& options)
 		alg = SemiCrf::createLearner(options.flg);
 		datas = SemiCrf::Datas( new SemiCrf::TrainingDatas_() );
 
-	} else if( !options.inferenceDataFile.empty() ) {
+	} else if( !options.predictionDataFile.empty() ) {
 
-		file = options.inferenceDataFile;
+		file = options.predictionDataFile;
 		alg = SemiCrf::createPredictor(options.flg);
-
-		if( options.format == "digit" ) {
-
-			datas = SemiCrf::Datas( new App::PridectionDigitDatas_() );
-
-		} else if( options.format == "jpn" ) {
-
-			datas = SemiCrf::Datas( new SemiCrf::PredictionDatas_() );
-
-		} else {
-			std::stringstream ss;
-			ss << "unsupported format specified";
-			throw Error(ss.str());
-		}
+		datas = SemiCrf::Datas( new App::PridectionDigitDatas_() );
 
 	} else {
-		std::stringstream ss;
-		ss << "no input file specified";
-		throw Error(ss.str());
+		throw Error("no input file specified");
 	}
 
 	std::ifstream ifs;
