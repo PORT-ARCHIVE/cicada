@@ -6,6 +6,7 @@
 #include "Logger.hpp"
 #include "Error.hpp"
 #include "MultiByteTokenizer.hpp"
+#include "W2V.hpp"
 
 namespace App {
 
@@ -126,24 +127,22 @@ namespace App {
 
 		try {
 
-			int yval = static_cast<int>(y);
-			int ydval = static_cast<int>(yd);
-
 			int dim0 = yDim * xDim;
 			int dim1 = dim0 + yDim * yDim;
-			//int dim2 = dim2 + yDim * maxLength;
-			int dim2;
+			int dim2 = dim2 + yDim * ws->getMaxLength();
+
+			int yval = static_cast<int>(y);
+			int ydval = static_cast<int>(yd);
 
 			vector fvec(dim2);
 
 			// y2x
 			int d = i - j + 1;
-			for( int l = 0; l < d; l++ ) {
+			for( int l = 0; l < d; l++ ) { 
 
 				std::string str = x->getStrs()->at(j+l).at(0);
 				int xval = boost::lexical_cast<int>(str);
-				//vector wvec = w2v.i2v(xval);
-				vector wvec;
+				const vector& wvec = w2vmat.i2v(xval);
 
 				for( int k = 0; k < dim0; k++ ) {
 					fvec(k) += wvec(k);
