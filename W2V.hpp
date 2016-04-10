@@ -13,10 +13,10 @@ namespace W2V {
     using namespace boost::numeric::ublas;
     typedef boost::numeric::ublas::vector<double> vector;
 
- 	class Matrix {
+ 	class Matrix_ {
 	public:
-		Matrix();
-        virtual ~Matrix();
+		Matrix_();
+        virtual ~Matrix_();
 		void read(std::string file);
 		int w2i(const std::string& w);
 		const vector& i2v(int i);
@@ -25,6 +25,8 @@ namespace W2V {
         std::map<long long, std::string> i2w_;
         std::vector<vector> M;
 	};
+
+	typedef std::shared_ptr<Matrix_> Matrix;
 }
 
 #endif // W2V__H

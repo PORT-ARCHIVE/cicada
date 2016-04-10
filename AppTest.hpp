@@ -33,6 +33,7 @@ namespace App {
 		virtual void write();
 		virtual double operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i);
 		virtual double wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i);
+		void setMatrix(W2V::Matrix m) { w2vmat = m; }
 	private:
 		W2V::Matrix w2vmat;
 	};

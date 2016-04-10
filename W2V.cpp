@@ -6,15 +6,15 @@
 
 namespace W2V {
 
-	Matrix::Matrix()
+	Matrix_::Matrix_()
 	{
 	}
 
-	Matrix::~Matrix()
+	Matrix_::~Matrix_()
 	{
 	}
 
-	void Matrix::read(std::string file)
+	void Matrix_::read(std::string file)
  	{
         FILE* f = std::fopen(file.c_str(), "rb");
    	    if( f == NULL ) {
@@ -61,7 +61,7 @@ namespace W2V {
         std::fclose(f);
 	}
 
-	int Matrix::w2i(const std::string& w)
+	int Matrix_::w2i(const std::string& w)
 	{
         auto ip = w2i_.find(w);
         if( ip != w2i_.end() ) {
@@ -71,7 +71,7 @@ namespace W2V {
         }
 	}
 
-	const vector& Matrix::i2v(int i)
+	const vector& Matrix_::i2v(int i)
 	{
 		const vector& v = M[i];
 		return v;

@@ -17,10 +17,16 @@ namespace App {
 		SemiCrf::FeatureFunction ff;
 
 		if( feature.empty() ) {
+
 			SemiCrf::FeatureFunction digitFeature(new Digit());
 			ff = digitFeature;
+
 		} else {
-			SemiCrf::FeatureFunction jpnFeature(new Jpn());
+			
+			std::shared_ptr<Jpn> jpnFeature(new Jpn());
+			W2V::Matrix m(new W2V::Matrix_());
+			m->read(feature); // T.B.D.
+			jpnFeature->setMatrix(m);
 			ff = jpnFeature;
 		}
 
@@ -153,7 +159,7 @@ namespace App {
 
 				std::string str = x->getStrs()->at(j+l).at(0);
 				int xval = boost::lexical_cast<int>(str);
-				const vector& wvec = w2vmat.i2v(xval);
+				const vector& wvec = w2vmat->i2v(xval);
 
 				for( int k = 0; k < dim0; k++ ) {
 					fvec(k) += wvec(k);
@@ -283,7 +289,7 @@ namespace App {
 
 				std::string str = x->getStrs()->at(j+l).at(0);
 				int xval = boost::lexical_cast<int>(str);
-				const vector& wvec = w2vmat.i2v(xval);
+				const vector& wvec = w2vmat->i2v(xval);
 
 				for( int k = 0; k < dim0; k++ ) {
 					fvec(k) += wvec(k);
