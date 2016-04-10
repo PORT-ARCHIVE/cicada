@@ -160,6 +160,7 @@ namespace SemiCrf {
 		FeatureFunction_();
 		virtual ~FeatureFunction_();
 		virtual double operator() (int k, App::Label y, App::Label yd, Data x, int j, int i) = 0;
+		virtual double wg(Weights w, App::Label y, App::Label yd, Data x, int j, int i) = 0;
 		virtual void read() = 0;
 		virtual void write() = 0;
 		void setXDim(int arg) { xDim = arg; }

@@ -1,12 +1,15 @@
 // © 2016 PORT INC.
 
 #include <boost/lexical_cast.hpp>
+#include <boost/numeric/ublas/vector.hpp>
 #include "AppTest.hpp"
 #include "Logger.hpp"
 #include "Error.hpp"
 #include "MultiByteTokenizer.hpp"
 
 namespace App {
+
+    typedef boost::numeric::ublas::vector<double> vector;
 
 	Simple::Simple()
 	{
@@ -112,6 +115,57 @@ namespace App {
 		}
 
 		return ret;
+	}
+
+	double Simple::wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i)
+	{
+		assert(0 < xDim);
+		assert(0 < yDim);
+
+		double v = 0.0;
+
+		try {
+
+			int yval = static_cast<int>(y);
+			int ydval = static_cast<int>(yd);
+
+			int dim0 = yDim * xDim;
+			int dim1 = dim0 + yDim * yDim;
+			//int dim2 = dim2 + yDim * maxLength;
+			int dim2;
+
+			vector fvec(dim2);
+
+			// y2x
+			int d = i - j + 1;
+			for( int l = 0; l < d; l++ ) {
+
+				std::string str = x->getStrs()->at(j+l).at(0);
+				int xval = boost::lexical_cast<int>(str);
+				//vector wvec = w2v.i2v(xval);
+				vector wvec;
+
+				for( int k = 0; k < dim0; k++ ) {
+					fvec(k) += wvec(k);
+				}
+			}
+
+            // y2y
+			fvec(dim0+ydval*yDim+yval) += 1;
+
+            // y2l
+			fvec(dim1+d) += 1;
+
+			int k = 0;
+			for( auto w : *ws ) {
+				v += w*fvec(k++);
+			}
+
+		} catch (...) {
+			throw Error("Simple::operator(): unexpected exception");
+		}
+
+		return v;
 	}
 
 	void PridectionDigitDatas_::read(std::istream& strm)

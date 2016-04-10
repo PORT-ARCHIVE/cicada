@@ -17,6 +17,7 @@ namespace App {
 		virtual void read();
 		virtual void write();
 		virtual double operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i);
+		virtual double wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i);
 	};
 
 	SemiCrf::FeatureFunction createFeatureFunction();
