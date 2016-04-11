@@ -573,7 +573,6 @@ namespace SemiCrf {
 	void Algorithm_::setDatas(Datas arg)
 	{
 		datas = arg;
-		dim = datas->getDim();
 	}
 
 	void Algorithm_::setFeatureFunction(FeatureFunction arg)
@@ -635,6 +634,14 @@ namespace SemiCrf {
 
 	void Learner_::preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile)
 	{
+		int xdim = datas->getXDim();
+		int ydim = datas->getYDim();
+		const std::string& feature = datas->getFeature();
+		ff = App::createFeatureFunction(feature, w2vfile);
+		ff->setXDim(xdim);
+		ff->setYDim(ydim);
+		dim = ff->getDim();
+
 		SemiCrf::Weights weights = SemiCrf::createWeights(dim);
 		setWeights(weights);
 
@@ -646,12 +653,6 @@ namespace SemiCrf {
 
 		}
 
-		int xdim = datas->getXDim();
-		int ydim = datas->getYDim();
-		const std::string& feature = datas->getFeature();
-		ff = App::createFeatureFunction(feature, w2vfile);
-		ff->setXDim(xdim);
-		ff->setYDim(ydim);
 		weights->setFeature(feature);
 		Labels labels = createLabels(ydim);
 		setLabels(labels);
@@ -1044,6 +1045,10 @@ namespace SemiCrf {
 		ff = App::createFeatureFunction(feature, w2vfile);
 		ff->setXDim(xdim);
 		ff->setYDim(ydim);
+		dim = ff->getDim();
+		if( weights->size() != dim ) {
+			throw Error("warning: feature mismatch");
+		}
 		datas->setXDim(xdim);
 		datas->setYDim(ydim);
 		if( datas->getFeature() != feature ) {

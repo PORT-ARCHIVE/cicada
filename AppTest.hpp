@@ -17,6 +17,7 @@ namespace App {
 	public:
 		Digit();
 		virtual ~Digit();
+		virtual int getDim();
 		virtual void read();
 		virtual void write();
 		virtual double operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i);
@@ -27,6 +28,7 @@ namespace App {
 	public:
 		Jpn();
 		virtual ~Jpn();
+		virtual int getDim();
 		virtual void read();
 		virtual void write();
 		virtual double operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i);

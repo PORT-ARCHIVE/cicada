@@ -98,7 +98,6 @@ namespace SemiCrf {
 		virtual ~Datas_();
 		virtual void read(std::istream& input) = 0;
 		virtual void write(std::ostream& output) const;
-		virtual int getDim() { return (( xDim + yDim ) * yDim); }
 		virtual int getXDim() { return xDim; }
 		virtual int getYDim() { return yDim; }
 		virtual void setXDim(int arg) { xDim = arg; }
@@ -171,6 +170,7 @@ namespace SemiCrf {
 		virtual void write() = 0;
 		void setXDim(int arg) { xDim = arg; }
 		void setYDim(int arg) { yDim = arg; }
+		virtual int getDim() = 0;
 		const std::string& getFeature() { return feature; };
 	protected:
 		int xDim;

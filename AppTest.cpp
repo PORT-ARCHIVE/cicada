@@ -75,6 +75,11 @@ namespace App {
 		Logger::out(2) << "~Digit()" << std::endl;
 	}
 
+	int Digit::getDim()
+	{
+		return (( xDim + yDim ) * yDim);
+	}
+
 	void Digit::read()
 	{
 		Logger::out(2) << "Digit::read()" << std::endl;
@@ -203,6 +208,11 @@ namespace App {
 	Jpn::~Jpn()
 	{
 		Logger::out(2) << "~Jpn()" << std::endl;
+	}
+
+	int Jpn::getDim()
+	{
+		return (( xDim + yDim ) * yDim);
 	}
 
 	void Jpn::read()
