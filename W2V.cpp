@@ -14,7 +14,7 @@ namespace W2V {
 	{
 	}
 
-	void Matrix_::read(std::string file)
+	void Matrix_::read(const std::string& file)
  	{
         FILE* f = std::fopen(file.c_str(), "rb");
    	    if( f == NULL ) {

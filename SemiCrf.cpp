@@ -640,6 +640,7 @@ namespace SemiCrf {
 		ff = App::createFeatureFunction(feature, w2vfile);
 		ff->setXDim(xdim);
 		ff->setYDim(ydim);
+		ff->setMaxLength(maxLength);
 		dim = ff->getDim();
 
 		SemiCrf::Weights weights = SemiCrf::createWeights(dim);
@@ -1045,6 +1046,7 @@ namespace SemiCrf {
 		ff = App::createFeatureFunction(feature, w2vfile);
 		ff->setXDim(xdim);
 		ff->setYDim(ydim);
+		ff->setMaxLength(maxLength);
 		dim = ff->getDim();
 		if( weights->size() != dim ) {
 			throw Error("warning: feature mismatch");

@@ -17,7 +17,7 @@ namespace W2V {
 	public:
 		Matrix_();
         virtual ~Matrix_();
-		void read(std::string file);
+		void read(const std::string& file);
 		int w2i(const std::string& w);
 		const vector& i2v(int i);
     private:

@@ -171,10 +171,13 @@ namespace SemiCrf {
 		void setXDim(int arg) { xDim = arg; }
 		void setYDim(int arg) { yDim = arg; }
 		virtual int getDim() = 0;
+		int getMaxLength() { return maxLength; }
+		void setMaxLength(int arg) { maxLength = arg; }
 		const std::string& getFeature() { return feature; };
 	protected:
 		int xDim;
 		int yDim;
+		int maxLength;
 		std::string feature;
 	};
 

@@ -212,7 +212,7 @@ namespace App {
 
 	int Jpn::getDim()
 	{
-		return (( xDim + yDim ) * yDim);
+		return yDim * ( xDim + yDim + maxLength );
 	}
 
 	void Jpn::read()
@@ -293,14 +293,14 @@ namespace App {
 
 		try {
 
-			int dim0 = yDim * xDim;
-			int dim1 = dim0 + yDim * yDim;
-			int dim2 = dim2 + yDim * ws->getMaxLength();
-
 			int yval = static_cast<int>(y);
 			int ydval = static_cast<int>(yd);
 
-			vector fvec(dim2);
+			int dim0 = yDim * xDim;
+			int dim1 = yDim * ( xDim + yDim );
+			int dim2 = yDim * ( xDim + yDim + maxLength );
+
+			vector fvec(dim2, 0.0);
 
 			// y2x
 			int d = i - j + 1;
@@ -316,7 +316,7 @@ namespace App {
 			}
 
             // y2y
-			fvec(dim0+ydval*yDim+yval) += 1;
+			fvec(dim0+ydval*yDim+yval) += 1.0;
 
             // y2l
 			fvec(dim1+d) += 1;
