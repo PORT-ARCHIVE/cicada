@@ -288,7 +288,7 @@ namespace SemiCrf {
 
 				} else {
 
-					Logger::out(2) << "warning: unknown descriptor" << std::endl;
+					Logger::out(1) << "warning: unknown descriptor" << std::endl;
 				}
 			}
 
