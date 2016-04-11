@@ -1046,6 +1046,9 @@ namespace SemiCrf {
 		ff->setYDim(ydim);
 		datas->setXDim(xdim);
 		datas->setYDim(ydim);
+		if( datas->getFeature() != feature ) {
+			Logger::out(1) << "warning: feature mismatch" << std::endl;
+		}
 		datas->setFeature(feature);
 		Labels labels = createLabels(ydim);
 		setLabels(labels);
