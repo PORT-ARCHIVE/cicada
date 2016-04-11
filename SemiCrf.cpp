@@ -574,16 +574,11 @@ namespace SemiCrf {
 		dim = arg;
 	}
 
+	static int debug = 0;
+
 	double Algorithm_::computeWG(App::Label y, App::Label yd, int i, int d)
 	{
-		double v = 0.0;
-
-		int k = 0;
-		for( auto w : *weights ) {
-			v += w * (*ff)(k, y, yd, current_data, i-d+1, i);
-			k++;
-		}
-
+		double v = ff->wg(weights, y, yd, current_data, i-d+1, i);
 		return v;
 	}
 

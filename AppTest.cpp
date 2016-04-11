@@ -2,6 +2,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include "AppTest.hpp"
 #include "Logger.hpp"
 #include "Error.hpp"
@@ -144,14 +145,13 @@ namespace App {
 
 		try {
 
-			int dim0 = yDim * xDim;
-			int dim1 = dim0 + yDim * yDim;
-			int dim2 = dim2 + yDim * ws->getMaxLength();
-
 			int yval = static_cast<int>(y);
 			int ydval = static_cast<int>(yd);
 
-			vector fvec(dim2);
+			int dim0 = yDim * xDim;
+			int dim1 = yDim * ( xDim + yDim );
+
+			vector fvec(dim1, 0.0);
 
 			// y2x
 			int d = i - j + 1;
@@ -159,18 +159,18 @@ namespace App {
 
 				std::string str = x->getStrs()->at(j+l).at(0);
 				int xval = boost::lexical_cast<int>(str);
-				const vector& wvec = w2vmat->i2v(xval);
-
-				for( int k = 0; k < dim0; k++ ) {
-					fvec(k) += wvec(k);
-				}
+				fvec(yval*xDim+xval) += 1.0;
 			}
 
             // y2y
-			fvec(dim0+ydval*yDim+yval) += 1;
+			fvec(dim0+yval*yDim+yval) += 1.0;
+
+			if( ydval != yval ) {
+				fvec(dim0+ydval*yDim+yval) += 1.0;
+			}
 
             // y2l
-			fvec(dim1+d) += 1;
+			// fvec(dim1+d) += 1.0;
 
 			int k = 0;
 			for( auto w : *ws ) {
@@ -178,7 +178,7 @@ namespace App {
 			}
 
 		} catch (...) {
-			throw Error("Digit::operator(): unexpected exception");
+			throw Error("Digit::wg: unexpected exception");
 		}
 
 		return v;
