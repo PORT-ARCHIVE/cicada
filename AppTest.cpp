@@ -90,66 +90,7 @@ namespace App {
 		Logger::out(2) << "Digit::write()" << std::endl;
 	}
 
-	double Digit::operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i)
-	{
-		assert(0 < xDim);
-		assert(0 < yDim);
-
-		int ret = 0;
-
-		try {
-
-			int yval = static_cast<int>(y);
-			int ydval = static_cast<int>(yd);
-
-			int dim0 = yDim * xDim;
-			int dim1 = yDim * ( xDim + yDim );
-
-			// y2x
-			if( k < dim0 ) {
-
-				int col = k % xDim;
-				int row = k / xDim;
-				int d = i - j + 1;
-
-				for( int l = 0; l < d; l++ ) {
-
-					std::string str = x->getStrs()->at(j+l).at(0);
-					int xval = boost::lexical_cast<int>(str);
-
-					if( yval == row && xval == col ) {
-						ret += 1;
-					}
-				}
-
-			// y2y
-			} else if( dim0 <= k && k < dim1 ) {
-
-				int index = k - dim0;
-				int col = index % yDim;
-				int row = index / yDim;
-
-				if( row == col && row == yval ) {
-
-					ret = 1; // Sum of this value equals to the number of segments whose label is yval.
-
-				} else if( ydval == row && yval == col ) {
-
-					ret = 1; // Sum of this value equals to the number of transitions from ydval to yval
-				}
-
-			} else {
-				throw Error("Digit::operator(): invalid dimension specified");
-			}
-
-		} catch (...) {
-			throw Error("Digit::operator(): unexpected exception");
-		}
-
-		return ret;
-	}
-
-	double Digit::wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i)
+	double Digit::wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i, SemiCrf::vector& gs)
 	{
 		assert(0 < xDim);
 		assert(0 < yDim);
@@ -187,6 +128,7 @@ namespace App {
 
 			int k = 0;
 			for( auto w : *ws ) {
+				gs(k) = fvec(k);
 				v += w*fvec(k++);
 			}
 
@@ -225,66 +167,7 @@ namespace App {
 		Logger::out(2) << "Jpn::write()" << std::endl;
 	}
 
-	double Jpn::operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i)
-	{
-		assert(0 < xDim);
-		assert(0 < yDim);
-
-		int ret = 0;
-
-		try {
-
-			int yval = static_cast<int>(y);
-			int ydval = static_cast<int>(yd);
-
-			int dim0 = yDim * xDim;
-			int dim1 = yDim * ( xDim + yDim );
-
-			// y2x
-			if( k < dim0 ) {
-
-				int col = k % xDim;
-				int row = k / xDim;
-				int d = i - j + 1;
-
-				for( int l = 0; l < d; l++ ) {
-
-					std::string str = x->getStrs()->at(j+l).at(0);
-					int xval = boost::lexical_cast<int>(str);
-
-					if( yval == row && xval == col ) {
-						ret += 1;
-					}
-				}
-
-			// y2y
-			} else if( dim0 <= k && k < dim1 ) {
-
-				int index = k - dim0;
-				int col = index % yDim;
-				int row = index / yDim;
-
-				if( row == col && row == yval ) {
-
-					ret = 1; // Sum of this value equals to the number of segments whose label is yval.
-
-				} else if( ydval == row && yval == col ) {
-
-					ret = 1; // Sum of this value equals to the number of transitions from ydval to yval
-				}
-
-			} else {
-				throw Error("Jpn::operator(): invalid dimension specified");
-			}
-
-		} catch (...) {
-			throw Error("Jpn::operator(): unexpected exception");
-		}
-
-		return ret;
-	}
-
-	double Jpn::wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i)
+	double Jpn::wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i, SemiCrf::vector& gs)
 	{
 		assert(0 < xDim);
 		assert(0 < yDim);
@@ -323,6 +206,7 @@ namespace App {
 
 			int k = 0;
 			for( auto w : *ws ) {
+				gs(k) = fvec(k);
 				v += w*fvec(k++);
 			}
 

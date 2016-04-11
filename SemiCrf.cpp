@@ -592,9 +592,9 @@ namespace SemiCrf {
 
 	static int debug = 0;
 
-	double Algorithm_::computeWG(App::Label y, App::Label yd, int i, int d)
+	double Algorithm_::computeWG(App::Label y, App::Label yd, int i, int d, vector& gs)
 	{
-		double v = ff->wg(weights, y, yd, current_data, i-d+1, i);
+		double v = ff->wg(weights, y, yd, current_data, i-d+1, i, gs);
 		return v;
 	}
 
@@ -738,25 +738,26 @@ namespace SemiCrf {
 		auto segments = current_data->getSegments();
 		assert( 0 < segments->size() );
 
-		auto iw = weights->begin();
-		for( int k = 0; k < dim; k++, iw++ ) {
+		Gs.resize(dim);
+		auto si = segments->begin();
+		auto y1 = App::ZERO;
+		for( ; si != segments->end(); si++ ){
 
-			double G = 0.0;
-			auto si = segments->begin();
-
-			auto y1 = App::ZERO;
-			for( ; si != segments->end(); si++ ){
-
-				auto y = (*si)->getLabel();
-				int ti = (*si)->getStart();
-				int ui = (*si)->getEnd();
-				G += (*ff)(k, y, y1, current_data, ti, ui);
-				y1 = y;
+			auto y = (*si)->getLabel();
+			int ti = (*si)->getStart();
+			int ui = (*si)->getEnd();
+			vector gs(dim);
+			WG += computeWG(y, y1, ui, ui-ti+1, gs);
+			int k = 0;
+			for( auto& g : Gs ) {
+				g += gs(k++);
 			}
+			y1 = y;
+		}
 
-			Gs.push_back(G); Logger::out(2) << "G(" << k << ")=" << G << std::endl;
-			double w = *iw;
-			WG += w*G;
+		int k = 0;
+		for( auto g : Gs ) {
+			Logger::out(2) << "G(" << k++ << ")=" << g << std::endl;
 		}
 
 		if( flg & ENABLE_LIKELIHOOD_ONLY ) {
@@ -771,13 +772,8 @@ namespace SemiCrf {
 				auto y = (*si)->getLabel();
 				int ti = (*si)->getStart();
 				int ui = (*si)->getEnd();
-
-				auto iw = weights->begin();
-				for( int k = 0; k < dim; k++, iw++ ) {
-					double g = (*ff)(k, y, y1, current_data, ti, ui);
-					double w = *iw;
-					wg += w*g;
-				}
+				vector gs(dim);
+				wg = computeWG(y, y1, ui, ui-ti+1, gs);
 
 				y1 = y;
 				awg += wg;
@@ -855,7 +851,8 @@ namespace SemiCrf {
 						}
 
 						double alp = alpha(i-d, yd);
-						double wg = computeWG(y, yd, i, d);
+						vector gs(dim);
+						double wg = computeWG(y, yd, i, d, gs);
 						v += alp*exp(wg);
 					}
 				}
@@ -898,8 +895,9 @@ namespace SemiCrf {
 							continue;
 						}
 
-						double cof = eta(i-d, yd, k) + alpha(i-d, yd) * (*ff)(k, y, yd, current_data, i-d+1, i);
-						double wg = computeWG(y, yd, i, d);
+						vector gs(dim);
+						double wg = computeWG(y, yd, i, d, gs);
+						double cof = eta(i-d, yd, k) + alpha(i-d, yd) * gs(k);
 						v += cof*exp(wg);
 					}
 				}
@@ -1133,7 +1131,8 @@ namespace SemiCrf {
 
 						int tmp = -1;
 						double v = V(i-d, yd, tmp);
-						v += computeWG(y, yd, i, d);
+						vector gs(dim);
+						v += computeWG(y, yd, i, d, gs);
 					
 						if( maxV < v ) {
 							maxV = v;

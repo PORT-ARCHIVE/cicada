@@ -20,8 +20,7 @@ namespace App {
 		virtual int getDim();
 		virtual void read();
 		virtual void write();
-		virtual double operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i);
-		virtual double wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i);
+		virtual double wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i, SemiCrf::vector& gs);
 	};
 
 	class Jpn : public SemiCrf::FeatureFunction_ {
@@ -31,8 +30,7 @@ namespace App {
 		virtual int getDim();
 		virtual void read();
 		virtual void write();
-		virtual double operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i);
-		virtual double wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i);
+		virtual double wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i, SemiCrf::vector& gs);
 		void setMatrix(W2V::Matrix m) { w2vmat = m; }
 	private:
 		W2V::Matrix w2vmat;
