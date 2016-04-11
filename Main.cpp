@@ -16,6 +16,7 @@ public:
 		, predictionDataFile("")
 		, weightsFile("")
 		, initWeightsFile("")
+		, w2vMatrixFile("w2vmat")
 		, maxLength(0)
 		, maxIteration(1024)
 		, e0(1.0e-5)
@@ -162,10 +163,7 @@ int main(int argc, char *argv[])
 		Logger::setLevel(options.logLevel);
 
 		SemiCrf::Algorithm alg = createAlgorithm(options);
-		SemiCrf::FeatureFunction ff = App::createFeatureFunction(options.w2vMatrixFile);
-
-		alg->setFeatureFunction(ff);
-		alg->preProcess(options.weightsFile, options.initWeightsFile);
+		alg->preProcess(options.weightsFile, options.initWeightsFile, options.w2vMatrixFile);
 		alg->compute();
 		alg->postProcess(options.weightsFile);
 

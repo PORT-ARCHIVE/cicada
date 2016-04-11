@@ -11,7 +11,7 @@ namespace App {
 
 	const int ZERO = 0;
 
-	SemiCrf::FeatureFunction createFeatureFunction(std::string feature);
+	SemiCrf::FeatureFunction createFeatureFunction(const std::string& feature, const std::string& w2vmat);
 
 	class Digit : public SemiCrf::FeatureFunction_ {
 	public:
@@ -21,8 +21,6 @@ namespace App {
 		virtual void write();
 		virtual double operator() (int k, Label y, Label yd, SemiCrf::Data x, int j, int i);
 		virtual double wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i);
-	private:
-		W2V::Matrix w2vmat;
 	};
 
 	class Jpn : public SemiCrf::FeatureFunction_ {

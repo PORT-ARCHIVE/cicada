@@ -135,6 +135,7 @@ namespace SemiCrf {
 		: xDim(0)
 		, yDim(0)
 		, maxLength(-std::numeric_limits<int>::max())
+		, feature("")
 	{
 		Logger::out(2) << "Datas_()" << std::endl;
 	};
@@ -146,7 +147,9 @@ namespace SemiCrf {
 
 	void Datas_::write(std::ostream& output)  const {
 		Logger::out(2) << "Datas_::write()" << std::endl;
-
+		if( !feature.empty() ) {
+			output << "# FEATURE" << " " << feature << std::endl;
+		}
 		output << "# DIMENSION" << " " << xDim << " " << yDim << std::endl;
 		for( auto d : *this ) {
 
@@ -207,6 +210,15 @@ namespace SemiCrf {
 						tok = tokenizer.get();
 						if( !tok.empty() ) {
 							yDim = boost::lexical_cast<int>(tok);
+						}
+						tok = tokenizer.get();
+						if( !tok.empty() ) {
+							// T.B.D.
+						}
+					} else if( tok == "FEATURE" ) {
+						tok = tokenizer.get();
+						if( !tok.empty() ) {
+							feature = tok;
 						}
 						tok = tokenizer.get();
 						if( !tok.empty() ) {
@@ -389,6 +401,7 @@ namespace SemiCrf {
 		, xDim(-1)
 		, yDim(-1)
 		, maxLength(-1)
+		, feature("")
 	{
 		Logger::out(2) << "Weights_()" << std::endl;
 	}
@@ -475,6 +488,10 @@ namespace SemiCrf {
 		Logger::out(2) << "Weights_::write()" << std::endl;
 
 		ofs << "# Semi-CRF Weights" << std::endl;
+		if( !feature.empty() ) {
+			ofs << std::endl;
+			ofs << "# FEATURE" << " " << feature << std::endl;
+		}
 		ofs << std::endl;
 		ofs << "# DIMENSION" << " " << xDim << " " << yDim << std::endl;
 		ofs << std::endl;
@@ -616,7 +633,7 @@ namespace SemiCrf {
 		Logger::out(1) << "OK" << std::endl;
 	}
 
-	void Learner_::preProcess(const std::string& wfile, const std::string& w0file)
+	void Learner_::preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile)
 	{
 		SemiCrf::Weights weights = SemiCrf::createWeights(dim);
 		setWeights(weights);
@@ -626,12 +643,16 @@ namespace SemiCrf {
 			open(ifs, w0file);
 			weights->resize(0);
 			weights->read(ifs);
+
 		}
 
 		int xdim = datas->getXDim();
 		int ydim = datas->getYDim();
+		const std::string& feature = datas->getFeature();
+		ff = App::createFeatureFunction(feature, w2vfile);
 		ff->setXDim(xdim);
 		ff->setYDim(ydim);
+		weights->setFeature(feature);
 		Labels labels = createLabels(ydim);
 		setLabels(labels);
 	}
@@ -1001,7 +1022,7 @@ namespace SemiCrf {
 		Logger::out(1) << "OK" << std::endl;
 	}
 
-	void Predictor_::preProcess(const std::string& wfile, const std::string& w0file)
+	void Predictor_::preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile)
 	{
 		SemiCrf::Weights weights = SemiCrf::createWeights();
 		std::ifstream ifs; // 入力
@@ -1016,12 +1037,16 @@ namespace SemiCrf {
 				throw Error("could not determine maxLength");
 			}
 		}
+
 		int xdim = weights->getXDim();
 		int ydim = weights->getYDim();
+		const std::string& feature = weights->getFeature();
+		ff = App::createFeatureFunction(feature, w2vfile);
 		ff->setXDim(xdim);
 		ff->setYDim(ydim);
 		datas->setXDim(xdim);
 		datas->setYDim(ydim);
+		datas->setFeature(feature);
 		Labels labels = createLabels(ydim);
 		setLabels(labels);
 	}

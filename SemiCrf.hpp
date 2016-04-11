@@ -104,10 +104,13 @@ namespace SemiCrf {
 		virtual void setXDim(int arg) { xDim = arg; }
 		virtual void setYDim(int arg) { yDim = arg; }
 		virtual int getMaxLength() { return maxLength; }
+		const std::string& getFeature() { return feature; }
+		void setFeature(const std::string& arg) { feature = arg; }
 	protected:
 		int xDim;
 		int yDim;
 		int maxLength;
+		std::string feature;
 	};
 
 	typedef std::shared_ptr<Datas_> Datas;
@@ -145,10 +148,13 @@ namespace SemiCrf {
 		int getYDim() { return yDim; }
 		int getMaxLength() { return maxLength; }
 		void setMaxLength(int arg) { maxLength = arg; }
+		const std::string& getFeature() { return feature; }
+		void setFeature(const std::string& arg) { feature = arg; }
 	protected:
 		int xDim;
 		int yDim;
 		int maxLength;
+		std::string feature;
 	};
 
 	typedef std::shared_ptr<Weights_> Weights;
@@ -165,9 +171,11 @@ namespace SemiCrf {
 		virtual void write() = 0;
 		void setXDim(int arg) { xDim = arg; }
 		void setYDim(int arg) { yDim = arg; }
+		const std::string& getFeature() { return feature; };
 	protected:
 		int xDim;
 		int yDim;
+		std::string feature;
 	};
 
 	typedef std::shared_ptr<FeatureFunction_> FeatureFunction;
@@ -196,7 +204,7 @@ namespace SemiCrf {
 		virtual void setWeights(Weights arg);
 		virtual void setDimension(int arg);
 		virtual void compute() = 0;
-		virtual void preProcess(const std::string& wfile, const std::string& w0file) = 0;
+		virtual void preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile) = 0;
 		virtual void postProcess(const std::string& wfile) = 0;
 		void setFlg(int flg);
 
@@ -231,7 +239,7 @@ namespace SemiCrf {
 		Learner_(int arg);
 		virtual ~Learner_();
 		virtual void compute();
-		virtual void preProcess(const std::string& wfile, const std::string& w0file);
+		virtual void preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile);
 		virtual void postProcess(const std::string& wfile);
 
 	private:
@@ -277,7 +285,7 @@ namespace SemiCrf {
 		Predictor_(int arg);
 		virtual ~Predictor_();
 		virtual void compute();
-		virtual void preProcess(const std::string& wfile, const std::string& w0file);
+		virtual void preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile);
 		virtual void postProcess(const std::string& wfile);
 		
 	private:

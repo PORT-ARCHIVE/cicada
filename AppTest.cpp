@@ -13,22 +13,29 @@ namespace App {
 
     typedef boost::numeric::ublas::vector<double> vector;
 
-	SemiCrf::FeatureFunction createFeatureFunction(std::string feature)
+	SemiCrf::FeatureFunction createFeatureFunction(const std::string& feature, const std::string& w2vmat)
 	{
 		SemiCrf::FeatureFunction ff;
 
-		if( feature.empty() ) {
+		if( feature == "DIGIT" || feature.empty() ) {
 
 			SemiCrf::FeatureFunction digitFeature(new Digit());
 			ff = digitFeature;
 
-		} else {
+		} else if( feature == "JPN" ) {
 			
 			std::shared_ptr<Jpn> jpnFeature(new Jpn());
 			W2V::Matrix m(new W2V::Matrix_());
-			m->read(feature); // T.B.D.
+			if( w2vmat.empty() ) {
+				throw Error("no w2v matrix file specifed");
+			}
+			m->read(w2vmat); // T.B.D.
 			jpnFeature->setMatrix(m);
 			ff = jpnFeature;
+
+		} else {
+
+			throw Error("unsupported feature specifed");
 		}
 
 		return ff;
@@ -59,6 +66,7 @@ namespace App {
 
 	Digit::Digit()
 	{
+		feature = "DIGIT";
 		Logger::out(2) << "Digit()" << std::endl;
 	}
 
@@ -188,6 +196,7 @@ namespace App {
 
 	Jpn::Jpn()
 	{
+		feature = "JPN";
 		Logger::out(2) << "Jpn()" << std::endl;
 	}
 
@@ -353,6 +362,15 @@ namespace App {
 						tok = tokenizer.get();
 						if( !tok.empty() ) {
 							yDim = boost::lexical_cast<int>(tok);
+						}
+						tok = tokenizer.get();
+						if( !tok.empty() ) {
+							// T.B.D.
+						}
+					} else if( tok == "FEATURE" ) {
+						tok = tokenizer.get();
+						if( !tok.empty() ) {
+							feature = tok;
 						}
 						tok = tokenizer.get();
 						if( !tok.empty() ) {
