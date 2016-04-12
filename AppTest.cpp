@@ -190,7 +190,7 @@ namespace App {
 			for( int l = 0; l < d; l++ ) { 
 
 				std::string str = x->getStrs()->at(j+l).at(0);
-				int xval = boost::lexical_cast<int>(str);
+				long long xval = boost::lexical_cast<long long>(str);
 				const vector& wvec = w2vmat->i2v(xval);
 
 				for( int k = 0; k < dim0; k++ ) {
