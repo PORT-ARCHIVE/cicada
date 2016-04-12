@@ -634,27 +634,35 @@ namespace SemiCrf {
 
 	void Learner_::preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile)
 	{
+		// datasからx,yの次元、featureを取得する
 		int xdim = datas->getXDim();
 		int ydim = datas->getYDim();
 		const std::string& feature = datas->getFeature();
+
+		// feature関数を生成し、x,yの次元、feature、maxLengthを設定する
 		ff = App::createFeatureFunction(feature, w2vfile);
 		ff->setXDim(xdim);
 		ff->setYDim(ydim);
-		ff->setMaxLength(maxLength);
+		ff->setMaxLength(maxLength); // maxLengthはdatasをreadした直後に設定されている
+
+		// featureから次元を取得しアルゴリズムに設定
 		dim = ff->getDim();
 
+		// 重みを生成しアルゴリズムに設定
 		SemiCrf::Weights weights = SemiCrf::createWeights(dim);
 		setWeights(weights);
 
-		if( !w0file.empty() ) {
+		if( !w0file.empty() ) { // 初期重みが指定されている場合
 			std::ifstream ifs; // 入力
 			open(ifs, w0file);
 			weights->resize(0);
-			weights->read(ifs);
-
+			weights->read(ifs); // 重みを初期重みで初期化
 		}
 
+		// 重みにfeatureを設定
 		weights->setFeature(feature);
+
+		// ラベルを生成
 		Labels labels = createLabels(ydim);
 		setLabels(labels);
 	}
@@ -1024,37 +1032,50 @@ namespace SemiCrf {
 
 	void Predictor_::preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile)
 	{
+		// 重みを生成しファイルから読み込む
 		SemiCrf::Weights weights = SemiCrf::createWeights();
 		std::ifstream ifs; // 入力
 		open(ifs, wfile);
 		weights->read(ifs);
 		setWeights(weights);
+
+		// maxLengthが明示的に指定されていなければ自動設定する
 		if( maxLength < 1 ) {
 			int ml = weights->getMaxLength();
 			if( 0 < ml ) {
 				setMaxLength(ml);
 			} else {
-				throw Error("could not determine maxLength");
+				throw Error("negative maxLength specifed in weight file");
 			}
 		}
 
+		// weightsからx,yの次元、featureを取得する
 		int xdim = weights->getXDim();
 		int ydim = weights->getYDim();
 		const std::string& feature = weights->getFeature();
+
+		// feature関数を生成し、x,yの次元、feature、maxLengthを設定する
 		ff = App::createFeatureFunction(feature, w2vfile);
 		ff->setXDim(xdim);
 		ff->setYDim(ydim);
 		ff->setMaxLength(maxLength);
+
+		// featureから次元を取得しアルゴリズムに設定
 		dim = ff->getDim();
 		if( weights->size() != dim ) {
-			throw Error("warning: feature mismatch");
+			throw Error("dimension mismatch between feature function and weight file");
 		}
+
+		// datasにx,yの次元、featureを設定する
 		datas->setXDim(xdim);
 		datas->setYDim(ydim);
 		if( datas->getFeature() != feature ) {
-			Logger::out(1) << "warning: feature mismatch" << std::endl;
+			// 推論データのfeatureが重みファイルと整合していない、推論データには明示的にfeatuteを指定する必要はない
+			throw Error("feature mismatch between data file and weight file");
 		}
 		datas->setFeature(feature);
+
+		// ラベルを生成
 		Labels labels = createLabels(ydim);
 		setLabels(labels);
 	}
