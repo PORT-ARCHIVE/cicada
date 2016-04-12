@@ -234,6 +234,7 @@ namespace SemiCrf {
 		CheckTable current_ectab;
 		int flg;
 		std::string method;
+		vector gs; // 作業領域
 	};
 
 	typedef std::shared_ptr<Algorithm_> Algorithm;

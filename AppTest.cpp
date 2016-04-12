@@ -117,10 +117,10 @@ namespace App {
 			}
 
             // y2y
-			fvec(dim0+yval*yDim+yval) += 1.0;
+			fvec(dim0+yval*yDim+yval) = 1.0;
 
 			if( ydval != yval ) {
-				fvec(dim0+ydval*yDim+yval) += 1.0;
+				fvec(dim0+ydval*yDim+yval) = 1.0;
 			}
 
             // y2l
@@ -199,10 +199,10 @@ namespace App {
 			}
 
             // y2y
-			fvec(dim0+ydval*yDim+yval) += 1.0;
+			fvec(dim0+ydval*yDim+yval) = 1.0;
 
             // y2l
-			fvec(dim1+d) += 1;
+			fvec(dim1+d) = 1;
 
 			int k = 0;
 			for( auto w : *ws ) {

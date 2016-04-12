@@ -665,6 +665,9 @@ namespace SemiCrf {
 		// ラベルを生成
 		Labels labels = createLabels(ydim);
 		setLabels(labels);
+
+		// 作業領域を初期化
+		gs.resize(dim);
 	}
 
 	void Learner_::postProcess(const std::string& wfile)
@@ -754,7 +757,6 @@ namespace SemiCrf {
 			auto y = (*si)->getLabel();
 			int ti = (*si)->getStart();
 			int ui = (*si)->getEnd();
-			vector gs(dim);
 			WG += computeWG(y, y1, ui, ui-ti+1, gs);
 			int k = 0;
 			for( auto& g : Gs ) {
@@ -780,7 +782,6 @@ namespace SemiCrf {
 				auto y = (*si)->getLabel();
 				int ti = (*si)->getStart();
 				int ui = (*si)->getEnd();
-				vector gs(dim);
 				wg = computeWG(y, y1, ui, ui-ti+1, gs);
 
 				y1 = y;
@@ -859,7 +860,6 @@ namespace SemiCrf {
 						}
 
 						double alp = alpha(i-d, yd);
-						vector gs(dim);
 						double wg = computeWG(y, yd, i, d, gs);
 						v += alp*exp(wg);
 					}
@@ -903,9 +903,9 @@ namespace SemiCrf {
 							continue;
 						}
 
-						vector gs(dim);
 						double wg = computeWG(y, yd, i, d, gs);
-						double cof = eta(i-d, yd, k) + alpha(i-d, yd) * gs(k);
+						double gsk = gs(k); // alphaでもgsを使うので書き変わる前にすぐ保存する
+						double cof = eta(i-d, yd, k) + alpha(i-d, yd) * gsk;
 						v += cof*exp(wg);
 					}
 				}
@@ -1078,6 +1078,9 @@ namespace SemiCrf {
 		// ラベルを生成
 		Labels labels = createLabels(ydim);
 		setLabels(labels);
+
+		// 作業領域を初期化
+		gs.resize(dim);
 	}
 
 	void Predictor_::postProcess(const std::string& wfile)
@@ -1152,7 +1155,6 @@ namespace SemiCrf {
 
 						int tmp = -1;
 						double v = V(i-d, yd, tmp);
-						vector gs(dim);
 						v += computeWG(y, yd, i, d, gs);
 					
 						if( maxV < v ) {
