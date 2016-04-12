@@ -21,6 +21,7 @@ public:
 		, maxIteration(1024)
 		, e0(1.0e-5)
 		, e1(1.0e-5)
+		, rp(1.0e-7)
 		, logLevel(0)
 		, flg(0)
 		, method("bfgs")
@@ -36,6 +37,7 @@ public:
 	int maxIteration;
 	double e0;
 	double e1;
+	double rp;
 	int logLevel;
 	int flg;
 	std::string method;
@@ -59,6 +61,8 @@ void Options::parse(int argc, char *argv[])
 				e0 = boost::lexical_cast<double>(argv[++i]);
 			} else if( arg == "-e1" ) {
 				e1 = boost::lexical_cast<double>(argv[++i]);
+			} else if( arg == "-g" || arg == "--regularization-parameter") {
+				rp = boost::lexical_cast<double>(argv[++i]);
 			} else if( arg == "-w" ) {
 				weightsFile = argv[++i];
 			} else if( arg == "-w0" ) {
@@ -73,6 +77,8 @@ void Options::parse(int argc, char *argv[])
 				flg |= SemiCrf::DISABLE_ADAGRAD;
 			} else if( arg == "--disable-date-version" ) {
 				flg |= SemiCrf::DISABLE_DATE_VERSION;
+			} else if( arg == "--disable-regularization" ) {
+				flg |= SemiCrf::DISABLE_REGULARIZATION;
 			} else if( arg == "--log-level" ) {
 				logLevel = boost::lexical_cast<int>(argv[++i]);
 			} else {
@@ -147,6 +153,7 @@ SemiCrf::Algorithm createAlgorithm(const Options& options)
 	alg->setMaxIteration(options.maxIteration);
 	alg->setE0(options.e0);
 	alg->setE1(options.e1);
+	alg->setRp(options.rp);
 	alg->setMethod(options.method);
 
 	return alg;

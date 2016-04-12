@@ -30,9 +30,10 @@ namespace SemiCrf {
     typedef boost::numeric::ublas::vector<double> vector;
 
 	enum {
-		DISABLE_ADAGRAD = 0x1,
-		DISABLE_DATE_VERSION = (0x1 << 1),
-		ENABLE_LIKELIHOOD_ONLY = (0x1 << 2)
+		DISABLE_ADAGRAD          =  0x1
+		, DISABLE_DATE_VERSION   = (0x1 << 1)
+		, ENABLE_LIKELIHOOD_ONLY = (0x1 << 2)
+		, DISABLE_REGULARIZATION = (0x1 << 3)
 	};
 
 	// ラベル集合
@@ -203,6 +204,7 @@ namespace SemiCrf {
 		virtual void setMaxIteration(int arg);
 		virtual void setE0(double arg);
 		virtual void setE1(double arg);
+		virtual void setRp(double arg);
 		virtual void setMethod(std::string arg);
 		virtual void setDatas(Datas arg);
 		virtual void setFeatureFunction(FeatureFunction arg);
@@ -228,6 +230,7 @@ namespace SemiCrf {
 		int maxIteration;
 		double e0;
 		double e1;
+		double rp;
 		Data current_data;
 		CheckTable current_vctab;
 		CheckTable current_actab;

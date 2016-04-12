@@ -529,6 +529,7 @@ namespace SemiCrf {
 		, maxIteration(1024)
 		, e0(1.0e-5)
 		, e1(1.0e-5)
+		, rp(1.0e-7)
 		, flg(arg)
 		, method("bfgs")
 	{
@@ -563,6 +564,11 @@ namespace SemiCrf {
 	void Algorithm_::setE1(double arg)
 	{
 		e1 = arg;
+	}
+
+	void Algorithm_::setRp(double arg)
+	{
+		rp = arg;
 	}
 
 	void Algorithm_::setMethod(std::string arg)
@@ -728,6 +734,16 @@ namespace SemiCrf {
 			auto Gs = computeG(WG);
 
 			L += WG - log(Z);
+
+			if( !(flg & DISABLE_REGULARIZATION) ) {
+				double w2 = 0.0;
+				for( auto w : *weights ) {
+					w2 += w*w;
+				}
+				w2 *= rp;
+				L += w2;
+			}
+
 			if( flg & ENABLE_LIKELIHOOD_ONLY ) {
 				Logger::out(1) << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z) << std::endl;
 			}
@@ -736,8 +752,16 @@ namespace SemiCrf {
 
 				auto Gms = computeGm(Z);
 				auto idL = dL.begin();
-				for( int k = 0; k < dim; k++, idL++ ) {
-					(*idL) += Gs[k] - Gms[k]; Logger::out(2) << "dL(" << k << ")=" << *idL << std::endl;
+				auto iw = weights->begin();
+				for( int k = 0; k < dim; k++, idL++, iw++ ) {
+					(*idL) += Gs[k] - Gms[k];
+
+					if( !(flg & DISABLE_REGULARIZATION) ) {
+						double dw2 = 2.0 * rp * (*iw);
+						(*idL) += dw2;
+					}
+
+					Logger::out(2) << "dL(" << k << ")=" << *idL << std::endl;
 				}
 			}
 		}
