@@ -39,7 +39,17 @@ namespace Optimizer {
 		double gd = inner_prod(g0, d);
 		double f0 = ofunc->value(x);
 		vector x1 = x + beta*d;
-		double f1 = ofunc->value(x1);
+
+		double f1 = 0.0;
+		while(1) {
+			try {
+				f1 = ofunc->value(x1);
+				break;
+			} catch(Error& e) {
+				beta *= tau;
+				x1 = x + beta*d;
+			}
+		}
 
 		while( xi*beta*gd < f1 - f0 ) { // Armijo's rule
 			beta *= tau;

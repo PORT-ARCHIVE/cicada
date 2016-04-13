@@ -890,6 +890,9 @@ namespace SemiCrf {
 						double alp = alpha(i-d, yd);
 						double wg = computeWG(y, yd, i, d, gs);
 						v += alp*exp(wg);
+						if( std::isinf(v) || std::isnan(v) ) {
+							throw Error("numerical problem");
+						}
 					}
 				}
 
@@ -935,6 +938,9 @@ namespace SemiCrf {
 						double gsk = gs(k); // alphaでもgsを使うので書き変わる前にすぐ保存する
 						double cof = eta(i-d, yd, k) + alpha(i-d, yd) * gsk;
 						v += cof*exp(wg);
+						if( std::isinf(v) || std::isnan(v) ) {
+							throw Error("numerical problem");
+						}
 					}
 				}
 
