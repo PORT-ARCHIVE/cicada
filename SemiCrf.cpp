@@ -455,6 +455,13 @@ namespace SemiCrf {
 						} else {
 							// T.B.D.
 						}
+					} else if( tok == "FEATURE" ) {
+						tok = tokenizer.get();
+						if( !tok.empty() ) {
+							feature = tok;
+						} else {
+							// T.B.D.
+						}
 					}
 				}
 				continue;
@@ -472,12 +479,6 @@ namespace SemiCrf {
 				}
 			}
 		}
-
-		int s = size();
-		if( s != yDim*(yDim+xDim) ) {
-			throw Error("dimension mismatch"); // T.B.D.
-		}
-
 		if( empty() ) {
 			throw Error("empty weights file"); // T.B.D.
 		}
