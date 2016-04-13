@@ -3,15 +3,20 @@
 #include <W2V.hpp>
 #include <cstdlib>
 #include "Error.hpp"
+#include "Logger.hpp"
 
 namespace W2V {
 
 	Matrix_::Matrix_()
+		: words(-1)
+		, size(-1)
 	{
+		Logger::out(2) << "Matrix_()" << std::endl;
 	}
 
 	Matrix_::~Matrix_()
 	{
+		Logger::out(2) << "~Matrix_()" << std::endl;
 	}
 
 	void Matrix_::read(const std::string& file)
@@ -21,10 +26,10 @@ namespace W2V {
 			throw Error("cannot open such file"); // T.B.D.
         }
 
-        long long words;
+        //long long words;
      	fscanf(f, "%lld", &words);
 
-        long long size;
+        //long long size;
     	fscanf(f, "%lld", &size);
 
         M.resize(words);

@@ -647,7 +647,11 @@ namespace SemiCrf {
 
 		// feature関数を生成し、x,yの次元、feature、maxLengthを設定する
 		ff = App::createFeatureFunction(feature, w2vfile);
-		ff->setXDim(xdim);
+		try {
+			ff->setXDim(xdim);
+		} catch (Error& e) {
+			throw Error("dimension mismatch between data file and w2v mastrix file");
+		}
 		ff->setYDim(ydim);
 		ff->setMaxLength(maxLength); // maxLengthはdatasをreadした直後に設定されている
 

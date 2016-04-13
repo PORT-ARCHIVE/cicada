@@ -28,6 +28,7 @@ namespace App {
 		Jpn();
 		virtual ~Jpn();
 		virtual int getDim();
+		virtual void setXDim(int arg);
 		virtual void read();
 		virtual void write();
 		virtual double wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i, SemiCrf::vector& gs);

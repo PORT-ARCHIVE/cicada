@@ -124,7 +124,7 @@ namespace App {
 			}
 
             // y2l
-			// fvec(dim1+d) += 1.0;
+			// fvec(dim1+yval*maxLength+(d-1)) = 1.0;
 
 			int k = 0;
 			for( auto w : *ws ) {
@@ -157,6 +157,14 @@ namespace App {
 		return yDim * ( xDim + yDim + maxLength );
 	}
 
+	void Jpn::setXDim(int arg)
+	{
+		if( w2vmat->getSize() != arg ) {
+			throw Error("dimension mismatch");
+		}
+		xDim = arg;
+	}
+
 	void Jpn::read()
 	{
 		Logger::out(2) << "Jpn::read()" << std::endl;
@@ -172,29 +180,28 @@ namespace App {
 		assert(0 < xDim);
 		assert(0 < yDim);
 
+		int l, k;
 		double v = 0.0;
+		int yval = static_cast<int>(y);
+		int ydval = static_cast<int>(yd);
+		int dim0 = yDim * xDim;
+		int dim1 = yDim * ( xDim + yDim );
+		int dim2 = yDim * ( xDim + yDim + maxLength );
+		int d = i - j + 1;
+
+		vector fvec(dim2, 0.0);
 
 		try {
 
-			int yval = static_cast<int>(y);
-			int ydval = static_cast<int>(yd);
-
-			int dim0 = yDim * xDim;
-			int dim1 = yDim * ( xDim + yDim );
-			int dim2 = yDim * ( xDim + yDim + maxLength );
-
-			vector fvec(dim2, 0.0);
-
 			// y2x
-			int d = i - j + 1;
-			for( int l = 0; l < d; l++ ) { 
+			for( l = 0; l < d; l++ ) {
 
 				std::string str = x->getStrs()->at(j+l).at(0);
 				long long xval = boost::lexical_cast<long long>(str);
 				const vector& wvec = w2vmat->i2v(xval);
 
-				for( int k = 0; k < dim0; k++ ) {
-					fvec(k) += wvec(k);
+				for( k = 0; k < xDim; k++ ) {
+					fvec(yval*xDim+k) += wvec(k);
 				}
 			}
 
@@ -202,16 +209,16 @@ namespace App {
 			fvec(dim0+ydval*yDim+yval) = 1.0;
 
             // y2l
-			fvec(dim1+d) = 1;
+			fvec(dim1+yval*maxLength+(d-1)) = 1.0;
 
-			int k = 0;
+			k = 0;
 			for( auto w : *ws ) {
 				gs(k) = fvec(k);
 				v += w*fvec(k++);
 			}
 
 		} catch (...) {
-			throw Error("Jpn::operator(): unexpected exception");
+			throw Error("Jpn::wg: unexpected exception");
 		}
 
 		return v;

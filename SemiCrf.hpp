@@ -171,7 +171,7 @@ namespace SemiCrf {
 		virtual double wg(Weights w, App::Label y, App::Label yd, Data x, int j, int i, vector& gs) = 0;
 		virtual void read() = 0;
 		virtual void write() = 0;
-		void setXDim(int arg) { xDim = arg; }
+		virtual void setXDim(int arg) { xDim = arg; }
 		void setYDim(int arg) { yDim = arg; }
 		virtual int getDim() = 0;
 		int getMaxLength() { return maxLength; }
