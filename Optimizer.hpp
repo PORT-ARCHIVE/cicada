@@ -52,6 +52,7 @@ namespace Optimizer {
 
 	protected:
 
+		virtual double avoidDivergence(vector& g, double& f1);
 		virtual double linearSearch(vector& g);
 
 	protected:

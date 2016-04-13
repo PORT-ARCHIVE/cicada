@@ -34,33 +34,42 @@ namespace Optimizer {
 	{
 	}
 
-	double UnconstrainedNLP_::linearSearch(vector& d)
+	double UnconstrainedNLP_::avoidDivergence(vector& d, double& f1)
 	{
-		double gd = inner_prod(g0, d);
-		double f0 = ofunc->value(x);
-		vector x1 = x + beta*d;
+		double beta1 = beta;
+		vector x1 = x + beta1*d;
 
-		double f1 = 0.0;
 		while(1) {
 			try {
 				f1 = ofunc->value(x1);
 				break;
 			} catch(Error& e) {
-				beta *= tau;
-				x1 = x + beta*d;
+				beta1 *= tau;
+				x1 = x + beta1*d;
 			}
 		}
 
-		while( xi*beta*gd < f1 - f0 ) { // Armijo's rule
-			beta *= tau;
-			x1 = x + beta*d;
+		return beta1;
+	}
+
+	double UnconstrainedNLP_::linearSearch(vector& d)
+	{
+		vector x1;
+		double gd = inner_prod(g0, d);
+		double f0 = ofunc->value(x);
+		double f1 = 0.0;
+		double beta1 = avoidDivergence(d, f1);
+
+		while( xi*beta1*gd < f1 - f0 ) { // Armijo's rule
+			beta1 *= tau;
+			x1 = x + beta1*d;
 			f1 = ofunc->value(x1);
-			if( beta < minBeta ) {
+			if( beta1 < minBeta ) {
 				break;
 			}
 		}
 
-		return beta;
+		return beta1;
 	}
 
 	bool UnconstrainedNLP_::isConv()
@@ -120,11 +129,13 @@ namespace Optimizer {
 				for( auto& idx : dx ) {
 					idx = e0/(1.0+sqrt(*iad++))*(*id++);
 				}                            Logger::out(2) << "dx=" << dx << std::endl;
+				double f1 = 0.0;
+				alpha = avoidDivergence(d, f1);
 			} else {
 				alpha = linearSearch(d);     Logger::out(2) << "alpha=" << alpha << std::endl;
-				dx = alpha * d;              Logger::out(2) << "dx=" << dx << std::endl;
 			}
 
+			dx = alpha * d;                  Logger::out(2) << "dx=" << dx << std::endl;
 			x = x + dx;                      Logger::out(2) << "x=" << x << std::endl;
 			ofunc->afterUpdateXProcess(x);
 			if( isConv() ) break;
