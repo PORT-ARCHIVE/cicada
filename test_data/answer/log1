@@ -892,7 +892,6 @@ x=[8](5.72712,-5.10687,-5.72712,5.10687,0.620255,3.96872,-1.13814,-0.620255)
 f= 5.462734e-06 |∇f|= 5.894415e-01
 Weights_::write()
 ~Learner_()
-OK
 ~Algorithm_()
 ~TrainingDatas_()
 ~Datas_()
@@ -901,3 +900,4 @@ OK
 ~Digit()
 ~FeatureFunction_()
 ~Labels_()
+OK

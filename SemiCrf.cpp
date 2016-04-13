@@ -636,7 +636,6 @@ namespace SemiCrf {
 	Learner_::~Learner_()
 	{
 		Logger::out(2) << "~Learner_()" << std::endl;
-		Logger::out(1) << "OK" << std::endl;
 	}
 
 	void Learner_::preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile)
@@ -1062,7 +1061,6 @@ namespace SemiCrf {
 	Predictor_::~Predictor_()
 	{
 		Logger::out(2) << "~Predictor_()" << std::endl;
-		Logger::out(1) << "OK" << std::endl;
 	}
 
 	void Predictor_::preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile)

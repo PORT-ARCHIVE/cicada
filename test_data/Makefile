@@ -61,11 +61,7 @@ gen_test: gen
 	@diff answer/test19.txt test19.txt && echo "OK" || echo "ERROR"
 
 update:
-	-cp result*.txt weight*.txt answer
-	-cp test16.txt answer/test16.txt
-	-cp test17.txt answer/test17.txt
-	-cp test18.txt answer/test18.txt
-	-cp test19.txt answer/test19.txt
+	cp log1 answer/log1
 
 gen:
 	../gen -i p0.json -s 1 -r 2 -l 16 > test16.txt

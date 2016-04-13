@@ -16,7 +16,7 @@ public:
 		, predictionDataFile("")
 		, weightsFile("")
 		, initWeightsFile("")
-		, w2vMatrixFile("w2vmat")
+		, w2vMatrixFile("")
 		, maxLength(0)
 		, maxIteration(1024)
 		, e0(1.0e-5)
@@ -67,7 +67,7 @@ void Options::parse(int argc, char *argv[])
 				weightsFile = argv[++i];
 			} else if( arg == "-w0" ) {
 				initWeightsFile = argv[++i];
-			} else if( arg == "-m" || arg == "--w2v-maxtirx" ) {
+			} else if( arg == "-m" || arg == "--w2v-matrix" ) {
 				w2vMatrixFile = argv[++i];
 			} else if( arg == "--set-optimizer" ) {
 				method = argv[++i];
@@ -183,6 +183,10 @@ int main(int argc, char *argv[])
 
 		std::cerr << "error: unexpected exception" << std::endl;
 		ret = 0x2;
+	}
+
+	if( !ret ) {
+		std::cerr << "OK" << std::endl;
 	}
 
 	exit(ret);

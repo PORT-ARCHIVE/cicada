@@ -2,6 +2,7 @@
 
 #include <W2V.hpp>
 #include <cstdlib>
+#include <strstream>
 #include "Error.hpp"
 #include "Logger.hpp"
 
@@ -23,7 +24,9 @@ namespace W2V {
  	{
         FILE* f = std::fopen(file.c_str(), "rb");
    	    if( f == NULL ) {
-			throw Error("cannot open such file"); // T.B.D.
+			std::stringstream ss;
+			ss << "cannot open such file: " << file;
+			throw Error(ss.str());
         }
 
         //long long words;
