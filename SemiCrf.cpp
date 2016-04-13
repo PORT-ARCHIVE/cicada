@@ -705,6 +705,10 @@ namespace SemiCrf {
 				optimizer = createBfgs(dim, ofunc);
 			} else if( method == "steepest_decent" ) {
 				optimizer = createSteepestDescent(dim, ofunc);
+			} else {
+				std::stringstream ss;
+				ss << "unknown method specifed: " << method;
+				throw Error(ss.str());
 			}
 
 			int f = 0x0;
