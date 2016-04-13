@@ -18,8 +18,8 @@ FILES0=\
 test2:
 	@for file in $(FILES0); do \
 		echo "###### $$file ######"; \
-		echo "$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 2.0 -e1 1.0e-5 --max-iteration 100000 --disable-regularization"; \
-		$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 2.0 -e1 1.0e-5 --max-iteration 100000 --disable-regularization && echo "OK" || echo "ERROR"; \
+		echo "$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 2.0 -e1 1.0e-6 --max-iteration 100000 --disable-regularization"; \
+		$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 2.0 -e1 1.0e-6 --max-iteration 100000 --disable-regularization && echo "OK" || echo "ERROR"; \
 		echo "$(SEMICRF) -i $$file -w tmp1 --log-level 0"; \
 		$(SEMICRF) -i $$file -w tmp1 --log-level 0 > tmp2 && echo "OK" || echo "ERROR"; \
 		echo "diff -c $$file tmp2"; \
