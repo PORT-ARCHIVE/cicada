@@ -12,6 +12,7 @@
 #include "Error.hpp"
 #include "FileIO.hpp"
 #include "Optimizer.hpp"
+#include "ujson.hpp"
 
 namespace App {
 
@@ -101,6 +102,7 @@ namespace SemiCrf {
 		Datas_();
 		virtual ~Datas_();
 		virtual void read(std::istream& input) = 0;
+		virtual void readJson(std::istream& input) = 0;
 		virtual void write(std::ostream& output) const;
 		virtual int getXDim() { return xDim; }
 		virtual int getYDim() { return yDim; }
@@ -124,6 +126,12 @@ namespace SemiCrf {
 		TrainingDatas_();
 		virtual ~TrainingDatas_();
 		virtual void read(std::istream& input);
+		virtual void readJson(std::istream& input);
+	protected:
+		virtual void readJsonTitle(std::vector<std::pair<std::string, ujson::value>>& object);
+		virtual void readJsonDimension(std::vector<std::pair<std::string, ujson::value>>& object);
+		virtual void readJsonFeature(std::vector<std::pair<std::string, ujson::value>>& object);
+		virtual void readJsonData(std::vector<std::pair<std::string, ujson::value>>& object);
 	};
 
 	Datas createTrainingDatas();
@@ -134,6 +142,7 @@ namespace SemiCrf {
 		PredictionDatas_();
 		virtual ~PredictionDatas_();
 		virtual void read(std::istream& input);
+		virtual void readJson(std::istream& input);
 	};
 
 	Datas createPredictionDatas();

@@ -17,6 +17,7 @@
 #include "MultiByteTokenizer.hpp"
 #include "Logger.hpp"
 #include "Error.hpp"
+#include "ujson.hpp"
 
 
 namespace SemiCrf {
@@ -170,6 +171,177 @@ namespace SemiCrf {
 		Logger::out(2) << "~TrainingDatas_()" << std::endl;
 	}
 
+	void TrainingDatas_::readJson(std::istream& is)
+	{
+		try {
+
+			std::string jsonstr;
+			jsonstr.assign((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+
+			auto v = ujson::parse(jsonstr);
+
+			if( !v.is_object() ) {
+				throw std::invalid_argument("object expected for make_book");
+			}
+
+			std::vector<std::pair<std::string, ujson::value>> object = object_cast(std::move(v));
+
+			readJsonTitle(object);
+			readJsonDimension(object);
+			readJsonFeature(object);
+			readJsonData(object);
+
+		} catch(...) {
+			throw Error("json parse error");
+		}
+	}
+
+	void TrainingDatas_::readJsonTitle(std::vector<std::pair<std::string, ujson::value>>& object)
+	{
+		auto it = find(object, "title");
+		if( it == object.end() || !it->second.is_string() ) {
+			throw std::invalid_argument("title' with type string not found");
+		}
+		std::string title = string_cast(std::move(it->second));
+	}
+
+	void TrainingDatas_::readJsonDimension(std::vector<std::pair<std::string, ujson::value>>& object)
+	{
+		auto it = find(object, "dimension");
+		if( it == object.end() || !it->second.is_array() ) {
+			throw std::invalid_argument("'dimention' with type array not found");
+		}
+
+		std::vector<ujson::value> array = array_cast(std::move(it->second));
+
+		auto i = array.begin();
+
+		if( !i->is_number() ) {
+			throw std::invalid_argument("invalid format");
+		}
+
+		xDim = int32_cast(std::move(*i));
+
+		++i;
+
+		if( !i->is_number() ) {
+			throw std::invalid_argument("invalid format");
+		}
+
+		yDim = int32_cast(std::move(*i));
+	}
+
+	void TrainingDatas_::readJsonFeature(std::vector<std::pair<std::string, ujson::value>>& object)
+	{
+		auto it = find(object, "feature");
+		if( it == object.end() || !it->second.is_string() ) {
+			throw std::invalid_argument("'feature' with type string not found");
+		}
+		feature = string_cast(std::move(it->second));
+	}
+
+	void TrainingDatas_::readJsonData(std::vector<std::pair<std::string, ujson::value>>& object)
+	{
+		auto it = find(object, "data");
+		if( it == object.end() || !it->second.is_array() ) {
+			throw std::invalid_argument("'data' with type string not found");
+		}
+
+		std::vector<ujson::value> array0 = array_cast(std::move(it->second));
+		for( auto i = array0.begin(); i != array0.end(); ++i ) {
+
+			if( !i->is_array() ) {
+				throw std::invalid_argument("invalid format");
+			}
+
+			Data data = Data( new Data_() );
+			Logger::out(2) << "BEGIN : data was created." << std::endl;
+
+			Segment seg;
+			int counter = -1;
+			int seg_start = -1;
+
+			std::vector<ujson::value> array1 = array_cast(std::move(*i));
+			for( auto j = array1.begin(); j != array1.end(); ++j ) {
+
+				counter++;
+
+				if( !j->is_array() ) {
+					throw std::invalid_argument("invalid format");
+				}
+
+				std::vector<ujson::value> array2 = array_cast(std::move(*j));
+				auto k = array2.begin();
+
+				if( !k->is_number() ) {
+					throw std::invalid_argument("invalid format");
+				}
+
+				std::string word = boost::lexical_cast<std::string>(int32_cast(std::move(*k))); // !!!!!!!
+				Logger::out(2) << word << "\t";
+
+				std::vector<std::string> vs;
+				vs.push_back(word);
+				data->getStrs()->push_back(vs);
+
+				k++;
+				if( !k->is_string() ) {
+					throw std::invalid_argument("invalid format");
+				}
+
+				std::string descriptor = string_cast(std::move(*k));
+				Logger::out(2) << descriptor << "\t";
+
+				k++;
+				if( !k->is_number() ) {
+					throw std::invalid_argument("invalid format");
+				}
+
+				std::string label = boost::lexical_cast<std::string>(int32_cast(std::move(*k))); // !!!!!!!
+				Logger::out(2) << label << std::endl;
+
+				App::Label lb = App::string2Label(label);
+
+				if( descriptor == "N" ) {
+
+					seg = createSegment(counter, counter, lb);
+					data->getSegments()->push_back(seg);
+
+				} else if( descriptor == "S" ) {
+
+					seg_start = counter;
+
+				} else if( descriptor == "M" ) {
+
+					// nothing to do
+
+				} else if( descriptor == "E" ) {
+
+					seg	= createSegment(seg_start, counter, lb);
+					data->getSegments()->push_back(seg);
+					int length = counter - seg_start + 1;
+					if( maxLength < length ) {
+						maxLength = length;
+					}
+
+				} else if( descriptor == "S/E" ) {
+
+					seg	= createSegment(counter, counter, lb);
+					data->getSegments()->push_back(seg);
+					if( maxLength < 1 ) {
+						maxLength = 1;
+					}
+
+				} else {
+					Logger::out(1) << "warning: unknown descriptor" << std::endl;
+				}
+			}
+
+			push_back(data);
+			Logger::out(2) << "END : data was pushed." << std::endl;
+		}
+	}
+
 	void TrainingDatas_::read(std::istream& strm)
 	{
 		Logger::out(2) << "TrainingDatas_::read()" << std::endl;
@@ -312,6 +484,11 @@ namespace SemiCrf {
 	PredictionDatas_::~PredictionDatas_()
 	{
 		Logger::out(2) << "~PredictionDatas_()" << std::endl;
+	}
+
+	void PredictionDatas_::readJson(std::istream& strm)
+	{
+		assert(0);
 	}
 
 	void PredictionDatas_::read(std::istream& strm)

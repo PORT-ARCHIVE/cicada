@@ -43,6 +43,7 @@ namespace App {
 		PridectionDigitDatas_(){};
 		virtual ~PridectionDigitDatas_(){};
 		virtual void read(std::istream& input);
+		virtual void readJson(std::istream& input);
 	};
 
 }

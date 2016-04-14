@@ -223,6 +223,11 @@ namespace App {
 
     ///////////////
 
+	void PridectionDigitDatas_::readJson(std::istream& strm)
+	{
+		assert(0);
+	}
+
 	void PridectionDigitDatas_::read(std::istream& strm)
 	{
 		int warningsLimit = 5;
