@@ -32,7 +32,7 @@ test2:
 
 learn:
 	../gen -i p0.json -r 32 -l 16 > tmp1
-	$(SEMICRF) -t tmp1 -w tmp2 --log-level 1 -e0 1.0e-3 -e1 1.0e-2 --max-iteration 100000 --disable-adagrad && echo "OK" || echo "ERROR"
+	$(SEMICRF) -t tmp1 -w tmp2 --log-level 1 -e0 1.0e-3 -e1 1.0e-3 --max-iteration 100000 --disable-adagrad && echo "OK" || echo "ERROR"
 
 infer:
 	@rm -f tmp5;
