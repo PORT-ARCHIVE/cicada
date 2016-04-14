@@ -268,13 +268,11 @@ int main(int argc, char *argv[])
 
 		std::ifstream ifs; // 入力
 		open(ifs, options.file);
-		std::string jsonfile;
-		std::string line;
-		while( std::getline(ifs, line) ) {
-			jsonfile += line;
-		}
+		std::string jsonstr;
+		jsonstr.assign((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+
 		try {
-			auto v = ujson::parse(jsonfile);
+			auto v = ujson::parse(jsonstr);
 			make_arrays(v, options.nomalize);
 		} catch(...) {
 			throw Error("json parse error");
