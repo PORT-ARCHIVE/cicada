@@ -78,9 +78,46 @@ namespace SemiCrf {
 		Logger::out(2) << "~Data_()" << std::endl;
 	}
 
-	void Data_::read()
+	void Data_::writeJson(ujson::array& ary0) const
 	{
-		Logger::out(2) << "Data_::read()" << std::endl;
+		Logger::out(2) << "Data_::writeJson()" << std::endl;
+
+		for( auto s : *segs ) {
+
+			int start = s->getStart();
+			int end = s->getEnd();
+			App::Label l = s->getLabel();
+
+			ujson::array ary1;
+
+			for( int i = start; i <= end; i++ ) {
+
+				ary1.push_back(strs->at(i).at(0));
+
+				if( i == start ) {
+
+					if( i == end ) {
+						ary1.push_back("S/E");
+					} else {
+						ary1.push_back("E");
+					}
+
+				} else if( start < i && i < end ) {
+
+					ary1.push_back("M");
+
+				} else if( i == end ) {
+
+					ary1.push_back("E");
+
+				} else {
+					// T.B.D.
+				}
+
+				ary1.push_back(App::label2String(l));
+				ary0.push_back(ary1);
+			}
+		}
 	}
 
 	void Data_::write(std::ostream& output) const
@@ -146,8 +183,29 @@ namespace SemiCrf {
 		Logger::out(2) << "~Datas_()" << std::endl;
 	};
 
+	void Datas_::writeJson(std::ostream& output)  const {
+		Logger::out(2) << "Datas_::writeJson()" << std::endl;
+
+		ujson::array datas;
+		for( auto d : *this ) {
+			d->writeJson(datas);
+		}
+
+		auto object = ujson::object{
+			{ "title", "" },
+			{ "dimension", ujson::array{ xDim, yDim } },
+			{ "feature", feature },
+			{ "data", datas }
+		};
+
+		std::cout << to_string(object) << std::endl;
+	}
+
 	void Datas_::write(std::ostream& output)  const {
 		Logger::out(2) << "Datas_::write()" << std::endl;
+#if 0
+		writeJson(output);
+#else
 		if( !feature.empty() ) {
 			output << "# FEATURE" << " " << feature << std::endl;
 		}
@@ -158,6 +216,7 @@ namespace SemiCrf {
 		 	d->write(output);
 			output << "# END" << std::endl;
 		}
+#endif
 	}
 
 	// TrainingDatas ctr
@@ -273,11 +332,11 @@ namespace SemiCrf {
 				std::vector<ujson::value> array2 = array_cast(std::move(*j));
 				auto k = array2.begin();
 
-				if( !k->is_number() ) {
+				if( !k->is_string() ) {
 					throw std::invalid_argument("invalid format");
 				}
 
-				std::string word = boost::lexical_cast<std::string>(int32_cast(std::move(*k))); // !!!!!!!
+				std::string word = string_cast(std::move(*k));
 				Logger::out(2) << word << "\t";
 
 				std::vector<std::string> vs;
@@ -293,11 +352,11 @@ namespace SemiCrf {
 				Logger::out(2) << descriptor << "\t";
 
 				k++;
-				if( !k->is_number() ) {
+				if( !k->is_string() ) {
 					throw std::invalid_argument("invalid format");
 				}
 
-				std::string label = boost::lexical_cast<std::string>(int32_cast(std::move(*k))); // !!!!!!!
+				std::string label = string_cast(std::move(*k));
 				Logger::out(2) << label << std::endl;
 
 				App::Label lb = App::string2Label(label);
@@ -345,7 +404,9 @@ namespace SemiCrf {
 	void TrainingDatas_::read(std::istream& strm)
 	{
 		Logger::out(2) << "TrainingDatas_::read()" << std::endl;
-
+#if 0
+		readJson(strm);
+#else
 		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D
 
 		int counter = -1;
@@ -469,10 +530,11 @@ namespace SemiCrf {
 				// T.B.D.
 			}
 		}
-
+#endif
 		if( empty() ) {
 			throw Error("empty training data file"); // T.B.D.
 		}
+
 	}
 
 	// PredictionDatas ctr

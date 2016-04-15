@@ -84,8 +84,9 @@ namespace SemiCrf {
 	public:
 		Data_();
 		virtual ~Data_();
-		virtual void read();
+		// virtual void read();
 		virtual void write(std::ostream& output) const;
+		virtual void writeJson(ujson::array& ary) const;
 		Strs getStrs() { return strs; }
 		Segments getSegments() { return segs; }
 		void setSegments(Segments arg) { segs = arg; }
@@ -104,6 +105,7 @@ namespace SemiCrf {
 		virtual void read(std::istream& input) = 0;
 		virtual void readJson(std::istream& input) = 0;
 		virtual void write(std::ostream& output) const;
+		virtual void writeJson(std::ostream& output) const;
 		virtual int getXDim() { return xDim; }
 		virtual int getYDim() { return yDim; }
 		virtual void setXDim(int arg) { xDim = arg; }
