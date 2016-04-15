@@ -7,20 +7,34 @@ TrainingDatas_()
 TrainingDatas_::read()
 Data_()
 BEGIN : data was created.
-0
-S/E
-0
-1
-S/E
-1
-END : data was pushed.
-Datas_::write()
-# DIMENSION 2 2
-# BEGIN
-Data_::write()
 0	S/E	0
 1	S/E	1
-# END
+END : data was pushed.
+Datas_::write()
+Datas_::writeJson()
+Data_::writeJson()
+{
+    "data" : [
+        [
+            [
+                "0",
+                "S/E",
+                "0"
+            ],
+            [
+                "1",
+                "S/E",
+                "1"
+            ]
+        ]
+    ],
+    "dimension" : [
+        2,
+        2
+    ],
+    "feature" : "DIGIT",
+    "title" : ""
+}
 FeatureFunction_()
 Digit()
 Weights_()

@@ -5,15 +5,15 @@ all: test1 test2
 
 test1:
 	@echo "###### check0 ######"
-	$(SEMICRF) -t check1 -w tmp1 --log-level 2 -e0 2.0 -e1 1.0e-5 --max-iteration 100000 --disable-date-version --disable-regularization 2>log1 
+	$(SEMICRF) -t check1.json -w tmp1 --log-level 2 -e0 2.0 -e1 1.0e-5 --max-iteration 100000 --disable-date-version --disable-regularization 2>log1 
 	@diff answer/log1 log1 && echo "OK" || echo "ERROR"
 
 FILES0=\
-	check1 \
-	check2 \
-	check3 \
-	check4 \
-	check5
+	check1.json \
+	check2.json \
+	check3.json \
+	check4.json \
+	check5.json
 
 test2:
 	@for file in $(FILES0); do \
@@ -22,10 +22,12 @@ test2:
 		$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 2.0 -e1 1.0e-6 --max-iteration 100000 --disable-regularization && echo "OK" || echo "ERROR"; \
 		echo "$(SEMICRF) -i $$file -w tmp1 --log-level 0"; \
 		$(SEMICRF) -i $$file -w tmp1 --log-level 0 > tmp2 && echo "OK" || echo "ERROR"; \
-		echo "diff -c $$file tmp2"; \
-		diff -c $$file tmp2 && echo "OK" || echo "ERROR"; \
-		grep -v "^#" $$file | awk '{ print $$3 }' > a; \
-		grep -v "^#" tmp2 | awk '{ print $$3 }' > b; \
+		cat $$file | jq '.data[][][]' > r1; \
+		cat tmp2 | jq '.data[][][]' > r2; \
+		echo "diff -c r1 r2"; \
+		diff -c r1 r2 && echo "OK" || echo "ERROR"; \
+		cat r1 | awk '{ if(k++ % 3 == 2) print $$3 }' > a; \
+		cat r2 | awk '{ if(k++ % 3 == 2) print $$3 }' > b; \
 		paste a b | awk '{ if( $$1 == $$2 ) count++; total++; } END{ print count/total*100,"%"; }'; \
 		rm tmp1 tmp2; \
 	done;

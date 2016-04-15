@@ -125,7 +125,7 @@ SemiCrf::Algorithm createAlgorithm(const Options& options)
 
 		file = options.predictionDataFile;
 		alg = SemiCrf::createPredictor(options.flg);
-		datas = SemiCrf::Datas( new App::PridectionDigitDatas_() );
+		datas = SemiCrf::Datas( new SemiCrf::PredictionDatas_() );
 
 	} else {
 		throw Error("no input file specified");

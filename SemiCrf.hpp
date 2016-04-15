@@ -103,7 +103,7 @@ namespace SemiCrf {
 		Datas_();
 		virtual ~Datas_();
 		virtual void read(std::istream& input) = 0;
-		virtual void readJson(std::istream& input) = 0;
+		virtual void readJson(std::istream& input);
 		virtual void write(std::ostream& output) const;
 		virtual void writeJson(std::ostream& output) const;
 		virtual int getXDim() { return xDim; }
@@ -113,6 +113,11 @@ namespace SemiCrf {
 		virtual int getMaxLength() { return maxLength; }
 		const std::string& getFeature() { return feature; }
 		void setFeature(const std::string& arg) { feature = arg; }
+	protected:
+		virtual void readJsonTitle(std::vector<std::pair<std::string, ujson::value>>& object);
+		virtual void readJsonDimension(std::vector<std::pair<std::string, ujson::value>>& object);
+		virtual void readJsonFeature(std::vector<std::pair<std::string, ujson::value>>& object);
+		virtual void readJsonData(std::vector<std::pair<std::string, ujson::value>>& object) = 0;
 	protected:
 		int xDim;
 		int yDim;
@@ -128,11 +133,7 @@ namespace SemiCrf {
 		TrainingDatas_();
 		virtual ~TrainingDatas_();
 		virtual void read(std::istream& input);
-		virtual void readJson(std::istream& input);
 	protected:
-		virtual void readJsonTitle(std::vector<std::pair<std::string, ujson::value>>& object);
-		virtual void readJsonDimension(std::vector<std::pair<std::string, ujson::value>>& object);
-		virtual void readJsonFeature(std::vector<std::pair<std::string, ujson::value>>& object);
 		virtual void readJsonData(std::vector<std::pair<std::string, ujson::value>>& object);
 	};
 
@@ -144,7 +145,8 @@ namespace SemiCrf {
 		PredictionDatas_();
 		virtual ~PredictionDatas_();
 		virtual void read(std::istream& input);
-		virtual void readJson(std::istream& input);
+	protected:
+		virtual void readJsonData(std::vector<std::pair<std::string, ujson::value>>& object);
 	};
 
 	Datas createPredictionDatas();

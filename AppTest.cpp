@@ -223,7 +223,7 @@ namespace App {
 
     ///////////////
 
-	void PridectionDigitDatas_::readJson(std::istream& strm)
+	void PridectionDigitDatas_::writeJson(std::ostream& output) const
 	{
 		assert(0);
 	}
