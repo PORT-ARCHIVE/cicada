@@ -280,16 +280,15 @@ int main(int argc, char *argv[])
 
 		preProcess();
 
-		Logger::out(0) << "# DIMENSION";
-		Logger::out(0) << " " << y2x.at(0).size();
-		Logger::out(0) << " " << y2y.size() << endl;
+		ujson::array datas;
 	
 		mt19937 mt(options.seed);
 		uniform_real_distribution<double> score(0.0,1.0);
 
 		for( int j = 0; j < options.iteration; j++ ) {
 
-			Logger::out(0) << "# BEGIN" << endl;
+			ujson::array ary1;
+			ujson::array ary2;
 
 			vector<int> y;
 			vector<int> x;
@@ -305,46 +304,61 @@ int main(int argc, char *argv[])
 			auto yj = y.begin(); yj += 1;
 			auto yk = y.begin(); yk += 2;
 
-			Logger::out(0) << *xi << "\t";
+			ary2.push_back(boost::lexical_cast<std::string>(*xi));
 
 			if( *yi == *yj ) {
-				Logger::out(0) << "S\t";
+				ary2.push_back("S");
 			} else {
-				Logger::out(0) << "S/E\t";
+				ary2.push_back("S/E");
 			}
 
-			Logger::out(0) << *yi << endl;
+			ary2.push_back(boost::lexical_cast<std::string>(*yi));
+			ary1.push_back(ary2);
+			ary2.resize(0);
 
 			++xi;
 			for( ; yk != y.end(); ++xi, ++yi, ++yj, ++yk ) {
-				Logger::out(0) << *xi;
+				ary2.push_back(boost::lexical_cast<std::string>(*xi));
 				if( *yi != *yj && *yj == *yk ) {
-					Logger::out(0) << "\tS\t";
+					ary2.push_back("S");
 				} else if( *yi == *yj && *yj == *yk ) {
-					Logger::out(0) << "\tM\t";
+					ary2.push_back("M");
 				} else if( *yi != *yj && *yj != *yk ) {
-					Logger::out(0) << "\tS/E\t";
+					ary2.push_back("S/E");
 				} else if( *yi == *yj && *yj != *yk ) {
-					Logger::out(0) << "\tE\t";
+					ary2.push_back("E");
 				} else {
 					assert(0);
 				}
-				Logger::out(0) << *yj << endl;
+				ary2.push_back(boost::lexical_cast<std::string>(*yj));
+				ary1.push_back(ary2);
+				ary2.resize(0);
 			}
 
-			Logger::out(0) << *xi;
+			ary2.push_back(boost::lexical_cast<std::string>(*xi));
 
 			if( *yi != *yj ) {
-				Logger::out(0) << "\tS/E\t";
+				ary2.push_back("S/E");
 			} else if( *yi == *yj ) {
-				Logger::out(0) << "\tE\t";
+				ary2.push_back("E");
 			} else {
 				assert(0);
 			}
 
-			Logger::out(0) << *yj << endl;
-			Logger::out(0) << "# END" << endl;
+			ary2.push_back(boost::lexical_cast<std::string>(*yj));
+			ary1.push_back(ary2);
+			ary2.resize(0);
+			datas.push_back(ary1);
 		}
+
+		auto object = ujson::object{
+			{ "title", "test" },
+			{ "dimension", ujson::array{ int(y2x.at(0).size()), int(y2y.size()) } },
+			{ "feature", "DIGIT" },
+			{ "data", datas }
+		};
+
+		Logger::out(0) << "" << to_string(object) << std::endl;
 
 	} catch(Error& e) {
 
