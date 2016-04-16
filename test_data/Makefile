@@ -26,8 +26,8 @@ test2:
 		cat tmp2 | jq '.data[][][]' > r2; \
 		echo "diff -c r1 r2"; \
 		diff -c r1 r2 && echo "OK" || echo "ERROR"; \
-		cat r1 | awk '{ if(k++ % 3 == 2) print $$3 }' > a; \
-		cat r2 | awk '{ if(k++ % 3 == 2) print $$3 }' > b; \
+		cat r1 | awk '{ if(k++ % 3 == 2) print $$1 }' > a; \
+		cat r2 | awk '{ if(k++ % 3 == 2) print $$1 }' > b; \
 		paste a b | awk '{ if( $$1 == $$2 ) count++; total++; } END{ print count/total*100,"%"; }'; \
 		rm tmp1 tmp2; \
 	done;
@@ -37,14 +37,15 @@ learn:
 	$(SEMICRF) -t tmp1 -w tmp2 --log-level 1 -e0 1.0e-3 -e1 1.0e-3 --max-iteration 100000 --disable-adagrad && echo "OK" || echo "ERROR"
 
 infer:
-	@rm -f tmp5;
-	@for SEED in {1..32}; do \
+	@rm -f a b tmp5;
+	@for SEED in 1 2 3 4 5 6 7 8 9 10; do \
 		../gen -i p0.json -s $$SEED -r 32 -l 16 > tmp3; \
 		$(SEMICRF) -i tmp3 -w tmp2 --log-level 0 > tmp4 || echo "ERROR"; \
-		grep -v "^#" tmp3 | awk '{ print $$3 }' > a; \
-		grep -v "^#" tmp4 | awk '{ print $$3 }' > b; \
-		paste a b | awk '{ if( $$1 == $$2 ) count++; total++; } END{ print count/total*100; }' | tee -a tmp5; \
-		rm a b; \
+		cat tmp3 | jq '.data[][][]' > r1; \
+		cat tmp4 | jq '.data[][][]' > r2; \
+		cat r1 | awk '{ if(k++ % 3 == 2) print $$1 }' > a; \
+		cat r2 | awk '{ if(k++ % 3 == 2) print $$1 }' > b; \
+		paste a b | awk '{ if( $$1 == $$2 ) count++; total++; } END{ print count/total*100,"%"; }' | tee -a tmp5; \
 	done;
 	@awk '{ sum += $$1; count++; } END{ print "Accuracy:", sum/count, "%" }' tmp5
 
