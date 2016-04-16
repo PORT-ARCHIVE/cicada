@@ -22,13 +22,57 @@
 
 namespace SemiCrf {
 
-	std::string date() {
+	static std::string date() {
         time_t t = time(0);
         char *s,*p;
         p = s = asctime(localtime(&t));
         while(*s != '\0') { if (*s == '\n') {*s = '\0'; break;} else {s++;}}
         return std::move(std::string(p));
     }
+
+	static void readJsonTitle(std::vector<std::pair<std::string, ujson::value>>& object, std::string& title)
+	{
+		auto it = find(object, "title");
+		if( it == object.end() || !it->second.is_string() ) {
+			throw std::invalid_argument("title' with type string not found");
+		}
+		title = string_cast(std::move(it->second));
+	}
+
+	static void readJsonDimension(std::vector<std::pair<std::string, ujson::value>>& object, int& xDim, int& yDim)
+	{
+		auto it = find(object, "dimension");
+		if( it == object.end() || !it->second.is_array() ) {
+			throw std::invalid_argument("'dimention' with type array not found");
+		}
+
+		std::vector<ujson::value> array = array_cast(std::move(it->second));
+
+		auto i = array.begin();
+
+		if( !i->is_number() ) {
+			throw std::invalid_argument("1st dimension is not a number");
+		}
+
+		xDim = int32_cast(std::move(*i));
+
+		++i;
+
+		if( !i->is_number() ) {
+			throw std::invalid_argument("2nd dimension is not a number");
+		}
+
+		yDim = int32_cast(std::move(*i));
+	}
+
+	static void readJsonFeature(std::vector<std::pair<std::string, ujson::value>>& object, std::string& feature)
+	{
+		auto it = find(object, "feature");
+		if( it == object.end() || !it->second.is_string() ) {
+			throw std::invalid_argument("'feature' with type string not found");
+		}
+		feature = string_cast(std::move(it->second));
+	}
 
 	// ctr
 	Labels createLabels(int size =0)
@@ -78,6 +122,42 @@ namespace SemiCrf {
 		Logger::out(2) << "~Data_()" << std::endl;
 	}
 
+	void Data_::computeMeanLength(
+		std::map<int, int>* count_,
+		std::map<int ,double>* mean_,
+		std::map<int ,double>* variance_
+		)
+	{
+		count = count_;
+		mean = mean_;
+		variance = variance_;
+
+		for( auto& s : *segs ) {
+			int len = s->getEnd() - s->getStart() + 1;
+			int lb = static_cast<int>(s->getLabel());
+			(*count)[lb] += 1;
+			(*mean)[lb] += len;
+			(*variance)[lb] += len*len;
+		}
+
+	}
+
+	void Datas_::computeMeanLength()
+	{
+		for( auto& d : *this ) {
+			d->computeMeanLength(&count, &mean, &variance);
+		}
+
+		for( auto ic : count ) {
+			int lb = ic.first;
+			int c = ic.second;
+			double m = mean[lb]/c;
+			mean[lb] = m;
+			double v = variance[lb]/c;
+			variance[lb] = v - m*m;
+		}
+	}
+
 	void Datas_::readJson(std::istream& is)
 	{
 		try {
@@ -88,63 +168,20 @@ namespace SemiCrf {
 			auto v = ujson::parse(jsonstr);
 
 			if( !v.is_object() ) {
-				throw std::invalid_argument("object expected for make_book");
+				throw std::invalid_argument("object expected for Datas_");
 			}
 
 			std::vector<std::pair<std::string, ujson::value>> object = object_cast(std::move(v));
 
-			readJsonTitle(object);
-			readJsonDimension(object);
-			readJsonFeature(object);
+			std::string title;
+			readJsonTitle(object, title);
+			readJsonDimension(object, xDim, yDim);
+			readJsonFeature(object, feature);
 			readJsonData(object);
 
 		} catch(...) {
 			throw Error("json parse error");
 		}
-	}
-
-	void Datas_::readJsonTitle(std::vector<std::pair<std::string, ujson::value>>& object)
-	{
-		auto it = find(object, "title");
-		if( it == object.end() || !it->second.is_string() ) {
-			throw std::invalid_argument("title' with type string not found");
-		}
-		std::string title = string_cast(std::move(it->second));
-	}
-
-	void Datas_::readJsonDimension(std::vector<std::pair<std::string, ujson::value>>& object)
-	{
-		auto it = find(object, "dimension");
-		if( it == object.end() || !it->second.is_array() ) {
-			throw std::invalid_argument("'dimention' with type array not found");
-		}
-
-		std::vector<ujson::value> array = array_cast(std::move(it->second));
-
-		auto i = array.begin();
-
-		if( !i->is_number() ) {
-			throw std::invalid_argument("invalid format");
-		}
-
-		xDim = int32_cast(std::move(*i));
-
-		++i;
-
-		if( !i->is_number() ) {
-			throw std::invalid_argument("invalid format");
-		}
-
-		yDim = int32_cast(std::move(*i));
-	}
-
-	void Datas_::readJsonFeature(std::vector<std::pair<std::string, ujson::value>>& object)
-	{
-		auto it = find(object, "feature");
-		if( it == object.end() || !it->second.is_string() ) {
-			throw std::invalid_argument("'feature' with type string not found");
-		}
-		feature = string_cast(std::move(it->second));
 	}
 
 	void Data_::writeJson(ujson::array& ary0) const
@@ -186,11 +223,11 @@ namespace SemiCrf {
 				}
 
 				ary2.push_back(App::label2String(l));
-				ary1.push_back(ary2);
+				ary1.push_back(std::move(ary2));
 			}
 		}
 
-		ary0.push_back(ary1);
+		ary0.push_back(std::move(ary1));
 	}
 
 	void Data_::write(std::ostream& output) const
@@ -314,7 +351,7 @@ namespace SemiCrf {
 		for( auto i = array0.begin(); i != array0.end(); ++i ) {
 
 			if( !i->is_array() ) {
-				throw std::invalid_argument("invalid format");
+				throw std::invalid_argument("invalid data format");
 			}
 
 			Data data = Data( new Data_() );
@@ -330,14 +367,14 @@ namespace SemiCrf {
 				counter++;
 
 				if( !j->is_array() ) {
-					throw std::invalid_argument("invalid format");
+					throw std::invalid_argument("invalid data format");
 				}
 
 				std::vector<ujson::value> array2 = array_cast(std::move(*j));
 				auto k = array2.begin();
 
 				if( !k->is_string() ) {
-					throw std::invalid_argument("invalid format");
+					throw std::invalid_argument("invalid data format");
 				}
 
 				std::string word = string_cast(std::move(*k));
@@ -490,7 +527,6 @@ namespace SemiCrf {
 			} else {
 				Logger::out(2) << label << std::endl;
 
-
 				App::Label l = App::string2Label(label);
 
 				if( descriptor == "N" ) {
@@ -539,6 +575,7 @@ namespace SemiCrf {
 			throw Error("empty training data file"); // T.B.D.
 		}
 
+		computeMeanLength();
 	}
 
 	// PredictionDatas ctr
@@ -755,8 +792,128 @@ namespace SemiCrf {
 		Logger::out(2) << "~Weights_()" << std::endl;
 	}
 
+	void Weights_::readJson(std::ifstream& is)
+	{
+		try {
+
+			std::string jsonstr;
+			jsonstr.assign((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+
+			auto v = ujson::parse(jsonstr);
+
+			if( !v.is_object() ) {
+				throw std::invalid_argument("object expected for Weights_");
+			}
+
+			std::vector<std::pair<std::string, ujson::value>> object = object_cast(std::move(v));
+			std::string title;
+			readJsonTitle(object, title);
+			readJsonDimension(object, xDim, yDim);
+			readJsonFeature(object, feature);
+			readJsonMaxLength(object);
+			readJsonMeans(object);
+			readJsonVariancies(object);
+			readJsonWeights(object);
+
+		} catch(...) {
+			throw Error("json parse error");
+		}
+	}
+
+	void Weights_::readJsonWeights(std::vector<std::pair<std::string, ujson::value>>& object)
+	{
+		auto it = find(object, "weights");
+		if( it == object.end() || !it->second.is_array() ) {
+			throw std::invalid_argument("'weights' with type object not found");
+		}
+
+		std::vector<ujson::value> array = array_cast(std::move(it->second));
+		for( auto i = array.begin(); i != array.end(); ++i ) {
+
+			if( !i->is_number() ) {
+				throw std::invalid_argument("invalid data format");
+			}
+
+			push_back(double_cast(std::move(*i)));
+		}
+	}
+
+	void Weights_::readJsonMaxLength(std::vector<std::pair<std::string, ujson::value>>& object)
+	{
+		auto it = find(object, "max_length");
+		if( it == object.end() || !it->second.is_number() ) {
+			throw std::invalid_argument("max_length' with type string not found");
+		}
+		maxLength = int32_cast(std::move(it->second));
+	}
+
+	void Weights_::readJsonMeans(std::vector<std::pair<std::string, ujson::value>>& object)
+	{
+		auto it = find(object, "mean");
+		if( it == object.end() || !it->second.is_array() ) {
+			throw std::invalid_argument("'mean' with type object not found");
+		}
+
+		std::vector<ujson::value> array0 = array_cast(std::move(it->second));
+		for( auto i = array0.begin(); i != array0.end(); ++i ) {
+
+			std::vector<ujson::value> array1 = array_cast(std::move(*i));
+			auto j = array1.begin();
+
+			if( !j->is_number() ) {
+				throw std::invalid_argument("invalid data format");
+			}
+
+			int lb = int32_cast(std::move(*j));
+
+			j++;
+
+			if( !j->is_number() ) {
+				throw std::invalid_argument("invalid data format");
+			}
+
+			double m = double_cast(std::move(*j));
+
+			mean[lb] = m;
+		}
+	}
+
+	void Weights_::readJsonVariancies(std::vector<std::pair<std::string, ujson::value>>& object)
+	{
+		auto it = find(object, "variance");
+		if( it == object.end() || !it->second.is_array() ) {
+			throw std::invalid_argument("'variance' with type object not found");
+		}
+
+		std::vector<ujson::value> array0 = array_cast(std::move(it->second));
+		for( auto i = array0.begin(); i != array0.end(); ++i ) {
+
+			std::vector<ujson::value> array1 = array_cast(std::move(*i));
+			auto j = array1.begin();
+
+			if( !j->is_number() ) {
+				throw std::invalid_argument("invalid data format");
+			}
+
+			int lb = int32_cast(std::move(*j));
+
+			j++;
+
+			if( !j->is_number() ) {
+				throw std::invalid_argument("invalid data format");
+			}
+
+			double v = double_cast(std::move(*j));
+
+			variance[lb] = v;
+		}
+	}
+
 	void Weights_::read(std::ifstream& ifs)
 	{
+#if 1
+		readJson(ifs);
+#else
 		Logger::out(2) << "Weights_::read()" << std::endl;
 
 		bool state = false;
@@ -826,11 +983,53 @@ namespace SemiCrf {
 		if( empty() ) {
 			throw Error("empty weights file"); // T.B.D.
 		}
+#endif
+	}
+
+	void Weights_::writeJson(std::ofstream& ofs)
+	{
+		Logger::out(2) << "Weights_::writeJson()" << std::endl;
+
+		ujson::array jweights;
+		for( auto& w : *this ) {
+			jweights.push_back(w);
+		}
+
+		ujson::array jmeans;
+		for( auto& m : mean ) {
+			ujson::array jmean;
+			jmean.push_back(m.first);
+			jmean.push_back(m.second);
+			jmeans.push_back(std::move(jmean));
+		}
+
+		ujson::array jvariancies;
+		for( auto& v : variance ) {
+			ujson::array jvariance;
+			jvariance.push_back(v.first);
+			jvariance.push_back(v.second);
+			jvariancies.push_back(std::move(jvariance));
+		}
+
+		auto object = ujson::object{
+			{ "title", "Semi-CRF Weights" },
+			{ "dimension", ujson::array{ xDim, yDim } },
+			{ "feature", feature },
+			{ "max_length", maxLength },
+			{ "mean", jmeans },
+			{ "variance", jvariancies },
+			{ "weights", jweights }
+		};
+
+		ofs << to_string(object) << std::endl;
 	}
 
 	void Weights_::write(std::ofstream& ofs)
 	{
 		Logger::out(2) << "Weights_::write()" << std::endl;
+#if 1
+		writeJson(ofs);
+#else
 
 		ofs << "# Semi-CRF Weights" << std::endl;
 		if( !feature.empty() ) {
@@ -849,6 +1048,7 @@ namespace SemiCrf {
 		}
 
 		ofs << "# END" << std::endl;
+#endif
 	}
 
 	FeatureFunction_::FeatureFunction_()
@@ -1032,6 +1232,8 @@ namespace SemiCrf {
 			weights->setXDim(datas->getXDim());
 			weights->setYDim(datas->getYDim());
 			weights->setMaxLength(maxLength);
+			weights->setMean(datas->getMean());
+			weights->setVariance(datas->getVariance());
 			weights->write(ofs);
 		}
 	}
@@ -1434,6 +1636,8 @@ namespace SemiCrf {
 		int xdim = weights->getXDim();
 		int ydim = weights->getYDim();
 		const std::string& feature = weights->getFeature();
+		const std::map<int ,double>& mean = weights->getMean();
+		const std::map<int ,double>& variance = weights->getVariance();
 
 		// feature関数を生成し、x,yの次元、feature、maxLengthを設定する
 		ff = App::createFeatureFunction(feature, w2vfile);
@@ -1447,7 +1651,7 @@ namespace SemiCrf {
 			throw Error("dimension mismatch between feature function and weight file");
 		}
 
-		// datasにx,yの次元、featureを設定する
+		// datasにx,yの次元、feature, mean, varianceを設定する
 		datas->setXDim(xdim);
 		datas->setYDim(ydim);
 		if( datas->getFeature() != feature ) {
@@ -1455,6 +1659,8 @@ namespace SemiCrf {
 			throw Error("feature mismatch between data file and weight file");
 		}
 		datas->setFeature(feature);
+		datas->setMean(mean);
+		datas->setVariance(variance);
 
 		// ラベルを生成
 		Labels labels = createLabels(ydim);

@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <map>
 #include <boost/numeric/ublas/vector.hpp>
 #include "Error.hpp"
 #include "FileIO.hpp"
@@ -84,15 +85,22 @@ namespace SemiCrf {
 	public:
 		Data_();
 		virtual ~Data_();
-		// virtual void read();
 		virtual void write(std::ostream& output) const;
 		virtual void writeJson(ujson::array& ary) const;
 		Strs getStrs() { return strs; }
 		Segments getSegments() { return segs; }
 		void setSegments(Segments arg) { segs = arg; }
+		void computeMeanLength( std::map<int, int>* count, std::map<int ,double>* mean, std::map<int ,double>* variance );
+		double getMean(int lb) { return (*mean)[lb]; }
+		double getVariance(int lb) { return (*variance)[lb]; }
+		void setMeans(std::map<int ,double>* arg) { mean = arg; }
+		void setVariancies(std::map<int ,double>* arg) { variance = arg; }
 	protected:
 		Strs strs;
 		Segments segs;
+		std::map<int, int>* count;
+		std::map<int ,double>* mean;
+		std::map<int ,double>* variance;
 	};
 	
 	typedef std::shared_ptr<Data_> Data;
@@ -113,16 +121,31 @@ namespace SemiCrf {
 		virtual int getMaxLength() { return maxLength; }
 		const std::string& getFeature() { return feature; }
 		void setFeature(const std::string& arg) { feature = arg; }
+		void setMean(const std::map<int ,double>& arg) {
+			mean = arg;
+			for( auto& d : *this ) {
+				d->setMeans(&mean);
+			}
+		}
+		void setVariance(const std::map<int ,double>& arg) {
+			variance = arg;
+			for( auto& d : *this ) {
+				d->setVariancies(&variance);
+			}
+		}
+		const std::map<int ,double>& getMean() { return mean; }
+		const std::map<int ,double>& getVariance() { return variance; }
 	protected:
-		virtual void readJsonTitle(std::vector<std::pair<std::string, ujson::value>>& object);
-		virtual void readJsonDimension(std::vector<std::pair<std::string, ujson::value>>& object);
-		virtual void readJsonFeature(std::vector<std::pair<std::string, ujson::value>>& object);
 		virtual void readJsonData(std::vector<std::pair<std::string, ujson::value>>& object) = 0;
+		virtual void computeMeanLength();
 	protected:
 		int xDim;
 		int yDim;
 		int maxLength;
 		std::string feature;
+		std::map<int, int> count;
+		std::map<int ,double> mean;
+		std::map<int ,double> variance;
 	};
 
 	typedef std::shared_ptr<Datas_> Datas;
@@ -157,7 +180,9 @@ namespace SemiCrf {
 		Weights_(int dim);
 		virtual ~Weights_();
 		void read(std::ifstream& ifs);
+		void readJson(std::ifstream& ifs);
 		void write(std::ofstream& ofs);
+		void writeJson(std::ofstream& ofs);
 		void setXDim(int arg) { xDim = arg; }
 		void setYDim(int arg) { yDim = arg; }
 		int getXDim() { return xDim; }
@@ -166,11 +191,22 @@ namespace SemiCrf {
 		void setMaxLength(int arg) { maxLength = arg; }
 		const std::string& getFeature() { return feature; }
 		void setFeature(const std::string& arg) { feature = arg; }
+		void setMean(const std::map<int ,double>& arg) { mean = arg; }
+		void setVariance(const std::map<int ,double>& arg) { variance = arg; }
+		const std::map<int ,double>& getMean() { return mean; }
+		const std::map<int ,double>& getVariance() { return variance; }
+	protected:
+		void readJsonWeights(std::vector<std::pair<std::string, ujson::value>>& object);
+		void readJsonMeans(std::vector<std::pair<std::string, ujson::value>>& object);
+		void readJsonVariancies(std::vector<std::pair<std::string, ujson::value>>& object);
+		void readJsonMaxLength(std::vector<std::pair<std::string, ujson::value>>& object);
 	protected:
 		int xDim;
 		int yDim;
 		int maxLength;
 		std::string feature;
+		std::map<int ,double> mean;
+		std::map<int ,double> variance;
 	};
 
 	typedef std::shared_ptr<Weights_> Weights;
