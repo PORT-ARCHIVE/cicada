@@ -37,7 +37,7 @@ learn:
 	$(SEMICRF) -t tmp1 -w tmp2 --log-level 1 -e0 1.0e-3 -e1 1.0e-3 --max-iteration 100000 --disable-adagrad && echo "OK" || echo "ERROR"
 
 infer:
-	@rm -f a b tmp5;
+	@rm -f r1 r2 a b tmp5;
 	@for SEED in 1 2 3 4 5 6 7 8 9 10; do \
 		../gen -i p0.json -s $$SEED -r 32 -l 16 > tmp3; \
 		$(SEMICRF) -i tmp3 -w tmp2 --log-level 0 > tmp4 || echo "ERROR"; \
