@@ -77,7 +77,7 @@ namespace App {
 
 	int Digit::getDim()
 	{
-		return yDim * ( xDim + yDim + maxLength );
+		return yDim * ( xDim + yDim + 1 );
 	}
 
 	void Digit::read()
@@ -104,7 +104,7 @@ namespace App {
 
 			int dim0 = yDim * xDim;
 			int dim1 = yDim * ( xDim + yDim );
-			int dim2 = yDim * ( xDim + yDim + maxLength );
+			int dim2 = yDim * ( xDim + yDim + 1 );
 
 			vector fvec(dim2, 0.0);
 
@@ -121,7 +121,18 @@ namespace App {
 			fvec(dim0+ydval*yDim+yval) = 1.0;
 
             // y2l
-			fvec(dim1+yval*maxLength+(d-1)) = 1.0;
+			double m = x->getMean(static_cast<int>(y));
+			double s = x->getVariance(static_cast<int>(y));
+			const double eps = 1.0e-5;
+			double f = 0.0;
+			if( eps < s ) {
+				double dm = d - m;
+				f = dm*dm/s;
+			} else {
+				f = 1.0;
+			}
+
+			fvec(dim1+yval) = f;
 
 			int k = 0;
 			for( auto w : *ws ) {
