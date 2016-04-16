@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 	}
 
 	if( !ret ) {
-		std::cerr << "OK" << std::endl;
+		Logger::out(1) << "OK" << std::endl;
 	}
 
 	exit(ret);
