@@ -127,7 +127,7 @@ namespace App {
 			double f = 0.0;
 			if( eps < s ) {
 				double dm = d - m;
-				f = dm*dm/s;
+				f = dm*dm/(2.0*s);
 			} else {
 				f = 1.0;
 			}
