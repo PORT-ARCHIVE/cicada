@@ -3,7 +3,7 @@
 #ifndef FILE_IO__H
 #define FILE_IO__H
 
-#include <strstream>
+#include <sstream>
 #include "Error.hpp"
 
 template <class T>
