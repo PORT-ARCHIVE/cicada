@@ -6,7 +6,7 @@
 MultiByteIterator::MultiByteIterator(const std::string& arg)
 	: str(arg)
 {
-	buf = new char[MB_CUR_MAX];
+	buf = new char[MB_CUR_MAX]; // T.B.D.
 	p = const_cast<char*>(str.c_str());
 	setBuf();
 }
@@ -35,11 +35,11 @@ MultiByteIterator& MultiByteIterator::operator ++()
 void MultiByteIterator::setBuf()
 {
 	int i = 0;
-	int s = mblen(p, MB_CUR_MAX);
+	int s = mblen(p, MB_CUR_MAX); // T.B.D.
 	for( i = 0; i < s; i++ ) {
 		buf[i] = *(p++);
 	}
-	buf[i] = '\0';
+	buf[i] = '\0'; // T.B.D.
 }
 
 MultiByteTokenizer::MultiByteTokenizer(const std::string& str)
@@ -51,21 +51,31 @@ MultiByteTokenizer::~MultiByteTokenizer()
 {
 }
 
+void MultiByteTokenizer::setSeparator(const std::string& sep)
+{
+	seps.push_back(sep);
+}
+
+bool MultiByteTokenizer::isSep(const char* s)
+{
+	bool ret = false;
+	for( const auto& sep : seps ) {
+		if( s == sep ) {
+			ret = true;
+			break;
+		}
+	}
+	return ret;
+}
+
 std::string MultiByteTokenizer::get()
 {
-	while( strcmp(itr, " ") == 0 ||
-		   strcmp(itr, "　") == 0 ||
-		   strcmp(itr, "\t") == 0 ||
-		   strcmp(itr, ",") == 0 ) {
+	while( isSep(itr) ) {
 		++itr;
 	}
 
 	std::string token;
-	while( strcmp(itr, " ") != 0 &&
-		   strcmp(itr, "　") != 0 &&
-		   strcmp(itr, "\t") != 0 &&
-		   strcmp(itr, ",") != 0 &&
-		   strcmp(itr, "\0") != 0 ) {
+	while( !isSep(itr) && strcmp(itr, "\0") != 0 ) {
 
 		const char* p = itr;
 		int s = mblen(p, MB_CUR_MAX);
