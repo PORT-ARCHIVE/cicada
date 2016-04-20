@@ -16,4 +16,4 @@ void open(T& strm, const std::string& arg) {
 	}
 }
 
-#endif // SEMI_CRF__H
+#endif // FILE_IO__H
