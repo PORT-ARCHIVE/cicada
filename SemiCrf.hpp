@@ -196,11 +196,6 @@ namespace SemiCrf {
 		const std::map<int ,double>& getMean() { return mean; }
 		const std::map<int ,double>& getVariance() { return variance; }
 	protected:
-		void readJsonWeights(std::vector<std::pair<std::string, ujson::value>>& object);
-		void readJsonMeans(std::vector<std::pair<std::string, ujson::value>>& object);
-		void readJsonVariancies(std::vector<std::pair<std::string, ujson::value>>& object);
-		void readJsonMaxLength(std::vector<std::pair<std::string, ujson::value>>& object);
-	protected:
 		int xDim;
 		int yDim;
 		int maxLength;

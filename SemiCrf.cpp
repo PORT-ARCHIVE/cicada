@@ -18,6 +18,7 @@
 #include "Logger.hpp"
 #include "Error.hpp"
 #include "ujson.hpp"
+#include "JsonIO.hpp"
 
 
 namespace SemiCrf {
@@ -29,50 +30,6 @@ namespace SemiCrf {
         while(*s != '\0') { if (*s == '\n') {*s = '\0'; break;} else {s++;}}
         return std::move(std::string(p));
     }
-
-	static void readJsonTitle(std::vector<std::pair<std::string, ujson::value>>& object, std::string& title)
-	{
-		auto it = find(object, "title");
-		if( it == object.end() || !it->second.is_string() ) {
-			throw std::invalid_argument("title' with type string not found");
-		}
-		title = string_cast(std::move(it->second));
-	}
-
-	static void readJsonDimension(std::vector<std::pair<std::string, ujson::value>>& object, int& xDim, int& yDim)
-	{
-		auto it = find(object, "dimension");
-		if( it == object.end() || !it->second.is_array() ) {
-			throw std::invalid_argument("'dimention' with type array not found");
-		}
-
-		std::vector<ujson::value> array = array_cast(std::move(it->second));
-
-		auto i = array.begin();
-
-		if( !i->is_number() ) {
-			throw std::invalid_argument("1st dimension is not a number");
-		}
-
-		xDim = int32_cast(std::move(*i));
-
-		++i;
-
-		if( !i->is_number() ) {
-			throw std::invalid_argument("2nd dimension is not a number");
-		}
-
-		yDim = int32_cast(std::move(*i));
-	}
-
-	static void readJsonFeature(std::vector<std::pair<std::string, ujson::value>>& object, std::string& feature)
-	{
-		auto it = find(object, "feature");
-		if( it == object.end() || !it->second.is_string() ) {
-			throw std::invalid_argument("'feature' with type string not found");
-		}
-		feature = string_cast(std::move(it->second));
-	}
 
 	// ctr
 	Labels createLabels(int size =0)
@@ -171,12 +128,12 @@ namespace SemiCrf {
 				throw std::invalid_argument("object expected for Datas_");
 			}
 
-			std::vector<std::pair<std::string, ujson::value>> object = object_cast(std::move(v));
-
-			std::string title;
-			readJsonTitle(object, title);
-			readJsonDimension(object, xDim, yDim);
-			readJsonFeature(object, feature);
+			JsonIO::Object object = object_cast(std::move(v));
+			std::string title = JsonIO::readString(object, "title");
+			std::vector<int> dims = JsonIO::readIntAry(object, "dimension");
+			xDim = dims[0];
+			yDim = dims[1];
+			feature = JsonIO::readString(object, "feature");
 			readJsonData(object);
 
 		} catch(...) {
@@ -805,107 +762,20 @@ namespace SemiCrf {
 				throw std::invalid_argument("object expected for Weights_");
 			}
 
-			std::vector<std::pair<std::string, ujson::value>> object = object_cast(std::move(v));
-			std::string title;
-			readJsonTitle(object, title);
-			readJsonDimension(object, xDim, yDim);
-			readJsonFeature(object, feature);
-			readJsonMaxLength(object);
-			readJsonMeans(object);
-			readJsonVariancies(object);
-			readJsonWeights(object);
+			JsonIO::Object object = object_cast(std::move(v));
+			std::string title = JsonIO::readString(object, "title");
+			std::vector<int> dims = JsonIO::readIntAry(object, "dimension");
+			xDim = dims[0];
+			yDim = dims[1];
+			feature = JsonIO::readString(object, "feature");
+			maxLength = JsonIO::readInt(object, "max_length");
+			mean = JsonIO::readIntDoubleMap(object, "mean");
+			variance = JsonIO::readIntDoubleMap(object, "variance");
+			std::vector<double> weight = JsonIO::readDoubleAry(object, "weights");
+			for( auto w : weight ) push_back(w);
 
 		} catch(...) {
 			throw Error("json parse error");
-		}
-	}
-
-	void Weights_::readJsonWeights(std::vector<std::pair<std::string, ujson::value>>& object)
-	{
-		auto it = find(object, "weights");
-		if( it == object.end() || !it->second.is_array() ) {
-			throw std::invalid_argument("'weights' with type object not found");
-		}
-
-		std::vector<ujson::value> array = array_cast(std::move(it->second));
-		for( auto i = array.begin(); i != array.end(); ++i ) {
-
-			if( !i->is_number() ) {
-				throw std::invalid_argument("invalid data format");
-			}
-
-			push_back(double_cast(std::move(*i)));
-		}
-	}
-
-	void Weights_::readJsonMaxLength(std::vector<std::pair<std::string, ujson::value>>& object)
-	{
-		auto it = find(object, "max_length");
-		if( it == object.end() || !it->second.is_number() ) {
-			throw std::invalid_argument("max_length' with type string not found");
-		}
-		maxLength = int32_cast(std::move(it->second));
-	}
-
-	void Weights_::readJsonMeans(std::vector<std::pair<std::string, ujson::value>>& object)
-	{
-		auto it = find(object, "mean");
-		if( it == object.end() || !it->second.is_array() ) {
-			throw std::invalid_argument("'mean' with type object not found");
-		}
-
-		std::vector<ujson::value> array0 = array_cast(std::move(it->second));
-		for( auto i = array0.begin(); i != array0.end(); ++i ) {
-
-			std::vector<ujson::value> array1 = array_cast(std::move(*i));
-			auto j = array1.begin();
-
-			if( !j->is_number() ) {
-				throw std::invalid_argument("invalid data format");
-			}
-
-			int lb = int32_cast(std::move(*j));
-
-			j++;
-
-			if( !j->is_number() ) {
-				throw std::invalid_argument("invalid data format");
-			}
-
-			double m = double_cast(std::move(*j));
-
-			mean[lb] = m;
-		}
-	}
-
-	void Weights_::readJsonVariancies(std::vector<std::pair<std::string, ujson::value>>& object)
-	{
-		auto it = find(object, "variance");
-		if( it == object.end() || !it->second.is_array() ) {
-			throw std::invalid_argument("'variance' with type object not found");
-		}
-
-		std::vector<ujson::value> array0 = array_cast(std::move(it->second));
-		for( auto i = array0.begin(); i != array0.end(); ++i ) {
-
-			std::vector<ujson::value> array1 = array_cast(std::move(*i));
-			auto j = array1.begin();
-
-			if( !j->is_number() ) {
-				throw std::invalid_argument("invalid data format");
-			}
-
-			int lb = int32_cast(std::move(*j));
-
-			j++;
-
-			if( !j->is_number() ) {
-				throw std::invalid_argument("invalid data format");
-			}
-
-			double v = double_cast(std::move(*j));
-
-			variance[lb] = v;
 		}
 	}
 
