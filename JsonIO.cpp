@@ -18,7 +18,7 @@ namespace JsonIO {
 	{
 		auto it = find(object, tag.c_str());
 		if( it == object.end() || !it->second.is_number() ) {
-			throw std::invalid_argument("max_length' with type string not found");
+			throw std::invalid_argument("max_length' with type string not found"); // T.B.D
 		}
 		int value = int32_cast(std::move(it->second));
 		return value;
