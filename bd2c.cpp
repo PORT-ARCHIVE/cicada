@@ -156,8 +156,8 @@ int main(int argc, char *argv[])
 		///////////////	output
 
 		{
-			std::string dim0 = boost::lexical_cast<std::string>(matrix->getSize());
-			std::string dim1 = boost::lexical_cast<std::string>(labelArray.size());
+			int dim0 = matrix->getSize();
+			int dim1 = labelArray.size();
 			auto object = ujson::object{
 				{ "title", title },
 				{ "feature", options.feature },
