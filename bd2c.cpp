@@ -1,13 +1,13 @@
 // © 2016 PORT INC.
 
 #include <iostream>
+#include <sstream>
 #include <boost/lexical_cast.hpp>
 #include "Logger.hpp"
 #include "Error.hpp"
 #include "FileIO.hpp"
 #include "ujson.hpp"
-#include "JsonIO.hpp"
-#include "MultiByteTokenizer.hpp"
+#include "W2V.hpp"
 
 class Options {
 public:
@@ -55,59 +55,36 @@ int main(int argc, char *argv[])
 		options.parse(argc, argv);
 		Logger::setLevel(options.logLevel);
 
-		std::ifstream ifb;
-		open(ifb, options.bodyTextFile);
-
-		std::string jsonstr;
-		jsonstr.assign((std::istreambuf_iterator<char>(ifb)), std::istreambuf_iterator<char>());
-		ifb.close();
-
-		auto v = ujson::parse(jsonstr);
-		if( !v.is_object() ) {
-			throw std::invalid_argument("object expected for Datas_"); // T.B.D
+		W2V::Matrix matrix(new W2V::Matrix_());
+		if( options.w2vMatrixFile.empty() ) {
+			throw Error("no w2v matrix file specifed");
 		}
+		matrix->read(options.w2vMatrixFile); // T.B.D.
 
-		JsonIO::Object object = object_cast(std::move(v));
-		std::string bdtxt = JsonIO::readString(object, "body_text_split");
+		ujson::array data;		
+		ujson::array lines;
 
-		Logger::out(1) << "" << bdtxt << std::endl;
+		while( !std::cin.eof() ) {
 
-		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D
-		MultiByteTokenizer tokenizer(bdtxt);
-		tokenizer.setSeparator("\t");
-		tokenizer.setSeparator(" ");
-		tokenizer.setSeparator("　");
-
-		std::string tok = tokenizer.get();
-		Logger::out(1) << "" << tok << std::endl;
-		while( tok == "。" ||
-			   tok == "。" ||
-			   tok == "\n" ) {
-			tok = tokenizer.get();
-			Logger::out(1) << "" << tok << std::endl;
-		}
-
-		std::vector<std::vector<std::string>> data;
-
-		while( tok != "\0" ) {
-
-			std::vector<std::string> sentence;
-			while( tok != "。" &&
-				   tok != "\n" &&
-				   tok != "\0" ) {
-				   // tok != "、" &&
-				   // tok != ","  &&
-
-				sentence.push_back(tok);
-				tok = tokenizer.get();
-				Logger::out(1) << "" << tok << std::endl;
+			ujson::array line;
+			std::string word;
+			std::cin >> word;
+			long long i = matrix->w2i(word);
+			std::string ID = boost::lexical_cast<std::string>(i);
+			line.push_back(ID);
+			line.push_back("*");
+			line.push_back("*");
+			line.push_back(word);
+			lines.push_back(std::move(line));
+			if( word == "。" ){
+				data.push_back(std::move(lines));
+				lines.clear();
 			}
-
-			data.push_back(std::move(sentence));
-			tok = tokenizer.get();
-			Logger::out(1) << "" << tok << std::endl;
 		}
 
+		auto object = ujson::object{ { "data", data } };
+		Logger::out(0) << "" << to_string(object) << std::endl;
+	
 	} catch(Error& e) {
 
 		std::cerr << "error: " << e.what() << std::endl;
