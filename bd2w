@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cat $1 | jq -r '.[]'.body_text_split | tr -d '\n'
