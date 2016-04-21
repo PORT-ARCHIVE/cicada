@@ -16,12 +16,10 @@ public:
 	MultiByteIterator& operator ++();
 	void setBuf();
 
-
 private:
 	std::string str;
 	char* buf;
 	char* p;
-
 };
 
 class MultiByteTokenizer
