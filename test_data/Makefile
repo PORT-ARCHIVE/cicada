@@ -32,6 +32,28 @@ test2:
 		rm tmp1 tmp2; \
 	done;
 
+FILES1=\
+	check7.json
+
+MATRIX=../../word2vec/wakati.bin
+
+test3:
+	@for file in $(FILES1); do \
+		echo "###### $$file ######"; \
+		echo "$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 2.0 -e1 1.0e-6 --max-iteration 100000 --disable-regularization --w2v-matrix ${MATRIX}"; \
+		$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 2.0 -e1 1.0e-6 --max-iteration 100000 --disable-regularization --w2v-matrix ${MATRIX} && echo "OK" || echo "ERROR"; \
+		echo "$(SEMICRF) -i $$file -w tmp1 --log-level 0 --w2v-matrix ${MATRIX}" ; \
+		$(SEMICRF) -i $$file -w tmp1 --log-level 0 --w2v-matrix ${MATRIX} > tmp2 && echo "OK" || echo "ERROR"; \
+		cat $$file | jq '.data[][][]' > r1; \
+		cat tmp2 | jq '.data[][][]' > r2; \
+		cat r1 | awk '{ if(k++ % 4 == 2) print $$1 }' > a; \
+		cat r2 | awk '{ if(k++ % 3 == 2) print $$1 }' > b; \
+		echo "diff -c a b"; \
+		diff -c a b && echo "OK" || echo "ERROR"; \
+		paste a b | awk '{ if( $$1 == $$2 ) count++; total++; } END{ print count/total*100,"%"; }'; \
+		rm tmp1 tmp2; \
+	done;
+
 learn:
 	../gen -i p0.json -r 32 -l 16 > tmp1
 	$(SEMICRF) -t tmp1 -w tmp2 --log-level 1 -e0 1.0e-3 -e1 1.0e-3 --max-iteration 100000 --disable-adagrad && echo "OK" || echo "ERROR"
@@ -65,11 +87,13 @@ gen_test:
 
 bd2c_test:
 	@echo "###### bd2c test 1 ######"
+	@echo "../bd2c -b body0.json -w ../../word2vec/wakati.bin -l labels0.json > check8.json"
 	@../bd2c -b body0.json -w ../../word2vec/wakati.bin -l labels0.json > check8.json && echo "OK" || echo "ERROR"
 	@diff -c answer/check8.json check8.json && echo "OK" || echo "ERROR"
 
 bd2w_test:
 	@echo "###### bd2w test 1 ######"
+	@echo "../bd2w body1.json > body1.txt"
 	@../bd2w body1.json > body1.txt && echo "OK" || echo "ERROR"
 	@diff answer/body1.txt body1.txt && echo "OK" || echo "ERROR"
 

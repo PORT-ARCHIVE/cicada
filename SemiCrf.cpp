@@ -32,7 +32,7 @@ namespace SemiCrf {
     }
 
 	// ctr
-	Labels createLabels(int size =0)
+	Labels createLabels(int size = 0)
 	{
 		return Labels( new Labels_(size) );
 	}
@@ -123,17 +123,25 @@ namespace SemiCrf {
 			jsonstr.assign((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
 
 			auto v = ujson::parse(jsonstr);
+			jsonstr.clear();
 
 			if( !v.is_object() ) {
 				throw std::invalid_argument("object expected for Datas_");
 			}
 
 			JsonIO::Object object = object_cast(std::move(v));
-			std::string title = JsonIO::readString(object, "title");
+			title = JsonIO::readString(object, "title");
 			std::vector<int> dims = JsonIO::readIntAry(object, "dimension");
 			xDim = dims[0];
 			yDim = dims[1];
 			feature = JsonIO::readString(object, "feature");
+			try {
+				labels = JsonIO::readUAry(object, "labels");
+			} catch(...) {
+				if( feature == "JPN" ) {
+					throw Error("no labels specified");
+				}
+			}
 			readJsonData(object);
 
 		} catch(...) {
@@ -241,6 +249,7 @@ namespace SemiCrf {
 		, yDim(0)
 		, maxLength(-std::numeric_limits<int>::max())
 		, feature("")
+		, title("")
 	{
 		Logger::out(2) << "Datas_()" << std::endl;
 	};
@@ -259,9 +268,10 @@ namespace SemiCrf {
 		}
 
 		auto object = ujson::object{
-			{ "title", "" },
+			{ "title", title },
 			{ "dimension", ujson::array{ xDim, yDim } },
 			{ "feature", feature },
+			{ "labels", labels },
 			{ "data", datas }
 		};
 

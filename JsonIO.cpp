@@ -102,4 +102,15 @@ namespace JsonIO {
 
 		return std::move(idm);
 	}
+
+	std::vector<ujson::value> readUAry(Object& object, const std::string& tag)
+	{
+		auto it = find(object, tag.c_str());
+		if( it == object.end() ) {
+			throw std::invalid_argument("labels' with type string not found"); // T.B.D
+		}
+
+		std::vector<ujson::value> ary = array_cast(std::move(it->second));
+		return std::move(ary);
+	}
 }

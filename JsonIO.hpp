@@ -16,6 +16,7 @@ namespace JsonIO {
 	std::vector<int> readIntAry(Object& object, const std::string& tag);
 	std::vector<double> readDoubleAry(Object& object, const std::string& tag);
 	std::map<int, double> readIntDoubleMap(Object& object, const std::string& tag);
+	std::vector<ujson::value> readUAry(Object& object, const std::string& tag);
 }
 
 

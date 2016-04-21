@@ -104,12 +104,7 @@ int main(int argc, char *argv[])
 			}
 
 			auto object = object_cast(std::move(v));
-			auto it = find(object, "labels");
-			if( it == object.end() ) {
-				throw std::invalid_argument("labels' with type string not found"); // T.B.D
-			}
-
-			labelArray = array_cast(std::move(it->second));
+			labelArray = JsonIO::readUAry(object, "labels");
 		}
 
 		/////////////// w2v

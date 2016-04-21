@@ -143,9 +143,11 @@ namespace SemiCrf {
 		int yDim;
 		int maxLength;
 		std::string feature;
+		std::string title;
 		std::map<int, int> count;
 		std::map<int ,double> mean;
 		std::map<int ,double> variance;
+		std::vector<ujson::value> labels;
 	};
 
 	typedef std::shared_ptr<Datas_> Datas;
