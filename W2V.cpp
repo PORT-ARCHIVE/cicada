@@ -69,14 +69,14 @@ namespace W2V {
         std::fclose(f);
 	}
 
-	int Matrix_::w2i(const std::string& w)
+	long long Matrix_::w2i(const std::string& w)
 	{
+		long long ret = -1;
         auto ip = w2i_.find(w);
         if( ip != w2i_.end() ) {
-            return ip->second;
-        } else {
-            throw Error("");
+            ret = ip->second;
         }
+		return ret;
 	}
 
 	const vector& Matrix_::i2v(int i)

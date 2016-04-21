@@ -18,7 +18,7 @@ namespace W2V {
 		Matrix_();
         virtual ~Matrix_();
 		void read(const std::string& file);
-		int w2i(const std::string& w);
+		long long w2i(const std::string& w);
 		const vector& i2v(int i);
 		long long getNumWords() { return words; }
 		long long getSize() { return size; }
