@@ -1,7 +1,7 @@
 
 SEMICRF=../semicrf
 
-all: test1 test2 gen_test bd2c_test
+all: test1 test2 gen_test bd2c_test bd2w_test
 
 test1:
 	@echo "###### check0 ######"
@@ -68,6 +68,11 @@ bd2c_test:
 	@../bd2c -b body0.json -w ../../word2vec/wakati.bin -l labels0.json > check8.json && echo "OK" || echo "ERROR"
 	@diff -c answer/check8.json check8.json && echo "OK" || echo "ERROR"
 
+bd2w_test:
+	@echo "###### bd2w test 1 ######"
+	@../bd2w body1.json > body1.txt && echo "OK" || echo "ERROR"
+	@diff answer/body1.txt body1.txt && echo "OK" || echo "ERROR"
+
 update:
 	-cp log1 answer/log1
 	-cp check8.json answer/check8.json
@@ -75,7 +80,8 @@ update:
 	-cp test17.json answer/test17.json
 	-cp test18.json answer/test18.json
 	-cp test19.json answer/test19.json
+	-cp body1.txt answer/body1.txt
 
 clean:
 	rm -f a b r1 r2 tmp* log1 check8.json
-	rm -f test16.json test17.json test18.json test19.json
+	rm -f test16.json test17.json test18.json test19.json body1.txt
