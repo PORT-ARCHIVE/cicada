@@ -271,9 +271,12 @@ namespace SemiCrf {
 			{ "title", title },
 			{ "dimension", ujson::array{ xDim, yDim } },
 			{ "feature", feature },
-			{ "labels", labels },
 			{ "data", datas }
 		};
+
+		if( !labels.empty() ) {
+			object.push_back( std::move( std::make_pair( "labels", labels ) ) );
+		}
 
 		output << "" << to_string(object) << std::endl;
 	}
