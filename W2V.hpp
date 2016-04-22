@@ -21,10 +21,10 @@ namespace W2V {
 		long long w2i(const std::string& w);
 		const vector& i2v(int i);
 		long long getNumWords() { return words; }
-		int getSize() { return size; }
+		long long  getSize() { return size; }
     private:
 		long long words;
-		int size;
+		long long size;
         std::map<std::string, long long> w2i_;
         std::map<long long, std::string> i2w_;
         std::vector<vector> M;
