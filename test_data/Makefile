@@ -1,7 +1,7 @@
 
 SEMICRF=../semicrf
 
-all: test1 test2 gen_test bd2c_test bd2w_test
+all: test1 test2 gen_test bd2c_test bd2w_test test3 learn infer
 
 test1:
 	@echo "###### check0 ######"
@@ -73,16 +73,23 @@ infer:
 
 gen_test:
 	@echo "###### gen test 1 ######"
-	@../gen -i p0.json -s 1 -r 2 -l 16 > test16.json
+	@echo "../gen -i p0.json -s 1 -r 2 -l 16"
+	@../gen -i p0.json -s 1 -r 2 -l 16 > test16.json && echo "OK" || echo "ERROR"
 	@diff -c answer/test16.json test16.json && echo "OK" || echo "ERROR"
+#
 	@echo "###### gen test 2 ######"
-	@../gen -i p0.json -s 2 -r 4 -l 32 > test17.json
+	@echo "./gen -i p0.json -s 2 -r 4 -l 32"
+	@../gen -i p0.json -s 2 -r 4 -l 32 > test17.json && echo "OK" || echo "ERROR"
 	@diff -c answer/test17.json test17.json && echo "OK" || echo "ERROR"
+#
 	@echo "###### gen test 3 ######"
-	@../gen -i p0.json -s 3 -r 8 -l 64 > test18.json
+	@echo "../gen -i p0.json -s 3 -r 8 -l 64"
+	@../gen -i p0.json -s 3 -r 8 -l 64 > test18.json && echo "OK" || echo "ERROR"
 	@diff -c answer/test18.json test18.json && echo "OK" || echo "ERROR"
+#
 	@echo "###### gen test 4 ######"
-	@../gen -i p0.json -s 4 -r 16 -l 64 > test19.json
+	@echo "../gen -i p0.json -s 4 -r 16 -l 64"
+	@../gen -i p0.json -s 4 -r 16 -l 64 > test19.json && echo "OK" || echo "ERROR"
 	@diff -c answer/test19.json test19.json && echo "OK" || echo "ERROR"
 
 bd2c_test:
