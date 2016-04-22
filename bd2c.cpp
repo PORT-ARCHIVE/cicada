@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <boost/lexical_cast.hpp>
-#include "Logger.hpp"
+#include "spdlog/spdlog.h"
 #include "Error.hpp"
 #include "FileIO.hpp"
 #include "ujson.hpp"
@@ -55,15 +55,21 @@ void Options::parse(int argc, char *argv[])
 	}
 }
 
+namespace spd = spdlog;
 int main(int argc, char *argv[])
 {
 	int ret = 0x0;
+	auto console = spd::stderr_logger_mt("console", true);
 
 	try {
 
 		Options options;
 		options.parse(argc, argv);
-		Logger::setLevel(options.logLevel);
+
+		size_t q_size = 4096; // queue size must be power of 2
+		spdlog::set_async_mode(q_size);
+		spd::set_level((spd::level::level_enum)options.logLevel);
+        console->info("bd2c ver 0.1.0.");
 
 		///////////////	body
 
@@ -72,6 +78,7 @@ int main(int argc, char *argv[])
 		{
 			std::ifstream ifb;
 			open(ifb, options.bodyTextFile);
+			console->info() << "parse " << options.bodyTextFile;
 			std::string jsonstr;
 			jsonstr.assign((std::istreambuf_iterator<char>(ifb)), std::istreambuf_iterator<char>());
 			ifb.close();
@@ -93,6 +100,7 @@ int main(int argc, char *argv[])
 		{
 			std::ifstream ifb;
 			open(ifb, options.labelTableFile);
+			console->info() << "parse " << options.labelTableFile;
 			std::string jsonstr;
 			jsonstr.assign((std::istreambuf_iterator<char>(ifb)), std::istreambuf_iterator<char>());
 			ifb.close();
@@ -109,15 +117,18 @@ int main(int argc, char *argv[])
 
 		/////////////// w2v
 
+
 		W2V::Matrix matrix(new W2V::Matrix_());
 		{
 			if( options.w2vMatrixFile.empty() ) {
 				throw Error("no w2v matrix file specifed");
 			}
+			console->info() << "parse " << options.w2vMatrixFile;
 			matrix->read(options.w2vMatrixFile);
 		}
 
 		///////////////	data
+		console->info("transform data...");
 
 		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
 		MultiByteTokenizer toknizer(body);
@@ -149,7 +160,6 @@ int main(int argc, char *argv[])
 		}
 
 		///////////////	output
-
 		{
 			long long size = matrix->getSize();
 			if( std::numeric_limits<int>::max() < size ) {
@@ -164,22 +174,22 @@ int main(int argc, char *argv[])
 				{ "labels", labelArray },
 				{ "data", data }
 			};
-			Logger::out(0) << "" << to_string(object) << std::endl;
+			std::cout << "" << to_string(object) << std::endl;
 		}
 	
 	} catch(Error& e) {
 
-		std::cerr << "error: " << e.what() << std::endl;
+		console->error() << e.what();
 		ret = 0x1;
 
 	} catch(...) {
 
-		std::cerr << "error: unexpected exception" << std::endl;
+		console->error() << "unexpected exception";
 		ret = 0x2;
 	}
 
 	if( !ret ) {
-		Logger::out(1) << "OK" << std::endl;
+		console->info("OK");
 	}
 
 	exit(ret);
