@@ -36,6 +36,7 @@ namespace SemiCrf {
 		, DISABLE_DATE_VERSION   = (0x1 << 1)
 		, ENABLE_LIKELIHOOD_ONLY = (0x1 << 2)
 		, DISABLE_REGULARIZATION = (0x1 << 3)
+		, DISABLE_WG_CACHE       = (0x1 << 4)
 	};
 
 	// ラベル集合
@@ -273,6 +274,7 @@ namespace SemiCrf {
 		virtual void preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile) = 0;
 		virtual void postProcess(const std::string& wfile) = 0;
 		void setFlg(int flg);
+		void setCacheSize(int size) { cacheSize = size; }
 
 	protected:
 		double computeWG(App::Label y, App::Label yd, int i, int d);
@@ -300,6 +302,7 @@ namespace SemiCrf {
 		int flg;
 		std::string method;
 		vector gs; // 作業領域
+		int cacheSize;
 	};
 
 	typedef std::shared_ptr<Algorithm_> Algorithm;

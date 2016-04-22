@@ -970,6 +970,7 @@ namespace SemiCrf {
 		, rp(1.0e-7)
 		, flg(arg)
 		, method("bfgs")
+		, cacheSize(0xff)
 	{
 		Logger::out(2) << "Algorithm_()" << std::endl;
 	}
@@ -1038,35 +1039,40 @@ namespace SemiCrf {
 
 	double Algorithm_::computeWG(App::Label y, App::Label yd, int i, int d, vector& gs)
 	{
-		int l = labels->size();
-		int s = current_data->getStrs()->size();
-		int idx = y*l*s*maxLength + yd*s*maxLength + i*maxLength + d;
-		const int cacheSize = 0xff;
-		int p = idx % cacheSize;
 		double v = 0.0;
-#if 1
-		auto& tp = current_wgtab->at(p);
-		if( std::get<0>(tp) == idx ) {
 
-			v = std::get<1>(tp);
-			gs = *std::get<2>(tp);
+		if( ! (flg & DISABLE_WG_CACHE) ) {
+
+			int l = labels->size();
+			int s = current_data->getStrs()->size();
+			int idx = y*l*s*maxLength + yd*s*maxLength + i*maxLength + d;
+			int p = idx % cacheSize;
+			auto& tp = current_wgtab->at(p);
+
+			if( std::get<0>(tp) == idx ) {
+
+				v = std::get<1>(tp);
+				gs = *std::get<2>(tp);
+
+			} else {
+
+				v = ff->wg(weights, y, yd, current_data, i-d+1, i, gs);
+				std::get<0>(tp) = idx;
+				std::get<1>(tp) = v;
+				std::get<2>(tp) = SVector( new vector(gs) );
+			}
 
 		} else {
 
 			v = ff->wg(weights, y, yd, current_data, i-d+1, i, gs);
-			std::get<0>(tp) = idx;
-			std::get<1>(tp) = v;
-			std::get<2>(tp) = SVector( new vector(gs) );
+
 		}
-#else
-		v = ff->wg(weights, y, yd, current_data, i-d+1, i, gs);
-#endif
+
 		return v;
 	}
 
 	void Algorithm_::clearWGCache()
 	{
-		const int cacheSize = 0xff;
 		current_wgtab = createCacheTable(cacheSize);
 	}
 

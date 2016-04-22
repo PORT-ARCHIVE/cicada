@@ -41,6 +41,7 @@ public:
 	int logLevel;
 	int flg;
 	std::string method;
+	int cacheSize;
 };
 
 void Options::parse(int argc, char *argv[])
@@ -71,6 +72,8 @@ void Options::parse(int argc, char *argv[])
 				w2vMatrixFile = argv[++i];
 			} else if( arg == "--set-optimizer" ) {
 				method = argv[++i];
+			} else if( arg == "--cache-size" ) {
+				cacheSize = boost::lexical_cast<int>(argv[++i]);
 			} else if( arg == "--enable-likelihood-only" ) {
 				flg |= SemiCrf::ENABLE_LIKELIHOOD_ONLY;
 			} else if( arg == "--disable-adagrad" ) {
@@ -79,6 +82,8 @@ void Options::parse(int argc, char *argv[])
 				flg |= SemiCrf::DISABLE_DATE_VERSION;
 			} else if( arg == "--disable-regularization" ) {
 				flg |= SemiCrf::DISABLE_REGULARIZATION;
+			} else if( arg == "--disable-wg-cache" ) {
+				flg |= SemiCrf::DISABLE_WG_CACHE;
 			} else if( arg == "--log-level" ) {
 				logLevel = boost::lexical_cast<int>(argv[++i]);
 			} else {
@@ -155,6 +160,7 @@ SemiCrf::Algorithm createAlgorithm(const Options& options)
 	alg->setE1(options.e1);
 	alg->setRp(options.rp);
 	alg->setMethod(options.method);
+	alg->setCacheSize(options.cacheSize);
 
 	return alg;
 }
