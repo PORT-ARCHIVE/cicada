@@ -240,6 +240,13 @@ namespace SemiCrf {
 	typedef std::shared_ptr<CheckTable_> CheckTable;
 	CheckTable createCheckTable(int capacity);
 
+	// vector用チェックテーブル
+	typedef std::shared_ptr<vector> SVector;
+	typedef std::pair<bool,SVector> CheckPair;
+	typedef std::vector<CheckPair> CheckVTable_;
+	typedef std::shared_ptr<CheckVTable_> CheckVTable;
+	CheckVTable createCheckVTable(int capacity);
+
 	// 抽象アルゴリズム
 	class Algorithm_ {
 	public:
@@ -281,6 +288,7 @@ namespace SemiCrf {
 		CheckTable current_vctab;
 		CheckTable current_actab;
 		CheckTable current_ectab;
+		CheckVTable current_ecvtab;
 		int flg;
 		std::string method;
 		vector gs; // 作業領域
@@ -305,6 +313,7 @@ namespace SemiCrf {
 		std::vector<double> computeGm(double Z);
 		double alpha(int i, App::Label y);
 		double eta(int i, App::Label y, int k);
+		SVector eta(int i, App::Label y);
 	};
 
 	typedef std::shared_ptr<Learner_> Learner;

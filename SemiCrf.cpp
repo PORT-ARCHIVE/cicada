@@ -52,6 +52,11 @@ namespace SemiCrf {
 		return CheckTable( new CheckTable_(capacity, CheckTuple()) );
 	}
 
+	CheckVTable createCheckVTable(int capacity)
+	{
+		return CheckVTable( new CheckVTable_(capacity, CheckPair()) );
+	}
+
 	// Labels
 	Labels_::Labels_(int size)
 	{
@@ -1280,7 +1285,7 @@ namespace SemiCrf {
 		int l = labels->size();
 		int s = current_data->getStrs()->size();
 		int capacity = l*s;
-
+#if 0
 		for( int k = 0; k < dim; k++ ) {
 
 			double Gmk = 0.0;
@@ -1294,7 +1299,22 @@ namespace SemiCrf {
 			Gms.push_back(Gmk);
 			Logger::out(2) << "Gm(" << k << ")=" << Gmk << std::endl;
 		}
+#else
+		{
+			vector tmp(dim, 0.0);
+			current_ecvtab = createCheckVTable(capacity);
 
+			for( auto y : *labels ) {
+				tmp += *eta(s-1, y);
+			}
+
+			tmp /= Z;
+			for( int k = 0; k < dim; k++ ) {
+				Gms.push_back(tmp(k));
+				Logger::out(2) << "Gm(" << k << ")=" << tmp(k) << std::endl;
+			}
+		}
+#endif
 		return(std::move(Gms));
 	}
 
@@ -1391,6 +1411,56 @@ namespace SemiCrf {
 
 		Logger::out(3) << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
 		return v;
+	}
+
+	SVector Learner_::eta(int i, App::Label y)
+	{
+		SVector sv;
+
+		if( -1 < i ) {
+
+			int idx = (i*labels->size()) + (static_cast<int>(y));
+			auto& tp = current_ecvtab->at(idx);
+
+			if( std::get<0>(tp) ) {
+
+				sv = std::get<1>(tp);
+
+			} else {
+
+				sv = SVector(new vector(dim, 0.0));
+
+				for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
+					for( auto yd : *labels ) {
+
+						if( i == 0 && yd != App::ZERO ) {
+							continue;
+						}
+
+						vector gs(dim, 0.0); // alphaでもgsを使うのでローカルで領域を確保
+						double wg = computeWG(y, yd, i, d, gs);
+						vector cof = (*eta(i-d, yd)) + alpha(i-d, yd) * gs;
+						(*sv) += cof*exp(wg);
+						// if( std::isinf(v) || std::isnan(v) ) { !!!!!!! T.B.D.
+						// 	throw Error("numerical problem");
+						// }
+					}
+				}
+
+				std::get<0>(tp) = true;
+				std::get<1>(tp) = sv;
+			}
+
+		} else if( i == -1 ) {
+
+			sv = SVector( new vector(dim, 0.0) );
+
+		} else {
+			assert( -2 < i ); // T.B.D.
+		}
+
+		//Logger::out(3) << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
+		return sv;
 	}
 
 	//// Likilihood class ////
