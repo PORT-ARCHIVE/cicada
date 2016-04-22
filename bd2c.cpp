@@ -151,7 +151,11 @@ int main(int argc, char *argv[])
 		///////////////	output
 
 		{
-			int dim0 = matrix->getSize();
+			long long size = matrix->getSize();
+			if( std::numeric_limits<int>::max() < size ) {
+				throw Error("too large matrix");
+			}
+			int dim0 = size; // !!! long long -> int !!!
 			int dim1 = labelArray.size();
 			auto object = ujson::object{
 				{ "title", title },
