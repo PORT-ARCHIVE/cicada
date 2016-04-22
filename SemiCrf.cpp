@@ -1440,10 +1440,11 @@ namespace SemiCrf {
 						vector gs(dim, 0.0); // alphaでもgsを使うのでローカルで領域を確保
 						double wg = computeWG(y, yd, i, d, gs);
 						vector cof = (*eta(i-d, yd)) + alpha(i-d, yd) * gs;
-						(*sv) += cof*exp(wg);
-						// if( std::isinf(v) || std::isnan(v) ) { !!!!!!! T.B.D.
-						// 	throw Error("numerical problem");
-						// }
+						double ex = exp(wg);
+						if( std::isinf(ex) || std::isnan(ex) ) {
+							throw Error("numerical problem");
+						}
+						(*sv) += cof*ex;
 					}
 				}
 
