@@ -247,6 +247,12 @@ namespace SemiCrf {
 	typedef std::shared_ptr<CheckVTable_> CheckVTable;
 	CheckVTable createCheckVTable(int capacity);
 
+	// WGキャッシュ
+	typedef std::tuple<int,double,SVector> CacheTuple;
+	typedef std::vector<CacheTuple> CacheTable_;
+	typedef std::shared_ptr<CacheTable_> CacheTable;
+	CacheTable createCacheTable(int capacity);
+
 	// 抽象アルゴリズム
 	class Algorithm_ {
 	public:
@@ -271,6 +277,7 @@ namespace SemiCrf {
 	protected:
 		double computeWG(App::Label y, App::Label yd, int i, int d);
 		double computeWG(App::Label y, App::Label yd, int i, int d, vector& gs);
+		void clearWGCache();
 
 		int dim;
 		int y2xDim;
@@ -289,6 +296,7 @@ namespace SemiCrf {
 		CheckTable current_actab;
 		CheckTable current_ectab;
 		CheckVTable current_ecvtab;
+		CacheTable current_wgtab;
 		int flg;
 		std::string method;
 		vector gs; // 作業領域
