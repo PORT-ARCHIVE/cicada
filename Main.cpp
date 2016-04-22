@@ -25,6 +25,7 @@ public:
 		, logLevel(0)
 		, flg(0)
 		, method("bfgs")
+		, cacheSize(0xff)
 		{};
 	void parse(int argc, char *argv[]);
 public:
