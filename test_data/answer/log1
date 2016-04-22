@@ -33,7 +33,7 @@ Data_::writeJson()
         2
     ],
     "feature" : "DIGIT",
-    "title" : ""
+    "title" : "check1"
 }
 FeatureFunction_()
 Digit()
