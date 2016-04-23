@@ -2,7 +2,7 @@
 
 #include <W2V.hpp>
 #include <cstdlib>
-#include <strstream>
+#include <sstream>
 #include "Error.hpp"
 #include "Logger.hpp"
 
@@ -12,12 +12,12 @@ namespace W2V {
 		: words(-1)
 		, size(-1)
 	{
-		Logger::out(2) << "Matrix_()" << std::endl;
+		Logger::debug() << "Matrix_()";
 	}
 
 	Matrix_::~Matrix_()
 	{
-		Logger::out(2) << "~Matrix_()" << std::endl;
+		Logger::debug() << "~Matrix_()";
 	}
 
 	void Matrix_::read(const std::string& file)

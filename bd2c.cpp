@@ -1,6 +1,7 @@
 // © 2016 PORT INC.
 
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <boost/lexical_cast.hpp>
 #include "spdlog/spdlog.h"

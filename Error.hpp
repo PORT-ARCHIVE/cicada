@@ -4,7 +4,6 @@
 #define ERROR__H
 
 #include <string>
-#include "Logger.hpp"
 
 class Error {
 public:

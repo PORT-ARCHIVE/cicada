@@ -5,7 +5,7 @@ all: test1 test2 gen_test bd2c_test bd2w_test test3 learn infer
 
 test1:
 	@echo "###### check0 ######"
-	$(SEMICRF) -t check1.json -w tmp1 --log-level 2 -e0 2.0 -e1 1.0e-5 --max-iteration 100000 --disable-date-version --disable-regularization 2>log1 
+	$(SEMICRF) -t check1.json -w tmp1 --log-level 0 -e0 2.0 -e1 1.0e-5 --max-iteration 100000 --disable-date-version --disable-regularization 2>log1 
 	@diff answer/log1 log1 && echo "OK" || echo "ERROR"
 
 FILES0=\
@@ -18,10 +18,10 @@ FILES0=\
 test2:
 	@for file in $(FILES0); do \
 		echo "###### $$file ######"; \
-		echo "$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 2.0 -e1 1.0e-6 --max-iteration 100000 --disable-regularization"; \
-		$(SEMICRF) -t $$file -w tmp1 --log-level 0 -e0 2.0 -e1 1.0e-6 --max-iteration 100000 --disable-regularization && echo "OK" || echo "ERROR"; \
-		echo "$(SEMICRF) -i $$file -w tmp1 --log-level 0"; \
-		$(SEMICRF) -i $$file -w tmp1 --log-level 0 > tmp2 && echo "OK" || echo "ERROR"; \
+		echo "$(SEMICRF) -t $$file -w tmp1 --log-level 3 -e0 2.0 -e1 1.0e-6 --max-iteration 100000 --disable-regularization"; \
+		$(SEMICRF) -t $$file -w tmp1 --log-level 3 -e0 2.0 -e1 1.0e-6 --max-iteration 100000 --disable-regularization && echo "OK" || echo "ERROR"; \
+		echo "$(SEMICRF) -i $$file -w tmp1 --log-level 3"; \
+		$(SEMICRF) -i $$file -w tmp1 --log-level 3 > tmp2 && echo "OK" || echo "ERROR"; \
 		cat $$file | jq '.data[][][]' > r1; \
 		cat tmp2 | jq '.data[][][]' > r2; \
 		echo "diff -c r1 r2"; \
@@ -40,10 +40,10 @@ MATRIX=../../word2vec/wakati.bin
 test3:
 	@for file in $(FILES1); do \
 		echo "###### $$file ######"; \
-		echo "$(SEMICRF) -t $$file -w tmp1 --log-level 1 -e0 2.0 -e1 1.0e-6 --max-iteration 100000 --disable-regularization --w2v-matrix ${MATRIX}"; \
-		time $(SEMICRF) -t $$file -w tmp1 --log-level 1 -e0 2.0 -e1 1.0e-6 --max-iteration 100000 --disable-regularization --w2v-matrix ${MATRIX} && echo "OK" || echo "ERROR"; \
-		echo "$(SEMICRF) -i $$file -w tmp1 --log-level 0 --w2v-matrix ${MATRIX}" ; \
-		$(SEMICRF) -i $$file -w tmp1 --log-level 0 --w2v-matrix ${MATRIX} > tmp2 && echo "OK" || echo "ERROR"; \
+		echo "$(SEMICRF) -t $$file -w tmp1 --log-level 2 -e0 2.0 -e1 1.0e-6 --max-iteration 100000 --disable-regularization --w2v-matrix ${MATRIX}"; \
+		time $(SEMICRF) -t $$file -w tmp1 --log-level 2 -e0 2.0 -e1 1.0e-6 --max-iteration 100000 --disable-regularization --w2v-matrix ${MATRIX} && echo "OK" || echo "ERROR"; \
+		echo "$(SEMICRF) -i $$file -w tmp1 --log-level 2 --w2v-matrix ${MATRIX}" ; \
+		$(SEMICRF) -i $$file -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} > tmp2 && echo "OK" || echo "ERROR"; \
 		cat $$file | jq '.data[][][]' > r1; \
 		cat tmp2 | jq '.data[][][]' > r2; \
 		cat r1 | awk '{ if(k++ % 4 == 2) print $$1 }' > a; \
@@ -56,13 +56,13 @@ test3:
 
 learn:
 	../gen -i p0.json -r 32 -l 16 > tmp1
-	time $(SEMICRF) -t tmp1 -w tmp2 --log-level 1 -e0 1.0e-3 -e1 1.0e-3 --max-iteration 100000 --disable-adagrad && echo "OK" || echo "ERROR"
+	time $(SEMICRF) -t tmp1 -w tmp2 --log-level 2 -e0 1.0e-3 -e1 1.0e-3 --max-iteration 100000 --disable-adagrad && echo "OK" || echo "ERROR"
 
 infer:
 	@rm -f r1 r2 a b tmp5;
 	@for SEED in 1 2 3 4 5 6 7 8 9 10; do \
 		../gen -i p0.json -s $$SEED -r 32 -l 16 > tmp3; \
-		$(SEMICRF) -i tmp3 -w tmp2 --log-level 0 > tmp4 || echo "ERROR"; \
+		$(SEMICRF) -i tmp3 -w tmp2 --log-level 2 > tmp4 || echo "ERROR"; \
 		cat tmp3 | jq '.data[][][]' > r1; \
 		cat tmp4 | jq '.data[][][]' > r2; \
 		cat r1 | awk '{ if(k++ % 3 == 2) print $$1 }' > a; \

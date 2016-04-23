@@ -87,7 +87,7 @@ namespace Optimizer {
 			double err = r/(r0*re + ae);
 			flg = ( err < 1.0 );
 			double f = ofunc->value(x);
-			Logger::out(1) << boost::format("f= %10.6e |∇f|= %10.6e") % f % err << std::endl;
+			Logger::info() << boost::format("f= %10.6e |∇f|= %10.6e") % f % err;
 		}
 
 		if( !flg && itr == maxIteration ) {
@@ -114,32 +114,32 @@ namespace Optimizer {
 	{
 		ofunc->preProcess(x);
 
-		g0 = ofunc->grad(x);                 Logger::out(2) << "g0=" << g0 << std::endl;
+		g0 = ofunc->grad(x);                 Logger::debug() << "g0=" << g0;
 		double alpha = 1.0;
 
 		while(1) {
 
 			ofunc->beginLoopProcess(x);
 
-			d = - g0;                        Logger::out(2) << "d=" << d << std::endl;
+			d = - g0;                        Logger::debug() << "d=" << d;
 
 			if( flg & ENABLE_ADAGRAD ) {
 				auto iad = adagrad.begin();
 				auto id = d.begin();
 				for( auto& idx : dx ) {
 					idx = e0/(1.0+sqrt(*iad++))*(*id++);
-				}                            Logger::out(2) << "dx=" << dx << std::endl;
+				}                            Logger::debug() << "dx=" << dx;
 				double f1 = 0.0;
 				alpha = avoidDivergence(d, f1);
 			} else {
-				alpha = linearSearch(d);     Logger::out(2) << "alpha=" << alpha << std::endl;
+				alpha = linearSearch(d);     Logger::debug() << "alpha=" << alpha;
 			}
 
-			dx = alpha * d;                  Logger::out(2) << "dx=" << dx << std::endl;
-			x = x + dx;                      Logger::out(2) << "x=" << x << std::endl;
+			dx = alpha * d;                  Logger::debug() << "dx=" << dx;
+			x = x + dx;                      Logger::debug() << "x=" << x;
 			ofunc->afterUpdateXProcess(x);
 			if( isConv() ) break;
-			g0 = ofunc->grad(x);             Logger::out(2) << "g0=" << g0 << std::endl;
+			g0 = ofunc->grad(x);             Logger::debug() << "g0=" << g0;
 
 			ofunc->endLoopProcess(x);
 
@@ -165,7 +165,7 @@ namespace Optimizer {
 			double err = r/(r0*re + ae);
 			flg = ( err < 1.0 );
 			double f = ofunc->savedValue();
-			Logger::out(1) << boost::format("f= %10.6e |∇f|= %10.6e") % f % err << std::endl;
+			Logger::info() << boost::format("f= %10.6e |∇f|= %10.6e") % f % err;
 		}
 
 		if( !flg && itr == maxIteration ) {
@@ -193,23 +193,23 @@ namespace Optimizer {
 		ofunc->preProcess(x);
 
 		H0 = I;
-		g0 = ofunc->grad(x);                 Logger::out(2) << "g0=" << g0 << std::endl;
+		g0 = ofunc->grad(x);                 Logger::debug() << "g0=" << g0;
 		double alpha = 1.0;
 
 		while(1) {
 
 			ofunc->beginLoopProcess(x);
 
-			d = - prod(H0, g0);              Logger::out(2) << "d=" << d << std::endl;
-			alpha = linearSearch(d);         Logger::out(2) << "alpha=" << alpha << std::endl;
-			dx = alpha * d;                  Logger::out(2) << "dx=" << dx << std::endl;
-			x = x + dx;                      Logger::out(2) << "x=" << x << std::endl;
+			d = - prod(H0, g0);              Logger::debug() << "d=" << d;
+			alpha = linearSearch(d);         Logger::debug() << "alpha=" << alpha;
+			dx = alpha * d;                  Logger::debug() << "dx=" << dx;
+			x = x + dx;                      Logger::debug() << "x=" << x;
 			ofunc->afterUpdateXProcess(x);
 			if( isConv() ) break;
-			g1 = ofunc->grad(x);             Logger::out(2) << "g1=" << g1 << std::endl;
-			y = g1 - g0;                     Logger::out(2) << "y=" << y << std::endl;
+			g1 = ofunc->grad(x);             Logger::debug() << "g1=" << g1;
+			y = g1 - g0;                     Logger::debug() << "y=" << y;
 			g0 = g1;
-			updateMatrix();                  Logger::out(2) << "H=" << H0 << std::endl;
+			updateMatrix();                  Logger::debug() << "H=" << H0;
 
 			ofunc->endLoopProcess(x);
 
@@ -234,7 +234,7 @@ namespace Optimizer {
 			double err = r/(r0*re + ae);
 			flg = ( err < 1.0 );
 			double f = ofunc->savedValue();
-			Logger::out(1) << boost::format("f= %10.6e |∇f|= %10.6e") % f % err << std::endl;
+			Logger::info() << boost::format("f= %10.6e |∇f|= %10.6e") % f % err;
 		}
 
 		if( !flg && itr == maxIteration ) {
@@ -258,10 +258,10 @@ namespace Optimizer {
 
 	void Bfgs::updateMatrix()
 	{
-		double p = inner_prod(y, dx);                     Logger::out(3) << "p=" << p << std::endl;
-		A = outer_prod(dx, dx)/p; 	                      Logger::out(3) << "A=" << A << std::endl;
-		B = I - outer_prod(y, dx)/p;                      Logger::out(3) << "B=" << B << std::endl;
-		H1 = prod(trans(B), matrix(prod(H0, B))) + A;     Logger::out(3) << "H=" << H1 << std::endl;
+		double p = inner_prod(y, dx);                     Logger::trace() << "p=" << p;
+		A = outer_prod(dx, dx)/p; 	                      Logger::trace() << "A=" << A;
+		B = I - outer_prod(y, dx)/p;                      Logger::trace() << "B=" << B;
+		H1 = prod(trans(B), matrix(prod(H0, B))) + A;     Logger::trace() << "H=" << H1;
 		H0 = H1;
 	}
 
@@ -290,7 +290,7 @@ namespace Optimizer {
 		virtual void preProcess(vector& x){
 			x[0] = 0;
 			x[1] = 0;
-			Logger::out(1) << " " << x[0] << " " << x[1] << std::endl;
+			Logger::info() << " " << x[0] << " " << x[1];
 		}
 		virtual void beginLoopProcess(vector& x){}
 		virtual void afterUpdateXProcess(vector& x){}
@@ -324,15 +324,15 @@ namespace Optimizer {
 		virtual void preProcess(vector& x){
 			x[0] = -1.9;
 			x[1] = 2;
-			Logger::out(1) << " " << x[0] << " " << x[1] << std::endl;
+			Logger::info() << " " << x[0] << " " << x[1];
 		}
 		virtual void beginLoopProcess(vector& x){}
 		virtual void afterUpdateXProcess(vector& x){
-			Logger::out(1) << " " << x[0] << " " << x[1] << std::endl;
+			Logger::info() << " " << x[0] << " " << x[1];
 		}
 		virtual void endLoopProcess(vector& x){}
 		virtual void postProcess(vector& x){
-			Logger::out(1) << " " << x[0] << " " << x[1] << std::endl;
+			Logger::info() << " " << x[0] << " " << x[1];
 		}
 	private:
 		double x0;

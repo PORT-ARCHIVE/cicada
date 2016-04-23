@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <sstream>
 #include <algorithm>
@@ -74,7 +75,7 @@ int f_y2x(int y, double r)
 		}
 	}
 	if( !(i < a_y2x.at(y).size()) ){
-		Logger::out(1) << "warrning: r=" << r << ", ay2x(" << y << ")=" << a_y2x.at(y).at(i-1) << endl;
+		Logger::warn() << "r=" << r << ", ay2x(" << y << ")=" << a_y2x.at(y).at(i-1);
 		--i;
 	}
 	return i;
@@ -92,7 +93,7 @@ int f_y2y(int y, double r)
 		}
 	}
 	if( !(i < a_y2y.size()) ) {
-		Logger::out(1) << "warrning: r=" << r << ", ay2y(" << y << ")=" << a_y2y.at(y).at(i-1) << endl;
+		Logger::warn() << "r=" << r << ", ay2y(" << y << ")=" << a_y2y.at(y).at(i-1);
 		--i;
 	}
 	return i;
@@ -208,15 +209,15 @@ void make_array(const ujson::object::const_iterator& it, vector<vector<double>>&
 			}
 		}
 
-		Logger::out(1) << "{" << std::endl;
+		Logger::info() << "{";
 		for( auto& i : vec ) {
-			Logger::out(1) << "{ ";
+			Logger::info() << "{ ";
 			for( auto& j : i ) {
-				Logger::out(1) << j << " ";
+				Logger::info() << j << " ";
 			}
-			Logger::out(1) << "}" << std::endl;
+			Logger::info() << "}";
 		}
-		Logger::out(1) << "}" << std::endl;
+		Logger::info() << "}";
 	}
 }
 
@@ -358,16 +359,16 @@ int main(int argc, char *argv[])
 			{ "data", datas }
 		};
 
-		Logger::out(0) << "" << to_string(object) << std::endl;
+		std::cout << "" << to_string(object) << std::endl;
 
 	} catch(Error& e) {
 
-		cerr << "error: " << e.what() << endl;
+		Logger::error() << e.what();
 		ret = 0x1;
 		
 	} catch(...) {
 
-		cerr << "error: unexpected exception" << endl;
+		Logger::error() << "unexpected exception";
 		ret = 0x2;
 	}
 

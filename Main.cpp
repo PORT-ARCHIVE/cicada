@@ -1,6 +1,7 @@
 // © 2016 PORT INC.
 
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <boost/lexical_cast.hpp>
 #include "SemiCrf.hpp"
@@ -148,7 +149,7 @@ SemiCrf::Algorithm createAlgorithm(const Options& options)
 		throw Error(ss.str());
 	}
 
-	datas->write(Logger::out(2) << "");
+	// datas->write(std::cerr);
 
 	alg->setDatas(datas);
 	if( 0 < options.maxLength ) {
@@ -183,17 +184,17 @@ int main(int argc, char *argv[])
 
 	} catch(Error& e) {
 
-		std::cerr << "error: " << e.what() << std::endl;
+		Logger::error() << e.what();
 		ret = 0x1;
 
 	} catch(...) {
 
-		std::cerr << "error: unexpected exception" << std::endl;
+		Logger::error() << "unexpected exception";
 		ret = 0x2;
 	}
 
 	if( !ret ) {
-		Logger::out(1) << "OK" << std::endl;
+		Logger::info() << "OK";
 	}
 
 	exit(ret);

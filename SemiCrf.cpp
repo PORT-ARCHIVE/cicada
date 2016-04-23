@@ -65,7 +65,7 @@ namespace SemiCrf {
 	// Labels
 	Labels_::Labels_(int size)
 	{
-		Logger::out(2) << "Labels_()" << std::endl;
+		Logger::debug() << "Labels_()";
 		for( int i = 0; i < size; i++ ) {
 			push_back(i);
 		}
@@ -73,7 +73,7 @@ namespace SemiCrf {
 
 	Labels_::~Labels_()
 	{
-		Logger::out(2) << "~Labels_()" << std::endl;
+		Logger::debug() << "~Labels_()";
 	}
 
 	// Data_ ctr
@@ -81,12 +81,12 @@ namespace SemiCrf {
 		: strs( new Strs_() )
 		, segs( new Segments_() )
 	{
-		Logger::out(2) << "Data_()" << std::endl;
+		Logger::debug() << "Data_()";
 	}
 
 	Data_::~Data_()
 	{
-		Logger::out(2) << "~Data_()" << std::endl;
+		Logger::debug() << "~Data_()";
 	}
 
 	void Data_::computeMeanLength(
@@ -161,7 +161,7 @@ namespace SemiCrf {
 
 	void Data_::writeJson(ujson::array& ary0) const
 	{
-		Logger::out(2) << "Data_::writeJson()" << std::endl;
+		Logger::debug() << "Data_::writeJson()";
 
 		ujson::array ary1;
 
@@ -207,7 +207,7 @@ namespace SemiCrf {
 
 	void Data_::write(std::ostream& output) const
 	{
-		Logger::out(2) << "Data_::write()" << std::endl;
+		Logger::debug() << "Data_::write()";
 
 		for( auto s : *segs ) {
 
@@ -261,16 +261,16 @@ namespace SemiCrf {
 		, feature("")
 		, title("")
 	{
-		Logger::out(2) << "Datas_()" << std::endl;
+		Logger::debug() << "Datas_()";
 	};
 
 	Datas_::~Datas_()
 	{
-		Logger::out(2) << "~Datas_()" << std::endl;
+		Logger::debug() << "~Datas_()";
 	};
 
 	void Datas_::writeJson(std::ostream& output)  const {
-		Logger::out(2) << "Datas_::writeJson()" << std::endl;
+		Logger::debug() << "Datas_::writeJson()";
 
 		ujson::array datas;
 		for( auto d : *this ) {
@@ -292,7 +292,7 @@ namespace SemiCrf {
 	}
 
 	void Datas_::write(std::ostream& output)  const {
-		Logger::out(2) << "Datas_::write()" << std::endl;
+		Logger::debug() << "Datas_::write()";
 #if 1
 		writeJson(output);
 #else
@@ -312,12 +312,12 @@ namespace SemiCrf {
 	// TrainingDatas ctr
 	TrainingDatas_::TrainingDatas_()
 	{
-		Logger::out(2) << "TrainingDatas_()" << std::endl;
+		Logger::debug() << "TrainingDatas_()";
 	}
 
 	TrainingDatas_::~TrainingDatas_()
 	{
-		Logger::out(2) << "~TrainingDatas_()" << std::endl;
+		Logger::debug() << "~TrainingDatas_()";
 	}
 
 	void TrainingDatas_::readJsonData(std::vector<std::pair<std::string, ujson::value>>& object)
@@ -335,7 +335,7 @@ namespace SemiCrf {
 			}
 
 			Data data = Data( new Data_() );
-			Logger::out(2) << "BEGIN : data was created." << std::endl;
+			Logger::debug() << "BEGIN : data was created.";
 
 			Segment seg;
 			int counter = -1;
@@ -358,7 +358,7 @@ namespace SemiCrf {
 				}
 
 				std::string word = string_cast(std::move(*k));
-				Logger::out(2) << word << "\t";
+				Logger::debug() << word;
 
 				std::vector<std::string> vs;
 				vs.push_back(word);
@@ -370,7 +370,7 @@ namespace SemiCrf {
 				}
 
 				std::string descriptor = string_cast(std::move(*k));
-				Logger::out(2) << descriptor << "\t";
+				Logger::debug() << descriptor;
 
 				k++;
 				if( !k->is_string() ) {
@@ -378,7 +378,7 @@ namespace SemiCrf {
 				}
 
 				std::string label = string_cast(std::move(*k));
-				Logger::out(2) << label << std::endl;
+				Logger::debug() << label;
 
 				App::Label lb = App::string2Label(label);
 
@@ -413,18 +413,18 @@ namespace SemiCrf {
 					}
 
 				} else {
-					Logger::out(1) << "warning: unknown descriptor" << std::endl;
+					Logger::warn() << "unknown descriptor";
 				}
 			}
 
 			push_back(data);
-			Logger::out(2) << "END : data was pushed." << std::endl;
+			Logger::debug() << "END : data was pushed.";
 		}
 	}
 
 	void TrainingDatas_::read(std::istream& strm)
 	{
-		Logger::out(2) << "TrainingDatas_::read()" << std::endl;
+		Logger::debug() << "TrainingDatas_::read()";
 #if 1
 		readJson(strm);
 #else
@@ -449,10 +449,10 @@ namespace SemiCrf {
 				if( line == "# BEGIN" ) {
 					data = Data( new Data_() );
 					counter = -1;
-					Logger::out(2) << "BEGIN : data was created." << std::endl;
+					Logger::debug() << "BEGIN : data was created.";
 				} else if( line == "# END" ) {
 					push_back(data);
-					Logger::out(2) << "END : data was pushed." << std::endl;
+					Logger::debug() << "END : data was pushed.";
 				} else {
 					tokenizer.get(); // # を捨てる
 					std::string tok = tokenizer.get();
@@ -487,7 +487,7 @@ namespace SemiCrf {
 			if( word.empty() ) {
 				// T.B.D.
 			} else {
-				Logger::out(2) << word << std::endl;
+				Logger::debug() << word;
 				std::vector<std::string> vs;
 				vs.push_back(word);
 				data->getStrs()->push_back(vs);
@@ -497,7 +497,7 @@ namespace SemiCrf {
 			if( descriptor.empty() ) {
 				// T.B.D.
 			} else {
-				Logger::out(2) << descriptor << std::endl;
+				Logger::debug() << descriptor;
 			}
 
 			std::string label = tokenizer.get();
@@ -505,7 +505,7 @@ namespace SemiCrf {
 				// T.B.D.
 
 			} else {
-				Logger::out(2) << label << std::endl;
+				Logger::debug() << label;
 
 				App::Label l = App::string2Label(label);
 
@@ -541,7 +541,7 @@ namespace SemiCrf {
 
 				} else {
 
-					Logger::out(1) << "warning: unknown descriptor" << std::endl;
+					Logger::warn() << "unknown descriptor";
 				}
 			}
 
@@ -561,12 +561,12 @@ namespace SemiCrf {
 	// PredictionDatas ctr
 	PredictionDatas_::PredictionDatas_()
 	{
-		Logger::out(2) << "PredictionDatas_()" << std::endl;
+		Logger::debug() << "PredictionDatas_()";
 	}
 
 	PredictionDatas_::~PredictionDatas_()
 	{
-		Logger::out(2) << "~PredictionDatas_()" << std::endl;
+		Logger::debug() << "~PredictionDatas_()";
 	}
 
 	void PredictionDatas_::readJsonData(std::vector<std::pair<std::string, ujson::value>>& object)
@@ -584,7 +584,7 @@ namespace SemiCrf {
 			}
 
 			Data data = Data( new Data_() );
-			Logger::out(2) << "BEGIN : data was created." << std::endl;
+			Logger::debug() << "BEGIN : data was created.";
 
 			Segment seg;
 			int counter = -1;
@@ -607,7 +607,7 @@ namespace SemiCrf {
 				}
 
 				std::string word = string_cast(std::move(*k));
-				Logger::out(2) << word << "\t";
+				Logger::debug() << word;
 
 				std::vector<std::string> vs;
 				vs.push_back(word);
@@ -619,7 +619,7 @@ namespace SemiCrf {
 				}
 
 				std::string descriptor = string_cast(std::move(*k));
-				Logger::out(2) << descriptor << "\t";
+				Logger::debug() << descriptor;
 
 				k++;
 				if( !k->is_string() ) {
@@ -627,7 +627,7 @@ namespace SemiCrf {
 				}
 
 				std::string label = string_cast(std::move(*k));
-				Logger::out(2) << label << std::endl;
+				Logger::debug() << label;
 
 				App::Label lb = App::string2Label(label);
 
@@ -662,19 +662,19 @@ namespace SemiCrf {
 					}
 
 				} else {
-					Logger::out(1) << "warning: unknown descriptor" << std::endl;
+					Logger::warn() << "unknown descriptor";
 				}
 #endif
 			}
 
 			push_back(data);
-			Logger::out(2) << "END : data was pushed." << std::endl;
+			Logger::debug() << "END : data was pushed.";
 		}
 	}
 
 	void PredictionDatas_::read(std::istream& strm)
 	{
-		Logger::out(2) << "PredictionDatas_::read()" << std::endl;
+		Logger::debug() << "PredictionDatas_::read()";
 #if 1
 		readJson(strm);
 #else
@@ -697,7 +697,7 @@ namespace SemiCrf {
 				if( line == "# BEGIN" ) {
 					data = Data( new Data_() );
 					input = "";
-					Logger::out(2) << "BEGIN : data was created." << std::endl;
+					Logger::debug() << "BEGIN : data was created.";
 
 				} else if( line == "# END" ) {
 
@@ -707,7 +707,7 @@ namespace SemiCrf {
 					for( ; node ; node = node->next ) {
 
 						std::string cppstr = node->feature;
-						Logger::out(2) << cppstr << std::endl;
+						Logger::debug() << cppstr;
 						if( cppstr.find("BOS") == 0 ) { // T.B.D.
 							continue;
 						}
@@ -722,13 +722,13 @@ namespace SemiCrf {
 						}
 
 						vs.push_back(word);
-						Logger::out(2) << word << std::endl;
+						Logger::debug() << word;
 
 						MultiByteTokenizer tok(cppstr);
 						std::string t = tok.get();
 
 						while( !t.empty() ) {
-							Logger::out(2) << t << std::endl;
+							Logger::debug() << t;
 							vs.push_back(t);
 							t = tok.get();
 						}
@@ -737,7 +737,7 @@ namespace SemiCrf {
 					}
 
 					push_back(data);
-					Logger::out(2) << "END : data was pushed." << std::endl;
+					Logger::debug() << "END : data was pushed.";
 				}
 
 				continue;
@@ -764,12 +764,12 @@ namespace SemiCrf {
 		, maxLength(-1)
 		, feature("")
 	{
-		Logger::out(2) << "Weights_()" << std::endl;
+		Logger::debug() << "Weights_()";
 	}
 
 	Weights_::~Weights_()
 	{
-		Logger::out(2) << "~Weights_()" << std::endl;
+		Logger::debug() << "~Weights_()";
 	}
 
 	void Weights_::readJson(std::ifstream& is)
@@ -807,7 +807,7 @@ namespace SemiCrf {
 #if 1
 		readJson(ifs);
 #else
-		Logger::out(2) << "Weights_::read()" << std::endl;
+		Logger::debug() << "Weights_::read()";
 
 		bool state = false;
 
@@ -881,7 +881,7 @@ namespace SemiCrf {
 
 	void Weights_::writeJson(std::ofstream& ofs)
 	{
-		Logger::out(2) << "Weights_::writeJson()" << std::endl;
+		Logger::debug() << "Weights_::writeJson()";
 
 		ujson::array jweights;
 		for( auto& w : *this ) {
@@ -919,7 +919,7 @@ namespace SemiCrf {
 
 	void Weights_::write(std::ofstream& ofs)
 	{
-		Logger::out(2) << "Weights_::write()" << std::endl;
+		Logger::debug() << "Weights_::write()";
 #if 1
 		writeJson(ofs);
 #else
@@ -948,12 +948,12 @@ namespace SemiCrf {
 		: xDim(-1)
 		, yDim(-1)
 	{
-		Logger::out(2) << "FeatureFunction_()" << std::endl;
+		Logger::debug() << "FeatureFunction_()";
 	}
 
 	FeatureFunction_::~FeatureFunction_()
 	{
-		Logger::out(2) << "~FeatureFunction_()" << std::endl;
+		Logger::debug() << "~FeatureFunction_()";
 	}
 
 	//// Algorithm ////
@@ -972,12 +972,18 @@ namespace SemiCrf {
 		, method("bfgs")
 		, cacheSize(0xff)
 	{
-		Logger::out(2) << "Algorithm_()" << std::endl;
+		Logger::debug() << "Algorithm_()";
+		if( flg & DISABLE_DATE_VERSION ) {
+			Logger::info() << "cicada 0.0.1";
+			Logger::info() << "Copyright (C) 2016 PORT, Inc.";
+		} else {
+			Logger::info() << "cicada";
+		}
 	}
 
 	Algorithm_::~Algorithm_()
 	{
-		Logger::out(2) << "~Algorithm_()" << std::endl;
+		Logger::debug() << "~Algorithm_()";
 	}
 
 	void Algorithm_::setLabels(Labels arg)
@@ -1035,8 +1041,6 @@ namespace SemiCrf {
 		dim = arg;
 	}
 
-	static int debug = 0;
-
 	double Algorithm_::computeWG(App::Label y, App::Label yd, int i, int d, vector& gs)
 	{
 		double v = 0.0;
@@ -1091,22 +1095,15 @@ namespace SemiCrf {
 	Learner_::Learner_(int arg)
 		: Algorithm_(arg)
 	{
-		Logger::out(2) << "Learner_()" << std::endl;
-		Logger::out(1) << "Semi-CRF";
-		if( flg & DISABLE_DATE_VERSION ) {
-			Logger::out(1) << "" << std::endl;
-		} else {
-			Logger::out(1) << " 0.0.1" << std::endl;
-			Logger::out(1) << "" << date() << std::endl;
-		}
+		Logger::debug() << "Learner_()";
 		if( !(flg & ENABLE_LIKELIHOOD_ONLY) ) {
-			Logger::out(1) << "Learning ..." << std::endl;
+			Logger::info() << "Learning ...";
 		}
 	}
 
 	Learner_::~Learner_()
 	{
-		Logger::out(2) << "~Learner_()" << std::endl;
+		Logger::debug() << "~Learner_()";
 	}
 
 	void Learner_::preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile)
@@ -1167,7 +1164,7 @@ namespace SemiCrf {
 
 	void Learner_::compute()
 	{
-		Logger::out(2) << "Learner_::compute()" << std::endl;
+		Logger::debug() << "Learner_::compute()";
 
 		if( !(flg & ENABLE_LIKELIHOOD_ONLY) ){
 
@@ -1226,7 +1223,8 @@ namespace SemiCrf {
 			}
 
 			if( flg & ENABLE_LIKELIHOOD_ONLY ) {
-				Logger::out(1) << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z) << std::endl;
+				//Logger::info() << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z) << std::endl;
+				Logger::info() << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z);
 			}
 
 			if( grad ) {
@@ -1242,7 +1240,7 @@ namespace SemiCrf {
 						(*idL) += dw2;
 					}
 
-					Logger::out(2) << "dL(" << k << ")=" << *idL << std::endl;
+					Logger::debug() << "dL(" << k << ")=" << *idL;
 				}
 			}
 		}
@@ -1272,7 +1270,7 @@ namespace SemiCrf {
 
 		int k = 0;
 		for( auto g : Gs ) {
-			Logger::out(2) << "G(" << k++ << ")=" << g << std::endl;
+			Logger::debug() << "G(" << k++ << ")=" << g;
 		}
 
 		if( flg & ENABLE_LIKELIHOOD_ONLY ) {
@@ -1292,8 +1290,8 @@ namespace SemiCrf {
 				y1 = y;
 				awg += wg;
 
-				Logger::out(1) << boost::format( "(%3d,%3d)" ) % ti % ui;
-				Logger::out(1) << boost::format(" WG= %+10.6e AWG= %+10.6e") % wg % awg << std::endl;
+				Logger::info() << boost::format( "(%3d,%3d)" ) % ti % ui;
+				Logger::info() << boost::format(" WG= %+10.6e AWG= %+10.6e") % wg % awg;
 			}
 		}
 
@@ -1314,7 +1312,7 @@ namespace SemiCrf {
 			Z += alpha(s-1, y);
 		}
 
-		Logger::out(2) << "Z=" << Z << std::endl;
+		Logger::debug() << "Z=" << Z;
 		return Z;
 	}
 
@@ -1337,7 +1335,7 @@ namespace SemiCrf {
 
 			Gmk /= Z;
 			Gms.push_back(Gmk);
-			Logger::out(2) << "Gm(" << k << ")=" << Gmk << std::endl;
+			Logger::debug() << "Gm(" << k << ")=" << Gmk;
 		}
 #else
 		{
@@ -1351,7 +1349,7 @@ namespace SemiCrf {
 			tmp /= Z;
 			for( int k = 0; k < dim; k++ ) {
 				Gms.push_back(tmp(k));
-				Logger::out(2) << "Gm(" << k << ")=" << tmp(k) << std::endl;
+				Logger::debug() << "Gm(" << k << ")=" << tmp(k);
 			}
 		}
 #endif
@@ -1401,7 +1399,7 @@ namespace SemiCrf {
 			assert( -2 < i ); // T.B.D.
 		}
 
-		Logger::out(3) << "alpha(i=" << i << ",y=" << int(y) << ")=" << v << std::endl;
+		Logger::trace() << "alpha(i=" << i << ",y=" << int(y) << ")=" << v;
 		return v;
 	}
 
@@ -1449,7 +1447,7 @@ namespace SemiCrf {
 			assert( -2 < i ); // T.B.D.
 		}
 
-		Logger::out(3) << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
+		Logger::trace() << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v;
 		return v;
 	}
 
@@ -1591,20 +1589,13 @@ namespace SemiCrf {
 	Predictor_::Predictor_(int arg)
 		: Algorithm_(arg)
 	{
-		Logger::out(2) << "Predictor_()" << std::endl;
-		Logger::out(1) << "Semi-CRF";
-		if( flg & DISABLE_DATE_VERSION ) {
-			Logger::out(1) << "" << std::endl;
-		} else {
-			Logger::out(1) << " 0.0.1" << std::endl;
-			Logger::out(1) << "" << date() << std::endl;
-		}
-		Logger::out(1) << "Prediction ..." << std::endl;
+		Logger::debug() << "Predictor_()";
+		Logger::info() << "Prediction ...";
 	}
 
 	Predictor_::~Predictor_()
 	{
-		Logger::out(2) << "~Predictor_()" << std::endl;
+		Logger::debug() << "~Predictor_()";
 	}
 
 	void Predictor_::preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile)
@@ -1666,12 +1657,12 @@ namespace SemiCrf {
 
 	void Predictor_::postProcess(const std::string& wfile)
 	{
-		datas->write(Logger::out(0) << "");
+		datas->write(std::cout);
 	}
 
 	void Predictor_::compute()
 	{
-		Logger::out(2) << "Predictor_::compute()" << std::endl;
+		Logger::debug() << "Predictor_::compute()";
 
 		for( auto data : *datas ) {
 
@@ -1701,7 +1692,7 @@ namespace SemiCrf {
 			}
 
 			if( flg & ENABLE_LIKELIHOOD_ONLY ) {
-				Logger::out(1) << boost::format("WG(maxV)= %10.6e") % maxV << std::endl;
+				Logger::info() << boost::format("WG(maxV)= %10.6e") % maxV;
 			}
 			assert( 0 < maxd );
 			backtrack(maxy, maxd);
@@ -1762,13 +1753,13 @@ namespace SemiCrf {
 			assert( -2 < i ); // T.B.D.
 		}
 
-		Logger::out(3) << "V(i=" << i << ", y=" << int(y) << ")=" << maxV << std::endl;
+		Logger::trace() << "V(i=" << i << ", y=" << int(y) << ")=" << maxV;
 		return maxV;
 	}
 
 	void Predictor_::backtrack(App::Label maxy, int maxd)
 	{
-		Logger::out(3) << "Predictor_::backtrack()" << std::endl;
+		Logger::trace() << "Predictor_::backtrack()";
 
 		int l = labels->size();
 		int s = current_data->getStrs()->size();
@@ -1817,9 +1808,9 @@ namespace SemiCrf {
 					double maxV = std::get<1>(tp);
 					int maxd = std::get<2>(tp);
 					App::Label maxyd = std::get<3>(tp);
-					Logger::out(1) << boost::format("(%+10.6e %2d %2d)") % maxV % maxd % (int)maxyd << " ";
+					std::cout << boost::format("(%+10.6e %2d %2d)") % maxV % maxd % (int)maxyd << " " << std::endl;
 				}
-				Logger::out(1) << "" << std::endl;
+				std::cout << std::endl;
 			}
 		}
 	}

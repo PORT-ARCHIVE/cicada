@@ -3,6 +3,7 @@
 #ifndef LOGGER__H
 #define LOGGER__H
 
+#if 0
 #include <iostream>
 #include <fstream>
 
@@ -49,5 +50,38 @@ std::ostream& operator<<(Logger& logger, T& in)
 
 	return logger.getDevNull();
 }
+
+#else
+
+#include "spdlog/spdlog.h"
+
+namespace Logger
+{
+	namespace spd = spdlog;
+
+	decltype ( spd::stderr_logger_mt("console", true) ) out();
+
+	void setLevel(int level);
+
+	decltype(( out()->trace() )) trace();
+	decltype(( out()->debug() )) debug();
+	decltype(( out()->info() )) info();
+	decltype(( out()->notice() )) notice();
+	decltype(( out()->warn() )) warn();
+	decltype(( out()->error() )) error();
+	decltype(( out()->critical() )) critical();
+	decltype(( out()->alert() )) alert();
+
+	decltype(( out()->trace() )) trace(const char* msg);
+	decltype(( out()->debug() )) debug(const char* msg);
+	decltype(( out()->info() )) info(const char* msg);
+	decltype(( out()->notice() )) notice(const char* msg);
+	decltype(( out()->warn() )) warn(const char* msg);
+	decltype(( out()->error() )) error(const char* msg);
+	decltype(( out()->critical() )) critical(const char* msg);
+	decltype(( out()->alert() )) alert(const char* msg);
+}
+
+#endif
 
 #endif // LOGGER__H

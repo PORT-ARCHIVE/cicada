@@ -67,12 +67,12 @@ namespace App {
 	Digit::Digit()
 	{
 		feature = "DIGIT";
-		Logger::out(2) << "Digit()" << std::endl;
+		Logger::debug() << "Digit()";
 	}
 
 	Digit::~Digit()
 	{
-		Logger::out(2) << "~Digit()" << std::endl;
+		Logger::debug() << "~Digit()";
 	}
 
 	int Digit::getDim()
@@ -82,12 +82,12 @@ namespace App {
 
 	void Digit::read()
 	{
-		Logger::out(2) << "Digit::read()" << std::endl;
+		Logger::debug() << "Digit::read()";
 	}
 
 	void Digit::write()
 	{
-		Logger::out(2) << "Digit::write()" << std::endl;
+		Logger::debug() << "Digit::write()";
 	}
 
 	double Digit::wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i, SemiCrf::vector& gs)
@@ -152,12 +152,12 @@ namespace App {
 	Jpn::Jpn()
 	{
 		feature = "JPN";
-		Logger::out(2) << "Jpn()" << std::endl;
+		Logger::debug() << "Jpn()";
 	}
 
 	Jpn::~Jpn()
 	{
-		Logger::out(2) << "~Jpn()" << std::endl;
+		Logger::debug() << "~Jpn()";
 	}
 
 	int Jpn::getDim()
@@ -175,12 +175,12 @@ namespace App {
 
 	void Jpn::read()
 	{
-		Logger::out(2) << "Jpn::read()" << std::endl;
+		Logger::debug() << "Jpn::read()";
 	}
 
 	void Jpn::write()
 	{
-		Logger::out(2) << "Jpn::write()" << std::endl;
+		Logger::debug() << "Jpn::write()";
 	}
 
 	double Jpn::wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i, SemiCrf::vector& gs)
@@ -243,7 +243,7 @@ namespace App {
 	{
 		int warningsLimit = 5;
 		int numOfWarnings = 0;
-		Logger::out(2) << "PridectionDigitDatas_::read()" << std::endl;
+		Logger::debug() << "PridectionDigitDatas_::read()";
 
 		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
 
@@ -261,10 +261,10 @@ namespace App {
 			if( line[0] == '#' ) {
 				if( line == "# BEGIN" ) {
 					data = SemiCrf::Data( new SemiCrf::Data_() );
-					Logger::out(2) << "BEGIN : data was created." << std::endl;
+					Logger::debug() << "BEGIN : data was created.";
 				} else if( line == "# END" ) {
 					push_back(data);
-					Logger::out(2) << "END : data was pushed." << std::endl;
+					Logger::debug() << "END : data was pushed.";
 				} else {
 					tokenizer.get(); // # を捨てる
 					std::string tok = tokenizer.get();
@@ -299,7 +299,7 @@ namespace App {
 			if( word.empty() ) {
 				throw Error("invalid format"); // T.B.D.
 			} else {
-				Logger::out(2) << word << std::endl;
+				Logger::debug() << word;
 				std::vector<std::string> vs;
 				vs.push_back(word);
 				data->getStrs()->push_back(vs);
@@ -308,9 +308,9 @@ namespace App {
 			std::string remains = tokenizer.get();
 			if( !remains.empty() ) {
 				if( numOfWarnings < warningsLimit ) {
-					Logger::out(1) << "warning: Extra data has been detected." << std::endl;
+					Logger::info() << "warning: Extra data has been detected.";
 					if( numOfWarnings == warningsLimit-1 ) {
-						Logger::out(1) << "warning: repeated warnings suppressesed." << std::endl;
+						Logger::info() << "warning: repeated warnings suppressesed.";
 					}
 				}
 				++numOfWarnings;

@@ -6,7 +6,7 @@
 Error::Error(const std::string& arg)
 	: msg(arg)
 {
-	Logger::out(2) << "Error()" << std::endl;
+	Logger::debug() << "Error()";
 }
 
 Error::~Error()
