@@ -43,14 +43,16 @@ namespace Logger
 {
 	namespace spd = spdlog;
 
-	static decltype ( spd::stderr_logger_mt("console", true) ) lg;
+	static decltype ( spd::stderr_logger_mt("", true) ) lg;
+	static std::string name = "console";
+	static bool flg = true;
 
-	decltype ( spd::stderr_logger_mt("console", true) ) out()
+	decltype ( spd::stderr_logger_mt("", true) ) out()
 	{
 		if( !lg.get() ) {
 			size_t q_size = 4096; // queue size must be power of 2
 			spd::set_async_mode(q_size);
-			lg = spd::stderr_logger_mt("console", true);
+			lg = spd::stderr_logger_mt(name, flg);
 		}
 		return lg;
 	}
@@ -59,6 +61,16 @@ namespace Logger
 	{
 		spd::set_level((spd::level::level_enum)level);
 	}
+
+	void setName(const std::string& arg)
+	{
+		name = arg;
+	}
+
+	void setColor(bool arg)
+	{
+		flg = arg;
+	}		
 
 	decltype(( out()->trace() )) trace()
 	{

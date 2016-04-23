@@ -59,9 +59,11 @@ namespace Logger
 {
 	namespace spd = spdlog;
 
-	decltype ( spd::stderr_logger_mt("console", true) ) out();
+	decltype ( spd::stderr_logger_mt("", true) ) out();
 
 	void setLevel(int level);
+	void setName(const std::string& name);
+	void setColor(bool flg);
 
 	decltype(( out()->trace() )) trace();
 	decltype(( out()->debug() )) debug();

@@ -176,6 +176,8 @@ int main(int argc, char *argv[])
 		Options options;
 		options.parse(argc, argv);
 		Logger::setLevel(options.logLevel);
+		Logger::setName("cicada");
+		Logger::setColor(true);
 
 		SemiCrf::Algorithm alg = createAlgorithm(options);
 		alg->preProcess(options.weightsFile, options.initWeightsFile, options.w2vMatrixFile);
