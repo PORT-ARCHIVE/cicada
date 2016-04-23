@@ -973,7 +973,7 @@ namespace SemiCrf {
 		, cacheSize(0xff)
 	{
 		Logger::debug() << "Algorithm_()";
-		if( flg & DISABLE_DATE_VERSION ) {
+		if( !(flg & DISABLE_DATE_VERSION) ) {
 			Logger::info() << "cicada 0.0.1";
 			Logger::info() << "Copyright (C) 2016 PORT, Inc.";
 		} else {
