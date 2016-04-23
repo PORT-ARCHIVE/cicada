@@ -23,10 +23,12 @@ public:
 		, e0(1.0e-5)
 		, e1(1.0e-5)
 		, rp(1.0e-7)
-		, logLevel(0)
+		, logLevel(2)
 		, flg(0)
 		, method("bfgs")
 		, cacheSize(0xff)
+		, logColor(true)
+		, logPattern("")
 		{};
 	void parse(int argc, char *argv[]);
 public:
@@ -44,6 +46,8 @@ public:
 	int flg;
 	std::string method;
 	int cacheSize;
+	bool logColor;
+	std::string logPattern;
 };
 
 void Options::parse(int argc, char *argv[])
@@ -74,6 +78,8 @@ void Options::parse(int argc, char *argv[])
 				w2vMatrixFile = argv[++i];
 			} else if( arg == "--set-optimizer" ) {
 				method = argv[++i];
+			} else if( arg == "--set-log-pattern" ) {
+				logPattern = argv[++i];
 			} else if( arg == "--cache-size" ) {
 				cacheSize = boost::lexical_cast<int>(argv[++i]);
 			} else if( arg == "--enable-likelihood-only" ) {
@@ -86,6 +92,8 @@ void Options::parse(int argc, char *argv[])
 				flg |= SemiCrf::DISABLE_REGULARIZATION;
 			} else if( arg == "--disable-wg-cache" ) {
 				flg |= SemiCrf::DISABLE_WG_CACHE;
+			} else if( arg == "--disable-log-color" ) {
+				logColor = false;
 			} else if( arg == "--log-level" ) {
 				logLevel = boost::lexical_cast<int>(argv[++i]);
 			} else {
@@ -177,7 +185,10 @@ int main(int argc, char *argv[])
 		options.parse(argc, argv);
 		Logger::setLevel(options.logLevel);
 		Logger::setName("cicada");
-		Logger::setColor(true);
+		Logger::setColor(options.logColor);
+		if( !options.logPattern.empty() ) {
+			Logger::setPattern(options.logPattern);
+		}
 
 		SemiCrf::Algorithm alg = createAlgorithm(options);
 		alg->preProcess(options.weightsFile, options.initWeightsFile, options.w2vMatrixFile);

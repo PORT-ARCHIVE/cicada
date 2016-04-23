@@ -1808,9 +1808,8 @@ namespace SemiCrf {
 					double maxV = std::get<1>(tp);
 					int maxd = std::get<2>(tp);
 					App::Label maxyd = std::get<3>(tp);
-					std::cout << boost::format("(%+10.6e %2d %2d)") % maxV % maxd % (int)maxyd << " " << std::endl;
+					std::cerr << boost::format("(%+10.6e %2d %2d)") % maxV % maxd % (int)maxyd << " " << std::endl;
 				}
-				std::cout << std::endl;
 			}
 		}
 	}

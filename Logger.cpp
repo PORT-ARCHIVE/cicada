@@ -70,7 +70,12 @@ namespace Logger
 	void setColor(bool arg)
 	{
 		flg = arg;
-	}		
+	}
+
+	void setPattern(const std::string& arg)
+	{
+		spd::set_pattern(arg);
+	}
 
 	decltype(( out()->trace() )) trace()
 	{

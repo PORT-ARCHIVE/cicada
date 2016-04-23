@@ -1,40 +1,19 @@
 Algorithm_()
+cicada
 Learner_()
-Semi-CRF
 Learning ...
 Datas_()
 TrainingDatas_()
 TrainingDatas_::read()
 Data_()
 BEGIN : data was created.
-0	S/E	0
-1	S/E	1
+0
+S/E
+0
+1
+S/E
+1
 END : data was pushed.
-Datas_::write()
-Datas_::writeJson()
-Data_::writeJson()
-{
-    "data" : [
-        [
-            [
-                "0",
-                "S/E",
-                "0"
-            ],
-            [
-                "1",
-                "S/E",
-                "1"
-            ]
-        ]
-    ],
-    "dimension" : [
-        2,
-        2
-    ],
-    "feature" : "DIGIT",
-    "title" : "check1"
-}
 FeatureFunction_()
 Digit()
 Weights_()

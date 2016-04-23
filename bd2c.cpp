@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <boost/lexical_cast.hpp>
-#include "spdlog/spdlog.h"
+#include "Logger.hpp"
 #include "Error.hpp"
 #include "FileIO.hpp"
 #include "ujson.hpp"
@@ -19,7 +19,9 @@ public:
 		, w2vMatrixFile("")
 		, labelTableFile("")
 		, feature("JPN")
-		, logLevel(0)		  
+		, logLevel(2)
+		, logColor(true)
+		, logPattern("")
 		{};
 	void parse(int argc, char *argv[]);
 public:
@@ -27,7 +29,9 @@ public:
 	std::string w2vMatrixFile;
 	std::string labelTableFile;
 	std::string feature;
-	int logLevel;	
+	int logLevel;
+	bool logColor;
+	std::string logPattern;
 };
 
 void Options::parse(int argc, char *argv[])
@@ -44,6 +48,10 @@ void Options::parse(int argc, char *argv[])
 				labelTableFile = argv[++i];
 			} else if( arg == "-f" ) {
 				feature = argv[++i];
+			} else if( arg == "--set-log-pattern" ) {
+				logPattern = argv[++i];
+			} else if( arg == "--disable-log-color" ) {
+				logColor = false;
 			} else if( arg == "--log-level" ) {
 				logLevel = boost::lexical_cast<int>(argv[++i]);
 			} else {
@@ -56,21 +64,23 @@ void Options::parse(int argc, char *argv[])
 	}
 }
 
-namespace spd = spdlog;
 int main(int argc, char *argv[])
 {
 	int ret = 0x0;
-	auto console = spd::stderr_logger_mt("console", true);
 
 	try {
 
 		Options options;
 		options.parse(argc, argv);
 
-		size_t q_size = 4096; // queue size must be power of 2
-		spdlog::set_async_mode(q_size);
-		spd::set_level((spd::level::level_enum)options.logLevel);
-        console->info("bd2c ver 0.1.0.");
+		Logger::setLevel(options.logLevel);
+		Logger::setName("bd2c");
+		Logger::setColor(options.logColor);
+		if( !options.logPattern.empty() ) {
+			Logger::setPattern(options.logPattern);
+		}
+
+		Logger::info("bd2c 0.0.1");
 
 		///////////////	body
 
@@ -79,7 +89,7 @@ int main(int argc, char *argv[])
 		{
 			std::ifstream ifb;
 			open(ifb, options.bodyTextFile);
-			console->info() << "parse " << options.bodyTextFile;
+			Logger::info() << "parse " << options.bodyTextFile;
 			std::string jsonstr;
 			jsonstr.assign((std::istreambuf_iterator<char>(ifb)), std::istreambuf_iterator<char>());
 			ifb.close();
@@ -101,7 +111,7 @@ int main(int argc, char *argv[])
 		{
 			std::ifstream ifb;
 			open(ifb, options.labelTableFile);
-			console->info() << "parse " << options.labelTableFile;
+			Logger::info() << "parse " << options.labelTableFile;
 			std::string jsonstr;
 			jsonstr.assign((std::istreambuf_iterator<char>(ifb)), std::istreambuf_iterator<char>());
 			ifb.close();
@@ -124,12 +134,12 @@ int main(int argc, char *argv[])
 			if( options.w2vMatrixFile.empty() ) {
 				throw Error("no w2v matrix file specifed");
 			}
-			console->info() << "parse " << options.w2vMatrixFile;
+			Logger::info() << "parse " << options.w2vMatrixFile;
 			matrix->read(options.w2vMatrixFile);
 		}
 
 		///////////////	data
-		console->info("transform data...");
+		Logger::info("transform data...");
 
 		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
 		MultiByteTokenizer toknizer(body);
@@ -180,17 +190,17 @@ int main(int argc, char *argv[])
 	
 	} catch(Error& e) {
 
-		console->error() << e.what();
+		Logger::error() << e.what();
 		ret = 0x1;
 
 	} catch(...) {
 
-		console->error() << "unexpected exception";
+		Logger::error() << "unexpected exception";
 		ret = 0x2;
 	}
 
 	if( !ret ) {
-		console->info("OK");
+		Logger::info("OK");
 	}
 
 	exit(ret);

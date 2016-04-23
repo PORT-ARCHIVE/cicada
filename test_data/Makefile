@@ -5,7 +5,7 @@ all: test1 test2 gen_test bd2c_test bd2w_test test3 learn infer
 
 test1:
 	@echo "###### check0 ######"
-	$(SEMICRF) -t check1.json -w tmp1 --log-level 0 -e0 2.0 -e1 1.0e-5 --max-iteration 100000 --disable-date-version --disable-regularization 2>log1 
+	$(SEMICRF) -t check1.json -w tmp1 --log-level 1 -e0 2.0 -e1 1.0e-5 --max-iteration 100000 --disable-date-version --disable-regularization --disable-log-color --set-log-pattern "%v" 2>log1 
 	@diff answer/log1 log1 && echo "OK" || echo "ERROR"
 
 FILES0=\
