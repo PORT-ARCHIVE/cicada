@@ -23,14 +23,6 @@
 
 namespace SemiCrf {
 
-	static std::string date() {
-        time_t t = time(0);
-        char *s,*p;
-        p = s = asctime(localtime(&t));
-        while(*s != '\0') { if (*s == '\n') {*s = '\0'; break;} else {s++;}}
-        return std::move(std::string(p));
-    }
-
 	// ctr
 	Labels createLabels(int size = 0)
 	{
@@ -154,6 +146,9 @@ namespace SemiCrf {
 			}
 			readJsonData(object);
 
+		} catch(Error& e){
+			throw e;
+
 		} catch(...) {
 			throw Error("json parse error");
 		}
@@ -194,7 +189,7 @@ namespace SemiCrf {
 					ary2.push_back("E");
 
 				} else {
-					// T.B.D.
+					throw Error("invalid segment");
 				}
 
 				ary2.push_back(App::label2String(l));
@@ -288,7 +283,7 @@ namespace SemiCrf {
 			object.push_back( std::move( std::make_pair( "labels", labels ) ) );
 		}
 
-		output << "" << to_string(object) << std::endl;
+		output << to_string(object) << std::endl;
 	}
 
 	void Datas_::write(std::ostream& output)  const {
@@ -552,7 +547,7 @@ namespace SemiCrf {
 		}
 #endif
 		if( empty() ) {
-			throw Error("empty training data file"); // T.B.D.
+			throw Error("empty training data");
 		}
 
 		computeMeanLength();
@@ -747,7 +742,7 @@ namespace SemiCrf {
 		}
 #endif
 		if( empty() ) {
-			throw Error("empty inference data file"); // T.B.D.
+			throw Error("empty prediction data");
 		}
 	}
 
@@ -798,7 +793,7 @@ namespace SemiCrf {
 			for( auto w : weight ) push_back(w);
 
 		} catch(...) {
-			throw Error("json parse error");
+			throw Error("json parse error"); // T.B.D.
 		}
 	}
 
@@ -873,10 +868,10 @@ namespace SemiCrf {
 				}
 			}
 		}
-		if( empty() ) {
-			throw Error("empty weights file"); // T.B.D.
-		}
 #endif
+		if( empty() ) {
+			throw Error("empty weights");
+		}
 	}
 
 	void Weights_::writeJson(std::ofstream& ofs)
@@ -1223,7 +1218,6 @@ namespace SemiCrf {
 			}
 
 			if( flg & ENABLE_LIKELIHOOD_ONLY ) {
-				//Logger::info() << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z) << std::endl;
 				Logger::info() << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z);
 			}
 
@@ -1396,7 +1390,7 @@ namespace SemiCrf {
 			v = 1.0;
 
 		} else {
-			assert( -2 < i ); // T.B.D.
+			throw Error("fatal bug");
 		}
 
 		Logger::trace() << "alpha(i=" << i << ",y=" << int(y) << ")=" << v;
@@ -1444,7 +1438,7 @@ namespace SemiCrf {
 			v = 0.0;
 
 		} else {
-			assert( -2 < i ); // T.B.D.
+			throw Error("fatal bug");
 		}
 
 		Logger::trace() << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v;
@@ -1492,10 +1486,10 @@ namespace SemiCrf {
 
 		} else if( i == -1 ) {
 
-			sv = SVector( new vector(dim, 0.0) );
+			sv = SVector(new vector(dim, 0.0));
 
 		} else {
-			assert( -2 < i ); // T.B.D.
+			throw Error("fatal bug");
 		}
 
 		//Logger::out(3) << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
@@ -1604,7 +1598,13 @@ namespace SemiCrf {
 		SemiCrf::Weights weights = SemiCrf::createWeights();
 		std::ifstream ifs; // 入力
 		open(ifs, wfile);
-		weights->read(ifs);
+		try {
+			weights->read(ifs);
+		} catch(Error& e) {
+			std::stringstream ss;
+			ss << "failed to read " << wfile << ": " << e.what();
+			throw Error(ss.str());
+		}
 		setWeights(weights);
 
 		// maxLengthが明示的に指定されていなければ自動設定する
@@ -1750,7 +1750,7 @@ namespace SemiCrf {
 			maxV = 0.0;
 
 		} else {
-			assert( -2 < i ); // T.B.D.
+			throw Error("fatal bug");
 		}
 
 		Logger::trace() << "V(i=" << i << ", y=" << int(y) << ")=" << maxV;
