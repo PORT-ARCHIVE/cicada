@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <exception>
 #include <boost/lexical_cast.hpp>
 #include "SemiCrf.hpp"
 #include "AppTest.hpp"
@@ -200,10 +201,15 @@ int main(int argc, char *argv[])
 		Logger::error() << e.what();
 		ret = 0x1;
 
+	} catch(std::exception& e) {
+
+		Logger::error() << e.what();
+		ret = 0x2;
+
 	} catch(...) {
 
 		Logger::error() << "unexpected exception";
-		ret = 0x2;
+		ret = 0x3;
 	}
 
 	if( !ret ) {
