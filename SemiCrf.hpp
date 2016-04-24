@@ -86,7 +86,6 @@ namespace SemiCrf {
 	public:
 		Data_();
 		virtual ~Data_();
-		virtual void write(std::ostream& output) const;
 		virtual void writeJson(ujson::array& ary) const;
 		Strs getStrs() { return strs; }
 		Segments getSegments() { return segs; }
@@ -184,8 +183,8 @@ namespace SemiCrf {
 		virtual ~Weights_();
 		void read(std::ifstream& ifs);
 		void readJson(std::ifstream& ifs);
-		void write(std::ofstream& ofs);
-		void writeJson(std::ofstream& ofs);
+		void write(std::ostream& ofs);
+		void writeJson(std::ostream& ofs);
 		void setXDim(int arg) { xDim = arg; }
 		void setYDim(int arg) { yDim = arg; }
 		int getXDim() { return xDim; }

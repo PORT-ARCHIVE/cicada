@@ -36,18 +36,6 @@ namespace App {
 	private:
 		W2V::Matrix w2vmat;
 	};
-
-	// 推論用数字データ集合
-	class PridectionDigitDatas_ : public SemiCrf::Datas_ {
-	public:
-		PridectionDigitDatas_(){};
-		virtual ~PridectionDigitDatas_(){};
-		virtual void read(std::istream& input);
-		virtual void writeJson(std::ostream& output) const;
-	protected:
-		virtual void readJsonData(std::vector<std::pair<std::string, ujson::value>>& object) {};
-	};
-
 }
 
 #endif // APP_TEST__H

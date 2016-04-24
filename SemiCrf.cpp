@@ -8,6 +8,7 @@
 #include <list>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include <cassert>
 #include <cmath>
 #include <clocale>
@@ -119,39 +120,20 @@ namespace SemiCrf {
 
 	void Datas_::readJson(std::istream& is)
 	{
+		JsonIO::Object object = JsonIO::parse(is);
+		title = JsonIO::readString(object, "title");
+		std::vector<int> dims = JsonIO::readIntAry(object, "dimension");
+		xDim = dims[0];
+		yDim = dims[1];
+		feature = JsonIO::readString(object, "feature");
 		try {
-
-			std::string jsonstr;
-			jsonstr.assign((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-			auto v = ujson::parse(jsonstr);
-			jsonstr.clear();
-
-			if( !v.is_object() ) {
-				throw std::invalid_argument("object expected for Datas_");
-			}
-
-			JsonIO::Object object = object_cast(std::move(v));
-			title = JsonIO::readString(object, "title");
-			std::vector<int> dims = JsonIO::readIntAry(object, "dimension");
-			xDim = dims[0];
-			yDim = dims[1];
-			feature = JsonIO::readString(object, "feature");
-			try {
-				labels = JsonIO::readUAry(object, "labels");
-			} catch(...) {
-				if( feature == "JPN" ) {
-					throw Error("no labels specified");
-				}
-			}
-			readJsonData(object);
-
-		} catch(Error& e){
-			throw e;
-
+			labels = JsonIO::readUAry(object, "labels");
 		} catch(...) {
-			throw Error("json parse error");
+			if( feature == "JPN" ) {
+				throw Error("no labels specified");
+			}
 		}
+		readJsonData(object);
 	}
 
 	void Data_::writeJson(ujson::array& ary0) const
@@ -200,54 +182,6 @@ namespace SemiCrf {
 		ary0.push_back(std::move(ary1));
 	}
 
-	void Data_::write(std::ostream& output) const
-	{
-		Logger::debug() << "Data_::write()";
-
-		for( auto s : *segs ) {
-
-			int start = s->getStart();
-			int end = s->getEnd();
-			App::Label l = s->getLabel();
-
-			for( int i = start; i <= end; i++ ) {
-
-				output << strs->at(i).at(0);
-
-				if( i == start ) {
-
-					if( i == end ) {
-						output << "\tS/E\t";
-					} else {
-						output << "\tS\t";
-					}
-
-				} else if( start < i && i < end ) {
-
-					output << "\tM\t";
-
-				} else if( i == end ) {
-
-					output << "\tE\t";
-
-				} else {
-					// T.B.D.
-				}
-
-				output << App::label2String(l) << std::endl;
-			}
-		}
-
-		if( segs->empty() ) {
-			for( auto str : *strs ) {
-				for( auto s : str ) {
-					output << s << "\t";
-				}
-				output << std::endl;
-			}
-		}
-	}
-
 	// Datas ctr
 	Datas_::Datas_()
 		: xDim(0)
@@ -288,20 +222,7 @@ namespace SemiCrf {
 
 	void Datas_::write(std::ostream& output)  const {
 		Logger::debug() << "Datas_::write()";
-#if 1
 		writeJson(output);
-#else
-		if( !feature.empty() ) {
-			output << "# FEATURE" << " " << feature << std::endl;
-		}
-		output << "# DIMENSION" << " " << xDim << " " << yDim << std::endl;
-		for( auto d : *this ) {
-
-			output << "# BEGIN" << std::endl;
-		 	d->write(output);
-			output << "# END" << std::endl;
-		}
-#endif
 	}
 
 	// TrainingDatas ctr
@@ -315,7 +236,7 @@ namespace SemiCrf {
 		Logger::debug() << "~TrainingDatas_()";
 	}
 
-	void TrainingDatas_::readJsonData(std::vector<std::pair<std::string, ujson::value>>& object)
+	void TrainingDatas_::readJsonData(JsonIO::Object& object)
 	{
 		auto it = find(object, "data");
 		if( it == object.end() || !it->second.is_array() ) {
@@ -420,132 +341,8 @@ namespace SemiCrf {
 	void TrainingDatas_::read(std::istream& strm)
 	{
 		Logger::debug() << "TrainingDatas_::read()";
-#if 1
+
 		readJson(strm);
-#else
-		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D
-
-		int counter = -1;
-		int seg_start = -1;
-		Segment seg;
-		Data data;
-		std::string line;
-
-		while( std::getline(strm, line) ) {
-
-			if( line == "" ) {
-				continue;
-			}
-
-			MultiByteTokenizer tokenizer(line);
-			counter++;
-
-			if( line[0] == '#' ) {
-				if( line == "# BEGIN" ) {
-					data = Data( new Data_() );
-					counter = -1;
-					Logger::debug() << "BEGIN : data was created.";
-				} else if( line == "# END" ) {
-					push_back(data);
-					Logger::debug() << "END : data was pushed.";
-				} else {
-					tokenizer.get(); // # を捨てる
-					std::string tok = tokenizer.get();
-					if( tok == "DIMENSION" ) {
-						tok = tokenizer.get();
-						if( !tok.empty() ) {
-							xDim = boost::lexical_cast<int>(tok);
-						}
-						tok = tokenizer.get();
-						if( !tok.empty() ) {
-							yDim = boost::lexical_cast<int>(tok);
-						}
-						tok = tokenizer.get();
-						if( !tok.empty() ) {
-							// T.B.D.
-						}
-					} else if( tok == "FEATURE" ) {
-						tok = tokenizer.get();
-						if( !tok.empty() ) {
-							feature = tok;
-						}
-						tok = tokenizer.get();
-						if( !tok.empty() ) {
-							// T.B.D.
-						}
-					}
-				}
-				continue;
-			}
-
-			std::string word = tokenizer.get();
-			if( word.empty() ) {
-				// T.B.D.
-			} else {
-				Logger::debug() << word;
-				std::vector<std::string> vs;
-				vs.push_back(word);
-				data->getStrs()->push_back(vs);
-			}
-
-			std::string descriptor = tokenizer.get();
-			if( descriptor.empty() ) {
-				// T.B.D.
-			} else {
-				Logger::debug() << descriptor;
-			}
-
-			std::string label = tokenizer.get();
-			if( label.empty() ) {
-				// T.B.D.
-
-			} else {
-				Logger::debug() << label;
-
-				App::Label l = App::string2Label(label);
-
-				if( descriptor == "N" ) {
-
-					seg = createSegment(counter, counter, l);
-					data->getSegments()->push_back(seg);
-
-				} else if( descriptor == "S" ) {
-
-					seg_start = counter;
-
-				} else if( descriptor == "M" ) {
-
-					// nothing to do
-
-				} else if( descriptor == "E" ) {
-
-					seg	= createSegment(seg_start, counter, l);
-					data->getSegments()->push_back(seg);
-					int length = counter - seg_start + 1;
-					if( maxLength < length ) {
-						maxLength = length;
-					}
-
-				} else if( descriptor == "S/E" ) {
-
-					seg	= createSegment(counter, counter, l);
-					data->getSegments()->push_back(seg);
-					if( maxLength < 1 ) {
-						maxLength = 1;
-					}
-
-				} else {
-
-					Logger::warn() << "unknown descriptor";
-				}
-			}
-
-			std::string remains = tokenizer.get();
-			if( !remains.empty() ) {
-				// T.B.D.
-			}
-		}
-#endif
 		if( empty() ) {
 			throw Error("empty training data");
 		}
@@ -564,7 +361,7 @@ namespace SemiCrf {
 		Logger::debug() << "~PredictionDatas_()";
 	}
 
-	void PredictionDatas_::readJsonData(std::vector<std::pair<std::string, ujson::value>>& object)
+	void PredictionDatas_::readJsonData(JsonIO::Object& object)
 	{
 		auto it = find(object, "data");
 		if( it == object.end() || !it->second.is_array() ) {
@@ -607,59 +404,6 @@ namespace SemiCrf {
 				std::vector<std::string> vs;
 				vs.push_back(word);
 				data->getStrs()->push_back(vs);
-#if 0
-				k++;
-				if( !k->is_string() ) {
-					throw std::invalid_argument("invalid format");
-				}
-
-				std::string descriptor = string_cast(std::move(*k));
-				Logger::debug() << descriptor;
-
-				k++;
-				if( !k->is_string() ) {
-					throw std::invalid_argument("invalid format");
-				}
-
-				std::string label = string_cast(std::move(*k));
-				Logger::debug() << label;
-
-				App::Label lb = App::string2Label(label);
-
-				if( descriptor == "N" ) {
-
-					seg = createSegment(counter, counter, lb);
-					data->getSegments()->push_back(seg);
-
-				} else if( descriptor == "S" ) {
-
-					seg_start = counter;
-
-				} else if( descriptor == "M" ) {
-
-					// nothing to do
-
-				} else if( descriptor == "E" ) {
-
-					seg	= createSegment(seg_start, counter, lb);
-					data->getSegments()->push_back(seg);
-					int length = counter - seg_start + 1;
-					if( maxLength < length ) {
-						maxLength = length;
-					}
-
-				} else if( descriptor == "S/E" ) {
-
-					seg	= createSegment(counter, counter, lb);
-					data->getSegments()->push_back(seg);
-					if( maxLength < 1 ) {
-						maxLength = 1;
-					}
-
-				} else {
-					Logger::warn() << "unknown descriptor";
-				}
-#endif
 			}
 
 			push_back(data);
@@ -670,77 +414,8 @@ namespace SemiCrf {
 	void PredictionDatas_::read(std::istream& strm)
 	{
 		Logger::debug() << "PredictionDatas_::read()";
-#if 1
+
 		readJson(strm);
-#else
-		typedef std::shared_ptr<MeCab::Tagger> Tagger;
-
-		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
-
-		Data data;
-		std::string input;
-		std::string line;
-
-		while( std::getline(strm, line) ) {
-
-			if( line == "" ) {
-				continue;
-			}
-
-			if( line[0] == '#' ) {
-
-				if( line == "# BEGIN" ) {
-					data = Data( new Data_() );
-					input = "";
-					Logger::debug() << "BEGIN : data was created.";
-
-				} else if( line == "# END" ) {
-
-					Tagger tagger = std::shared_ptr<MeCab::Tagger>(MeCab::createTagger("")); // T.B.D.
-					const MeCab::Node* node = tagger->parseToNode(input.c_str());
-
-					for( ; node ; node = node->next ) {
-
-						std::string cppstr = node->feature;
-						Logger::debug() << cppstr;
-						if( cppstr.find("BOS") == 0 ) { // T.B.D.
-							continue;
-						}
-
-						std::vector<std::string> vs;
-						std::string word;
-
-						auto c = node->surface;
-						for( int i = 0; i < node->length; i++ ) {
-							word.push_back(*c);
-							c++;
-						}
-
-						vs.push_back(word);
-						Logger::debug() << word;
-
-						MultiByteTokenizer tok(cppstr);
-						std::string t = tok.get();
-
-						while( !t.empty() ) {
-							Logger::debug() << t;
-							vs.push_back(t);
-							t = tok.get();
-						}
-
-						data->getStrs()->push_back(vs);
-					}
-
-					push_back(data);
-					Logger::debug() << "END : data was pushed.";
-				}
-
-				continue;
-			}
-
-			input += line;
-		}
-#endif
 		if( empty() ) {
 			throw Error("empty prediction data");
 		}
@@ -769,112 +444,30 @@ namespace SemiCrf {
 
 	void Weights_::readJson(std::ifstream& is)
 	{
-		try {
-
-			std::string jsonstr;
-			jsonstr.assign((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-			auto v = ujson::parse(jsonstr);
-
-			if( !v.is_object() ) {
-				throw std::invalid_argument("object expected for Weights_");
-			}
-
-			JsonIO::Object object = object_cast(std::move(v));
-			std::string title = JsonIO::readString(object, "title");
-			std::vector<int> dims = JsonIO::readIntAry(object, "dimension");
-			xDim = dims[0];
-			yDim = dims[1];
-			feature = JsonIO::readString(object, "feature");
-			maxLength = JsonIO::readInt(object, "max_length");
-			mean = JsonIO::readIntDoubleMap(object, "mean");
-			variance = JsonIO::readIntDoubleMap(object, "variance");
-			std::vector<double> weight = JsonIO::readDoubleAry(object, "weights");
-			for( auto w : weight ) push_back(w);
-
-		} catch(...) {
-			throw Error("json parse error"); // T.B.D.
-		}
+		JsonIO::Object object = JsonIO::parse(is);
+		std::string title = JsonIO::readString(object, "title");
+		std::vector<int> dims = JsonIO::readIntAry(object, "dimension");
+		xDim = dims[0];
+		yDim = dims[1];
+		feature = JsonIO::readString(object, "feature");
+		maxLength = JsonIO::readInt(object, "max_length");
+		mean = JsonIO::readIntDoubleMap(object, "mean");
+		variance = JsonIO::readIntDoubleMap(object, "variance");
+		std::vector<double> weight = JsonIO::readDoubleAry(object, "weights");
+		for( auto w : weight ) push_back(w);
 	}
 
 	void Weights_::read(std::ifstream& ifs)
 	{
-#if 1
-		readJson(ifs);
-#else
 		Logger::debug() << "Weights_::read()";
 
-		bool state = false;
-
-		std::string line;
-		while( std::getline(ifs, line) ) {
-
-			if( line == "" ) {
-				continue;
-			}
-
-			MultiByteTokenizer tokenizer(line);
-
-			if( line[0] == '#' ) {
-				if( line == "# BEGIN" ) {
-					state = true;
-				} else if( line == "# END" ) {
-					state = false;
-					break;
-				} else {
-					tokenizer.get(); // # を捨てる
-					std::string tok = tokenizer.get();
-					if( tok == "DIMENSION" ) {
-						tok = tokenizer.get();
-						if( !tok.empty() ) {
-							xDim = boost::lexical_cast<int>(tok);
-						}
-						tok = tokenizer.get();
-						if( !tok.empty() ) {
-							yDim = boost::lexical_cast<int>(tok);
-						}
-						tok = tokenizer.get();
-						if( !tok.empty() ) {
-							// T.B.D.
-						}
-					} else if( tok == "MAXLENGTH" ) {
-						tok = tokenizer.get();
-						if( !tok.empty() ) {
-							maxLength = boost::lexical_cast<int>(tok);
-						} else {
-							// T.B.D.
-						}
-					} else if( tok == "FEATURE" ) {
-						tok = tokenizer.get();
-						if( !tok.empty() ) {
-							feature = tok;
-						} else {
-							// T.B.D.
-						}
-					}
-				}
-				continue;
-			}
-
-			if( state ) {
-
-				MultiByteTokenizer tokenizer(line);
-				std::string weight = tokenizer.get();
-				double wv  = boost::lexical_cast<double>(weight);
-				push_back(wv);
-
-				if( !tokenizer.get().empty() ) {
-					// T.B.D
-				}
-			}
-		}
-#endif
+		readJson(ifs);
 		if( empty() ) {
 			throw Error("empty weights");
 		}
 	}
 
-	void Weights_::writeJson(std::ofstream& ofs)
+	void Weights_::writeJson(std::ostream& ofs)
 	{
 		Logger::debug() << "Weights_::writeJson()";
 
@@ -912,31 +505,10 @@ namespace SemiCrf {
 		ofs << to_string(object) << std::endl;
 	}
 
-	void Weights_::write(std::ofstream& ofs)
+	void Weights_::write(std::ostream& ofs)
 	{
 		Logger::debug() << "Weights_::write()";
-#if 1
 		writeJson(ofs);
-#else
-
-		ofs << "# Semi-CRF Weights" << std::endl;
-		if( !feature.empty() ) {
-			ofs << std::endl;
-			ofs << "# FEATURE" << " " << feature << std::endl;
-		}
-		ofs << std::endl;
-		ofs << "# DIMENSION" << " " << xDim << " " << yDim << std::endl;
-		ofs << std::endl;
-		ofs << "# MAXLENGTH" << " " << maxLength << std::endl;
-		ofs << std::endl;
-		ofs << "# BEGIN" << std::endl;
-
-		for( auto w : *this ) {
-			ofs << boost::format("%14.8e") % w << std::endl;
-		}
-
-		ofs << "# END" << std::endl;
-#endif
 	}
 
 	FeatureFunction_::FeatureFunction_()
@@ -1048,7 +620,7 @@ namespace SemiCrf {
 			int p = idx % cacheSize;
 			auto& tp = current_wgtab->at(p);
 
-			if( std::get<0>(tp) == idx ) {
+			if( std::get<0>(tp) == idx ) { // T.B.D
 
 				v = std::get<1>(tp);
 				gs = *std::get<2>(tp);
@@ -1317,21 +889,7 @@ namespace SemiCrf {
 		int l = labels->size();
 		int s = current_data->getStrs()->size();
 		int capacity = l*s;
-#if 0
-		for( int k = 0; k < dim; k++ ) {
 
-			double Gmk = 0.0;
-			current_ectab = createCheckTable(capacity);
-
-			for( auto y : *labels ) {
-				Gmk += eta(s-1, y, k);
-			}
-
-			Gmk /= Z;
-			Gms.push_back(Gmk);
-			Logger::debug() << "Gm(" << k << ")=" << Gmk;
-		}
-#else
 		{
 			vector tmp(dim, 0.0);
 			current_ecvtab = createCheckVTable(capacity);
@@ -1346,7 +904,7 @@ namespace SemiCrf {
 				Logger::debug() << "Gm(" << k << ")=" << tmp(k);
 			}
 		}
-#endif
+
 		return(std::move(Gms));
 	}
 
@@ -1492,7 +1050,7 @@ namespace SemiCrf {
 			throw Error("fatal bug");
 		}
 
-		//Logger::out(3) << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v << std::endl;
+		Logger::trace() << "eta(i=" << i << ",y=" << int(y) << ")=" << *sv;
 		return sv;
 	}
 
