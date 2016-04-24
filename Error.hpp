@@ -3,9 +3,10 @@
 #ifndef ERROR__H
 #define ERROR__H
 
+#include <exception>
 #include <string>
 
-class Error {
+class Error : public std::exception {
 public:
 	Error(const std::string& arg);
 	virtual ~Error();
