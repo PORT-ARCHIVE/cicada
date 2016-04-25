@@ -786,7 +786,7 @@ namespace SemiCrf {
 					w2 += w*w;
 				}
 				w2 *= rp;
-				L += w2;
+				L -= w2;
 			}
 
 			if( flg & ENABLE_LIKELIHOOD_ONLY ) {
@@ -803,7 +803,7 @@ namespace SemiCrf {
 
 					if( !(flg & DISABLE_REGULARIZATION) ) {
 						double dw2 = 2.0 * rp * (*iw);
-						(*idL) += dw2;
+						(*idL) -= dw2;
 					}
 
 					Logger::debug() << "dL(" << k << ")=" << *idL;
