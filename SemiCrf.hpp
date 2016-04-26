@@ -12,6 +12,7 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include "Error.hpp"
 #include "FileIO.hpp"
+#include "JsonIO.hpp"
 #include "Optimizer.hpp"
 #include "ujson.hpp"
 
@@ -136,7 +137,8 @@ namespace SemiCrf {
 		const std::map<int ,double>& getMean() { return mean; }
 		const std::map<int ,double>& getVariance() { return variance; }
 	protected:
-		virtual void readJsonData(std::vector<std::pair<std::string, ujson::value>>& object) = 0;
+		virtual void readJsonData(JsonIO::Object& object);
+		virtual void readJsonDataCore(ujson::value& value, Data data) = 0;
 		virtual void computeMeanLength();
 	protected:
 		int xDim;
@@ -159,7 +161,7 @@ namespace SemiCrf {
 		virtual ~TrainingDatas_();
 		virtual void read(std::istream& input);
 	protected:
-		virtual void readJsonData(std::vector<std::pair<std::string, ujson::value>>& object);
+		virtual void readJsonDataCore(ujson::value& value, Data data);
 	};
 
 	Datas createTrainingDatas();
@@ -171,7 +173,7 @@ namespace SemiCrf {
 		virtual ~PredictionDatas_();
 		virtual void read(std::istream& input);
 	protected:
-		virtual void readJsonData(std::vector<std::pair<std::string, ujson::value>>& object);
+		virtual void readJsonDataCore(ujson::value& value, Data data);
 	};
 
 	Datas createPredictionDatas();

@@ -99,7 +99,6 @@ namespace SemiCrf {
 			(*mean)[lb] += len;
 			(*variance)[lb] += len*len;
 		}
-
 	}
 
 	void Datas_::computeMeanLength()
@@ -208,7 +207,7 @@ namespace SemiCrf {
 
 		auto object = ujson::object{
 			{ "title", title },
-			{ "dimension", ujson::array{ xDim, yDim } },
+			{ "dimension", std::move(ujson::array{ xDim, yDim }) },
 			{ "feature", feature },
 			{ "data", datas }
 		};
@@ -225,18 +224,7 @@ namespace SemiCrf {
 		writeJson(output);
 	}
 
-	// TrainingDatas ctr
-	TrainingDatas_::TrainingDatas_()
-	{
-		Logger::debug() << "TrainingDatas_()";
-	}
-
-	TrainingDatas_::~TrainingDatas_()
-	{
-		Logger::debug() << "~TrainingDatas_()";
-	}
-
-	void TrainingDatas_::readJsonData(JsonIO::Object& object)
+	void Datas_::readJsonData(JsonIO::Object& object)
 	{
 		auto it = find(object, "data");
 		if( it == object.end() || !it->second.is_array() ) {
@@ -251,82 +239,96 @@ namespace SemiCrf {
 			}
 
 			Data data = Data( new Data_() ); Logger::debug() << "BEGIN : data was created.";
+			readJsonDataCore(i, data);
+			push_back(std::move(data)); Logger::debug() << "END : data was pushed.";
+		}
+	}
 
-			Segment seg;
-			int counter = -1;
-			int seg_start = -1;
+	// TrainingDatas ctr
+	TrainingDatas_::TrainingDatas_()
+	{
+		Logger::debug() << "TrainingDatas_()";
+	}
 
-			auto array1 = array_cast(std::move(i));
-			for( auto& j : array1 ) {
+	TrainingDatas_::~TrainingDatas_()
+	{
+		Logger::debug() << "~TrainingDatas_()";
+	}
 
-				counter++;
+	void TrainingDatas_::readJsonDataCore(ujson::value& value, Data data)
+	{
+		Segment seg;
+		int counter = -1;
+		int seg_start = -1;
 
-				if( !j.is_array() ) {
-					throw std::invalid_argument("invalid data format");
-				}
+		auto array1 = array_cast(std::move(value));
+		for( auto& j : array1 ) {
 
-				auto array2 = array_cast(std::move(j));
-				auto k = array2.begin();
-				if( !k->is_string() ) {
-					throw std::invalid_argument("invalid data format");
-				}
+			counter++;
 
-				auto word = string_cast(std::move(*k)); Logger::debug() << word;
-				std::vector<std::string> vs;
-				vs.push_back(std::move(word));
-				data->getStrs()->push_back(std::move(vs));
-
-				k++;
-				if( !k->is_string() ) {
-					throw std::invalid_argument("invalid format");
-				}
-
-				auto descriptor = string_cast(std::move(*k)); Logger::debug() << descriptor;
-
-				k++;
-				if( !k->is_string() ) {
-					throw std::invalid_argument("invalid format");
-				}
-
-				auto label = string_cast(std::move(*k)); Logger::debug() << label;
-				auto lb = App::string2Label(label);
-
-				if( descriptor == "N" ) {
-
-					seg = createSegment(counter, counter, lb);
-					data->getSegments()->push_back(seg);
-
-				} else if( descriptor == "S" ) {
-
-					seg_start = counter;
-
-				} else if( descriptor == "M" ) {
-
-					// nothing to do
-
-				} else if( descriptor == "E" ) {
-
-					seg	= createSegment(seg_start, counter, lb);
-					data->getSegments()->push_back(seg);
-					int length = counter - seg_start + 1;
-					if( maxLength < length ) {
-						maxLength = length;
-					}
-
-				} else if( descriptor == "S/E" ) {
-
-					seg	= createSegment(counter, counter, lb);
-					data->getSegments()->push_back(seg);
-					if( maxLength < 1 ) {
-						maxLength = 1;
-					}
-
-				} else {
-					Logger::warn() << "unknown descriptor";
-				}
+			if( !j.is_array() ) {
+				throw std::invalid_argument("invalid data format");
 			}
 
-			push_back(std::move(data)); Logger::debug() << "END : data was pushed.";
+			auto array2 = array_cast(std::move(j));
+			auto k = array2.begin();
+			if( !k->is_string() ) {
+				throw std::invalid_argument("invalid data format");
+			}
+
+			auto word = string_cast(std::move(*k)); Logger::debug() << word;
+			std::vector<std::string> vs;
+			vs.push_back(std::move(word));
+			data->getStrs()->push_back(std::move(vs));
+
+			k++;
+			if( !k->is_string() ) {
+				throw std::invalid_argument("invalid format");
+			}
+
+			auto descriptor = string_cast(std::move(*k)); Logger::debug() << descriptor;
+
+			k++;
+			if( !k->is_string() ) {
+				throw std::invalid_argument("invalid format");
+			}
+
+			auto label = string_cast(std::move(*k)); Logger::debug() << label;
+			auto lb = App::string2Label(label);
+
+			if( descriptor == "N" ) {
+
+				seg = createSegment(counter, counter, lb);
+				data->getSegments()->push_back(seg);
+
+			} else if( descriptor == "S" ) {
+
+				seg_start = counter;
+
+			} else if( descriptor == "M" ) {
+
+				// nothing to do
+
+			} else if( descriptor == "E" ) {
+
+				seg	= createSegment(seg_start, counter, lb);
+				data->getSegments()->push_back(seg);
+				int length = counter - seg_start + 1;
+				if( maxLength < length ) {
+					maxLength = length;
+				}
+
+			} else if( descriptor == "S/E" ) {
+
+				seg	= createSegment(counter, counter, lb);
+				data->getSegments()->push_back(seg);
+				if( maxLength < 1 ) {
+					maxLength = 1;
+				}
+
+			} else {
+				Logger::warn() << "unknown descriptor";
+			}
 		}
 	}
 
@@ -353,48 +355,31 @@ namespace SemiCrf {
 		Logger::debug() << "~PredictionDatas_()";
 	}
 
-	void PredictionDatas_::readJsonData(JsonIO::Object& object)
+	void PredictionDatas_::readJsonDataCore(ujson::value& value, Data data)
 	{
-		auto it = find(object, "data");
-		if( it == object.end() || !it->second.is_array() ) {
-			throw std::invalid_argument("'data' with type string not found");
-		}
+		Segment seg;
+		int counter = -1;
+		int seg_start = -1;
 
-		auto array0 = array_cast(std::move(it->second));
-		for( auto& i : array0 ) {
+		auto array1 = array_cast(std::move(value));
+		for( auto& j : array1 ) {
 
-			if( !i.is_array() ) {
+			counter++;
+
+			if( !j.is_array() ) {
 				throw std::invalid_argument("invalid format");
 			}
 
-			Data data = Data( new Data_() ); Logger::debug() << "BEGIN : data was created.";
-
-			Segment seg;
-			int counter = -1;
-			int seg_start = -1;
-
-			auto array1 = array_cast(std::move(i));
-			for( auto& j : array1 ) {
-
-				counter++;
-
-				if( !j.is_array() ) {
-					throw std::invalid_argument("invalid format");
-				}
-
-				auto array2 = array_cast(std::move(j));
-				auto k = array2.begin();
-				if( !k->is_string() ) {
-					throw std::invalid_argument("invalid format");
-				}
-
-				auto word = string_cast(std::move(*k)); Logger::debug() << word;
-				std::vector<std::string> vs;
-				vs.push_back(std::move(word));
-				data->getStrs()->push_back(std::move(vs));
+			auto array2 = array_cast(std::move(j));
+			auto k = array2.begin();
+			if( !k->is_string() ) {
+				throw std::invalid_argument("invalid format");
 			}
 
-			push_back(std::move(data)); Logger::debug() << "END : data was pushed.";
+			auto word = string_cast(std::move(*k)); Logger::debug() << word;
+			std::vector<std::string> vs;
+			vs.push_back(std::move(word));
+			data->getStrs()->push_back(std::move(vs));
 		}
 	}
 
@@ -479,9 +464,9 @@ namespace SemiCrf {
 			jvariancies.push_back(std::move(jvariance));
 		}
 
-		auto object = ujson::object{
+		auto object = ujson::object {
 			{ "title", "Semi-CRF Weights" },
-			{ "dimension", ujson::array{ xDim, yDim } },
+			{ "dimension", std::move(ujson::array{ xDim, yDim }) },
 			{ "feature", feature },
 			{ "max_length", maxLength },
 			{ "mean", jmeans },
