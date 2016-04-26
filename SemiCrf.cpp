@@ -28,32 +28,32 @@ namespace SemiCrf {
 
 	Labels createLabels(int size = 0)
 	{
-		return Labels( new Labels_(size) );
+		return std::make_shared<Labels_>(size);
 	}
 
 	Segment createSegment(int start, int end, App::Label label)
 	{
-		return Segment( new Segment_(start, end, label) );
+		return std::make_shared<Segment_>(start, end, label);
 	}
 
 	Segments createSegments()
 	{
-		return Segments( new Segments_() );
+		return std::make_shared<Segments_>();
 	}
 
 	CheckTable createCheckTable(int capacity)
 	{
-		return CheckTable( new CheckTable_(capacity, CheckTuple()) );
+		return std::make_shared<CheckTable_>(capacity, CheckTuple());
 	}
 
 	CheckVTable createCheckVTable(int capacity)
 	{
-		return CheckVTable( new CheckVTable_(capacity, CheckPair()) );
+		return std::make_shared<CheckVTable_>(capacity, CheckPair());
 	}
 
 	CacheTable createCacheTable(int capacity)
 	{
-		return CacheTable( new CacheTable_(capacity, CacheTuple()) );
+		return std::make_shared<CacheTable_>(capacity, CacheTuple());
 	}
 
 	//// Labels ////
@@ -74,8 +74,8 @@ namespace SemiCrf {
 	//// Data ////
 
 	Data_::Data_()
-		: strs( new Strs_() )
-		, segs( new Segments_() )
+		: strs( std::make_shared<Strs_>() )
+		, segs( std::make_shared<Segments_>() )
 	{
 		Logger::debug() << "Data_()";
 	}
@@ -122,9 +122,9 @@ namespace SemiCrf {
 
 	void Datas_::readJson(std::istream& is)
 	{
-		JsonIO::Object object = JsonIO::parse(is);
+		auto object = JsonIO::parse(is);
 		title = JsonIO::readString(object, "title");
-		std::vector<int> dims = JsonIO::readIntAry(object, "dimension");
+		auto dims = JsonIO::readIntAry(object, "dimension");
 		xDim = dims[0];
 		yDim = dims[1];
 		feature = JsonIO::readString(object, "feature");
@@ -148,7 +148,7 @@ namespace SemiCrf {
 
 			int start = s->getStart();
 			int end = s->getEnd();
-			App::Label l = s->getLabel();
+			auto l = s->getLabel();
 
 			for( int i = start; i <= end; i++ ) {
 
@@ -201,7 +201,7 @@ namespace SemiCrf {
 		Logger::debug() << "~Datas_()";
 	}
 
-	void Datas_::writeJson(std::ostream& output)  const {
+	void Datas_::writeJson(std::ostream& output) const {
 		Logger::debug() << "Datas_::writeJson()";
 
 		ujson::array datas;
@@ -209,7 +209,7 @@ namespace SemiCrf {
 			d->writeJson(datas);
 		}
 
-		auto object = ujson::object{
+		auto object = ujson::object {
 			{ "title", title },
 			{ "dimension", std::move(ujson::array{ xDim, yDim }) },
 			{ "feature", feature },
@@ -242,7 +242,7 @@ namespace SemiCrf {
 				throw std::invalid_argument("invalid data format");
 			}
 
-			Data data = Data( new Data_() ); Logger::debug() << "BEGIN : data was created.";
+			Data data = std::make_shared<Data_>(); Logger::debug() << "BEGIN : data was created.";
 			readJsonDataCore(i, data);
 			push_back(std::move(data)); Logger::debug() << "END : data was pushed.";
 		}
@@ -417,7 +417,7 @@ namespace SemiCrf {
 
 	Weights createWeights(int dim)
 	{
-		return Weights( new Weights_(dim) );
+		return std::make_shared<Weights_>(dim);
 	}
 
 	Weights_::Weights_(int dim)
@@ -437,16 +437,16 @@ namespace SemiCrf {
 
 	void Weights_::readJson(std::istream& is)
 	{
-		JsonIO::Object object = JsonIO::parse(is);
-		std::string title = JsonIO::readString(object, "title");
-		std::vector<int> dims = JsonIO::readIntAry(object, "dimension");
+		auto object = JsonIO::parse(is);
+		auto title = JsonIO::readString(object, "title");
+		auto dims = JsonIO::readIntAry(object, "dimension");
 		xDim = dims[0];
 		yDim = dims[1];
 		feature = JsonIO::readString(object, "feature");
 		maxLength = JsonIO::readInt(object, "max_length");
 		mean = JsonIO::readIntDoubleMap(object, "mean");
 		variance = JsonIO::readIntDoubleMap(object, "variance");
-		std::vector<double> weight = JsonIO::readDoubleAry(object, "weights");
+		auto weight = JsonIO::readDoubleAry(object, "weights");
 		for( auto w : weight ) push_back(w);
 	}
 
@@ -623,7 +623,7 @@ namespace SemiCrf {
 				v = ff->wg(weights, y, yd, current_data, i-d+1, i, gs);
 				std::get<0>(tp) = idx;
 				std::get<1>(tp) = v;
-				std::get<2>(tp) = SVector( new vector(gs) );
+				std::get<2>(tp) = std::make_shared<vector>(gs); // gsをコピーしてshared_ptrを作る
 			}
 
 		} else {
@@ -649,7 +649,7 @@ namespace SemiCrf {
 
 	Algorithm createLearner(int arg)
 	{
-		return Learner(new Learner_(arg));
+		return std::make_shared<Learner_>(arg);
 	}
 
 	Learner_::Learner_(int arg)
@@ -671,7 +671,7 @@ namespace SemiCrf {
 		// datasからx,yの次元、featureを取得する
 		int xdim = datas->getXDim();
 		int ydim = datas->getYDim();
-		const std::string& feature = datas->getFeature();
+		const auto& feature = datas->getFeature();
 
 		// feature関数を生成し、x,yの次元、feature、maxLengthを設定する
 		ff = App::createFeatureFunction(feature, w2vfile);
@@ -687,7 +687,7 @@ namespace SemiCrf {
 		dim = ff->getDim();
 
 		// 重みを生成しアルゴリズムに設定
-		SemiCrf::Weights weights = SemiCrf::createWeights(dim);
+		auto weights = SemiCrf::createWeights(dim);
 		setWeights(weights);
 
 		if( !w0file.empty() ) { // 初期重みが指定されている場合
@@ -701,7 +701,7 @@ namespace SemiCrf {
 		weights->setFeature(feature);
 
 		// ラベルを生成
-		Labels labels = createLabels(ydim);
+		auto labels = createLabels(ydim);
 		setLabels(labels);
 
 		// 作業領域を初期化
@@ -728,7 +728,7 @@ namespace SemiCrf {
 
 		if( !(flg & ENABLE_LIKELIHOOD_ONLY) ){
 
-			Optimizer::ObjectiveFunction ofunc = createLikelihood(this);
+			auto ofunc = createLikelihood(this);
 			Optimizer::UnconstrainedNLP optimizer;
 
 			if( method == "bfgs" ) {
@@ -768,7 +768,7 @@ namespace SemiCrf {
 			current_data = data;
 
 			double WG = 0.0;
-			double Z = computeZ();
+			auto Z = computeZ();
 			auto Gs = computeG(WG);
 
 			L += WG - log(Z);
@@ -783,7 +783,7 @@ namespace SemiCrf {
 			}
 
 			if( flg & ENABLE_LIKELIHOOD_ONLY ) {
-				Logger::info() << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z);
+				std::cerr << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z) << std::endl;
 			}
 
 			if( grad ) {
@@ -849,8 +849,8 @@ namespace SemiCrf {
 				y1 = y;
 				awg += wg;
 
-				Logger::info() << boost::format( "(%3d,%3d)" ) % ti % ui;
-				Logger::info() << boost::format(" WG= %+10.6e AWG= %+10.6e") % wg % awg;
+				std::cerr << boost::format( "(%3d,%3d)" ) % ti % ui;
+				std::cerr << boost::format(" WG= %+10.6e AWG= %+10.6e") % wg % awg << std::endl;
 			}
 		}
 
@@ -923,8 +923,8 @@ namespace SemiCrf {
 							continue;
 						}
 
-						double alp = alpha(i-d, yd);
-						double wg = computeWG(y, yd, i, d, gs);
+						auto alp = alpha(i-d, yd);
+						auto wg = computeWG(y, yd, i, d, gs);
 						v += alp*exp(wg);
 						if( std::isinf(v) || std::isnan(v) ) {
 							throw Error("numerical problem");
@@ -944,7 +944,7 @@ namespace SemiCrf {
 			throw Error("fatal bug");
 		}
 
-		Logger::trace() << "alpha(i=" << i << ",y=" << int(y) << ")=" << v;
+		Logger::trace() << "alpha(i=" << i << ",y=" << (int)y << ")=" << v;
 		return v;
 	}
 
@@ -992,7 +992,7 @@ namespace SemiCrf {
 			throw Error("fatal bug");
 		}
 
-		Logger::trace() << "eta(i=" << i << ",y=" << int(y) << ",k=" << k << ")=" << v;
+		Logger::trace() << "eta(i=" << i << ",y=" << (int)y << ",k=" << k << ")=" << v;
 		return v;
 	}
 
@@ -1011,7 +1011,7 @@ namespace SemiCrf {
 
 			} else {
 
-				sv = SVector(new vector(dim, 0.0));
+				sv = std::make_shared<vector>(dim, 0.0);
 
 				for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
 					for( auto yd : *labels ) {
@@ -1021,9 +1021,9 @@ namespace SemiCrf {
 						}
 
 						vector gs(dim, 0.0); // alphaでもgsを使うのでローカルで領域を確保
-						double wg = computeWG(y, yd, i, d, gs);
+						auto wg = computeWG(y, yd, i, d, gs);
 						vector cof = (*eta(i-d, yd)) + alpha(i-d, yd) * gs;
-						double ex = exp(wg);
+						auto ex = exp(wg);
 						if( std::isinf(ex) || std::isnan(ex) ) {
 							throw Error("numerical problem");
 						}
@@ -1037,13 +1037,13 @@ namespace SemiCrf {
 
 		} else if( i == -1 ) {
 
-			sv = SVector(new vector(dim, 0.0));
+			sv = std::make_shared<vector>(dim, 0.0);
 
 		} else {
 			throw Error("fatal bug");
 		}
 
-		Logger::trace() << "eta(i=" << i << ",y=" << int(y) << ")=" << *sv;
+		Logger::trace() << "eta(i=" << i << ",y=" << (int)y << ")=" << *sv;
 		return sv;
 	}
 
@@ -1051,7 +1051,7 @@ namespace SemiCrf {
 
 	Optimizer::ObjectiveFunction createLikelihood(Learner_* learner)
 	{
-	 	return Optimizer::ObjectiveFunction(new Likelihood_(learner));
+	 	return std::make_shared<Likelihood_>(learner);
 	}
 
 	double Likelihood_::value(Optimizer::vector& x)
@@ -1128,7 +1128,7 @@ namespace SemiCrf {
 
 	Algorithm createPredictor(int arg)
 	{
-		return Predictor(new Predictor_(arg));
+		return std::make_shared<Predictor_>(arg);
 	}
 
 	Predictor_::Predictor_(int arg)
@@ -1146,7 +1146,7 @@ namespace SemiCrf {
 	void Predictor_::preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile)
 	{
 		// 重みを生成しファイルから読み込む
-		SemiCrf::Weights weights = SemiCrf::createWeights();
+		auto weights = SemiCrf::createWeights();
 		std::ifstream ifs; // 入力
 		open(ifs, wfile);
 		try {
@@ -1171,9 +1171,9 @@ namespace SemiCrf {
 		// weightsからx,yの次元、featureを取得する
 		int xdim = weights->getXDim();
 		int ydim = weights->getYDim();
-		const std::string& feature = weights->getFeature();
-		const std::map<int ,double>& mean = weights->getMean();
-		const std::map<int ,double>& variance = weights->getVariance();
+		const auto& feature = weights->getFeature();
+		const auto& mean = weights->getMean();
+		const auto& variance = weights->getVariance();
 
 		// feature関数を生成し、x,yの次元、feature、maxLengthを設定する
 		ff = App::createFeatureFunction(feature, w2vfile);
@@ -1199,7 +1199,7 @@ namespace SemiCrf {
 		datas->setVariance(variance);
 
 		// ラベルを生成
-		Labels labels = createLabels(ydim);
+		auto labels = createLabels(ydim);
 		setLabels(labels);
 
 		// 作業領域を初期化
@@ -1228,12 +1228,12 @@ namespace SemiCrf {
 
 			int maxd = - 1;
 			App::Label maxy;
-			double maxV = - std::numeric_limits<double>::max();
+			auto maxV = - std::numeric_limits<double>::max();
 
 			for( auto y : *labels ) {
 
 				int d = -1;
-				double v = V(s-1, y, d);
+				auto v = V(s-1, y, d);
 
 				if( maxV < v ) {
 					maxy = y;
@@ -1243,7 +1243,7 @@ namespace SemiCrf {
 			}
 
 			if( flg & ENABLE_LIKELIHOOD_ONLY ) {
-				Logger::info() << boost::format("WG(maxV)= %10.6e") % maxV;
+				std::cerr << boost::format("WG(maxV)= %10.6e") % maxV << std::endl;
 			}
 			assert( 0 < maxd );
 			backtrack(maxy, maxd);
@@ -1253,7 +1253,7 @@ namespace SemiCrf {
 
 	double Predictor_::V(int i, App::Label y, int& maxd)
 	{
-		double maxV = - std::numeric_limits<double>::max();
+		auto maxV = - std::numeric_limits<double>::max();
 
 		if( -1 < i ) {
 
@@ -1278,7 +1278,7 @@ namespace SemiCrf {
 						}
 
 						int tmp = -1;
-						double v = V(i-d, yd, tmp);
+						auto v = V(i-d, yd, tmp);
 						v += computeWG(y, yd, i, d, gs);
 					
 						if( maxV < v ) {
@@ -1304,7 +1304,7 @@ namespace SemiCrf {
 			throw Error("fatal bug");
 		}
 
-		Logger::trace() << "V(i=" << i << ", y=" << int(y) << ")=" << maxV;
+		Logger::trace() << "V(i=" << i << ", y=" << (int)y << ")=" << maxV;
 		return maxV;
 	}
 
@@ -1318,7 +1318,7 @@ namespace SemiCrf {
 		int idx = i*l + (int)maxy;
 		auto& tp0 = current_vctab->at(idx);
 		maxd = std::get<2>(tp0);
-		App::Label maxyd = std::get<3>(tp0);
+		auto maxyd = std::get<3>(tp0);
 
 		std::list<Segment> ls;
 
@@ -1356,9 +1356,9 @@ namespace SemiCrf {
 
 					int idx = i*l + (static_cast<int>(y));
 					auto& tp = current_vctab->at(idx);
-					double maxV = std::get<1>(tp);
+					auto maxV = std::get<1>(tp);
 					int maxd = std::get<2>(tp);
-					App::Label maxyd = std::get<3>(tp);
+					auto maxyd = std::get<3>(tp);
 					std::cerr << boost::format("(%+10.6e %2d %2d)") % maxV % maxd % (int)maxyd << " " << std::endl;
 				}
 			}
