@@ -24,7 +24,8 @@
 
 namespace SemiCrf {
 
-	// ctr
+	//// Factories ////
+
 	Labels createLabels(int size = 0)
 	{
 		return Labels( new Labels_(size) );
@@ -55,7 +56,8 @@ namespace SemiCrf {
 		return CacheTable( new CacheTable_(capacity, CacheTuple()) );
 	}
 
-	// Labels
+	//// Labels ////
+
 	Labels_::Labels_(int size)
 	{
 		Logger::debug() << "Labels_()";
@@ -69,7 +71,8 @@ namespace SemiCrf {
 		Logger::debug() << "~Labels_()";
 	}
 
-	// Data_ ctr
+	//// Data ////
+
 	Data_::Data_()
 		: strs( new Strs_() )
 		, segs( new Segments_() )
@@ -181,7 +184,8 @@ namespace SemiCrf {
 		ary0.push_back(std::move(ary1));
 	}
 
-	// Datas ctr
+	//// Datas ////
+
 	Datas_::Datas_()
 		: xDim(0)
 		, yDim(0)
@@ -190,12 +194,12 @@ namespace SemiCrf {
 		, title("")
 	{
 		Logger::debug() << "Datas_()";
-	};
+	}
 
 	Datas_::~Datas_()
 	{
 		Logger::debug() << "~Datas_()";
-	};
+	}
 
 	void Datas_::writeJson(std::ostream& output)  const {
 		Logger::debug() << "Datas_::writeJson()";
@@ -244,7 +248,22 @@ namespace SemiCrf {
 		}
 	}
 
-	// TrainingDatas ctr
+	void Datas_::setMean(const std::map<int ,double>& arg) {
+		mean = arg;
+		for( auto& d : *this ) {
+			d->setMeans(&mean);
+		}
+	}
+
+	void Datas_::setVariance(const std::map<int ,double>& arg) {
+		variance = arg;
+		for( auto& d : *this ) {
+			d->setVariancies(&variance);
+		}
+	}
+
+	//// TrainingDatas ////
+
 	TrainingDatas_::TrainingDatas_()
 	{
 		Logger::debug() << "TrainingDatas_()";
@@ -344,7 +363,8 @@ namespace SemiCrf {
 		computeMeanLength();
 	}
 
-	// PredictionDatas ctr
+	//// PredictionDatas ////
+
 	PredictionDatas_::PredictionDatas_()
 	{
 		Logger::debug() << "PredictionDatas_()";
@@ -393,7 +413,8 @@ namespace SemiCrf {
 		}
 	}
 
-	// Weights ctr
+	//// Weights ////
+
 	Weights createWeights(int dim)
 	{
 		return Weights( new Weights_(dim) );
@@ -414,7 +435,7 @@ namespace SemiCrf {
 		Logger::debug() << "~Weights_()";
 	}
 
-	void Weights_::readJson(std::ifstream& is)
+	void Weights_::readJson(std::istream& is)
 	{
 		JsonIO::Object object = JsonIO::parse(is);
 		std::string title = JsonIO::readString(object, "title");
@@ -429,7 +450,7 @@ namespace SemiCrf {
 		for( auto w : weight ) push_back(w);
 	}
 
-	void Weights_::read(std::ifstream& ifs)
+	void Weights_::read(std::istream& ifs)
 	{
 		Logger::debug() << "Weights_::read()";
 
@@ -555,7 +576,7 @@ namespace SemiCrf {
 		rp = arg;
 	}
 
-	void Algorithm_::setMethod(std::string arg)
+	void Algorithm_::setMethod(const std::string& arg)
 	{
 		method = arg;
 	}
@@ -1026,7 +1047,7 @@ namespace SemiCrf {
 		return sv;
 	}
 
-	//// Likilihood class ////
+	//// Likilihood ////
 
 	Optimizer::ObjectiveFunction createLikelihood(Learner_* learner)
 	{
