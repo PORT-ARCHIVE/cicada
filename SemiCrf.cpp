@@ -243,60 +243,53 @@ namespace SemiCrf {
 			throw std::invalid_argument("'data' with type string not found");
 		}
 
-		std::vector<ujson::value> array0 = array_cast(std::move(it->second));
-		for( auto i = array0.begin(); i != array0.end(); ++i ) {
+		auto array0 = array_cast(std::move(it->second));
+		for( auto& i : array0 ) {
 
-			if( !i->is_array() ) {
+			if( !i.is_array() ) {
 				throw std::invalid_argument("invalid data format");
 			}
 
-			Data data = Data( new Data_() );
-			Logger::debug() << "BEGIN : data was created.";
+			Data data = Data( new Data_() ); Logger::debug() << "BEGIN : data was created.";
 
 			Segment seg;
 			int counter = -1;
 			int seg_start = -1;
 
-			std::vector<ujson::value> array1 = array_cast(std::move(*i));
-			for( auto j = array1.begin(); j != array1.end(); ++j ) {
+			auto array1 = array_cast(std::move(i));
+			for( auto& j : array1 ) {
 
 				counter++;
 
-				if( !j->is_array() ) {
+				if( !j.is_array() ) {
 					throw std::invalid_argument("invalid data format");
 				}
 
-				std::vector<ujson::value> array2 = array_cast(std::move(*j));
+				auto array2 = array_cast(std::move(j));
 				auto k = array2.begin();
-
 				if( !k->is_string() ) {
 					throw std::invalid_argument("invalid data format");
 				}
 
-				std::string word = string_cast(std::move(*k));
-				Logger::debug() << word;
-
+				auto word = string_cast(std::move(*k)); Logger::debug() << word;
 				std::vector<std::string> vs;
-				vs.push_back(word);
-				data->getStrs()->push_back(vs);
+				vs.push_back(std::move(word));
+				data->getStrs()->push_back(std::move(vs));
 
 				k++;
 				if( !k->is_string() ) {
 					throw std::invalid_argument("invalid format");
 				}
 
-				std::string descriptor = string_cast(std::move(*k));
-				Logger::debug() << descriptor;
+				auto descriptor = string_cast(std::move(*k)); Logger::debug() << descriptor;
 
 				k++;
 				if( !k->is_string() ) {
 					throw std::invalid_argument("invalid format");
 				}
 
-				std::string label = string_cast(std::move(*k));
-				Logger::debug() << label;
-
-				App::Label lb = App::string2Label(label);
+				auto label = string_cast(std::move(*k)); Logger::debug() << label;
+				auto lb = App::string2Label(label);
 
 				if( descriptor == "N" ) {
 
@@ -333,8 +326,7 @@ namespace SemiCrf {
 				}
 			}
 
-			push_back(data);
-			Logger::debug() << "END : data was pushed.";
+			push_back(std::move(data)); Logger::debug() << "END : data was pushed.";
 		}
 	}
 
@@ -368,46 +360,41 @@ namespace SemiCrf {
 			throw std::invalid_argument("'data' with type string not found");
 		}
 
-		std::vector<ujson::value> array0 = array_cast(std::move(it->second));
-		for( auto i = array0.begin(); i != array0.end(); ++i ) {
+		auto array0 = array_cast(std::move(it->second));
+		for( auto& i : array0 ) {
 
-			if( !i->is_array() ) {
+			if( !i.is_array() ) {
 				throw std::invalid_argument("invalid format");
 			}
 
-			Data data = Data( new Data_() );
-			Logger::debug() << "BEGIN : data was created.";
+			Data data = Data( new Data_() ); Logger::debug() << "BEGIN : data was created.";
 
 			Segment seg;
 			int counter = -1;
 			int seg_start = -1;
 
-			std::vector<ujson::value> array1 = array_cast(std::move(*i));
-			for( auto j = array1.begin(); j != array1.end(); ++j ) {
+			auto array1 = array_cast(std::move(i));
+			for( auto& j : array1 ) {
 
 				counter++;
 
-				if( !j->is_array() ) {
+				if( !j.is_array() ) {
 					throw std::invalid_argument("invalid format");
 				}
 
-				std::vector<ujson::value> array2 = array_cast(std::move(*j));
+				auto array2 = array_cast(std::move(j));
 				auto k = array2.begin();
-
 				if( !k->is_string() ) {
 					throw std::invalid_argument("invalid format");
 				}
 
-				std::string word = string_cast(std::move(*k));
-				Logger::debug() << word;
-
+				auto word = string_cast(std::move(*k)); Logger::debug() << word;
 				std::vector<std::string> vs;
-				vs.push_back(word);
-				data->getStrs()->push_back(vs);
+				vs.push_back(std::move(word));
+				data->getStrs()->push_back(std::move(vs));
 			}
 
-			push_back(data);
-			Logger::debug() << "END : data was pushed.";
+			push_back(std::move(data)); Logger::debug() << "END : data was pushed.";
 		}
 	}
 
