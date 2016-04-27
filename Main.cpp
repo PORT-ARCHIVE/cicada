@@ -125,10 +125,10 @@ void Options::parse(int argc, char *argv[])
 	}
 }
 
-SemiCrf::Algorithm createAlgorithm(const Options& options)
+decltype( std::make_shared<SemiCrf::Algorithm>() ) createAlgorithm(const Options& options)
 {
 	std::string file;
-	SemiCrf::Algorithm alg;
+	decltype( std::make_shared<SemiCrf::Algorithm>() ) alg;
 	SemiCrf::Datas datas;
 
 	if( !options.trainingDataFile.empty() ) {
@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
 			Logger::setPattern(options.logPattern);
 		}
 
-		SemiCrf::Algorithm alg = createAlgorithm(options);
+		auto alg = createAlgorithm(options);
 		alg->preProcess(options.weightsFile, options.initWeightsFile, options.w2vMatrixFile);
 		alg->compute();
 		alg->postProcess(options.weightsFile);

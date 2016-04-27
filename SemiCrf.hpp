@@ -242,10 +242,10 @@ namespace SemiCrf {
 	CacheTable createCacheTable(int capacity);
 
 	// 抽象アルゴリズム
-	class Algorithm_ {
+	class Algorithm {
 	public:
-		Algorithm_(int arg);
-		virtual ~Algorithm_();
+		Algorithm(int arg);
+		virtual ~Algorithm();
 		virtual void setLabels(Labels arg);
 		virtual void setMaxLength(int arg);
 		virtual void setMaxIteration(int arg);
@@ -290,14 +290,12 @@ namespace SemiCrf {
 		int cacheSize;
 	};
 
-	typedef std::shared_ptr<Algorithm_> Algorithm;
-
 	// 学習器
-	class Learner_ : public Algorithm_ {
+	class Learner : public Algorithm {
 	public:
-		friend class Likelihood_;
-		Learner_(int arg);
-		virtual ~Learner_();
+		friend class Likelihood;
+		Learner(int arg);
+		virtual ~Learner();
 		virtual void compute();
 		virtual void preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile);
 		virtual void postProcess(const std::string& wfile);
@@ -311,17 +309,16 @@ namespace SemiCrf {
 		SVector eta(int i, App::Label y);
 	};
 
-	typedef std::shared_ptr<Learner_> Learner;
-	Algorithm createLearner(int arg);
+	decltype( std::make_shared<Algorithm>() ) createLearner(int arg);
 
 	// 尤度関数
-	class Likelihood_ : public Optimizer::ObjectiveFunction_ {
+	class Likelihood : public Optimizer::ObjectiveFunction_ {
 	public:
-		Likelihood_(Learner_* arg)
+		Likelihood(Learner* arg)
 			: learner(arg)
 			, L(0.0)
 			{};
-		virtual ~Likelihood_(){};
+		virtual ~Likelihood(){};
 		virtual double value(Optimizer::vector& x);
 		virtual double savedValue();
 		virtual Optimizer::vector grad(Optimizer::vector& x);
@@ -331,18 +328,17 @@ namespace SemiCrf {
 		virtual void endLoopProcess(Optimizer::vector& x);
 		virtual void postProcess(Optimizer::vector& x);
 	private:
-		Learner_* learner;
+		Learner* learner;
 		double L;
 	};
 
-	typedef std::shared_ptr<Likelihood_> Likelihood;
-	Optimizer::ObjectiveFunction createLikelihood(Learner_* learner);
+	Optimizer::ObjectiveFunction createLikelihood(Learner* learner);
 
 	// 推論器
-	class Predictor_ : public Algorithm_ {
+	class Predictor : public Algorithm {
 	public:
-		Predictor_(int arg);
-		virtual ~Predictor_();
+		Predictor(int arg);
+		virtual ~Predictor();
 		virtual void compute();
 		virtual void preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile);
 		virtual void postProcess(const std::string& wfile);
@@ -352,8 +348,7 @@ namespace SemiCrf {
 		void printV();
 	};
 
-	typedef std::shared_ptr<Predictor_> Predictor;
-	Algorithm createPredictor(int arg);
+	decltype( std::make_shared<Algorithm>() ) createPredictor(int arg);
 }
 
 #endif // SEMI_CRF__H
