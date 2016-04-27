@@ -95,22 +95,22 @@ namespace SemiCrf {
 		Segments getSegments() { return segs; }
 		void setSegments(Segments arg) { segs = arg; }
 		void computeMeanLength
-		( std::map<int, int>* count
-		  , std::map<int ,double>* mean
-		  , std::map<int ,double>* variance
+		( std::map<int,int>* count
+		  , std::map<int,double>* mean
+		  , std::map<int,double>* variance
 			);
 		double getMean(int lb) { return (*mean)[lb]; }
 		double getVariance(int lb) { return (*variance)[lb]; }
-		void setMeans(std::map<int ,double>* arg) { mean = arg; }
-		void setVariancies(std::map<int ,double>* arg) { variance = arg; }
+		void setMeans(std::map<int,double>* arg) { mean = arg; }
+		void setVariancies(std::map<int,double>* arg) { variance = arg; }
 
 	protected:
 
 		Strs strs;
 		Segments segs;
-		std::map<int, int>* count;
-		std::map<int ,double>* mean;
-		std::map<int ,double>* variance;
+		std::map<int,int>* count;
+		std::map<int,double>* mean;
+		std::map<int,double>* variance;
 	};
 	
 	typedef std::shared_ptr<Data_> Data;
@@ -133,10 +133,10 @@ namespace SemiCrf {
 		virtual int getMaxLength() { return maxLength; }
 		const std::string& getFeature() { return feature; }
 		void setFeature(const std::string& arg) { feature = arg; }
-		void setMean(const std::map<int ,double>& arg);
-		void setVariance(const std::map<int ,double>& arg);
-		const std::map<int ,double>& getMean() { return mean; }
-		const std::map<int ,double>& getVariance() { return variance; }
+		void setMean(const std::map<int,double>& arg);
+		void setVariance(const std::map<int,double>& arg);
+		const std::map<int,double>& getMean() { return mean; }
+		const std::map<int,double>& getVariance() { return variance; }
 
 	protected:
 
@@ -151,9 +151,9 @@ namespace SemiCrf {
 		int maxLength;
 		std::string feature;
 		std::string title;
-		std::map<int, int> count;
-		std::map<int ,double> mean;
-		std::map<int ,double> variance;
+		std::map<int,int> count;
+		std::map<int,double> mean;
+		std::map<int,double> variance;
 		std::vector<ujson::value> labels;
 	};
 
@@ -208,10 +208,10 @@ namespace SemiCrf {
 		void setMaxLength(int arg) { maxLength = arg; }
 		const std::string& getFeature() { return feature; }
 		void setFeature(const std::string& arg) { feature = arg; }
-		void setMean(const std::map<int ,double>& arg) { mean = arg; }
-		void setVariance(const std::map<int ,double>& arg) { variance = arg; }
-		const std::map<int ,double>& getMean() { return mean; }
-		const std::map<int ,double>& getVariance() { return variance; }
+		void setMean(const std::map<int,double>& arg) { mean = arg; }
+		void setVariance(const std::map<int,double>& arg) { variance = arg; }
+		const std::map<int,double>& getMean() { return mean; }
+		const std::map<int,double>& getVariance() { return variance; }
 
 	protected:
 
@@ -219,8 +219,8 @@ namespace SemiCrf {
 		int yDim;
 		int maxLength;
 		std::string feature;
-		std::map<int ,double> mean;
-		std::map<int ,double> variance;
+		std::map<int,double> mean;
+		std::map<int,double> variance;
 	};
 
 	typedef std::shared_ptr<Weights_> Weights;
