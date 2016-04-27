@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
 			}
 			int dim0 = size; // !!! long long -> int !!!
 			int dim1 = labelArray.size();
-			auto object = ujson::object{
+			auto object = ujson::object {
 				{ "title", title },
 				{ "feature", options.feature },
 				{ "dimension", ujson::array{ dim0, dim1 } },

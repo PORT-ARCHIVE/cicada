@@ -19,13 +19,13 @@ namespace App {
 
 		if( feature == "DIGIT" || feature.empty() ) {
 
-			SemiCrf::FeatureFunction digitFeature(new Digit());
+			auto digitFeature = std::make_shared<Digit>();
 			ff = digitFeature;
 
 		} else if( feature == "JPN" ) {
 			
-			std::shared_ptr<Jpn> jpnFeature(new Jpn());
-			W2V::Matrix m(new W2V::Matrix_());
+			auto jpnFeature = std::make_shared<Jpn>();
+			auto m = std::make_shared<W2V::Matrix_>();
 			if( w2vmat.empty() ) {
 				throw Error("no w2v matrix file specifed");
 			}
@@ -112,7 +112,7 @@ namespace App {
 			int d = i - j + 1;
 			for( int l = 0; l < d; l++ ) { 
 
-				std::string str = x->getStrs()->at(j+l).at(0);
+				auto str = x->getStrs()->at(j+l).at(0);
 				int xval = boost::lexical_cast<int>(str);
 				fvec(yval*xDim+xval) += 1.0;
 			}
@@ -121,12 +121,12 @@ namespace App {
 			fvec(dim0+ydval*yDim+yval) = 1.0;
 
             // y2l
-			double m = x->getMean(static_cast<int>(y));
-			double s = x->getVariance(static_cast<int>(y));
+			auto m = x->getMean(static_cast<int>(y));
+			auto s = x->getVariance(static_cast<int>(y));
 			const double eps = 1.0e-5;
 			double f = 0.0;
 			if( eps < s ) {
-				double dm = d - m;
+				auto dm = d - m;
 				f = dm*dm/(2.0*s);
 			} else {
 				f = 1.0;
@@ -204,9 +204,9 @@ namespace App {
 			// y2x
 			for( l = 0; l < d; l++ ) {
 
-				std::string str = x->getStrs()->at(j+l).at(0);
+				auto str = x->getStrs()->at(j+l).at(0);
 				long long xval = boost::lexical_cast<long long>(str);
-				const vector& wvec = w2vmat->i2v(xval);
+				const auto& wvec = w2vmat->i2v(xval);
 
 				for( k = 0; k < xDim; k++ ) {
 					fvec(yval*xDim+k) += wvec(k);
