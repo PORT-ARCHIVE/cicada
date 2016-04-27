@@ -25,7 +25,7 @@ namespace JsonIO {
 		if( it == object.end() || !it->second.is_string() ) {
 			throw std::invalid_argument("title' with type string not found"); // T.B.D.
 		}
-		std::string str = string_cast(std::move(it->second));
+		auto str = string_cast(std::move(it->second));
 		return std::move(str);
 	}
 
@@ -48,7 +48,7 @@ namespace JsonIO {
 			throw std::invalid_argument("'dimention' with type array not found"); // T.B.D
 		}
 
-		std::vector<ujson::value> array = array_cast(std::move(it->second));
+		auto array = array_cast(std::move(it->second));
 		for( auto i = array.begin(); i != array.end(); ++i ) {
 
 			if( !i->is_number() ) {
@@ -70,7 +70,7 @@ namespace JsonIO {
 			throw std::invalid_argument("'weights' with type object not found"); // T.B.D
 		}
 
-		std::vector<ujson::value> array = array_cast(std::move(it->second));
+		auto array = array_cast(std::move(it->second));
 		for( auto i = array.begin(); i != array.end(); ++i ) {
 
 			if( !i->is_number() ) {
@@ -92,10 +92,10 @@ namespace JsonIO {
 			throw std::invalid_argument("'mean' with type object not found"); // T.B.D
 		}
 
-		std::vector<ujson::value> array0 = array_cast(std::move(it->second));
+		auto array0 = array_cast(std::move(it->second));
 		for( auto i = array0.begin(); i != array0.end(); ++i ) {
 
-			std::vector<ujson::value> array1 = array_cast(std::move(*i));
+			auto array1 = array_cast(std::move(*i));
 			auto j = array1.begin();
 
 			if( !j->is_number() ) {
@@ -125,7 +125,7 @@ namespace JsonIO {
 			throw std::invalid_argument("labels' with type string not found"); // T.B.D
 		}
 
-		std::vector<ujson::value> ary = array_cast(std::move(it->second));
+		auto ary = array_cast(std::move(it->second));
 		return std::move(ary);
 	}
 }
