@@ -1,10 +1,10 @@
-Algorithm_()
+Algorithm()
 cicada
-Learner_()
+Learner()
 Learning ...
-Datas_()
-TrainingDatas_()
-TrainingDatas_::read()
+Datas()
+TrainingDatas()
+TrainingDatas::read()
 Data_()
 BEGIN : data was created.
 0
@@ -14,11 +14,11 @@ S/E
 S/E
 1
 END : data was pushed.
-FeatureFunction_()
+FeatureFunction()
 Digit()
 Weights_()
 Labels_()
-Learner_::compute()
+Learner::compute()
 Z=4
 G(0)=1
 G(1)=0
@@ -1055,13 +1055,13 @@ x=[10](4.58646,-4.75508,-4.58646,4.75508,0.871163,3.7153,-1.03978,-3.54668,-0.16
 f= 4.832317e-06 |∇f|= 6.056128e-01
 Weights_::write()
 Weights_::writeJson()
-~Learner_()
-~Algorithm_()
-~TrainingDatas_()
-~Datas_()
+~Learner()
+~Algorithm()
+~TrainingDatas()
+~Datas()
 ~Data_()
 ~Weights_()
 ~Digit()
-~FeatureFunction_()
+~FeatureFunction()
 ~Labels_()
 OK
