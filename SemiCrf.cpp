@@ -104,7 +104,7 @@ namespace SemiCrf {
 		}
 	}
 
-	void Datas_::computeMeanLength()
+	void Datas::computeMeanLength()
 	{
 		for( auto& d : *this ) {
 			d->computeMeanLength(&count, &mean, &variance);
@@ -120,7 +120,7 @@ namespace SemiCrf {
 		}
 	}
 
-	void Datas_::readJson(std::istream& is)
+	void Datas::readJson(std::istream& is)
 	{
 		auto object = JsonIO::parse(is);
 		title = JsonIO::readString(object, "title");
@@ -186,23 +186,23 @@ namespace SemiCrf {
 
 	//// Datas ////
 
-	Datas_::Datas_()
+	Datas::Datas()
 		: xDim(0)
 		, yDim(0)
 		, maxLength(-std::numeric_limits<int>::max())
 		, feature("")
 		, title("")
 	{
-		Logger::debug() << "Datas_()";
+		Logger::debug() << "Datas()";
 	}
 
-	Datas_::~Datas_()
+	Datas::~Datas()
 	{
-		Logger::debug() << "~Datas_()";
+		Logger::debug() << "~Datas()";
 	}
 
-	void Datas_::writeJson(std::ostream& output) const {
-		Logger::debug() << "Datas_::writeJson()";
+	void Datas::writeJson(std::ostream& output) const {
+		Logger::debug() << "Datas::writeJson()";
 
 		ujson::array datas;
 		for( auto d : *this ) {
@@ -223,12 +223,12 @@ namespace SemiCrf {
 		output << to_string(object) << std::endl;
 	}
 
-	void Datas_::write(std::ostream& output)  const {
-		Logger::debug() << "Datas_::write()";
+	void Datas::write(std::ostream& output)  const {
+		Logger::debug() << "Datas::write()";
 		writeJson(output);
 	}
 
-	void Datas_::readJsonData(JsonIO::Object& object)
+	void Datas::readJsonData(JsonIO::Object& object)
 	{
 		auto it = find(object, "data");
 		if( it == object.end() || !it->second.is_array() ) {
@@ -248,14 +248,14 @@ namespace SemiCrf {
 		}
 	}
 
-	void Datas_::setMean(const std::map<int ,double>& arg) {
+	void Datas::setMean(const std::map<int ,double>& arg) {
 		mean = arg;
 		for( auto& d : *this ) {
 			d->setMeans(&mean);
 		}
 	}
 
-	void Datas_::setVariance(const std::map<int ,double>& arg) {
+	void Datas::setVariance(const std::map<int ,double>& arg) {
 		variance = arg;
 		for( auto& d : *this ) {
 			d->setVariancies(&variance);
@@ -264,17 +264,17 @@ namespace SemiCrf {
 
 	//// TrainingDatas ////
 
-	TrainingDatas_::TrainingDatas_()
+	TrainingDatas::TrainingDatas()
 	{
-		Logger::debug() << "TrainingDatas_()";
+		Logger::debug() << "TrainingDatas()";
 	}
 
-	TrainingDatas_::~TrainingDatas_()
+	TrainingDatas::~TrainingDatas()
 	{
-		Logger::debug() << "~TrainingDatas_()";
+		Logger::debug() << "~TrainingDatas()";
 	}
 
-	void TrainingDatas_::readJsonDataCore(ujson::value& value, Data data)
+	void TrainingDatas::readJsonDataCore(ujson::value& value, Data data)
 	{
 		Segment seg;
 		int counter = -1;
@@ -351,9 +351,9 @@ namespace SemiCrf {
 		}
 	}
 
-	void TrainingDatas_::read(std::istream& strm)
+	void TrainingDatas::read(std::istream& strm)
 	{
-		Logger::debug() << "TrainingDatas_::read()";
+		Logger::debug() << "TrainingDatas::read()";
 
 		readJson(strm);
 		if( empty() ) {
@@ -365,17 +365,17 @@ namespace SemiCrf {
 
 	//// PredictionDatas ////
 
-	PredictionDatas_::PredictionDatas_()
+	PredictionDatas::PredictionDatas()
 	{
-		Logger::debug() << "PredictionDatas_()";
+		Logger::debug() << "PredictionDatas()";
 	}
 
-	PredictionDatas_::~PredictionDatas_()
+	PredictionDatas::~PredictionDatas()
 	{
-		Logger::debug() << "~PredictionDatas_()";
+		Logger::debug() << "~PredictionDatas()";
 	}
 
-	void PredictionDatas_::readJsonDataCore(ujson::value& value, Data data)
+	void PredictionDatas::readJsonDataCore(ujson::value& value, Data data)
 	{
 		Segment seg;
 		int counter = -1;
@@ -403,9 +403,9 @@ namespace SemiCrf {
 		}
 	}
 
-	void PredictionDatas_::read(std::istream& strm)
+	void PredictionDatas::read(std::istream& strm)
 	{
-		Logger::debug() << "PredictionDatas_::read()";
+		Logger::debug() << "PredictionDatas::read()";
 
 		readJson(strm);
 		if( empty() ) {
@@ -504,16 +504,16 @@ namespace SemiCrf {
 		writeJson(ofs);
 	}
 
-	FeatureFunction_::FeatureFunction_()
+	FeatureFunction::FeatureFunction()
 		: xDim(-1)
 		, yDim(-1)
 	{
-		Logger::debug() << "FeatureFunction_()";
+		Logger::debug() << "FeatureFunction()";
 	}
 
-	FeatureFunction_::~FeatureFunction_()
+	FeatureFunction::~FeatureFunction()
 	{
-		Logger::debug() << "~FeatureFunction_()";
+		Logger::debug() << "~FeatureFunction()";
 	}
 
 	//// Algorithm ////
@@ -581,12 +581,12 @@ namespace SemiCrf {
 		method = arg;
 	}
 
-	void Algorithm::setDatas(Datas arg)
+	void Algorithm::setDatas(decltype(std::make_shared<Datas>()) arg)
 	{
 		datas = arg;
 	}
 
-	void Algorithm::setFeatureFunction(FeatureFunction arg)
+	void Algorithm::setFeatureFunction(decltype(std::make_shared<FeatureFunction>()) arg)
 	{
 		ff = arg;
 	}
@@ -647,7 +647,6 @@ namespace SemiCrf {
 
 	//// Learner ////
 
-	// Algorithm createLearner(int arg)
 	decltype( std::make_shared<Algorithm>() ) createLearner(int arg)
 	{
 		return std::make_shared<Learner>(arg);
@@ -1049,6 +1048,16 @@ namespace SemiCrf {
 	}
 
 	//// Likilihood ////
+
+	Likelihood::Likelihood(Learner* arg)
+		: learner(arg)
+		, L(0.0)
+	{
+	}
+
+	Likelihood::~Likelihood()
+	{
+	}
 
 	Optimizer::ObjectiveFunction createLikelihood(Learner* learner)
 	{

@@ -11,9 +11,9 @@ namespace App {
 
 	const int ZERO = 0;
 
-	SemiCrf::FeatureFunction createFeatureFunction(const std::string& feature, const std::string& w2vmat);
+	decltype( std::make_shared<SemiCrf::FeatureFunction>()) createFeatureFunction(const std::string& feature, const std::string& w2vmat);
 
-	class Digit : public SemiCrf::FeatureFunction_ {
+	class Digit : public SemiCrf::FeatureFunction {
 	public:
 		Digit();
 		virtual ~Digit();
@@ -23,7 +23,7 @@ namespace App {
 		virtual double wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i, SemiCrf::vector& gs);
 	};
 
-	class Jpn : public SemiCrf::FeatureFunction_ {
+	class Jpn : public SemiCrf::FeatureFunction {
 	public:
 		Jpn();
 		virtual ~Jpn();

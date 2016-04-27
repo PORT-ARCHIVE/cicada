@@ -129,19 +129,19 @@ decltype( std::make_shared<SemiCrf::Algorithm>() ) createAlgorithm(const Options
 {
 	std::string file;
 	decltype( std::make_shared<SemiCrf::Algorithm>() ) alg;
-	SemiCrf::Datas datas;
+	decltype( std::make_shared<SemiCrf::Datas>() ) datas;
 
 	if( !options.trainingDataFile.empty() ) {
 
 		file = options.trainingDataFile;
 		alg = SemiCrf::createLearner(options.flg);
-		datas = SemiCrf::Datas( new SemiCrf::TrainingDatas_() );
+		datas = std::make_shared<SemiCrf::TrainingDatas>();
 
 	} else if( !options.predictionDataFile.empty() ) {
 
 		file = options.predictionDataFile;
 		alg = SemiCrf::createPredictor(options.flg);
-		datas = SemiCrf::Datas( new SemiCrf::PredictionDatas_() );
+		datas = std::make_shared<SemiCrf::PredictionDatas>();
 
 	} else {
 		throw Error("no input file specified");

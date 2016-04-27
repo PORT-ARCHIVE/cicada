@@ -43,6 +43,7 @@ namespace SemiCrf {
 	// ラベル集合
 	class Labels_ : public std::vector<App::Label> {
 	public:
+
 		Labels_(int size = 0);
 		virtual ~Labels_();
 	};
@@ -53,6 +54,7 @@ namespace SemiCrf {
 	// セグメント 
 	class Segment_ {
 	public:
+
 		Segment_(int start_, int end_, App::Label label_)
 			: start(start_), end(end_), label(label_) {}
 		int getStart() const { return start; }
@@ -61,7 +63,9 @@ namespace SemiCrf {
 		void setEnd(int arg) { end = arg; }
 		App::Label getLabel() const { return label; } // const?
 		void setLabel(App::Label arg) { label = arg; }
+
 	private:
+
 		int start;
 		int end;
 		App::Label label;
@@ -82,18 +86,26 @@ namespace SemiCrf {
 	// データ
 	class Data_ {
 	public:
+
 		Data_();
 		virtual ~Data_();
+
 		virtual void writeJson(ujson::array& ary) const;
 		Strs getStrs() { return strs; }
 		Segments getSegments() { return segs; }
 		void setSegments(Segments arg) { segs = arg; }
-		void computeMeanLength( std::map<int, int>* count, std::map<int ,double>* mean, std::map<int ,double>* variance );
+		void computeMeanLength
+		( std::map<int, int>* count
+		  , std::map<int ,double>* mean
+		  , std::map<int ,double>* variance
+			);
 		double getMean(int lb) { return (*mean)[lb]; }
 		double getVariance(int lb) { return (*variance)[lb]; }
 		void setMeans(std::map<int ,double>* arg) { mean = arg; }
 		void setVariancies(std::map<int ,double>* arg) { variance = arg; }
+
 	protected:
+
 		Strs strs;
 		Segments segs;
 		std::map<int, int>* count;
@@ -104,10 +116,12 @@ namespace SemiCrf {
 	typedef std::shared_ptr<Data_> Data;
 
 	// データ集合
-	class Datas_ : public std::vector<Data> {
+	class Datas : public std::vector<Data> {
 	public:
-		Datas_();
-		virtual ~Datas_();
+
+		Datas();
+		virtual ~Datas();
+
 		virtual void read(std::istream& input) = 0;
 		virtual void readJson(std::istream& input);
 		virtual void write(std::ostream& output) const;
@@ -123,11 +137,15 @@ namespace SemiCrf {
 		void setVariance(const std::map<int ,double>& arg);
 		const std::map<int ,double>& getMean() { return mean; }
 		const std::map<int ,double>& getVariance() { return variance; }
+
 	protected:
+
 		virtual void readJsonData(JsonIO::Object& object);
 		virtual void readJsonDataCore(ujson::value& value, Data data) = 0;
 		virtual void computeMeanLength();
+
 	protected:
+
 		int xDim;
 		int yDim;
 		int maxLength;
@@ -139,37 +157,45 @@ namespace SemiCrf {
 		std::vector<ujson::value> labels;
 	};
 
-	typedef std::shared_ptr<Datas_> Datas;
-
 	// 教師データ集合
-	class TrainingDatas_ : public Datas_ {
+	class TrainingDatas : public Datas {
 	public:
-		TrainingDatas_();
-		virtual ~TrainingDatas_();
+
+		TrainingDatas();
+		virtual ~TrainingDatas();
+
 		virtual void read(std::istream& input);
+
 	protected:
+
 		virtual void readJsonDataCore(ujson::value& value, Data data);
 	};
 
-	Datas createTrainingDatas();
+	decltype( std::make_shared<Datas>() ) createTrainingDatas();
 
 	// 推論データ集合
-	class PredictionDatas_ : public Datas_ {
+	class PredictionDatas : public Datas {
 	public:
-		PredictionDatas_();
-		virtual ~PredictionDatas_();
+
+		PredictionDatas();
+		virtual ~PredictionDatas();
+
 		virtual void read(std::istream& input);
+
 	protected:
+
 		virtual void readJsonDataCore(ujson::value& value, Data data);
 	};
 
-	Datas createPredictionDatas();
+	decltype( std::make_shared<Datas>() ) createPredictionDatas();
   
 	// 重みベクトル
 	class Weights_ : public std::vector<double> {
 	public:
+
 		Weights_(int dim);
 		virtual ~Weights_();
+
 		void read(std::istream& ifs);
 		void readJson(std::istream& ifs);
 		void write(std::ostream& ofs);
@@ -186,7 +212,9 @@ namespace SemiCrf {
 		void setVariance(const std::map<int ,double>& arg) { variance = arg; }
 		const std::map<int ,double>& getMean() { return mean; }
 		const std::map<int ,double>& getVariance() { return variance; }
+
 	protected:
+
 		int xDim;
 		int yDim;
 		int maxLength;
@@ -199,11 +227,21 @@ namespace SemiCrf {
 	Weights createWeights(int dim = 0);
 
 	// 素性関数
-	class FeatureFunction_ {
+	class FeatureFunction {
 	public:
-		FeatureFunction_();
-		virtual ~FeatureFunction_();
-		virtual double wg(Weights w, App::Label y, App::Label yd, Data x, int j, int i, vector& gs) = 0;
+
+		FeatureFunction();
+		virtual ~FeatureFunction();
+
+		virtual double wg
+		( Weights w
+		  , App::Label y
+		  , App::Label yd
+		  , Data x
+		  , int j
+		  , int i
+		  , vector& gs
+			) = 0;
 		virtual void read() = 0;
 		virtual void write() = 0;
 		virtual void setXDim(int arg) { xDim = arg; }
@@ -212,15 +250,16 @@ namespace SemiCrf {
 		int getMaxLength() { return maxLength; }
 		void setMaxLength(int arg) { maxLength = arg; }
 		const std::string& getFeature() { return feature; };
+
 	protected:
+
 		int xDim;
 		int yDim;
 		int maxLength;
 		std::string feature;
 	};
 
-	typedef std::shared_ptr<FeatureFunction_> FeatureFunction;
-	FeatureFunction createFeatureFunction();
+	decltype( std::make_shared<FeatureFunction>() ) createFeatureFunction();
 
 	// チェックテーブル
 	typedef std::tuple<bool,double,int,App::Label> CheckTuple;
@@ -244,8 +283,10 @@ namespace SemiCrf {
 	// 抽象アルゴリズム
 	class Algorithm {
 	public:
+
 		Algorithm(int arg);
 		virtual ~Algorithm();
+
 		virtual void setLabels(Labels arg);
 		virtual void setMaxLength(int arg);
 		virtual void setMaxIteration(int arg);
@@ -253,26 +294,40 @@ namespace SemiCrf {
 		virtual void setE1(double arg);
 		virtual void setRp(double arg);
 		virtual void setMethod(const std::string& arg);
-		virtual void setDatas(Datas arg);
-		virtual void setFeatureFunction(FeatureFunction arg);
+		virtual void setDatas(decltype(std::make_shared<Datas>()) arg);
+		virtual void setFeatureFunction(decltype(std::make_shared<FeatureFunction>()) arg);
 		virtual void setWeights(Weights arg);
 		virtual void setDimension(int arg);
 		virtual void compute() = 0;
-		virtual void preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile) = 0;
+		virtual void preProcess
+		( const std::string& wfile
+		  , const std::string& w0file
+		  , const std::string& w2vfile
+			) = 0;
 		virtual void postProcess(const std::string& wfile) = 0;
 		void setFlg(int flg);
 		void setCacheSize(int size) { cacheSize = size; }
+
 	protected:
-		double computeWG(App::Label y, App::Label yd, int i, int d, vector& gs);
+
+		double computeWG
+		( App::Label y
+		  , App::Label yd
+		  , int i
+		  , int d
+		  , vector& gs
+			);
 		void clearWGCache();
+
 	protected:
+
 		int dim;
 		int y2xDim;
 		int y2yDim;
 		Labels labels;
-		FeatureFunction ff;
+		decltype( std::make_shared<FeatureFunction>() ) ff;
 		Weights weights;
-		Datas datas;
+		decltype( std::make_shared<Datas>() ) datas;
 		int maxLength; // 最大セグメント長
 		int maxIteration;
 		double e0;
@@ -293,13 +348,22 @@ namespace SemiCrf {
 	// 学習器
 	class Learner : public Algorithm {
 	public:
+
 		friend class Likelihood;
+
 		Learner(int arg);
 		virtual ~Learner();
+
 		virtual void compute();
-		virtual void preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile);
+		virtual void preProcess
+		( const std::string& wfile
+		  , const std::string& w0file
+		  , const std::string& w2vfile
+			);
 		virtual void postProcess(const std::string& wfile);
+
 	private:
+
 		void computeGrad(double& L, std::vector<double>& dL, bool grad=true);
 		double computeZ();
 		std::vector<double> computeG(double& WG);
@@ -314,11 +378,10 @@ namespace SemiCrf {
 	// 尤度関数
 	class Likelihood : public Optimizer::ObjectiveFunction_ {
 	public:
-		Likelihood(Learner* arg)
-			: learner(arg)
-			, L(0.0)
-			{};
-		virtual ~Likelihood(){};
+
+		Likelihood(Learner* arg);
+		virtual ~Likelihood();
+
 		virtual double value(Optimizer::vector& x);
 		virtual double savedValue();
 		virtual Optimizer::vector grad(Optimizer::vector& x);
@@ -327,7 +390,9 @@ namespace SemiCrf {
 		virtual void afterUpdateXProcess(Optimizer::vector& x);
 		virtual void endLoopProcess(Optimizer::vector& x);
 		virtual void postProcess(Optimizer::vector& x);
+
 	private:
+
 		Learner* learner;
 		double L;
 	};
@@ -337,12 +402,20 @@ namespace SemiCrf {
 	// 推論器
 	class Predictor : public Algorithm {
 	public:
+
 		Predictor(int arg);
 		virtual ~Predictor();
+
 		virtual void compute();
-		virtual void preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile);
+		virtual void preProcess
+		( const std::string& wfile
+		  , const std::string& w0file
+		  , const std::string& w2vfile
+			);
 		virtual void postProcess(const std::string& wfile);
+
 	private:
+
 		double V(int i, App::Label y, int& maxd);
 		void backtrack(App::Label maxy, int maxd);
 		void printV();

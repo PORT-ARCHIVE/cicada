@@ -13,9 +13,10 @@ namespace App {
 
     typedef boost::numeric::ublas::vector<double> vector;
 
-	SemiCrf::FeatureFunction createFeatureFunction(const std::string& feature, const std::string& w2vmat)
+	decltype( std::make_shared<SemiCrf::FeatureFunction>() )
+	createFeatureFunction(const std::string& feature, const std::string& w2vmat)
 	{
-		SemiCrf::FeatureFunction ff;
+		decltype( std::make_shared<SemiCrf::FeatureFunction>() ) ff;
 
 		if( feature == "DIGIT" || feature.empty() ) {
 
@@ -52,7 +53,8 @@ namespace App {
 		return ( static_cast<Label>(val) );
 	}
 
-	std::string label2String(Label label) {
+	std::string label2String(Label label)
+	{
 		std::string str;
 		try {
 			str = boost::lexical_cast<std::string>(label);
@@ -90,7 +92,15 @@ namespace App {
 		Logger::debug() << "Digit::write()";
 	}
 
-	double Digit::wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i, SemiCrf::vector& gs)
+	double Digit::wg
+	( SemiCrf::Weights ws
+	  , Label y
+	  , Label yd
+	  , SemiCrf::Data x
+	  , int j
+	  , int i
+	  , SemiCrf::vector& gs
+		)
 	{
 		assert(0 < xDim);
 		assert(0 < yDim);
@@ -183,7 +193,15 @@ namespace App {
 		Logger::debug() << "Jpn::write()";
 	}
 
-	double Jpn::wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i, SemiCrf::vector& gs)
+	double Jpn::wg
+	( SemiCrf::Weights ws
+	  , Label y
+	  , Label yd
+	  , SemiCrf::Data x
+	  , int j
+	  , int i
+	  , SemiCrf::vector& gs
+		)
 	{
 		assert(0 < xDim);
 		assert(0 < yDim);
