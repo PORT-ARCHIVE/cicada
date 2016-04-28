@@ -117,7 +117,7 @@ namespace App {
 
 			// y2x
 			int d = i - j + 1;
-			for( int l = 0; l < d; l++ ) { 
+			for( int l = 0; l < d; l++ ) {
 
 				auto str = x.getStrs()->at(j+l).at(0);
 				int xval = boost::lexical_cast<int>(str);

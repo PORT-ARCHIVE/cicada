@@ -221,7 +221,6 @@ namespace SemiCrf {
 		auto getFeature() -> decltype((feature)) { return feature; }
 	};
 
-	// using Weights = std::shared_ptr<Weights_>;
 	decltype(std::shared_ptr<Weights>()) createWeights(int dim = 0);
 
 	// 素性関数
@@ -408,7 +407,7 @@ namespace SemiCrf {
 
 		virtual void compute();
 		virtual void preProcess
-		(   const std::string& wfile
+		( const std::string& wfile
 		  , const std::string& w0file
 		  , const std::string& w2vfile
 			);
