@@ -48,12 +48,10 @@ namespace SemiCrf {
 		virtual ~Labels();
 	};
 
-	// using Labels = std::shared_ptr<Labels_>;
-	//Labels createLabels(int size);
 	decltype( std::make_shared<Labels>() ) createLabels(int size);
 
 	// セグメント 
-	class Segment_ {
+	class Segment {
 	private:
 
 		int start;
@@ -62,9 +60,9 @@ namespace SemiCrf {
 
 	public:
 
-		Segment_(int start_, int end_, App::Label label_)
+		Segment(int start_, int end_, App::Label label_)
 			: start(start_), end(end_), label(label_) {}
-		virtual ~Segment_(){}
+		virtual ~Segment(){}
 
 		void setStart(int arg) { start = arg; }
 		void setEnd(int arg) { end = arg; }
@@ -74,13 +72,11 @@ namespace SemiCrf {
 		auto getLabel() -> decltype( label ) const { return label; } // const?
 	};
 
-	using Segment = std::shared_ptr<Segment_>;
-	Segment createSegment(int start, int end, App::Label label);
+	decltype(std::make_shared<Segment>()) createSegment(int start, int end, App::Label label);
 
 	// セグメント集合
-	class Segments_ : public std::vector<Segment> {};
-	using Segments = std::shared_ptr<Segments_> ;
-	Segments createSegments();
+	class Segments : public std::vector<decltype(std::make_shared<Segment>())> {};
+	decltype(std::make_shared<Segments>()) createSegments();
 
 	// 文字列集合
 	class Strs_ : public std::vector<std::vector<std::string>> {};
@@ -91,7 +87,7 @@ namespace SemiCrf {
 	protected:
 
 		Strs strs;
-		Segments segs;
+		decltype(std::make_shared<Segments>()) segs;
 		std::map<int,int>* count;
 		std::map<int,double>* mean;
 		std::map<int,double>* variance;
@@ -107,7 +103,7 @@ namespace SemiCrf {
 		auto getSegments() -> decltype(segs) { return segs; }
 		auto getMean(int lb) -> decltype((*mean)[lb]) { return (*mean)[lb]; }
 		auto getVariance(int lb) -> decltype((*variance)[lb]) { return (*variance)[lb]; }
-		void setSegments(Segments arg) { segs = arg; }
+		void setSegments(decltype(segs) arg) { segs = arg; }
 		void setMeans(std::map<int,double>* arg) { mean = arg; }
 		void setVariancies(std::map<int,double>* arg) { variance = arg; }
 		void computeMeanLength

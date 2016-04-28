@@ -17,7 +17,7 @@ END : data was pushed.
 FeatureFunction()
 Digit()
 Weights_()
-Labels_()
+Labels()
 Learner::compute()
 Z=4
 G(0)=1
@@ -1063,5 +1063,5 @@ Weights_::writeJson()
 ~Digit()
 ~FeatureFunction()
 ~Weights_()
-~Labels_()
+~Labels()
 OK

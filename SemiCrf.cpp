@@ -26,19 +26,19 @@ namespace SemiCrf {
 
 	//// Factories ////
 
-	decltype( std::make_shared<Labels>() ) createLabels(int size)
+	decltype(std::make_shared<Labels>()) createLabels(int size)
 	{
 		return std::make_shared<Labels>(size);
 	}
 
-	Segment createSegment(int start, int end, App::Label label)
+	decltype(std::make_shared<Segment>()) createSegment(int start, int end, App::Label label)
 	{
-		return std::make_shared<Segment_>(start, end, label);
+		return std::make_shared<Segment>(start, end, label);
 	}
 
-	Segments createSegments()
+	decltype(std::make_shared<Segments>()) createSegments()
 	{
-		return std::make_shared<Segments_>();
+		return std::make_shared<Segments>();
 	}
 
 	CheckTable createCheckTable(int capacity)
@@ -75,7 +75,7 @@ namespace SemiCrf {
 
 	Data_::Data_()
 		: strs( std::make_shared<Strs_>() )
-		, segs( std::make_shared<Segments_>() )
+		, segs( std::make_shared<Segments>() )
 	{
 		Logger::debug() << "Data_()";
 	}
@@ -276,7 +276,7 @@ namespace SemiCrf {
 
 	void TrainingDatas::readJsonDataCore(ujson::value& value, Data data)
 	{
-		Segment seg;
+		decltype(std::make_shared<Segment>()) seg;
 		int counter = -1;
 		int seg_start = -1;
 
@@ -377,7 +377,7 @@ namespace SemiCrf {
 
 	void PredictionDatas::readJsonDataCore(ujson::value& value, Data data)
 	{
-		Segment seg;
+		decltype(std::make_shared<Segment>()) seg;
 		int counter = -1;
 		int seg_start = -1;
 
@@ -1338,11 +1338,11 @@ namespace SemiCrf {
 		maxd = std::get<2>(tp0);
 		auto maxyd = std::get<3>(tp0);
 
-		std::list<Segment> ls;
+		std::list<decltype(std::make_shared<Segment>())> ls;
 
 		while(1) {
 
-			Segment seg = createSegment(i-maxd+1, i, maxy);
+			auto seg = createSegment(i-maxd+1, i, maxy);
 			ls.push_front(seg);
 
 			i -= maxd;
