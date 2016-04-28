@@ -90,7 +90,7 @@ namespace App {
 	}
 
 	double Digit::wg
-	( Weights ws
+	( Weights& ws
 	  , Label y
 	  , Label yd
 	  , Data& x
@@ -142,7 +142,7 @@ namespace App {
 			fvec(dim1+yval) = f;
 
 			int k = 0;
-			for( auto w : *ws ) {
+			for( auto w : ws ) {
 				gs(k) = fvec(k);
 				v += w*fvec(k++);
 			}
@@ -191,7 +191,7 @@ namespace App {
 	}
 
 	double Jpn::wg
-	( Weights ws
+	( Weights& ws
 	  , Label y
 	  , Label yd
 	  , Data& x
@@ -235,7 +235,7 @@ namespace App {
 			fvec(dim1+yval*maxLength+(d-1)) = 1.0;
 
 			k = 0;
-			for( auto w : *ws ) {
+			for( auto w : ws ) {
 				gs(k) = fvec(k);
 				v += w*fvec(k++);
 			}

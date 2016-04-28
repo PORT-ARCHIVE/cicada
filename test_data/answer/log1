@@ -16,7 +16,7 @@ S/E
 END : data was pushed.
 FeatureFunction()
 Digit()
-Weights_()
+Weights()
 Labels()
 Learner::compute()
 Z=4
@@ -1053,8 +1053,8 @@ alpha=1
 dx=[10](0.246366,-0.249235,-0.246366,0.249235,0.0414699,0.204896,-0.0443382,-0.202028,-0.00286822,0.00286822)
 x=[10](4.58646,-4.75508,-4.58646,4.75508,0.871163,3.7153,-1.03978,-3.54668,-0.168619,0.168619)
 f= 4.832317e-06 |∇f|= 6.056128e-01
-Weights_::write()
-Weights_::writeJson()
+Weights::write()
+Weights::writeJson()
 ~Learner()
 ~Algorithm()
 ~TrainingDatas()
@@ -1062,6 +1062,6 @@ Weights_::writeJson()
 ~Data()
 ~Digit()
 ~FeatureFunction()
-~Weights_()
+~Weights()
 ~Labels()
 OK

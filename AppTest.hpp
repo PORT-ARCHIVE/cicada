@@ -26,7 +26,7 @@ namespace App {
 		virtual int getDim();
 		virtual void read();
 		virtual void write();
-		virtual double wg(Weights ws, Label y, Label yd, Data& x, int j, int i, uvector& gs);
+		virtual double wg(Weights& ws, Label y, Label yd, Data& x, int j, int i, uvector& gs);
 	};
 
 	class Jpn : public FeatureFunction {
@@ -37,7 +37,7 @@ namespace App {
 		virtual void setXDim(int arg);
 		virtual void read();
 		virtual void write();
-		virtual double wg(Weights ws, Label y, Label yd, Data& x, int j, int i, uvector& gs);
+		virtual double wg(Weights& ws, Label y, Label yd, Data& x, int j, int i, uvector& gs);
 		void setMatrix(W2V::Matrix m) { w2vmat = m; }
 	private:
 		W2V::Matrix w2vmat;

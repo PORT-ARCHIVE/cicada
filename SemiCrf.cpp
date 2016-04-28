@@ -415,27 +415,27 @@ namespace SemiCrf {
 
 	//// Weights ////
 
-	Weights createWeights(int dim)
+	decltype(std::shared_ptr<Weights>()) createWeights(int dim)
 	{
-		return std::make_shared<Weights_>(dim);
+		return std::make_shared<Weights>(dim);
 	}
 
-	Weights_::Weights_(int dim)
+	Weights::Weights(int dim)
 		: std::vector<double>(dim)
 		, xDim(-1)
 		, yDim(-1)
 		, maxLength(-1)
 		, feature("")
 	{
-		Logger::debug() << "Weights_()";
+		Logger::debug() << "Weights()";
 	}
 
-	Weights_::~Weights_()
+	Weights::~Weights()
 	{
-		Logger::debug() << "~Weights_()";
+		Logger::debug() << "~Weights()";
 	}
 
-	void Weights_::readJson(std::istream& is)
+	void Weights::readJson(std::istream& is)
 	{
 		auto object = JsonIO::parse(is);
 		auto title = JsonIO::readString(object, "title");
@@ -450,9 +450,9 @@ namespace SemiCrf {
 		for( auto w : weight ) push_back(w);
 	}
 
-	void Weights_::read(std::istream& ifs)
+	void Weights::read(std::istream& ifs)
 	{
-		Logger::debug() << "Weights_::read()";
+		Logger::debug() << "Weights::read()";
 
 		readJson(ifs);
 		if( empty() ) {
@@ -460,9 +460,9 @@ namespace SemiCrf {
 		}
 	}
 
-	void Weights_::writeJson(std::ostream& ofs)
+	void Weights::writeJson(std::ostream& ofs)
 	{
-		Logger::debug() << "Weights_::writeJson()";
+		Logger::debug() << "Weights::writeJson()";
 
 		ujson::array jweights;
 		for( auto& w : *this ) {
@@ -498,9 +498,9 @@ namespace SemiCrf {
 		ofs << to_string(object) << std::endl;
 	}
 
-	void Weights_::write(std::ostream& ofs)
+	void Weights::write(std::ostream& ofs)
 	{
-		Logger::debug() << "Weights_::write()";
+		Logger::debug() << "Weights::write()";
 		writeJson(ofs);
 	}
 
@@ -591,7 +591,7 @@ namespace SemiCrf {
 		ff = arg;
 	}
 
-	void Algorithm::setWeights(Weights arg)
+	void Algorithm::setWeights(decltype(weights) arg)
 	{
 		weights = arg;
 	}
@@ -620,7 +620,7 @@ namespace SemiCrf {
 
 			} else {
 
-				v = ff->wg(weights, y, yd, *current_data, i-d+1, i, gs);
+				v = ff->wg(*weights, y, yd, *current_data, i-d+1, i, gs);
 				std::get<0>(tp) = idx;
 				std::get<1>(tp) = v;
 				std::get<2>(tp) = std::make_shared<uvector>(gs); // gsをコピーしてshared_ptrを作る
@@ -628,7 +628,7 @@ namespace SemiCrf {
 
 		} else {
 
-			v = ff->wg(weights, y, yd, *current_data, i-d+1, i, gs);
+			v = ff->wg(*weights, y, yd, *current_data, i-d+1, i, gs);
 
 		}
 

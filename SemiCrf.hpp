@@ -188,7 +188,7 @@ namespace SemiCrf {
 	decltype( std::make_shared<Datas>() ) createPredictionDatas();
   
 	// 重みベクトル
-	class Weights_ : public std::vector<double> {
+	class Weights : public std::vector<double> {
 	protected:
 
 		int xDim;
@@ -200,8 +200,8 @@ namespace SemiCrf {
 
 	public:
 
-		Weights_(int dim);
-		virtual ~Weights_();
+		Weights(int dim);
+		virtual ~Weights();
 
 		void read(std::istream& is);
 		void readJson(std::istream& is);
@@ -221,8 +221,8 @@ namespace SemiCrf {
 		auto getFeature() -> decltype((feature)) { return feature; }
 	};
 
-	using Weights = std::shared_ptr<Weights_>;
-	Weights createWeights(int dim = 0);
+	// using Weights = std::shared_ptr<Weights_>;
+	decltype(std::shared_ptr<Weights>()) createWeights(int dim = 0);
 
 	// 素性関数
 	class FeatureFunction {
@@ -243,7 +243,7 @@ namespace SemiCrf {
 		virtual void setXDim(int arg) { xDim = arg; }
 		virtual int getDim() = 0;
 		virtual double wg
-		( Weights w
+		( Weights& w
 		  , App::Label y
 		  , App::Label yd
 		  , Data& x
@@ -292,7 +292,7 @@ namespace SemiCrf {
 		double e1;
 		double rp;
 		decltype( std::make_shared<Labels>() ) labels;
-		Weights weights;
+		decltype( std::shared_ptr<Weights>() ) weights;
 		decltype( std::make_shared<FeatureFunction>() ) ff;
 		decltype( std::make_shared<Datas>() ) datas;
 		decltype( std::make_shared<Data>() ) current_data;
@@ -320,7 +320,7 @@ namespace SemiCrf {
 		virtual void setMethod(const std::string& arg);
 		virtual void setDatas(decltype(datas) arg);
 		virtual void setFeatureFunction(decltype(ff) arg);
-		virtual void setWeights(Weights arg);
+		virtual void setWeights(decltype(weights) arg);
 		virtual void setDimension(int arg);
 		virtual void compute() = 0;
 		virtual void preProcess
