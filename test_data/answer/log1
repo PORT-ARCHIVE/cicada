@@ -5,7 +5,7 @@ Learning ...
 Datas()
 TrainingDatas()
 TrainingDatas::read()
-Data_()
+Data()
 BEGIN : data was created.
 0
 S/E
@@ -1059,7 +1059,7 @@ Weights_::writeJson()
 ~Algorithm()
 ~TrainingDatas()
 ~Datas()
-~Data_()
+~Data()
 ~Digit()
 ~FeatureFunction()
 ~Weights_()

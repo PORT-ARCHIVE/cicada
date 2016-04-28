@@ -93,7 +93,7 @@ namespace App {
 	( Weights ws
 	  , Label y
 	  , Label yd
-	  , Data x
+	  , Data& x
 	  , int j
 	  , int i
 	  , uvector& gs
@@ -119,7 +119,7 @@ namespace App {
 			int d = i - j + 1;
 			for( int l = 0; l < d; l++ ) { 
 
-				auto str = x->getStrs()->at(j+l).at(0);
+				auto str = x.getStrs()->at(j+l).at(0);
 				int xval = boost::lexical_cast<int>(str);
 				fvec(yval*xDim+xval) += 1.0;
 			}
@@ -128,8 +128,8 @@ namespace App {
 			fvec(dim0+ydval*yDim+yval) = 1.0;
 
             // y2l
-			auto m = x->getMean(static_cast<int>(y));
-			auto s = x->getVariance(static_cast<int>(y));
+			auto m = x.getMean(static_cast<int>(y));
+			auto s = x.getVariance(static_cast<int>(y));
 			const double eps = 1.0e-5;
 			double f = 0.0;
 			if( eps < s ) {
@@ -194,7 +194,7 @@ namespace App {
 	( Weights ws
 	  , Label y
 	  , Label yd
-	  , Data x
+	  , Data& x
 	  , int j
 	  , int i
 	  , uvector& gs
@@ -219,7 +219,7 @@ namespace App {
 			// y2x
 			for( l = 0; l < d; l++ ) {
 
-				auto str = x->getStrs()->at(j+l).at(0);
+				auto str = x.getStrs()->at(j+l).at(0);
 				long long xval = boost::lexical_cast<long long>(str);
 				const auto& wvec = w2vmat->i2v(xval);
 

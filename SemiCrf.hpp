@@ -82,7 +82,7 @@ namespace SemiCrf {
 	class Strs : public std::vector<std::vector<std::string>> {};
 
 	// データ
-	class Data_ {
+	class Data {
 	protected:
 
 		decltype(std::make_shared<Strs>()) strs;
@@ -93,8 +93,8 @@ namespace SemiCrf {
 
 	public:
 
-		Data_();
-		virtual ~Data_();
+		Data();
+		virtual ~Data();
 
 		virtual void writeJson(ujson::array& ary) const;
 
@@ -106,16 +106,14 @@ namespace SemiCrf {
 		void setMeans(std::map<int,double>* arg) { mean = arg; }
 		void setVariancies(std::map<int,double>* arg) { variance = arg; }
 		void computeMeanLength
-		(   std::map<int,int>* count
+		( std::map<int,int>* count
 		  , std::map<int,double>* mean
 		  , std::map<int,double>* variance
 			);
 	};
 	
-	using Data = std::shared_ptr<Data_>;
-
 	// データ集合
-	class Datas : public std::vector<Data> {
+	class Datas : public std::vector<std::shared_ptr<Data>> {
 	protected:
 
 		int xDim;
@@ -153,7 +151,7 @@ namespace SemiCrf {
 	protected:
 
 		virtual void readJsonData(JsonIO::Object& object);
-		virtual void readJsonDataCore(ujson::value& value, Data data) = 0;
+		virtual void readJsonDataCore(ujson::value& value, Data& data) = 0;
 		virtual void computeMeanLength();
 	};
 
@@ -168,7 +166,7 @@ namespace SemiCrf {
 
 	protected:
 
-		virtual void readJsonDataCore(ujson::value& value, Data data);
+		virtual void readJsonDataCore(ujson::value& value, Data& data);
 	};
 
 	decltype( std::make_shared<Datas>() ) createTrainingDatas();
@@ -184,7 +182,7 @@ namespace SemiCrf {
 
 	protected:
 
-		virtual void readJsonDataCore(ujson::value& value, Data data);
+		virtual void readJsonDataCore(ujson::value& value, Data& data);
 	};
 
 	decltype( std::make_shared<Datas>() ) createPredictionDatas();
@@ -248,7 +246,7 @@ namespace SemiCrf {
 		( Weights w
 		  , App::Label y
 		  , App::Label yd
-		  , Data x
+		  , Data& x
 		  , int j
 		  , int i
 		  , uvector& gs
@@ -288,16 +286,16 @@ namespace SemiCrf {
 		int dim;
 		int y2xDim;
 		int y2yDim;
-		decltype( std::make_shared<Labels>() ) labels;
-		Weights weights;
-		decltype( std::make_shared<FeatureFunction>() ) ff;
-		decltype( std::make_shared<Datas>() ) datas;
 		int maxLength; // 最大セグメント長
 		int maxIteration;
 		double e0;
 		double e1;
 		double rp;
-		Data current_data;
+		decltype( std::make_shared<Labels>() ) labels;
+		Weights weights;
+		decltype( std::make_shared<FeatureFunction>() ) ff;
+		decltype( std::make_shared<Datas>() ) datas;
+		decltype( std::make_shared<Data>() ) current_data;
 		CheckTable current_vctab;
 		CheckTable current_actab;
 		CheckTable current_ectab;
@@ -326,7 +324,7 @@ namespace SemiCrf {
 		virtual void setDimension(int arg);
 		virtual void compute() = 0;
 		virtual void preProcess
-		(   const std::string& wfile
+		( const std::string& wfile
 		  , const std::string& w0file
 		  , const std::string& w2vfile
 			) = 0;
@@ -358,7 +356,7 @@ namespace SemiCrf {
 
 		virtual void compute();
 		virtual void preProcess
-		(   const std::string& wfile
+		( const std::string& wfile
 		  , const std::string& w0file
 		  , const std::string& w2vfile
 			);

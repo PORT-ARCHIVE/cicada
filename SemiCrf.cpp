@@ -73,19 +73,19 @@ namespace SemiCrf {
 
 	//// Data ////
 
-	Data_::Data_()
+	Data::Data()
 		: strs( std::make_shared<Strs>() )
 		, segs( std::make_shared<Segments>() )
 	{
-		Logger::debug() << "Data_()";
+		Logger::debug() << "Data()";
 	}
 
-	Data_::~Data_()
+	Data::~Data()
 	{
-		Logger::debug() << "~Data_()";
+		Logger::debug() << "~Data()";
 	}
 
-	void Data_::computeMeanLength(
+	void Data::computeMeanLength(
 		std::map<int, int>* count_,
 		std::map<int ,double>* mean_,
 		std::map<int ,double>* variance_
@@ -138,9 +138,9 @@ namespace SemiCrf {
 		readJsonData(object);
 	}
 
-	void Data_::writeJson(ujson::array& ary0) const
+	void Data::writeJson(ujson::array& ary0) const
 	{
-		Logger::debug() << "Data_::writeJson()";
+		Logger::debug() << "Data::writeJson()";
 
 		ujson::array ary1;
 
@@ -242,8 +242,8 @@ namespace SemiCrf {
 				throw std::invalid_argument("invalid data format");
 			}
 
-			Data data = std::make_shared<Data_>(); Logger::debug() << "BEGIN : data was created.";
-			readJsonDataCore(i, data);
+			auto data = std::make_shared<Data>(); Logger::debug() << "BEGIN : data was created.";
+			readJsonDataCore(i, *data);
 			push_back(std::move(data)); Logger::debug() << "END : data was pushed.";
 		}
 	}
@@ -274,7 +274,7 @@ namespace SemiCrf {
 		Logger::debug() << "~TrainingDatas()";
 	}
 
-	void TrainingDatas::readJsonDataCore(ujson::value& value, Data data)
+	void TrainingDatas::readJsonDataCore(ujson::value& value, Data& data)
 	{
 		decltype(std::make_shared<Segment>()) seg;
 		int counter = -1;
@@ -298,7 +298,7 @@ namespace SemiCrf {
 			auto word = string_cast(std::move(*k)); Logger::debug() << word;
 			std::vector<std::string> vs;
 			vs.push_back(std::move(word));
-			data->getStrs()->push_back(std::move(vs));
+			data.getStrs()->push_back(std::move(vs));
 
 			k++;
 			if( !k->is_string() ) {
@@ -318,7 +318,7 @@ namespace SemiCrf {
 			if( descriptor == "N" ) {
 
 				seg = createSegment(counter, counter, lb);
-				data->getSegments()->push_back(seg);
+				data.getSegments()->push_back(seg);
 
 			} else if( descriptor == "S" ) {
 
@@ -331,7 +331,7 @@ namespace SemiCrf {
 			} else if( descriptor == "E" ) {
 
 				seg	= createSegment(seg_start, counter, lb);
-				data->getSegments()->push_back(seg);
+				data.getSegments()->push_back(seg);
 				int length = counter - seg_start + 1;
 				if( maxLength < length ) {
 					maxLength = length;
@@ -340,7 +340,7 @@ namespace SemiCrf {
 			} else if( descriptor == "S/E" ) {
 
 				seg	= createSegment(counter, counter, lb);
-				data->getSegments()->push_back(seg);
+				data.getSegments()->push_back(seg);
 				if( maxLength < 1 ) {
 					maxLength = 1;
 				}
@@ -375,7 +375,7 @@ namespace SemiCrf {
 		Logger::debug() << "~PredictionDatas()";
 	}
 
-	void PredictionDatas::readJsonDataCore(ujson::value& value, Data data)
+	void PredictionDatas::readJsonDataCore(ujson::value& value, Data& data)
 	{
 		decltype(std::make_shared<Segment>()) seg;
 		int counter = -1;
@@ -399,7 +399,7 @@ namespace SemiCrf {
 			auto word = string_cast(std::move(*k)); Logger::debug() << word;
 			std::vector<std::string> vs;
 			vs.push_back(std::move(word));
-			data->getStrs()->push_back(std::move(vs));
+			data.getStrs()->push_back(std::move(vs));
 		}
 	}
 
@@ -620,7 +620,7 @@ namespace SemiCrf {
 
 			} else {
 
-				v = ff->wg(weights, y, yd, current_data, i-d+1, i, gs);
+				v = ff->wg(weights, y, yd, *current_data, i-d+1, i, gs);
 				std::get<0>(tp) = idx;
 				std::get<1>(tp) = v;
 				std::get<2>(tp) = std::make_shared<uvector>(gs); // gsをコピーしてshared_ptrを作る
@@ -628,7 +628,7 @@ namespace SemiCrf {
 
 		} else {
 
-			v = ff->wg(weights, y, yd, current_data, i-d+1, i, gs);
+			v = ff->wg(weights, y, yd, *current_data, i-d+1, i, gs);
 
 		}
 
