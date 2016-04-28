@@ -53,22 +53,24 @@ namespace SemiCrf {
 
 	// セグメント 
 	class Segment_ {
-	public:
-
-		Segment_(int start_, int end_, App::Label label_)
-			: start(start_), end(end_), label(label_) {}
-		int getStart() const { return start; }
-		void setStart(int arg) { start = arg; }
-		int getEnd() const { return end; }
-		void setEnd(int arg) { end = arg; }
-		App::Label getLabel() const { return label; } // const?
-		void setLabel(App::Label arg) { label = arg; }
-
 	private:
 
 		int start;
 		int end;
 		App::Label label;
+
+	public:
+
+		Segment_(int start_, int end_, App::Label label_)
+			: start(start_), end(end_), label(label_) {}
+		virtual ~Segment_(){}
+
+		void setStart(int arg) { start = arg; }
+		void setEnd(int arg) { end = arg; }
+		void setLabel(App::Label arg) { label = arg; }
+		int getStart() const { return start; }
+		int getEnd() const { return end; }
+		auto getLabel() -> decltype( label ) const { return label; } // const?
 	};
 
 	typedef std::shared_ptr<Segment_> Segment;
@@ -85,25 +87,6 @@ namespace SemiCrf {
 
 	// データ
 	class Data_ {
-	public:
-
-		Data_();
-		virtual ~Data_();
-
-		virtual void writeJson(ujson::array& ary) const;
-		Strs getStrs() { return strs; }
-		Segments getSegments() { return segs; }
-		void setSegments(Segments arg) { segs = arg; }
-		void computeMeanLength
-		( std::map<int,int>* count
-		  , std::map<int,double>* mean
-		  , std::map<int,double>* variance
-			);
-		double getMean(int lb) { return (*mean)[lb]; }
-		double getVariance(int lb) { return (*variance)[lb]; }
-		void setMeans(std::map<int,double>* arg) { mean = arg; }
-		void setVariancies(std::map<int,double>* arg) { variance = arg; }
-
 	protected:
 
 		Strs strs;
@@ -111,39 +94,32 @@ namespace SemiCrf {
 		std::map<int,int>* count;
 		std::map<int,double>* mean;
 		std::map<int,double>* variance;
+
+	public:
+
+		Data_();
+		virtual ~Data_();
+
+		virtual void writeJson(ujson::array& ary) const;
+
+		auto getStrs() -> decltype(strs) { return strs; }
+		auto getSegments() -> decltype(segs) { return segs; }
+		auto getMean(int lb) -> decltype((*mean)[lb]) { return (*mean)[lb]; }
+		auto getVariance(int lb) -> decltype((*variance)[lb]) { return (*variance)[lb]; }
+		void setSegments(Segments arg) { segs = arg; }
+		void setMeans(std::map<int,double>* arg) { mean = arg; }
+		void setVariancies(std::map<int,double>* arg) { variance = arg; }
+		void computeMeanLength
+		(   std::map<int,int>* count
+		  , std::map<int,double>* mean
+		  , std::map<int,double>* variance
+			);
 	};
 	
 	typedef std::shared_ptr<Data_> Data;
 
 	// データ集合
 	class Datas : public std::vector<Data> {
-	public:
-
-		Datas();
-		virtual ~Datas();
-
-		virtual void read(std::istream& input) = 0;
-		virtual void readJson(std::istream& input);
-		virtual void write(std::ostream& output) const;
-		virtual void writeJson(std::ostream& output) const;
-		virtual int getXDim() { return xDim; }
-		virtual int getYDim() { return yDim; }
-		virtual void setXDim(int arg) { xDim = arg; }
-		virtual void setYDim(int arg) { yDim = arg; }
-		virtual int getMaxLength() { return maxLength; }
-		const std::string& getFeature() { return feature; }
-		void setFeature(const std::string& arg) { feature = arg; }
-		void setMean(const std::map<int,double>& arg);
-		void setVariance(const std::map<int,double>& arg);
-		const std::map<int,double>& getMean() { return mean; }
-		const std::map<int,double>& getVariance() { return variance; }
-
-	protected:
-
-		virtual void readJsonData(JsonIO::Object& object);
-		virtual void readJsonDataCore(ujson::value& value, Data data) = 0;
-		virtual void computeMeanLength();
-
 	protected:
 
 		int xDim;
@@ -155,6 +131,34 @@ namespace SemiCrf {
 		std::map<int,double> mean;
 		std::map<int,double> variance;
 		std::vector<ujson::value> labels;
+
+	public:
+
+		Datas();
+		virtual ~Datas();
+
+		virtual void read(std::istream& input) = 0;
+		virtual void readJson(std::istream& input);
+		virtual void write(std::ostream& output) const;
+		virtual void writeJson(std::ostream& output) const;
+		virtual void setXDim(int arg) { xDim = arg; }
+		virtual void setYDim(int arg) { yDim = arg; }
+		virtual int getXDim() { return xDim; }
+		virtual int getYDim() { return yDim; }
+		virtual int getMaxLength() { return maxLength; }
+
+		void setFeature(const std::string& arg) { feature = arg; }
+		void setMean(const std::map<int,double>& arg);
+		void setVariance(const std::map<int,double>& arg);
+		const auto getMean() -> decltype((mean)) { return mean; }
+		const auto getVariance() -> decltype((variance)) { return variance; }
+		const auto getFeature() -> decltype((feature)) { return feature; }
+
+	protected:
+
+		virtual void readJsonData(JsonIO::Object& object);
+		virtual void readJsonDataCore(ujson::value& value, Data data) = 0;
+		virtual void computeMeanLength();
 	};
 
 	// 教師データ集合
@@ -191,28 +195,6 @@ namespace SemiCrf {
   
 	// 重みベクトル
 	class Weights_ : public std::vector<double> {
-	public:
-
-		Weights_(int dim);
-		virtual ~Weights_();
-
-		void read(std::istream& ifs);
-		void readJson(std::istream& ifs);
-		void write(std::ostream& ofs);
-		void writeJson(std::ostream& ofs);
-		void setXDim(int arg) { xDim = arg; }
-		void setYDim(int arg) { yDim = arg; }
-		int getXDim() { return xDim; }
-		int getYDim() { return yDim; }
-		int getMaxLength() { return maxLength; }
-		void setMaxLength(int arg) { maxLength = arg; }
-		const std::string& getFeature() { return feature; }
-		void setFeature(const std::string& arg) { feature = arg; }
-		void setMean(const std::map<int,double>& arg) { mean = arg; }
-		void setVariance(const std::map<int,double>& arg) { variance = arg; }
-		const std::map<int,double>& getMean() { return mean; }
-		const std::map<int,double>& getVariance() { return variance; }
-
 	protected:
 
 		int xDim;
@@ -221,6 +203,28 @@ namespace SemiCrf {
 		std::string feature;
 		std::map<int,double> mean;
 		std::map<int,double> variance;
+
+	public:
+
+		Weights_(int dim);
+		virtual ~Weights_();
+
+		void read(std::istream& is);
+		void readJson(std::istream& is);
+		void write(std::ostream& os);
+		void writeJson(std::ostream& os);
+		void setXDim(int arg) { xDim = arg; }
+		void setYDim(int arg) { yDim = arg; }
+		void setMaxLength(int arg) { maxLength = arg; }
+		void setFeature(const std::string& arg) { feature = arg; }
+		void setMean(const std::map<int,double>& arg) { mean = arg; }
+		void setVariance(const std::map<int,double>& arg) { variance = arg; }
+		int getXDim() { return xDim; }
+		int getYDim() { return yDim; }
+		int getMaxLength() { return maxLength; }
+		const auto getMean() -> decltype((mean)) { return mean; }
+		const auto getVariance() -> decltype((variance)) { return variance; }
+		const auto getFeature() -> decltype((feature)) { return feature; }
 	};
 
 	typedef std::shared_ptr<Weights_> Weights;
@@ -228,13 +232,24 @@ namespace SemiCrf {
 
 	// 素性関数
 	class FeatureFunction {
+	protected:
+
+		int xDim;
+		int yDim;
+		int maxLength;
+		std::string feature;
+
 	public:
 
 		FeatureFunction();
 		virtual ~FeatureFunction();
 
+		virtual void read() = 0;
+		virtual void write() = 0;
+		virtual void setXDim(int arg) { xDim = arg; }
+		virtual int getDim() = 0;
 		virtual double wg
-		( Weights w
+		(   Weights w
 		  , App::Label y
 		  , App::Label yd
 		  , Data x
@@ -242,21 +257,11 @@ namespace SemiCrf {
 		  , int i
 		  , vector& gs
 			) = 0;
-		virtual void read() = 0;
-		virtual void write() = 0;
-		virtual void setXDim(int arg) { xDim = arg; }
+
 		void setYDim(int arg) { yDim = arg; }
-		virtual int getDim() = 0;
-		int getMaxLength() { return maxLength; }
 		void setMaxLength(int arg) { maxLength = arg; }
-		const std::string& getFeature() { return feature; };
-
-	protected:
-
-		int xDim;
-		int yDim;
-		int maxLength;
-		std::string feature;
+		int getMaxLength() { return maxLength; }
+		const auto getFeature() -> decltype((feature)) { return feature; }
 	};
 
 	decltype( std::make_shared<FeatureFunction>() ) createFeatureFunction();
@@ -282,51 +287,14 @@ namespace SemiCrf {
 
 	// 抽象アルゴリズム
 	class Algorithm {
-	public:
-
-		Algorithm(int arg);
-		virtual ~Algorithm();
-
-		virtual void setLabels(Labels arg);
-		virtual void setMaxLength(int arg);
-		virtual void setMaxIteration(int arg);
-		virtual void setE0(double arg);
-		virtual void setE1(double arg);
-		virtual void setRp(double arg);
-		virtual void setMethod(const std::string& arg);
-		virtual void setDatas(decltype(std::make_shared<Datas>()) arg);
-		virtual void setFeatureFunction(decltype(std::make_shared<FeatureFunction>()) arg);
-		virtual void setWeights(Weights arg);
-		virtual void setDimension(int arg);
-		virtual void compute() = 0;
-		virtual void preProcess
-		( const std::string& wfile
-		  , const std::string& w0file
-		  , const std::string& w2vfile
-			) = 0;
-		virtual void postProcess(const std::string& wfile) = 0;
-		void setFlg(int flg);
-		void setCacheSize(int size) { cacheSize = size; }
-
-	protected:
-
-		double computeWG
-		( App::Label y
-		  , App::Label yd
-		  , int i
-		  , int d
-		  , vector& gs
-			);
-		void clearWGCache();
-
 	protected:
 
 		int dim;
 		int y2xDim;
 		int y2yDim;
 		Labels labels;
-		decltype( std::make_shared<FeatureFunction>() ) ff;
 		Weights weights;
+		decltype( std::make_shared<FeatureFunction>() ) ff;
 		decltype( std::make_shared<Datas>() ) datas;
 		int maxLength; // 最大セグメント長
 		int maxIteration;
@@ -343,6 +311,44 @@ namespace SemiCrf {
 		std::string method;
 		vector gs; // 作業領域
 		int cacheSize;
+
+	public:
+
+		Algorithm(int arg);
+		virtual ~Algorithm();
+
+		virtual void setLabels(Labels arg);
+		virtual void setMaxLength(int arg);
+		virtual void setMaxIteration(int arg);
+		virtual void setE0(double arg);
+		virtual void setE1(double arg);
+		virtual void setRp(double arg);
+		virtual void setMethod(const std::string& arg);
+		virtual void setDatas(decltype(datas) arg);
+		virtual void setFeatureFunction(decltype(ff) arg);
+		virtual void setWeights(Weights arg);
+		virtual void setDimension(int arg);
+		virtual void compute() = 0;
+		virtual void preProcess
+		(   const std::string& wfile
+		  , const std::string& w0file
+		  , const std::string& w2vfile
+			) = 0;
+		virtual void postProcess(const std::string& wfile) = 0;
+
+		void setFlg(int flg);
+		void setCacheSize(int size) { cacheSize = size; }
+
+	protected:
+
+		double computeWG
+		(   App::Label y
+		  , App::Label yd
+		  , int i
+		  , int d
+		  , vector& gs
+			);
+		void clearWGCache();
 	};
 
 	// 学習器
@@ -356,7 +362,7 @@ namespace SemiCrf {
 
 		virtual void compute();
 		virtual void preProcess
-		( const std::string& wfile
+		(   const std::string& wfile
 		  , const std::string& w0file
 		  , const std::string& w2vfile
 			);
@@ -408,7 +414,7 @@ namespace SemiCrf {
 
 		virtual void compute();
 		virtual void preProcess
-		( const std::string& wfile
+		(   const std::string& wfile
 		  , const std::string& w0file
 		  , const std::string& w2vfile
 			);

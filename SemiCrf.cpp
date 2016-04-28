@@ -581,12 +581,12 @@ namespace SemiCrf {
 		method = arg;
 	}
 
-	void Algorithm::setDatas(decltype(std::make_shared<Datas>()) arg)
+	void Algorithm::setDatas(decltype(datas) arg)
 	{
 		datas = arg;
 	}
 
-	void Algorithm::setFeatureFunction(decltype(std::make_shared<FeatureFunction>()) arg)
+	void Algorithm::setFeatureFunction(decltype(ff) arg)
 	{
 		ff = arg;
 	}
@@ -666,7 +666,11 @@ namespace SemiCrf {
 		Logger::debug() << "~Learner()";
 	}
 
-	void Learner::preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile)
+	void Learner::preProcess
+	(     const std::string& wfile
+		, const std::string& w0file
+		, const std::string& w2vfile
+		)
 	{
 		// datasからx,yの次元、featureを取得する
 		int xdim = datas->getXDim();
@@ -1153,7 +1157,11 @@ namespace SemiCrf {
 		Logger::debug() << "~Predictor()";
 	}
 
-	void Predictor::preProcess(const std::string& wfile, const std::string& w0file, const std::string& w2vfile)
+	void Predictor::preProcess
+	(   const std::string& wfile
+	  , const std::string& w0file
+	  , const std::string& w2vfile
+		)
 	{
 		// 重みを生成しファイルから読み込む
 		auto weights = SemiCrf::createWeights();
