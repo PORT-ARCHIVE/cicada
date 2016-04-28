@@ -531,6 +531,8 @@ namespace SemiCrf {
 		, flg(arg)
 		, method("bfgs")
 		, cacheSize(0xff)
+		, hit(0)
+		, miss(0)
 	{
 		Logger::debug() << "Algorithm()";
 		if( !(flg & DISABLE_DATE_VERSION) ) {
@@ -609,14 +611,15 @@ namespace SemiCrf {
 
 			int l = labels->size();
 			int s = current_data->getStrs()->size();
-			int idx = y*l*s*maxLength + yd*s*maxLength + i*maxLength + d;
+			int idx = y*l*s*maxLength + yd*s*maxLength + i*maxLength + d - 1;
 			int p = idx % cacheSize;
 			auto& tp = current_wgtab->at(p);
 
-			if( std::get<0>(tp) == idx ) { // T.B.D
+			if( std::get<0>(tp) == idx && std::get<2>(tp) != nullptr ) { // T.B.D
 
 				v = std::get<1>(tp);
 				gs = *std::get<2>(tp);
+				++hit;
 
 			} else {
 
@@ -624,6 +627,7 @@ namespace SemiCrf {
 				std::get<0>(tp) = idx;
 				std::get<1>(tp) = v;
 				std::get<2>(tp) = std::make_shared<uvector>(gs); // gsをコピーしてshared_ptrを作る
+				++miss;
 			}
 
 		} else {
@@ -633,11 +637,6 @@ namespace SemiCrf {
 		}
 
 		return v;
-	}
-
-	void Algorithm::clearWGCache()
-	{
-		current_wgtab = createCacheTable(cacheSize);
 	}
 
 	void Algorithm::setFlg(int arg)
@@ -770,6 +769,7 @@ namespace SemiCrf {
 		for( auto data : *datas ) {
 
 			current_data = data;
+			current_wgtab = createCacheTable(cacheSize);
 
 			double WG = 0.0;
 			auto Z = computeZ();
@@ -869,7 +869,6 @@ namespace SemiCrf {
 		int s = current_data->getStrs()->size();
 		int capacity = l*s;
 		current_actab = createCheckTable(capacity);
-		clearWGCache();
 
 		for( auto y : *labels ) {
 			Z += alpha(s-1, y);
@@ -1242,7 +1241,7 @@ namespace SemiCrf {
 			int capacity = l*s;
 
 			current_vctab = createCheckTable(capacity);
-			clearWGCache();
+			current_wgtab = createCacheTable(cacheSize);
 
 			int maxd = - 1;
 			App::Label maxy;

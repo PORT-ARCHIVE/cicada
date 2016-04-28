@@ -304,6 +304,8 @@ namespace SemiCrf {
 		std::string method;
 		uvector gs; // 作業領域
 		int cacheSize;
+		int hit;
+		int miss;
 
 	public:
 
@@ -341,7 +343,7 @@ namespace SemiCrf {
 		  , int d
 		  , uvector& gs
 			);
-		void clearWGCache();
+		// void clearWGCache();
 	};
 
 	// 学習器
