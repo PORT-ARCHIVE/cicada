@@ -9,21 +9,27 @@
 
 namespace App {
 
+	using uvector = SemiCrf::uvector;
+	using Weights = SemiCrf::Weights;
+	using Data = SemiCrf::Data;
+	using FeatureFunction = SemiCrf::FeatureFunction;
+
 	const int ZERO = 0;
 
-	decltype( std::make_shared<SemiCrf::FeatureFunction>()) createFeatureFunction(const std::string& feature, const std::string& w2vmat);
+	decltype( std::make_shared<FeatureFunction>() )
+	createFeatureFunction(const std::string& feature, const std::string& w2vmat);
 
-	class Digit : public SemiCrf::FeatureFunction {
+	class Digit : public FeatureFunction {
 	public:
 		Digit();
 		virtual ~Digit();
 		virtual int getDim();
 		virtual void read();
 		virtual void write();
-		virtual double wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i, SemiCrf::vector& gs);
+		virtual double wg(Weights ws, Label y, Label yd, Data x, int j, int i, uvector& gs);
 	};
 
-	class Jpn : public SemiCrf::FeatureFunction {
+	class Jpn : public FeatureFunction {
 	public:
 		Jpn();
 		virtual ~Jpn();
@@ -31,7 +37,7 @@ namespace App {
 		virtual void setXDim(int arg);
 		virtual void read();
 		virtual void write();
-		virtual double wg(SemiCrf::Weights ws, Label y, Label yd, SemiCrf::Data x, int j, int i, SemiCrf::vector& gs);
+		virtual double wg(Weights ws, Label y, Label yd, Data x, int j, int i, uvector& gs);
 		void setMatrix(W2V::Matrix m) { w2vmat = m; }
 	private:
 		W2V::Matrix w2vmat;

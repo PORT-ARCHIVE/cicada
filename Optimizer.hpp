@@ -9,8 +9,8 @@
 namespace Optimizer {
 
 	using namespace boost::numeric::ublas;
-    typedef boost::numeric::ublas::vector<double> vector;
-    typedef boost::numeric::ublas::matrix<double> matrix;
+    using vector = boost::numeric::ublas::vector<double>;
+    using matrix = boost::numeric::ublas::matrix<double>;
 
 	enum {
 		ENABLE_ADAGRAD = 0x1

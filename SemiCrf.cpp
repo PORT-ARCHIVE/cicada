@@ -601,7 +601,7 @@ namespace SemiCrf {
 		dim = arg;
 	}
 
-	double Algorithm::computeWG(App::Label y, App::Label yd, int i, int d, vector& gs)
+	double Algorithm::computeWG(App::Label y, App::Label yd, int i, int d, uvector& gs)
 	{
 		double v = 0.0;
 
@@ -623,7 +623,7 @@ namespace SemiCrf {
 				v = ff->wg(weights, y, yd, current_data, i-d+1, i, gs);
 				std::get<0>(tp) = idx;
 				std::get<1>(tp) = v;
-				std::get<2>(tp) = std::make_shared<vector>(gs); // gsをコピーしてshared_ptrを作る
+				std::get<2>(tp) = std::make_shared<uvector>(gs); // gsをコピーしてshared_ptrを作る
 			}
 
 		} else {
@@ -888,7 +888,7 @@ namespace SemiCrf {
 		int capacity = l*s;
 
 		{
-			vector tmp(dim, 0.0);
+			uvector tmp(dim, 0.0);
 			current_ecvtab = createCheckVTable(capacity);
 
 			for( auto y : *labels ) {
@@ -1015,7 +1015,7 @@ namespace SemiCrf {
 
 			} else {
 
-				sv = std::make_shared<vector>(dim, 0.0);
+				sv = std::make_shared<uvector>(dim, 0.0);
 
 				for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
 					for( auto yd : *labels ) {
@@ -1024,9 +1024,9 @@ namespace SemiCrf {
 							continue;
 						}
 
-						vector gs(dim, 0.0); // alphaでもgsを使うのでローカルで領域を確保
+						uvector gs(dim, 0.0); // alphaでもgsを使うのでローカルで領域を確保
 						auto wg = computeWG(y, yd, i, d, gs);
-						vector cof = (*eta(i-d, yd)) + alpha(i-d, yd) * gs;
+						uvector cof = (*eta(i-d, yd)) + alpha(i-d, yd) * gs;
 						auto ex = exp(wg);
 						if( std::isinf(ex) || std::isnan(ex) ) {
 							throw Error("numerical problem");
@@ -1041,7 +1041,7 @@ namespace SemiCrf {
 
 		} else if( i == -1 ) {
 
-			sv = std::make_shared<vector>(dim, 0.0);
+			sv = std::make_shared<uvector>(dim, 0.0);
 
 		} else {
 			throw Error("fatal bug");
@@ -1068,7 +1068,7 @@ namespace SemiCrf {
 	 	return std::make_shared<Likelihood>(learner);
 	}
 
-	double Likelihood::value(Optimizer::vector& x)
+	double Likelihood::value(uvector& x)
 	{
 		int i = 0;
 		for( auto& w : *(learner->weights) ) {
@@ -1087,7 +1087,7 @@ namespace SemiCrf {
 		return (-L); //
 	}
 
-	Optimizer::vector Likelihood::grad(Optimizer::vector& x)
+	uvector Likelihood::grad(uvector& x)
 	{
 		int i;
 
@@ -1100,7 +1100,7 @@ namespace SemiCrf {
 		std::vector<double> dL(learner->dim);
 		learner->computeGrad(L, dL, true);
 
-		Optimizer::vector g(learner->dim);
+		uvector g(learner->dim);
 
 		i = 0;
 		for( auto& idL : dL ) {
@@ -1110,7 +1110,7 @@ namespace SemiCrf {
 		return std::move(g);
 	}
 
-	void Likelihood::preProcess(Optimizer::vector& x)
+	void Likelihood::preProcess(uvector& x)
 	{
 		int i = 0;
 		for( auto& w : *(learner->weights) ) {
@@ -1118,19 +1118,19 @@ namespace SemiCrf {
 		}
 	}
 
-	void Likelihood::beginLoopProcess(Optimizer::vector& x)
+	void Likelihood::beginLoopProcess(uvector& x)
 	{
 	}
 
-	void Likelihood::afterUpdateXProcess(Optimizer::vector& x)
+	void Likelihood::afterUpdateXProcess(uvector& x)
 	{
 	}
 
-	void Likelihood::endLoopProcess(Optimizer::vector& x)
+	void Likelihood::endLoopProcess(uvector& x)
 	{
 	}
 
-	void Likelihood::postProcess(Optimizer::vector& x)
+	void Likelihood::postProcess(uvector& x)
 	{
 		int i = 0;
 		for( auto& w : *(learner->weights) ) {

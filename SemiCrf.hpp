@@ -19,7 +19,7 @@
 namespace App {
 
 	// ラベル
-	typedef int Label;
+	using Label = int;
 
 	// 文字列→ラベル
 	Label string2Label(const std::string& str);
@@ -30,7 +30,7 @@ namespace App {
 
 namespace SemiCrf {
 
-    typedef boost::numeric::ublas::vector<double> vector;
+    using uvector = boost::numeric::ublas::vector<double>;
 
 	enum {
 		DISABLE_ADAGRAD          =  0x1
@@ -48,8 +48,8 @@ namespace SemiCrf {
 		virtual ~Labels_();
 	};
 
-	typedef std::shared_ptr<Labels_> Labels;
-	Labels	createLabels(int size);
+	using Labels = std::shared_ptr<Labels_>;
+	Labels createLabels(int size);
 
 	// セグメント 
 	class Segment_ {
@@ -73,17 +73,17 @@ namespace SemiCrf {
 		auto getLabel() -> decltype( label ) const { return label; } // const?
 	};
 
-	typedef std::shared_ptr<Segment_> Segment;
+	using Segment = std::shared_ptr<Segment_>;
 	Segment createSegment(int start, int end, App::Label label);
 
 	// セグメント集合
 	class Segments_ : public std::vector<Segment> {};
-	typedef std::shared_ptr<Segments_> Segments;
+	using Segments = std::shared_ptr<Segments_> ;
 	Segments createSegments();
 
 	// 文字列集合
 	class Strs_ : public std::vector<std::vector<std::string>> {};
-	typedef std::shared_ptr<Strs_> Strs;
+	using Strs = std::shared_ptr<Strs_>;
 
 	// データ
 	class Data_ {
@@ -116,7 +116,7 @@ namespace SemiCrf {
 			);
 	};
 	
-	typedef std::shared_ptr<Data_> Data;
+	using Data = std::shared_ptr<Data_>;
 
 	// データ集合
 	class Datas : public std::vector<Data> {
@@ -227,7 +227,7 @@ namespace SemiCrf {
 		auto getFeature() -> decltype((feature)) { return feature; }
 	};
 
-	typedef std::shared_ptr<Weights_> Weights;
+	using Weights = std::shared_ptr<Weights_>;
 	Weights createWeights(int dim = 0);
 
 	// 素性関数
@@ -249,13 +249,13 @@ namespace SemiCrf {
 		virtual void setXDim(int arg) { xDim = arg; }
 		virtual int getDim() = 0;
 		virtual double wg
-		(   Weights w
+		( Weights w
 		  , App::Label y
 		  , App::Label yd
 		  , Data x
 		  , int j
 		  , int i
-		  , vector& gs
+		  , uvector& gs
 			) = 0;
 
 		void setYDim(int arg) { yDim = arg; }
@@ -267,22 +267,22 @@ namespace SemiCrf {
 	decltype( std::make_shared<FeatureFunction>() ) createFeatureFunction();
 
 	// チェックテーブル
-	typedef std::tuple<bool,double,int,App::Label> CheckTuple;
-	typedef std::vector<CheckTuple> CheckTable_;
-	typedef std::shared_ptr<CheckTable_> CheckTable;
+	using CheckTuple = std::tuple<bool,double,int,App::Label>;
+	using CheckTable_ = std::vector<CheckTuple>;
+	using CheckTable = std::shared_ptr<CheckTable_>;
 	CheckTable createCheckTable(int capacity);
 
 	// vector用チェックテーブル
-	typedef std::shared_ptr<vector> SVector;
-	typedef std::pair<bool,SVector> CheckPair;
-	typedef std::vector<CheckPair> CheckVTable_;
-	typedef std::shared_ptr<CheckVTable_> CheckVTable;
+	using SVector = std::shared_ptr<uvector>;
+	using CheckPair = std::pair<bool,SVector>;
+	using CheckVTable_ = std::vector<CheckPair>;
+	using CheckVTable = std::shared_ptr<CheckVTable_>;
 	CheckVTable createCheckVTable(int capacity);
 
 	// WGキャッシュ
-	typedef std::tuple<int,double,SVector> CacheTuple;
-	typedef std::vector<CacheTuple> CacheTable_;
-	typedef std::shared_ptr<CacheTable_> CacheTable;
+	using CacheTuple = std::tuple<int,double,SVector>;
+	using CacheTable_ = std::vector<CacheTuple>;
+	using CacheTable = std::shared_ptr<CacheTable_>;
 	CacheTable createCacheTable(int capacity);
 
 	// 抽象アルゴリズム
@@ -309,7 +309,7 @@ namespace SemiCrf {
 		CacheTable current_wgtab;
 		int flg;
 		std::string method;
-		vector gs; // 作業領域
+		uvector gs; // 作業領域
 		int cacheSize;
 
 	public:
@@ -342,11 +342,11 @@ namespace SemiCrf {
 	protected:
 
 		double computeWG
-		(   App::Label y
+		( App::Label y
 		  , App::Label yd
 		  , int i
 		  , int d
-		  , vector& gs
+		  , uvector& gs
 			);
 		void clearWGCache();
 	};
@@ -388,14 +388,14 @@ namespace SemiCrf {
 		Likelihood(Learner* arg);
 		virtual ~Likelihood();
 
-		virtual double value(Optimizer::vector& x);
+		virtual double value(uvector& x);
 		virtual double savedValue();
-		virtual Optimizer::vector grad(Optimizer::vector& x);
-		virtual void preProcess(Optimizer::vector& x);
-		virtual void beginLoopProcess(Optimizer::vector& x);
-		virtual void afterUpdateXProcess(Optimizer::vector& x);
-		virtual void endLoopProcess(Optimizer::vector& x);
-		virtual void postProcess(Optimizer::vector& x);
+		virtual uvector grad(uvector& x);
+		virtual void preProcess(uvector& x);
+		virtual void beginLoopProcess(uvector& x);
+		virtual void afterUpdateXProcess(uvector& x);
+		virtual void endLoopProcess(uvector& x);
+		virtual void postProcess(uvector& x);
 
 	private:
 

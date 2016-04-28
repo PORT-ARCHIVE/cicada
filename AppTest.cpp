@@ -11,28 +11,25 @@
 
 namespace App {
 
-    typedef boost::numeric::ublas::vector<double> vector;
-
-	decltype( std::make_shared<SemiCrf::FeatureFunction>() )
+	decltype( std::make_shared<FeatureFunction>() )
 	createFeatureFunction(const std::string& feature, const std::string& w2vmat)
 	{
-		decltype( std::make_shared<SemiCrf::FeatureFunction>() ) ff;
+		decltype( std::make_shared<FeatureFunction>() ) ff;
 
 		if( feature == "DIGIT" || feature.empty() ) {
 
-			auto digitFeature = std::make_shared<Digit>();
-			ff = digitFeature;
+			ff = std::make_shared<Digit>();
 
 		} else if( feature == "JPN" ) {
 			
-			auto jpnFeature = std::make_shared<Jpn>();
+			auto jpnff = std::make_shared<Jpn>();
 			auto m = std::make_shared<W2V::Matrix_>();
 			if( w2vmat.empty() ) {
 				throw Error("no w2v matrix file specifed");
 			}
-			m->read(w2vmat); // T.B.D.
-			jpnFeature->setMatrix(m);
-			ff = jpnFeature;
+			m->read(w2vmat);
+			jpnff->setMatrix(m);
+			ff = jpnff;
 
 		} else {
 
@@ -93,13 +90,13 @@ namespace App {
 	}
 
 	double Digit::wg
-	( SemiCrf::Weights ws
+	( Weights ws
 	  , Label y
 	  , Label yd
-	  , SemiCrf::Data x
+	  , Data x
 	  , int j
 	  , int i
-	  , SemiCrf::vector& gs
+	  , uvector& gs
 		)
 	{
 		assert(0 < xDim);
@@ -116,7 +113,7 @@ namespace App {
 			int dim1 = yDim * ( xDim + yDim );
 			int dim2 = yDim * ( xDim + yDim + 1 );
 
-			vector fvec(dim2, 0.0);
+			uvector fvec(dim2, 0.0);
 
 			// y2x
 			int d = i - j + 1;
@@ -194,13 +191,13 @@ namespace App {
 	}
 
 	double Jpn::wg
-	( SemiCrf::Weights ws
+	( Weights ws
 	  , Label y
 	  , Label yd
-	  , SemiCrf::Data x
+	  , Data x
 	  , int j
 	  , int i
-	  , SemiCrf::vector& gs
+	  , uvector& gs
 		)
 	{
 		assert(0 < xDim);
@@ -215,7 +212,7 @@ namespace App {
 		int dim2 = yDim * ( xDim + yDim + maxLength );
 		int d = i - j + 1;
 
-		vector fvec(dim2, 0.0);
+		uvector fvec(dim2, 0.0);
 
 		try {
 
