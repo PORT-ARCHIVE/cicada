@@ -26,9 +26,9 @@ namespace SemiCrf {
 
 	//// Factories ////
 
-	Labels createLabels(int size = 0)
+	decltype( std::make_shared<Labels>() ) createLabels(int size)
 	{
-		return std::make_shared<Labels_>(size);
+		return std::make_shared<Labels>(size);
 	}
 
 	Segment createSegment(int start, int end, App::Label label)
@@ -58,17 +58,17 @@ namespace SemiCrf {
 
 	//// Labels ////
 
-	Labels_::Labels_(int size)
+	Labels::Labels(int size)
 	{
-		Logger::debug() << "Labels_()";
+		Logger::debug() << "Labels()";
 		for( int i = 0; i < size; i++ ) {
 			push_back(i);
 		}
 	}
 
-	Labels_::~Labels_()
+	Labels::~Labels()
 	{
-		Logger::debug() << "~Labels_()";
+		Logger::debug() << "~Labels()";
 	}
 
 	//// Data ////
@@ -546,7 +546,7 @@ namespace SemiCrf {
 		Logger::debug() << "~Algorithm()";
 	}
 
-	void Algorithm::setLabels(Labels arg)
+	void Algorithm::setLabels(decltype(labels) arg)
 	{
 		labels = arg;
 	}

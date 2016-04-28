@@ -41,15 +41,16 @@ namespace SemiCrf {
 	};
 
 	// ラベル集合
-	class Labels_ : public std::vector<App::Label> {
+	class Labels : public std::vector<App::Label> {
 	public:
 
-		Labels_(int size = 0);
-		virtual ~Labels_();
+		Labels(int size = 0);
+		virtual ~Labels();
 	};
 
-	using Labels = std::shared_ptr<Labels_>;
-	Labels createLabels(int size);
+	// using Labels = std::shared_ptr<Labels_>;
+	//Labels createLabels(int size);
+	decltype( std::make_shared<Labels>() ) createLabels(int size);
 
 	// セグメント 
 	class Segment_ {
@@ -292,7 +293,7 @@ namespace SemiCrf {
 		int dim;
 		int y2xDim;
 		int y2yDim;
-		Labels labels;
+		decltype( std::make_shared<Labels>() ) labels;
 		Weights weights;
 		decltype( std::make_shared<FeatureFunction>() ) ff;
 		decltype( std::make_shared<Datas>() ) datas;
@@ -317,7 +318,7 @@ namespace SemiCrf {
 		Algorithm(int arg);
 		virtual ~Algorithm();
 
-		virtual void setLabels(Labels arg);
+		virtual void setLabels(decltype(labels) arg);
 		virtual void setMaxLength(int arg);
 		virtual void setMaxIteration(int arg);
 		virtual void setE0(double arg);
