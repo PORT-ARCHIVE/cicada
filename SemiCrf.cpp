@@ -74,7 +74,7 @@ namespace SemiCrf {
 	//// Data ////
 
 	Data_::Data_()
-		: strs( std::make_shared<Strs_>() )
+		: strs( std::make_shared<Strs>() )
 		, segs( std::make_shared<Segments>() )
 	{
 		Logger::debug() << "Data_()";

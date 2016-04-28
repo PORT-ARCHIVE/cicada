@@ -79,14 +79,13 @@ namespace SemiCrf {
 	decltype(std::make_shared<Segments>()) createSegments();
 
 	// 文字列集合
-	class Strs_ : public std::vector<std::vector<std::string>> {};
-	using Strs = std::shared_ptr<Strs_>;
+	class Strs : public std::vector<std::vector<std::string>> {};
 
 	// データ
 	class Data_ {
 	protected:
 
-		Strs strs;
+		decltype(std::make_shared<Strs>()) strs;
 		decltype(std::make_shared<Segments>()) segs;
 		std::map<int,int>* count;
 		std::map<int,double>* mean;
