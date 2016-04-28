@@ -150,9 +150,9 @@ namespace SemiCrf {
 		void setFeature(const std::string& arg) { feature = arg; }
 		void setMean(const std::map<int,double>& arg);
 		void setVariance(const std::map<int,double>& arg);
-		const auto getMean() -> decltype((mean)) { return mean; }
-		const auto getVariance() -> decltype((variance)) { return variance; }
-		const auto getFeature() -> decltype((feature)) { return feature; }
+		auto getMean() -> decltype((mean)) { return mean; }
+		auto getVariance() -> decltype((variance)) { return variance; }
+		auto getFeature() -> decltype((feature)) { return feature; }
 
 	protected:
 
@@ -222,9 +222,9 @@ namespace SemiCrf {
 		int getXDim() { return xDim; }
 		int getYDim() { return yDim; }
 		int getMaxLength() { return maxLength; }
-		const auto getMean() -> decltype((mean)) { return mean; }
-		const auto getVariance() -> decltype((variance)) { return variance; }
-		const auto getFeature() -> decltype((feature)) { return feature; }
+		auto getMean() -> decltype((mean)) { return mean; }
+		auto getVariance() -> decltype((variance)) { return variance; }
+		auto getFeature() -> decltype((feature)) { return feature; }
 	};
 
 	typedef std::shared_ptr<Weights_> Weights;
@@ -261,7 +261,7 @@ namespace SemiCrf {
 		void setYDim(int arg) { yDim = arg; }
 		void setMaxLength(int arg) { maxLength = arg; }
 		int getMaxLength() { return maxLength; }
-		const auto getFeature() -> decltype((feature)) { return feature; }
+		auto getFeature() -> decltype((feature)) { return feature; }
 	};
 
 	decltype( std::make_shared<FeatureFunction>() ) createFeatureFunction();
