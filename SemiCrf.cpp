@@ -615,7 +615,7 @@ namespace SemiCrf {
 			int p = idx % cacheSize;
 			auto& tp = current_wgtab->at(p);
 
-			if( std::get<0>(tp) == idx && std::get<2>(tp) != nullptr ) { // T.B.D
+			if( std::get<0>(tp) == idx && std::get<2>(tp) != nullptr ) {
 
 				v = std::get<1>(tp);
 				gs = *std::get<2>(tp);
@@ -637,11 +637,6 @@ namespace SemiCrf {
 		}
 
 		return v;
-	}
-
-	void Algorithm::setFlg(int arg)
-	{
-		flg = arg;
 	}
 
 	//// Learner ////
@@ -770,6 +765,7 @@ namespace SemiCrf {
 
 			current_data = data;
 			current_wgtab = createCacheTable(cacheSize);
+			hit = miss = 0;
 
 			double WG = 0.0;
 			auto Z = computeZ();
@@ -806,6 +802,7 @@ namespace SemiCrf {
 					Logger::debug() << "dL(" << k << ")=" << *idL;
 				}
 			}
+			Logger::debug() << "cache_hit_rate=" << (double)hit/(double)(miss+hit);
 		}
 	}
 

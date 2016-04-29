@@ -309,20 +309,9 @@ namespace SemiCrf {
 
 	public:
 
-		Algorithm(int arg);
+		Algorithm(int flg);
 		virtual ~Algorithm();
 
-		virtual void setLabels(decltype(labels) arg);
-		virtual void setMaxLength(int arg);
-		virtual void setMaxIteration(int arg);
-		virtual void setE0(double arg);
-		virtual void setE1(double arg);
-		virtual void setRp(double arg);
-		virtual void setMethod(const std::string& arg);
-		virtual void setDatas(decltype(datas) arg);
-		virtual void setFeatureFunction(decltype(ff) arg);
-		virtual void setWeights(decltype(weights) arg);
-		virtual void setDimension(int arg);
 		virtual void compute() = 0;
 		virtual void preProcess
 		( const std::string& wfile
@@ -331,7 +320,18 @@ namespace SemiCrf {
 			) = 0;
 		virtual void postProcess(const std::string& wfile) = 0;
 
-		void setFlg(int flg);
+		virtual void setDimension(int arg);
+		virtual void setMaxLength(int arg);
+		virtual void setMaxIteration(int arg);
+		virtual void setE0(double arg);
+		virtual void setE1(double arg);
+		virtual void setRp(double arg);
+		virtual void setMethod(const std::string& arg);
+		virtual void setDatas(decltype(datas) arg);
+		virtual void setLabels(decltype(labels) arg);
+		virtual void setWeights(decltype(weights) arg);
+		virtual void setFeatureFunction(decltype(ff) arg);
+
 		void setCacheSize(int size) { cacheSize = size; }
 
 	protected:
@@ -343,7 +343,6 @@ namespace SemiCrf {
 		  , int d
 		  , uvector& gs
 			);
-		// void clearWGCache();
 	};
 
 	// 学習器
@@ -352,7 +351,7 @@ namespace SemiCrf {
 
 		friend class Likelihood;
 
-		Learner(int arg);
+		Learner(int flg);
 		virtual ~Learner();
 
 		virtual void compute();
@@ -404,7 +403,7 @@ namespace SemiCrf {
 	class Predictor : public Algorithm {
 	public:
 
-		Predictor(int arg);
+		Predictor(int flg);
 		virtual ~Predictor();
 
 		virtual void compute();
