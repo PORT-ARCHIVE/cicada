@@ -81,7 +81,6 @@ namespace W2V {
 
 	const vector& Matrix_::i2v(int i)
 	{
-		const vector& v = M[i];
-		return v;
+		return M.at(i);
 	}
 }

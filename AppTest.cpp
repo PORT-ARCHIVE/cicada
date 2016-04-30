@@ -89,15 +89,14 @@ namespace App {
 		Logger::debug() << "Digit::write()";
 	}
 
-	double Digit::wg
-	( Weights& ws
-	  , Label y
-	  , Label yd
-	  , Data& x
-	  , int j
-	  , int i
-	  , uvector& gs
-		)
+	double Digit::wg (
+		Weights& ws,
+		Label y,
+		Label yd,
+		Data& x,
+		int j,
+		int i,
+		uvector& gs )
 	{
 		assert(0 < xDim);
 		assert(0 < yDim);
@@ -119,7 +118,7 @@ namespace App {
 			int d = i - j + 1;
 			for( int l = 0; l < d; l++ ) {
 
-				auto str = x.getStrs()->at(j+l).at(0);
+				const auto& str = x.getStrs()->at(j+l).at(0);
 				int xval = boost::lexical_cast<int>(str);
 				fvec(yval*xDim+xval) += 1.0;
 			}
@@ -169,7 +168,7 @@ namespace App {
 
 	int Jpn::getDim()
 	{
-		return yDim * ( xDim + yDim + maxLength );
+		return yDim * ( xDim + yDim + 1 );
 	}
 
 	void Jpn::setXDim(int arg)
@@ -190,40 +189,40 @@ namespace App {
 		Logger::debug() << "Jpn::write()";
 	}
 
-	double Jpn::wg
-	( Weights& ws
-	  , Label y
-	  , Label yd
-	  , Data& x
-	  , int j
-	  , int i
-	  , uvector& gs
-		)
+	double Jpn::wg (
+		Weights& ws,
+		Label y,
+		Label yd,
+		Data& x,
+		int j,
+		int i,
+		uvector& gs )
 	{
 		assert(0 < xDim);
 		assert(0 < yDim);
 
-		int l, k;
 		double v = 0.0;
-		int yval = static_cast<int>(y);
-		int ydval = static_cast<int>(yd);
-		int dim0 = yDim * xDim;
-		int dim1 = yDim * ( xDim + yDim );
-		int dim2 = yDim * ( xDim + yDim + maxLength );
-		int d = i - j + 1;
-
-		uvector fvec(dim2, 0.0);
 
 		try {
 
+			int yval = static_cast<int>(y);
+			int ydval = static_cast<int>(yd);
+
+			int dim0 = yDim * xDim;
+			int dim1 = yDim * ( xDim + yDim );
+			int dim2 = yDim * ( xDim + yDim + 1 );
+
+			uvector fvec(dim2, 0.0);
+
 			// y2x
-			for( l = 0; l < d; l++ ) {
+			int d = i - j + 1;
+			for( int l = 0; l < d; l++ ) {
 
-				auto str = x.getStrs()->at(j+l).at(0);
+				const auto& str = x.getStrs()->at(j+l).at(0);
 				long long xval = boost::lexical_cast<long long>(str);
+				if( xval == -1 ) continue;
 				const auto& wvec = w2vmat->i2v(xval);
-
-				for( k = 0; k < xDim; k++ ) {
+				for( int k = 0; k < xDim; k++ ) {
 					fvec(yval*xDim+k) += wvec(k);
 				}
 			}
@@ -231,10 +230,21 @@ namespace App {
             // y2y
 			fvec(dim0+ydval*yDim+yval) = 1.0;
 
-            // y2l
-			fvec(dim1+yval*maxLength+(d-1)) = 1.0;
+			// y2l
+			auto m = x.getMean(static_cast<int>(y));
+			auto s = x.getVariance(static_cast<int>(y));
+			const double eps = 1.0e-5;
+			double f = 0.0;
+			if( eps < s ) {
+				auto dm = d - m;
+				f = dm*dm/(2.0*s);
+			} else {
+				f = 1.0;
+			}
 
-			k = 0;
+			fvec(dim1+yval) = f;
+
+			int k = 0;
 			for( auto w : ws ) {
 				gs(k) = fvec(k);
 				v += w*fvec(k++);
