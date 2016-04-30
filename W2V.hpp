@@ -21,7 +21,7 @@ namespace W2V {
 		long long w2i(const std::string& w);
 		const vector& i2v(int i);
 		long long getNumWords() { return words; }
-		long long  getSize() { return size; }
+		long long getSize() { return size; }
     private:
 		long long words;
 		long long size;
