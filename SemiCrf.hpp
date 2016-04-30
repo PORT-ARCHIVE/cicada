@@ -31,6 +31,7 @@ namespace App {
 namespace SemiCrf {
 
     using uvector = boost::numeric::ublas::vector<double>;
+	using Label = App::Label;
 
 	enum {
 		DISABLE_ADAGRAD          =  0x1
@@ -41,7 +42,7 @@ namespace SemiCrf {
 	};
 
 	// ラベル集合
-	class Labels : public std::vector<App::Label> {
+	class Labels : public std::vector<Label> {
 	public:
 
 		Labels(int size = 0);
@@ -54,25 +55,28 @@ namespace SemiCrf {
 	class Segment {
 	private:
 
-		int start;
-		int end;
-		App::Label label;
+		int start{-1};
+		int end{-1};
+		Label label;
 
 	public:
 
-		Segment(int start_, int end_, App::Label label_)
+		Segment(
+			decltype(start) start_,
+			decltype(end) end_,
+			decltype(label) label_ )
 			: start(start_), end(end_), label(label_) {}
 		virtual ~Segment(){}
 
-		void setStart(int arg) { start = arg; }
-		void setEnd(int arg) { end = arg; }
-		void setLabel(App::Label arg) { label = arg; }
-		int getStart() const { return start; }
-		int getEnd() const { return end; }
-		auto getLabel() -> decltype( label ) const { return label; } // const?
+		void setStart(decltype(start) arg) { start = arg; }
+		void setEnd(decltype(end) arg) { end = arg; }
+		void setLabel(decltype(label) arg) { label = arg; }
+		auto getStart() -> decltype(start) const { return start; }
+		auto getEnd() -> decltype(end) const { return end; }
+		auto getLabel() -> decltype( label ) const { return label; }
 	};
 
-	decltype(std::make_shared<Segment>()) createSegment(int start, int end, App::Label label);
+	decltype(std::make_shared<Segment>()) createSegment(int start, int end, Label label);
 
 	// セグメント集合
 	class Segments : public std::vector<decltype(std::make_shared<Segment>())> {};
@@ -85,11 +89,11 @@ namespace SemiCrf {
 	class Data {
 	protected:
 
-		decltype(std::make_shared<Strs>()) strs;
-		decltype(std::make_shared<Segments>()) segs;
-		std::map<int,int>* count;
-		std::map<int,double>* mean;
-		std::map<int,double>* variance;
+		decltype(std::make_shared<Strs>()) strs{ std::make_shared<Strs>() };
+		decltype(std::make_shared<Segments>()) segs{ std::make_shared<Segments>() };
+		std::map<int,int>* count{ nullptr };
+		std::map<int,double>* mean{ nullptr };
+		std::map<int,double>* variance{ nullptr };
 
 	public:
 
@@ -103,24 +107,23 @@ namespace SemiCrf {
 		auto getMean(int lb) -> decltype((*mean)[lb]) { return (*mean)[lb]; }
 		auto getVariance(int lb) -> decltype((*variance)[lb]) { return (*variance)[lb]; }
 		void setSegments(decltype(segs) arg) { segs = arg; }
-		void setMeans(std::map<int,double>* arg) { mean = arg; }
-		void setVariancies(std::map<int,double>* arg) { variance = arg; }
-		void computeMeanLength
-		( std::map<int,int>* count
-		  , std::map<int,double>* mean
-		  , std::map<int,double>* variance
-			);
+		void setMeans(decltype(mean) arg) { mean = arg; }
+		void setVariancies(decltype(variance) arg) { variance = arg; }
+		void computeMeanLength (
+			std::map<int,int>* count,
+			std::map<int,double>* mean,
+			std::map<int,double>* variance );
 	};
 	
 	// データ集合
 	class Datas : public std::vector<std::shared_ptr<Data>> {
 	protected:
 
-		int xDim;
-		int yDim;
-		int maxLength;
-		std::string feature;
-		std::string title;
+		int xDim{-1};
+		int yDim{-1};
+		int maxLength{-std::numeric_limits<int>::max()};
+		std::string feature{""};
+		std::string title{""};
 		std::map<int,int> count;
 		std::map<int,double> mean;
 		std::map<int,double> variance;
@@ -135,11 +138,11 @@ namespace SemiCrf {
 		virtual void readJson(std::istream& input);
 		virtual void write(std::ostream& output) const;
 		virtual void writeJson(std::ostream& output) const;
-		virtual void setXDim(int arg) { xDim = arg; }
-		virtual void setYDim(int arg) { yDim = arg; }
-		virtual int getXDim() { return xDim; }
-		virtual int getYDim() { return yDim; }
-		virtual int getMaxLength() { return maxLength; }
+		virtual void setXDim(decltype(xDim) arg) { xDim = arg; }
+		virtual void setYDim(decltype(yDim) arg) { yDim = arg; }
+		virtual auto getXDim() ->decltype(xDim) { return xDim; }
+		virtual auto getYDim() ->decltype(yDim) { return yDim; }
+		virtual auto getMaxLength() ->decltype(maxLength) { return maxLength; }
 
 		void setFeature(const std::string& arg) { feature = arg; }
 		void setMean(const std::map<int,double>& arg);
@@ -191,10 +194,10 @@ namespace SemiCrf {
 	class Weights : public std::vector<double> {
 	protected:
 
-		int xDim;
-		int yDim;
-		int maxLength;
-		std::string feature;
+		int xDim{-1};
+		int yDim{-1};
+		int maxLength{-1};
+		std::string feature{""};
 		std::map<int,double> mean;
 		std::map<int,double> variance;
 
@@ -207,15 +210,15 @@ namespace SemiCrf {
 		void readJson(std::istream& is);
 		void write(std::ostream& os);
 		void writeJson(std::ostream& os);
-		void setXDim(int arg) { xDim = arg; }
-		void setYDim(int arg) { yDim = arg; }
-		void setMaxLength(int arg) { maxLength = arg; }
+		void setXDim(decltype(xDim) arg) { xDim = arg; }
+		void setYDim(decltype(yDim) arg) { yDim = arg; }
+		void setMaxLength(decltype(maxLength) arg) { maxLength = arg; }
 		void setFeature(const std::string& arg) { feature = arg; }
 		void setMean(const std::map<int,double>& arg) { mean = arg; }
 		void setVariance(const std::map<int,double>& arg) { variance = arg; }
-		int getXDim() { return xDim; }
-		int getYDim() { return yDim; }
-		int getMaxLength() { return maxLength; }
+		auto getXDim() -> decltype(xDim) { return xDim; }
+		auto getYDim() -> decltype(yDim) { return yDim; }
+		auto getMaxLength() -> decltype(maxLength) { return maxLength; }
 		auto getMean() -> decltype((mean)) { return mean; }
 		auto getVariance() -> decltype((variance)) { return variance; }
 		auto getFeature() -> decltype((feature)) { return feature; }
@@ -227,10 +230,10 @@ namespace SemiCrf {
 	class FeatureFunction {
 	protected:
 
-		int xDim;
-		int yDim;
-		int maxLength;
-		std::string feature;
+		int xDim{-1};
+		int yDim{-1};
+		int maxLength{-1};
+		std::string feature{""};
 
 	public:
 
@@ -239,28 +242,27 @@ namespace SemiCrf {
 
 		virtual void read() = 0;
 		virtual void write() = 0;
-		virtual void setXDim(int arg) { xDim = arg; }
 		virtual int getDim() = 0;
-		virtual double wg
-		( Weights& w
-		  , App::Label y
-		  , App::Label yd
-		  , Data& x
-		  , int j
-		  , int i
-		  , uvector& gs
-			) = 0;
+		virtual void setXDim(decltype(xDim) arg) { xDim = arg; }
+		virtual void setYDim(decltype(yDim) arg) { yDim = arg; }
+		virtual double wg (
+			Weights& w,
+			Label y,
+			Label yd,
+			Data& x,
+			int j,
+			int i,
+			uvector& gs	) = 0;
 
-		void setYDim(int arg) { yDim = arg; }
-		void setMaxLength(int arg) { maxLength = arg; }
-		int getMaxLength() { return maxLength; }
+		void setMaxLength(decltype(maxLength) arg) { maxLength = arg; }
+		auto getMaxLength() -> decltype(maxLength) { return maxLength; }
 		auto getFeature() -> decltype((feature)) { return feature; }
 	};
 
 	decltype( std::make_shared<FeatureFunction>() ) createFeatureFunction();
 
 	// チェックテーブル
-	using CheckTuple = std::tuple<bool,double,int,App::Label>;
+	using CheckTuple = std::tuple<bool,double,int,Label>;
 	using CheckTable_ = std::vector<CheckTuple>;
 	using CheckTable = std::shared_ptr<CheckTable_>;
 	CheckTable createCheckTable(int capacity);
@@ -282,30 +284,30 @@ namespace SemiCrf {
 	class Algorithm {
 	protected:
 
-		int dim;
-		int y2xDim;
-		int y2yDim;
-		int maxLength; // 最大セグメント長
-		int maxIteration;
-		double e0;
-		double e1;
-		double rp;
-		decltype( std::make_shared<Labels>() ) labels;
-		decltype( std::shared_ptr<Weights>() ) weights;
-		decltype( std::make_shared<FeatureFunction>() ) ff;
-		decltype( std::make_shared<Datas>() ) datas;
-		decltype( std::make_shared<Data>() ) current_data;
-		CheckTable current_vctab;
-		CheckTable current_actab;
-		CheckTable current_ectab;
-		CheckVTable current_ecvtab;
-		CacheTable current_wgtab;
 		int flg;
-		std::string method;
+		int dim{-1};
+		int y2xDim{-1};
+		int y2yDim{-1};
+		int maxLength{5}; // 最大セグメント長
+		int maxIteration{1024};
+		double e0{1.0e-5};
+		double e1{1.0e-5};
+		double rp{1.0e-7};
+		decltype( std::make_shared<Labels>() ) labels{nullptr};
+		decltype( std::shared_ptr<Weights>() ) weights{nullptr};
+		decltype( std::make_shared<FeatureFunction>() ) ff{nullptr};
+		decltype( std::make_shared<Datas>() ) datas{nullptr};
+		decltype( std::make_shared<Data>() ) current_data{nullptr};
+		CheckTable current_vctab{nullptr};
+		CheckTable current_actab{nullptr};
+		CheckTable current_ectab{nullptr};
+		CheckVTable current_ecvtab{nullptr};
+		CacheTable current_wgtab{nullptr};
+		std::string method{"bfgs"};
 		uvector gs; // 作業領域
-		int cacheSize;
-		int hit;
-		int miss;
+		int cacheSize{0xff};
+		int hit{0};
+		int miss{0};
 
 	public:
 
@@ -320,7 +322,7 @@ namespace SemiCrf {
 			) = 0;
 		virtual void postProcess(const std::string& wfile) = 0;
 
-		virtual void setDimension(int arg);
+		virtual void setDimension(decltype(dim) arg);
 		virtual void setMaxLength(int arg);
 		virtual void setMaxIteration(int arg);
 		virtual void setE0(double arg);
@@ -332,17 +334,16 @@ namespace SemiCrf {
 		virtual void setWeights(decltype(weights) arg);
 		virtual void setFeatureFunction(decltype(ff) arg);
 
-		void setCacheSize(int size) { cacheSize = size; }
+		void setCacheSize(decltype(cacheSize) size) { cacheSize = size; }
 
 	protected:
 
-		double computeWG
-		( App::Label y
-		  , App::Label yd
-		  , int i
-		  , int d
-		  , uvector& gs
-			);
+		double computeWG (
+			Label y,
+			Label yd,
+			int i,
+			int d,
+			uvector& gs	);
 	};
 
 	// 学習器
@@ -355,11 +356,10 @@ namespace SemiCrf {
 		virtual ~Learner();
 
 		virtual void compute();
-		virtual void preProcess
-		( const std::string& wfile
-		  , const std::string& w0file
-		  , const std::string& w2vfile
-			);
+		virtual void preProcess (
+			const std::string& wfile,
+			const std::string& w0file,
+			const std::string& w2vfile );
 		virtual void postProcess(const std::string& wfile);
 
 	private:
@@ -368,9 +368,9 @@ namespace SemiCrf {
 		double computeZ();
 		std::vector<double> computeG(double& WG);
 		std::vector<double> computeGm(double Z);
-		double alpha(int i, App::Label y);
-		double eta(int i, App::Label y, int k);
-		SVector eta(int i, App::Label y);
+		double alpha(int i, Label y);
+		double eta(int i, Label y, int k);
+		SVector eta(int i, Label y);
 	};
 
 	decltype( std::make_shared<Algorithm>() ) createLearner(int arg);
@@ -394,7 +394,7 @@ namespace SemiCrf {
 	private:
 
 		Learner* learner;
-		double L;
+		double L{0.0};
 	};
 
 	Optimizer::ObjectiveFunction createLikelihood(Learner* learner);
@@ -407,17 +407,16 @@ namespace SemiCrf {
 		virtual ~Predictor();
 
 		virtual void compute();
-		virtual void preProcess
-		( const std::string& wfile
-		  , const std::string& w0file
-		  , const std::string& w2vfile
-			);
+		virtual void preProcess (
+			const std::string& wfile,
+			const std::string& w0file,
+			const std::string& w2vfile );
 		virtual void postProcess(const std::string& wfile);
 
 	private:
 
-		double V(int i, App::Label y, int& maxd);
-		void backtrack(App::Label maxy, int maxd);
+		double V(int i, Label y, int& maxd);
+		void backtrack(Label maxy, int maxd);
 		void printV();
 	};
 

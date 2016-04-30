@@ -31,7 +31,7 @@ namespace SemiCrf {
 		return std::make_shared<Labels>(size);
 	}
 
-	decltype(std::make_shared<Segment>()) createSegment(int start, int end, App::Label label)
+	decltype(std::make_shared<Segment>()) createSegment(int start, int end, Label label)
 	{
 		return std::make_shared<Segment>(start, end, label);
 	}
@@ -74,8 +74,6 @@ namespace SemiCrf {
 	//// Data ////
 
 	Data::Data()
-		: strs( std::make_shared<Strs>() )
-		, segs( std::make_shared<Segments>() )
 	{
 		Logger::debug() << "Data()";
 	}
@@ -86,9 +84,9 @@ namespace SemiCrf {
 	}
 
 	void Data::computeMeanLength(
-		std::map<int, int>* count_,
-		std::map<int ,double>* mean_,
-		std::map<int ,double>* variance_
+		std::map<int,int>* count_,
+		std::map<int,double>* mean_,
+		std::map<int,double>* variance_
 		)
 	{
 		count = count_;
@@ -187,11 +185,6 @@ namespace SemiCrf {
 	//// Datas ////
 
 	Datas::Datas()
-		: xDim(0)
-		, yDim(0)
-		, maxLength(-std::numeric_limits<int>::max())
-		, feature("")
-		, title("")
 	{
 		Logger::debug() << "Datas()";
 	}
@@ -422,10 +415,6 @@ namespace SemiCrf {
 
 	Weights::Weights(int dim)
 		: std::vector<double>(dim)
-		, xDim(-1)
-		, yDim(-1)
-		, maxLength(-1)
-		, feature("")
 	{
 		Logger::debug() << "Weights()";
 	}
@@ -505,8 +494,6 @@ namespace SemiCrf {
 	}
 
 	FeatureFunction::FeatureFunction()
-		: xDim(-1)
-		, yDim(-1)
 	{
 		Logger::debug() << "FeatureFunction()";
 	}
@@ -519,20 +506,7 @@ namespace SemiCrf {
 	//// Algorithm ////
 
 	Algorithm::Algorithm(int arg)
-		: labels( nullptr )
-		, ff( nullptr )
-		, weights( nullptr )
-		, datas( nullptr )
-		, maxLength(5)
-		, maxIteration(1024)
-		, e0(1.0e-5)
-		, e1(1.0e-5)
-		, rp(1.0e-7)
-		, flg(arg)
-		, method("bfgs")
-		, cacheSize(0xff)
-		, hit(0)
-		, miss(0)
+		: flg(arg)
 	{
 		Logger::debug() << "Algorithm()";
 		if( !(flg & DISABLE_DATE_VERSION) ) {
@@ -598,12 +572,12 @@ namespace SemiCrf {
 		weights = arg;
 	}
 
-	void Algorithm::setDimension(int arg)
+	void Algorithm::setDimension(decltype(dim) arg)
 	{
 		dim = arg;
 	}
 
-	double Algorithm::computeWG(App::Label y, App::Label yd, int i, int d, uvector& gs)
+	double Algorithm::computeWG(Label y, Label yd, int i, int d, uvector& gs)
 	{
 		double v = 0.0;
 
@@ -901,7 +875,7 @@ namespace SemiCrf {
 		return(std::move(Gms));
 	}
 
-	double Learner::alpha(int i, App::Label y)
+	double Learner::alpha(int i, Label y)
 	{
 		double v = 0;
 
@@ -948,7 +922,7 @@ namespace SemiCrf {
 		return v;
 	}
 
-	double Learner::eta(int i, App::Label y, int k)
+	double Learner::eta(int i, Label y, int k)
 	{
 		double v = 0;
 
@@ -996,7 +970,7 @@ namespace SemiCrf {
 		return v;
 	}
 
-	SVector Learner::eta(int i, App::Label y)
+	SVector Learner::eta(int i, Label y)
 	{
 		SVector sv;
 
@@ -1051,7 +1025,6 @@ namespace SemiCrf {
 
 	Likelihood::Likelihood(Learner* arg)
 		: learner(arg)
-		, L(0.0)
 	{
 	}
 
@@ -1241,7 +1214,7 @@ namespace SemiCrf {
 			current_wgtab = createCacheTable(cacheSize);
 
 			int maxd = - 1;
-			App::Label maxy;
+			Label maxy;
 			auto maxV = - std::numeric_limits<double>::max();
 
 			for( auto y : *labels ) {
@@ -1265,7 +1238,7 @@ namespace SemiCrf {
 		}
 	}
 
-	double Predictor::V(int i, App::Label y, int& maxd)
+	double Predictor::V(int i, Label y, int& maxd)
 	{
 		auto maxV = - std::numeric_limits<double>::max();
 
@@ -1282,7 +1255,7 @@ namespace SemiCrf {
 			} else {
 
 				maxd = -1;
-				App::Label maxyd;
+				Label maxyd;
 
 				for( int d = 1; d <= std::min(maxLength, i+1); d++ ) {
 					for( auto yd : *labels ) {
@@ -1322,7 +1295,7 @@ namespace SemiCrf {
 		return maxV;
 	}
 
-	void Predictor::backtrack(App::Label maxy, int maxd)
+	void Predictor::backtrack(Label maxy, int maxd)
 	{
 		Logger::trace() << "Predictor::backtrack()";
 
