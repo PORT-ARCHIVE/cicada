@@ -128,7 +128,6 @@ int main(int argc, char *argv[])
 
 		/////////////// w2v
 
-
 		W2V::Matrix matrix(new W2V::Matrix_());
 		{
 			if( options.w2vMatrixFile.empty() ) {
@@ -181,11 +180,11 @@ int main(int argc, char *argv[])
 			auto object = ujson::object {
 				{ "title", title },
 				{ "feature", options.feature },
-				{ "dimension", ujson::array{ dim0, dim1 } },
+				{ "dimension", std::move(ujson::array{ dim0, dim1 }) },
 				{ "labels", labelArray },
 				{ "data", data }
 			};
-			std::cout << "" << to_string(object) << std::endl;
+			std::cout << to_string(object) << std::endl;
 		}
 	
 	} catch(Error& e) {
