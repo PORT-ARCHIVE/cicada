@@ -13,42 +13,25 @@
 
 class Options {
 public:
-	Options()
-		: trainingDataFile("")
-		, predictionDataFile("")
-		, weightsFile("")
-		, initWeightsFile("")
-		, w2vMatrixFile("")
-		, maxLength(0)
-		, maxIteration(1024)
-		, e0(1.0e-5)
-		, e1(1.0e-5)
-		, rp(1.0e-7)
-		, logLevel(2)
-		, flg(0)
-		, method("bfgs")
-		, cacheSize(0xff)
-		, logColor(true)
-		, logPattern("")
-		{};
+	Options(){};
 	void parse(int argc, char *argv[]);
 public:
-	std::string trainingDataFile;
-	std::string predictionDataFile;
-	std::string weightsFile;
-	std::string initWeightsFile;
-	std::string w2vMatrixFile;
-	int maxLength;
-	int maxIteration;
-	double e0;
-	double e1;
-	double rp;
-	int logLevel;
-	int flg;
-	std::string method;
-	int cacheSize;
-	bool logColor;
-	std::string logPattern;
+	bool logColor{true};
+	int flg{0};
+	int logLevel{2};
+	int maxLength{0};
+	int cacheSize{0xff};
+	int maxIteration{1024};
+	double e0{1.0e-5};
+	double e1{1.0e-5};
+	double rp{1.0e-7};
+	std::string method{"bfgs"};
+	std::string logPattern{""};
+	std::string weightsFile{""};
+	std::string w2vMatrixFile{""};
+	std::string initWeightsFile{""};
+	std::string trainingDataFile{""};
+	std::string predictionDataFile{""};
 };
 
 void Options::parse(int argc, char *argv[])
