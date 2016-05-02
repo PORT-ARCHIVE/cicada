@@ -71,9 +71,9 @@ namespace SemiCrf {
 		void setStart(decltype(start) arg) { start = arg; }
 		void setEnd(decltype(end) arg) { end = arg; }
 		void setLabel(decltype(label) arg) { label = arg; }
-		auto getStart() -> decltype(start) const { return start; }
-		auto getEnd() -> decltype(end) const { return end; }
-		auto getLabel() -> decltype( label ) const { return label; }
+		decltype(start) getStart() const { return start; }
+		decltype(end) getEnd() const { return end; }
+		decltype(label) getLabel() const { return label; }
 	};
 
 	decltype(std::make_shared<Segment>()) createSegment(int start, int end, Label label);
@@ -102,10 +102,10 @@ namespace SemiCrf {
 
 		virtual void writeJson(ujson::array& ary) const;
 
-		auto getStrs() -> decltype(strs) { return strs; }
-		auto getSegments() -> decltype(segs) { return segs; }
-		auto getMean(int lb) -> decltype((*mean)[lb]) { return (*mean)[lb]; }
-		auto getVariance(int lb) -> decltype((*variance)[lb]) { return (*variance)[lb]; }
+		decltype(strs) getStrs() const { return strs; }
+		decltype(segs) getSegments() const { return segs; }
+		decltype((*mean)[0]) getMean(int lb) { return (*mean)[lb]; }
+		decltype((*variance)[0]) getVariance(int lb) { return (*variance)[lb]; }
 		void setSegments(decltype(segs) arg) { segs = arg; }
 		void setMeans(decltype(mean) arg) { mean = arg; }
 		void setVariancies(decltype(variance) arg) { variance = arg; }
@@ -140,16 +140,16 @@ namespace SemiCrf {
 		virtual void writeJson(std::ostream& output) const;
 		virtual void setXDim(decltype(xDim) arg) { xDim = arg; }
 		virtual void setYDim(decltype(yDim) arg) { yDim = arg; }
-		virtual auto getXDim() ->decltype(xDim) { return xDim; }
-		virtual auto getYDim() ->decltype(yDim) { return yDim; }
-		virtual auto getMaxLength() ->decltype(maxLength) { return maxLength; }
+		virtual decltype(xDim) getXDim() const { return xDim; }
+		virtual decltype(yDim) getYDim() const { return yDim; }
+		virtual decltype(maxLength) getMaxLength() const { return maxLength; }
 
 		void setFeature(const std::string& arg) { feature = arg; }
 		void setMean(const std::map<int,double>& arg);
 		void setVariance(const std::map<int,double>& arg);
-		auto getMean() -> decltype((mean)) { return mean; }
-		auto getVariance() -> decltype((variance)) { return variance; }
-		auto getFeature() -> decltype((feature)) { return feature; }
+		std::add_const<decltype((mean))>::type getMean() { return mean; }
+		std::add_const<decltype((variance))>::type getVariance() { return variance; }
+		std::add_const<decltype((feature))>::type getFeature() { return feature; }
 
 	protected:
 
@@ -216,12 +216,12 @@ namespace SemiCrf {
 		void setFeature(const std::string& arg) { feature = arg; }
 		void setMean(const std::map<int,double>& arg) { mean = arg; }
 		void setVariance(const std::map<int,double>& arg) { variance = arg; }
-		auto getXDim() -> decltype(xDim) { return xDim; }
-		auto getYDim() -> decltype(yDim) { return yDim; }
-		auto getMaxLength() -> decltype(maxLength) { return maxLength; }
-		auto getMean() -> decltype((mean)) { return mean; }
-		auto getVariance() -> decltype((variance)) { return variance; }
-		auto getFeature() -> decltype((feature)) { return feature; }
+		decltype(xDim) getXDim() const { return xDim; }
+		decltype(yDim) getYDim() const { return yDim; }
+		decltype(maxLength) getMaxLength() const { return maxLength; }
+		std::add_const<decltype((mean))>::type getMean() { return mean; }
+		std::add_const<decltype((variance))>::type getVariance() { return variance; }
+		std::add_const<decltype((feature))>::type getFeature() { return feature; }
 	};
 
 	decltype(std::shared_ptr<Weights>()) createWeights(int dim = 0);
@@ -255,8 +255,8 @@ namespace SemiCrf {
 			uvector& gs	) = 0;
 
 		void setMaxLength(decltype(maxLength) arg) { maxLength = arg; }
-		auto getMaxLength() -> decltype(maxLength) { return maxLength; }
-		auto getFeature() -> decltype((feature)) { return feature; }
+		decltype(maxLength) getMaxLength() const { return maxLength; }
+		std::add_const<decltype((feature))>::type getFeature() { return feature; }
 	};
 
 	decltype( std::make_shared<FeatureFunction>() ) createFeatureFunction();
@@ -315,11 +315,10 @@ namespace SemiCrf {
 		virtual ~Algorithm();
 
 		virtual void compute() = 0;
-		virtual void preProcess
-		( const std::string& wfile
-		  , const std::string& w0file
-		  , const std::string& w2vfile
-			) = 0;
+		virtual void preProcess (
+			const std::string& wfile,
+			const std::string& w0file,
+			const std::string& w2vfile ) = 0;
 		virtual void postProcess(const std::string& wfile) = 0;
 
 		virtual void setDimension(decltype(dim) arg);
