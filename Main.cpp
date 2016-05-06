@@ -162,13 +162,13 @@ decltype( std::make_shared<SemiCrf::Algorithm>() ) createAlgorithm(const Options
 int main(int argc, char *argv[])
 {
 	int ret = 0x0;
+	Logger::setName("cicada");
 
 	try {
 
 		Options options;
 		options.parse(argc, argv);
 		Logger::setLevel(options.logLevel);
-		Logger::setName("cicada");
 		Logger::setColor(options.logColor);
 		if( !options.logPattern.empty() ) {
 			Logger::setPattern(options.logPattern);
