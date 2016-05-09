@@ -103,6 +103,9 @@ int main(int argc, char *argv[])
 			auto object = object_cast(std::move(v));
 			title = JsonIO::readString(object, "title");
 			body = JsonIO::readString(object, "body_text_split");
+			if( body.empty() ) {
+				Logger::warn() << "empty body";
+			}
 		}
 
 		/////////////// labels
