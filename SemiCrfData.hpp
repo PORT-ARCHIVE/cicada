@@ -5,7 +5,9 @@
 
 #include <string>
 #include <boost/numeric/ublas/vector.hpp>
+#include <boost/lexical_cast.hpp>
 #include <map>
+#include "Error.hpp"
 #include "ujson.hpp"
 #include "JsonIO.hpp"
 

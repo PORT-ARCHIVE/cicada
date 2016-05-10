@@ -6,7 +6,6 @@
 #include <fstream>
 #include <sstream>
 #include <list>
-#include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/numeric/ublas/io.hpp>
 #include <cassert>
@@ -22,23 +21,6 @@
 #include "JsonIO.hpp"
 
 namespace SemiCrf {
-
-	//// Factories ////
-
-	decltype(std::make_shared<Labels>()) createLabels(int size)
-	{
-		return std::make_shared<Labels>(size);
-	}
-
-	decltype(std::make_shared<Segment>()) createSegment(int start, int end, Label label)
-	{
-		return std::make_shared<Segment>(start, end, label);
-	}
-
-	decltype(std::make_shared<Segments>()) createSegments()
-	{
-		return std::make_shared<Segments>();
-	}
 
 	CheckTable createCheckTable(int capacity)
 	{

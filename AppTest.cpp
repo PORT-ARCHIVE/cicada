@@ -39,28 +39,6 @@ namespace App {
 		return ff;
 	}
 
-	Label string2Label(const std::string& str)
-	{
-		int val;
-		try {
-			val = boost::lexical_cast<int>(str);
-		} catch(...) {
-			throw Error("unknown label");
-		}
-		return ( static_cast<Label>(val) );
-	}
-
-	std::string label2String(Label label)
-	{
-		std::string str;
-		try {
-			str = boost::lexical_cast<std::string>(label);
-		} catch(...) {
-			throw Error("unknown label");
-		}
-		return ( std::move(str) );
-	}
-
 	///////////////
 
 	Digit::Digit()

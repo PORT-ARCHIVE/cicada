@@ -4,8 +4,52 @@
 #include "Logger.hpp"
 #include "Error.hpp"
 
+namespace App {
+
+	// 文字列→ラベル
+	Label string2Label(const std::string& str)
+	{
+		int val;
+		try {
+			val = boost::lexical_cast<int>(str);
+		} catch(...) {
+			throw Error("unknown label");
+		}
+		return ( static_cast<Label>(val) );
+	}
+
+	// ラベル→文字列
+	std::string label2String(Label label)
+	{
+		std::string str;
+		try {
+			str = boost::lexical_cast<std::string>(label);
+		} catch(...) {
+			throw Error("unknown label");
+		}
+		return ( std::move(str) );
+	}
+}
+
 namespace SemiCrf {
 
+	//// Factories ////
+
+	decltype(std::make_shared<Labels>()) createLabels(int size)
+	{
+		return std::make_shared<Labels>(size);
+	}
+
+	decltype(std::make_shared<Segment>()) createSegment(int start, int end, Label label)
+	{
+		return std::make_shared<Segment>(start, end, label);
+	}
+
+	decltype(std::make_shared<Segments>()) createSegments()
+	{
+		return std::make_shared<Segments>();
+	}
+	
 	//// Labels ////
 
 	Labels::Labels(int size)
@@ -207,6 +251,12 @@ namespace SemiCrf {
 
 	//// TrainingDatas ////
 
+	decltype( std::make_shared<Datas>() )
+	createTrainingDatas()
+	{
+		return std::make_shared<SemiCrf::TrainingDatas>();
+	}
+
 	TrainingDatas::TrainingDatas()
 	{
 		Logger::debug() << "TrainingDatas()";
@@ -307,6 +357,12 @@ namespace SemiCrf {
 	}
 
 	//// PredictionDatas ////
+
+	decltype( std::make_shared<Datas>() )
+	createPredictionDatas()
+	{
+		return std::make_shared<SemiCrf::PredictionDatas>();
+	}
 
 	PredictionDatas::PredictionDatas()
 	{
