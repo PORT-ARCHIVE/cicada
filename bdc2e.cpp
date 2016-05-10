@@ -9,26 +9,28 @@
 #include "FileIO.hpp"
 #include "ujson.hpp"
 #include "JsonIO.hpp"
-#include "W2V.hpp"
-#include "MultiByteTokenizer.hpp"
+#include "SemiCrfData.hpp"
+
 
 class Options {
 public:
 	Options()
-		: bodyTextFile("")
-		, w2vMatrixFile("")
+		: predictionResultFile("")
+		// : bodyTextFile("")
+		// , w2vMatrixFile("")
 		, labelTableFile("")
-		, feature("JPN")
+		// , feature("JPN")
 		, logLevel(2)
 		, logColor(true)
 		, logPattern("")
 		{};
 	void parse(int argc, char *argv[]);
 public:
-	std::string bodyTextFile;
-	std::string w2vMatrixFile;
+	std::string predictionResultFile;
+	// std::string bodyTextFile;
+	// std::string w2vMatrixFile;
 	std::string labelTableFile;
-	std::string feature;
+	// std::string feature;
 	int logLevel;
 	bool logColor;
 	std::string logPattern;
@@ -40,14 +42,16 @@ void Options::parse(int argc, char *argv[])
 
 		for( int i = 1; i < argc; i++ ) {
 			std::string arg = argv[i];
-			if( arg == "-b" ) {
-				bodyTextFile = argv[++i];
-			} else if( arg == "-w" ) {
-				w2vMatrixFile = argv[++i];
+			if( arg == "-c" ) {
+				predictionResultFile = argv[++i];
+			// if( arg == "-b" ) {
+			// 	bodyTextFile = argv[++i];
+			// } else if( arg == "-w" ) {
+			// 	w2vMatrixFile = argv[++i];
 			} else if( arg == "-l" ) {
 				labelTableFile = argv[++i];
-			} else if( arg == "-f" ) {
-				feature = argv[++i];
+			// } else if( arg == "-f" ) {
+			// 	feature = argv[++i];
 			} else if( arg == "--set-log-pattern" ) {
 				logPattern = argv[++i];
 			} else if( arg == "--disable-log-color" ) {
@@ -67,7 +71,7 @@ void Options::parse(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	int ret = 0x0;
-	Logger::setName("bd2c");
+	Logger::setName("bdc2e");
 
 	try {
 
@@ -83,30 +87,24 @@ int main(int argc, char *argv[])
 
 		Logger::info("bd2c 0.0.1");
 
-		///////////////	body
+		///////////////	prediction result
+
+		auto data = SemiCrf::createTrainingDatas();
 
 		std::string title;
-		std::string body;
+		std::string prediction;
 		{
 			std::ifstream ifb;
-			open(ifb, options.bodyTextFile);
-			Logger::info() << "parse " << options.bodyTextFile;
-			// std::string jsonstr;
-			// jsonstr.assign((std::istreambuf_iterator<char>(ifb)), std::istreambuf_iterator<char>());
-			// ifb.close();
-
-			// auto v = ujson::parse(jsonstr);
-			// jsonstr.clear();
-			// if( !v.is_object() ) {
-			// 	throw std::invalid_argument("invalid JSON");
-			// }
+			open(ifb, options.predictionResultFile);
+			Logger::info() << "parse " << options.predictionResultFile;
 
 			auto v = JsonIO::parse(ifb);
 			auto object = object_cast(std::move(v));
 			title = JsonIO::readString(object, "title");
-			body = JsonIO::readString(object, "body_text_split");
-			if( body.empty() ) {
-				Logger::warn() << "empty body";
+
+			prediction = JsonIO::readString(object, "data");
+			if( prediction.empty() ) {
+				Logger::warn() << "empty prediction";
 			}
 		}
 
@@ -117,35 +115,16 @@ int main(int argc, char *argv[])
 			std::ifstream ifb;
 			open(ifb, options.labelTableFile);
 			Logger::info() << "parse " << options.labelTableFile;
-			// std::string jsonstr;
-			// jsonstr.assign((std::istreambuf_iterator<char>(ifb)), std::istreambuf_iterator<char>());
-			// ifb.close();
-
-			// auto v = ujson::parse(jsonstr);
-			// jsonstr.clear();
-			// if( !v.is_object() ) {
-			// 	throw std::invalid_argument("invalid JSON");
-			// }
 
 			auto v = JsonIO::parse(ifb);
 			auto object = object_cast(std::move(v));
 			labelArray = JsonIO::readUAry(object, "labels");
 		}
 
-		/////////////// w2v
-
-		W2V::Matrix matrix(new W2V::Matrix_());
-		{
-			if( options.w2vMatrixFile.empty() ) {
-				throw Error("no w2v matrix file specifed");
-			}
-			Logger::info() << "parse " << options.w2vMatrixFile;
-			matrix->read(options.w2vMatrixFile);
-		}
 
 		///////////////	data
 		Logger::info("transform data...");
-
+#if 0
 		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
 		MultiByteTokenizer toknizer(body);
 		toknizer.setSeparator(" ");
@@ -192,7 +171,7 @@ int main(int argc, char *argv[])
 			};
 			std::cout << to_string(object) << std::endl;
 		}
-	
+#endif
 	} catch(Error& e) {
 
 		Logger::error() << e.what();
