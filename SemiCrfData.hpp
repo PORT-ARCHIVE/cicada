@@ -130,6 +130,7 @@ namespace SemiCrf {
 		virtual decltype(xDim) getXDim() const { return xDim; }
 		virtual decltype(yDim) getYDim() const { return yDim; }
 		virtual decltype(maxLength) getMaxLength() const { return maxLength; }
+		virtual decltype(title) getTitle() const { return title; }
 
 		void setFeature(const std::string& arg) { feature = arg; }
 		void setMean(const std::map<int,double>& arg);

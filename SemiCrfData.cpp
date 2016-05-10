@@ -288,9 +288,9 @@ namespace SemiCrf {
 				throw std::invalid_argument("invalid data format");
 			}
 
-			auto word = string_cast(std::move(*k)); Logger::debug() << word;
+			auto word_id = string_cast(std::move(*k)); Logger::debug() << word_id;
 			std::vector<std::string> vs;
-			vs.push_back(std::move(word));
+			vs.push_back(std::move(word_id));
 			data.getStrs()->push_back(std::move(vs));
 
 			k++;
@@ -340,6 +340,13 @@ namespace SemiCrf {
 
 			} else {
 				Logger::warn() << "unknown descriptor";
+			}
+
+			k++;
+			if( k != array2.end() && !k->is_string() ) {
+				auto s = string_cast(std::move(*k));
+				std::vector<std::string> ss {std::move(s)};
+				data.getStrs()->push_back(std::move(ss));
 			}
 		}
 	}

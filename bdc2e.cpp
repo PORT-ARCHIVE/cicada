@@ -89,21 +89,14 @@ int main(int argc, char *argv[])
 
 		///////////////	prediction result
 
-		auto data = SemiCrf::createTrainingDatas();
-
-		std::string title;
-		std::string prediction;
+		auto datas = SemiCrf::createTrainingDatas();
 		{
-			std::ifstream ifb;
-			open(ifb, options.predictionResultFile);
+			std::ifstream ifs;
+			open(ifs, options.predictionResultFile);
 			Logger::info() << "parse " << options.predictionResultFile;
 
-			auto v = JsonIO::parse(ifb);
-			auto object = object_cast(std::move(v));
-			title = JsonIO::readString(object, "title");
-
-			prediction = JsonIO::readString(object, "data");
-			if( prediction.empty() ) {
+			datas->readJson(ifs);
+			if( datas->empty() ) {
 				Logger::warn() << "empty prediction";
 			}
 		}
@@ -111,6 +104,7 @@ int main(int argc, char *argv[])
 		/////////////// labels
 
 		std::vector<ujson::value> labelArray;
+		std::map<int, std::string> labels;
 		{
 			std::ifstream ifb;
 			open(ifb, options.labelTableFile);
@@ -119,59 +113,80 @@ int main(int argc, char *argv[])
 			auto v = JsonIO::parse(ifb);
 			auto object = object_cast(std::move(v));
 			labelArray = JsonIO::readUAry(object, "labels");
+
+			for( auto& i : labelArray ) {
+
+				if( !i.is_array() ) {
+					throw std::invalid_argument("invalid data format");
+				}
+
+				auto ary = array_cast(std::move(i));
+				auto it = ary.begin();
+
+				if( !it->is_string() ) {
+					throw std::invalid_argument("invalid data format");
+				}
+
+				auto label_id = boost::lexical_cast<int>(string_cast(std::move(*it)));
+
+				++it;
+
+				if( !it->is_string() ) {
+					throw std::invalid_argument("invalid data format");
+				}
+
+				auto key_jp = string_cast(std::move(*it));
+
+				++it;
+
+				if( !it->is_string() ) {
+					throw std::invalid_argument("invalid data format");
+				}
+
+				auto key_en = string_cast(std::move(*it));
+
+				labels.insert( std::make_pair(label_id, key_en) );
+			}
 		}
 
 
 		///////////////	data
 		Logger::info("transform data...");
-#if 0
-		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
-		MultiByteTokenizer toknizer(body);
-		toknizer.setSeparator(" ");
-		toknizer.setSeparator("　");
-		toknizer.setSeparator("\t");
-		toknizer.setSeparator("\n"); // T.B.D.
 
-		ujson::array data;
-		ujson::array lines;
-		std::string tok = toknizer.get();
+		ujson::array crf_estimate;
 
-		while( !tok.empty() ) {
+		for( auto& data : *datas ) {
 
-			ujson::array line;
-			auto i = matrix->w2i(tok);
-			std::string ID = boost::lexical_cast<std::string>(i);
-			line.push_back(ID);
-			line.push_back("*");
-			line.push_back("*");
-			line.push_back(tok);
-			lines.push_back(std::move(line));
-			if( tok == "。" ){ // T.B.D.
-				data.push_back(std::move(lines));
-				lines.clear();
+			ujson::array array;
+			auto strs = data->getStrs();
+
+			for( auto& seg : *data->getSegments() ) {
+
+				auto s = seg->getStart();
+				auto e = seg->getEnd();
+				auto label_id = seg->getLabel();
+				auto label = labels[label_id];
+
+				std::string word;
+				for( int i = s; i <= e; i++ ) {
+					word += strs->at(i).at(0);
+				}
+
+				array.push_back(label);
+				array.push_back(word);
 			}
 
-			tok = toknizer.get();
+			crf_estimate.push_back(std::move(array));
 		}
 
 		///////////////	output
-		{
-			long long size = matrix->getSize();
-			if( std::numeric_limits<int>::max() < size ) {
-				throw Error("too large matrix");
-			}
-			int dim0 = size; // !!! long long -> int !!!
-			int dim1 = labelArray.size();
-			auto object = ujson::object {
-				{ "title", title },
-				{ "feature", options.feature },
-				{ "dimension", std::move(ujson::array{ dim0, dim1 }) },
-				{ "labels", std::move(labelArray) },
-				{ "data", std::move(data) }
-			};
-			std::cout << to_string(object) << std::endl;
-		}
-#endif
+
+		auto object = ujson::object {
+			{ "title", std::move(datas->getTitle()) },
+			{ "crf_estimate", std::move(crf_estimate) }
+		};
+		std::cout << to_string(object) << std::endl;
+
 	} catch(Error& e) {
 
 		Logger::error() << e.what();
