@@ -3,6 +3,12 @@
 #ifndef SEMI_CRF_DATA__H
 #define SEMI_CRF_DATA__H
 
+#include <string>
+#include <boost/numeric/ublas/vector.hpp>
+#include <map>
+#include "ujson.hpp"
+#include "JsonIO.hpp"
+
 namespace App {
 
 	// ラベル
