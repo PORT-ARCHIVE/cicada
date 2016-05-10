@@ -67,6 +67,7 @@ void Options::parse(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	int ret = 0x0;
+	Logger::setName("bd2c");
 
 	try {
 
@@ -74,7 +75,7 @@ int main(int argc, char *argv[])
 		options.parse(argc, argv);
 
 		Logger::setLevel(options.logLevel);
-		Logger::setName("bd2c");
+
 		Logger::setColor(options.logColor);
 		if( !options.logPattern.empty() ) {
 			Logger::setPattern(options.logPattern);
@@ -90,16 +91,17 @@ int main(int argc, char *argv[])
 			std::ifstream ifb;
 			open(ifb, options.bodyTextFile);
 			Logger::info() << "parse " << options.bodyTextFile;
-			std::string jsonstr;
-			jsonstr.assign((std::istreambuf_iterator<char>(ifb)), std::istreambuf_iterator<char>());
-			ifb.close();
+			// std::string jsonstr;
+			// jsonstr.assign((std::istreambuf_iterator<char>(ifb)), std::istreambuf_iterator<char>());
+			// ifb.close();
 
-			auto v = ujson::parse(jsonstr);
-			jsonstr.clear();
-			if( !v.is_object() ) {
-				throw std::invalid_argument("invalid JSON");
-			}
+			// auto v = ujson::parse(jsonstr);
+			// jsonstr.clear();
+			// if( !v.is_object() ) {
+			// 	throw std::invalid_argument("invalid JSON");
+			// }
 
+			auto v = JsonIO::parse(ifb);
 			auto object = object_cast(std::move(v));
 			title = JsonIO::readString(object, "title");
 			body = JsonIO::readString(object, "body_text_split");
@@ -115,16 +117,17 @@ int main(int argc, char *argv[])
 			std::ifstream ifb;
 			open(ifb, options.labelTableFile);
 			Logger::info() << "parse " << options.labelTableFile;
-			std::string jsonstr;
-			jsonstr.assign((std::istreambuf_iterator<char>(ifb)), std::istreambuf_iterator<char>());
-			ifb.close();
+			// std::string jsonstr;
+			// jsonstr.assign((std::istreambuf_iterator<char>(ifb)), std::istreambuf_iterator<char>());
+			// ifb.close();
 
-			auto v = ujson::parse(jsonstr);
-			jsonstr.clear();
-			if( !v.is_object() ) {
-				throw std::invalid_argument("invalid JSON");
-			}
+			// auto v = ujson::parse(jsonstr);
+			// jsonstr.clear();
+			// if( !v.is_object() ) {
+			// 	throw std::invalid_argument("invalid JSON");
+			// }
 
+			auto v = JsonIO::parse(ifb);
 			auto object = object_cast(std::move(v));
 			labelArray = JsonIO::readUAry(object, "labels");
 		}
@@ -184,8 +187,8 @@ int main(int argc, char *argv[])
 				{ "title", title },
 				{ "feature", options.feature },
 				{ "dimension", std::move(ujson::array{ dim0, dim1 }) },
-				{ "labels", labelArray },
-				{ "data", data }
+				{ "labels", std::move(labelArray) },
+				{ "data", std::move(data) }
 			};
 			std::cout << to_string(object) << std::endl;
 		}
