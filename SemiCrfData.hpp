@@ -138,6 +138,7 @@ namespace SemiCrf {
 		std::add_const<decltype((mean))>::type getMean() { return mean; }
 		std::add_const<decltype((variance))>::type getVariance() { return variance; }
 		std::add_const<decltype((feature))>::type getFeature() { return feature; }
+		std::add_const<decltype((labels))>::type getLabels() { return labels; }
 
 	protected:
 

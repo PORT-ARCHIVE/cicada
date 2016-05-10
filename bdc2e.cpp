@@ -16,7 +16,6 @@ class Options {
 public:
 	Options()
 		: predictionResultFile("")
-		, labelTableFile("")
 		, logLevel(2)
 		, logColor(true)
 		, logPattern("")
@@ -38,8 +37,6 @@ void Options::parse(int argc, char *argv[])
 			std::string arg = argv[i];
 			if( arg == "-c" ) {
 				predictionResultFile = argv[++i];
-			} else if( arg == "-l" ) {
-				labelTableFile = argv[++i];
 			} else if( arg == "--set-log-pattern" ) {
 				logPattern = argv[++i];
 			} else if( arg == "--disable-log-color" ) {
@@ -91,16 +88,9 @@ int main(int argc, char *argv[])
 
 		/////////////// labels
 
-		std::vector<ujson::value> labelArray;
 		std::map<int, std::string> labels;
 		{
-			std::ifstream ifb;
-			open(ifb, options.labelTableFile);
-			Logger::info() << "parse " << options.labelTableFile;
-
-			auto v = JsonIO::parse(ifb);
-			auto object = object_cast(std::move(v));
-			labelArray = JsonIO::readUAry(object, "labels");
+			const auto& labelArray = datas->getLabels();
 
 			for( auto& i : labelArray ) {
 
@@ -111,7 +101,7 @@ int main(int argc, char *argv[])
 				auto ary = array_cast(std::move(i));
 				auto it = ary.begin();
 
-				if( !it->is_string() ) {
+				if( it == ary.end() || !it->is_string() ) {
 					throw std::invalid_argument("invalid data format");
 				}
 
@@ -119,7 +109,7 @@ int main(int argc, char *argv[])
 
 				++it;
 
-				if( !it->is_string() ) {
+				if( it == ary.end() || !it->is_string() ) {
 					throw std::invalid_argument("invalid data format");
 				}
 
@@ -127,18 +117,23 @@ int main(int argc, char *argv[])
 
 				++it;
 
+				if( it == ary.end() ) {
+					labels.insert( std::make_pair(label_id, key_jp) );
+					continue;
+				}
+
 				if( !it->is_string() ) {
 					throw std::invalid_argument("invalid data format");
 				}
 
 				auto key_en = string_cast(std::move(*it));
-
 				labels.insert( std::make_pair(label_id, key_en) );
 			}
 		}
 
 
 		///////////////	data
+
 		Logger::info("transform data...");
 
 		ujson::array crf_estimate;
@@ -157,11 +152,15 @@ int main(int argc, char *argv[])
 
 				std::string word;
 				for( int i = s; i <= e; i++ ) {
-					word += strs->at(i).at(0);
+					word += strs->at(i).at(1);
 				}
 
-				array.push_back(label);
-				array.push_back(word);
+				if( label == "NONE" || label == "なし" ) {
+					continue;
+				}
+
+				auto v = ujson::object { { std::move(label), std::move(word) } };
+				array.push_back(v);
 			}
 
 			crf_estimate.push_back(std::move(array));

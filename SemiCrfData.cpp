@@ -169,6 +169,9 @@ namespace SemiCrf {
 				}
 
 				ary2.push_back(App::label2String(l));
+				if( 1 < strs->at(i).size() ) {
+					ary2.push_back(strs->at(i).at(1));
+				}
 				ary1.push_back(std::move(ary2));
 			}
 		}
@@ -291,7 +294,6 @@ namespace SemiCrf {
 			auto word_id = string_cast(std::move(*k)); Logger::debug() << word_id;
 			std::vector<std::string> vs;
 			vs.push_back(std::move(word_id));
-			data.getStrs()->push_back(std::move(vs));
 
 			k++;
 			if( !k->is_string() ) {
@@ -342,12 +344,13 @@ namespace SemiCrf {
 				Logger::warn() << "unknown descriptor";
 			}
 
-			k++;
-			if( k != array2.end() && !k->is_string() ) {
-				auto s = string_cast(std::move(*k));
-				std::vector<std::string> ss {std::move(s)};
-				data.getStrs()->push_back(std::move(ss));
+			k++; // 第4カラムを保存
+			if( k != array2.end() && k->is_string() ) {
+				auto word = string_cast(std::move(*k));
+				vs.push_back(std::move(word));
 			}
+
+			data.getStrs()->push_back(std::move(vs));
 		}
 	}
 
@@ -402,10 +405,20 @@ namespace SemiCrf {
 				throw std::invalid_argument("invalid format");
 			}
 
-			auto word = string_cast(std::move(*k)); Logger::debug() << word;
-			std::vector<std::string> vs;
-			vs.push_back(std::move(word));
-			data.getStrs()->push_back(std::move(vs));
+
+			std::vector<std::string> ss;
+			auto word_id = string_cast(std::move(*k)); Logger::debug() << word_id;
+			ss.push_back(std::move(word_id));
+
+			++k;
+			++k;
+			++k; // 第4カラムへ移動
+			if( k != array2.end() && k->is_string() ) {
+				auto word = string_cast(std::move(*k)); Logger::debug() << word;
+				ss.push_back(std::move(word));
+			}
+
+			data.getStrs()->push_back(std::move(ss));
 		}
 	}
 
