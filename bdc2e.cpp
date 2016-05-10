@@ -16,10 +16,7 @@ class Options {
 public:
 	Options()
 		: predictionResultFile("")
-		// : bodyTextFile("")
-		// , w2vMatrixFile("")
 		, labelTableFile("")
-		// , feature("JPN")
 		, logLevel(2)
 		, logColor(true)
 		, logPattern("")
@@ -27,10 +24,7 @@ public:
 	void parse(int argc, char *argv[]);
 public:
 	std::string predictionResultFile;
-	// std::string bodyTextFile;
-	// std::string w2vMatrixFile;
 	std::string labelTableFile;
-	// std::string feature;
 	int logLevel;
 	bool logColor;
 	std::string logPattern;
@@ -44,14 +38,8 @@ void Options::parse(int argc, char *argv[])
 			std::string arg = argv[i];
 			if( arg == "-c" ) {
 				predictionResultFile = argv[++i];
-			// if( arg == "-b" ) {
-			// 	bodyTextFile = argv[++i];
-			// } else if( arg == "-w" ) {
-			// 	w2vMatrixFile = argv[++i];
 			} else if( arg == "-l" ) {
 				labelTableFile = argv[++i];
-			// } else if( arg == "-f" ) {
-			// 	feature = argv[++i];
 			} else if( arg == "--set-log-pattern" ) {
 				logPattern = argv[++i];
 			} else if( arg == "--disable-log-color" ) {
