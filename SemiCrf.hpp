@@ -15,6 +15,7 @@
 #include "JsonIO.hpp"
 #include "Optimizer.hpp"
 #include "ujson.hpp"
+#include "SemiCrfData.hpp"
 
 namespace App {
 
@@ -40,7 +41,7 @@ namespace SemiCrf {
 		, DISABLE_REGULARIZATION = (0x1 << 3)
 		, DISABLE_WG_CACHE       = (0x1 << 4)
 	};
-
+#if 0
 	// ラベル集合
 	class Labels : public std::vector<Label> {
 	public:
@@ -83,7 +84,7 @@ namespace SemiCrf {
 	decltype(std::make_shared<Segments>()) createSegments();
 
 	// 文字列集合
-	class Strs : public std::vector<std::vector<std::string>> {};
+	class Strs : public std::vector<std::vector<std::string>> {};o
 
 	// データ
 	class Data {
@@ -189,7 +190,7 @@ namespace SemiCrf {
 	};
 
 	decltype( std::make_shared<Datas>() ) createPredictionDatas();
-  
+#endif
 	// 重みベクトル
 	class Weights : public std::vector<double> {
 	protected:
