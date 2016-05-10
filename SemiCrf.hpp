@@ -84,7 +84,7 @@ namespace SemiCrf {
 	decltype(std::make_shared<Segments>()) createSegments();
 
 	// 文字列集合
-	class Strs : public std::vector<std::vector<std::string>> {};o
+	class Strs : public std::vector<std::vector<std::string>> {};
 
 	// データ
 	class Data {
