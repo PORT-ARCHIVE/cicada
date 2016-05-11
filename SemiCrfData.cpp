@@ -216,6 +216,10 @@ namespace SemiCrf {
 	void Datas::writeSimpleJson(std::ostream& output) const {
 		Logger::debug() << "Datas::writeSimpleJson()";
 
+		if( labels.empty() ) {
+			throw Error("option '--enable-simple-prediction-output' not supported");
+		}
+
 		std::map<int, std::string> labels_map;
 		{
 			for( auto& i : labels ) {
@@ -273,6 +277,9 @@ namespace SemiCrf {
 
 				std::string word;
 				for( int i = s; i <= e; i++ ) {
+					if( strs->at(i).size() < 2 ) {
+						throw Error("option '--enable-simple-prediction-output' not supported");
+					}
 					word += strs->at(i).at(1);
 				}
 
