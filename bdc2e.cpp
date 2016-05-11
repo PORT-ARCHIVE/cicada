@@ -77,24 +77,68 @@ int main(int argc, char *argv[])
 
 		///////////////	body		
 
-		// std::string title;
-		// std::string body;
+		ujson::value body;
 		{
-			std::ifstream ifb;
-			open(ifb, options.bodyTextFile);
+			std::ifstream ifs;
+			open(ifs, options.bodyTextFile);
 			Logger::info() << "parse " << options.bodyTextFile;
 
-			auto v = JsonIO::parse(ifb);
-			if( !v.is_array() ) {
+			body = JsonIO::parse(ifs);
+			if( !body.is_array() ) {
 				throw std::invalid_argument("invalid data format");				
 			}
-			// auto array = array_cast(std::move(v));
-			// title = JsonIO::readString(object, "title");
-			// body = JsonIO::readString(object, "body_text_split");
-			// if( body.empty() ) {
-			// 	Logger::warn() << "empty body";
-			// }
-		}		
+		}
+
+		///////////////	accumulated prediction result
+
+		ujson::value acc_prediction_result;
+		{
+			std::ifstream ifs;
+			open(ifs, options.accPredictionResultFile);
+			Logger::info() << "parse " << options.accPredictionResultFile;
+
+			acc_prediction_result = JsonIO::parse(ifs);
+			if( !acc_prediction_result.is_array() ) {
+				throw std::invalid_argument("invalid data format");				
+			}			
+		}
+
+		auto body_array = array_cast(std::move(body));
+		auto ib = body_array.begin();
+
+		auto acc_array = array_cast(std::move(acc_prediction_result));
+		auto ia = acc_array.begin();
+
+		ujson::array c;
+
+		for( ; ib != body_array.end(); ib++, ia++ ) {
+
+			if( !ib->is_object() ) {
+				throw std::invalid_argument("invalid data format");				
+			}
+
+			if( !ia->is_object() ) {
+				throw std::invalid_argument("invalid data format");				
+			}
+
+			auto ob = object_cast( std::move(*ib) );
+			auto oa = object_cast( std::move(*ia) );
+
+			auto itb = find(ob, "crf_estimate");
+			if( itb == ob.end() || !itb->second.is_string() ) {
+				throw std::invalid_argument("invalid data format");
+			}
+
+			auto ita = find(oa, "crf_estimate");
+			if( ita == oa.end() || !itb->second.is_string() ) {
+				throw std::invalid_argument("invalid data format");
+			}
+
+			*itb = *ita;
+			c.push_back(ob);
+		}
+
+		std::cout << to_string(c) << std::endl;
 		
 #if 0
 		///////////////	prediction result
