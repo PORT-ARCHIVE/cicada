@@ -114,7 +114,11 @@ namespace SemiCrf {
 
 	void Datas::readJson(std::istream& is)
 	{
-		auto object = JsonIO::parse(is);
+		auto v = JsonIO::parse(is);
+		if( !v.is_object() ) {
+			throw std::invalid_argument("object expected");
+		}
+		auto object = object_cast(std::move(v));
 		title = JsonIO::readString(object, "title");
 		auto dims = JsonIO::readIntAry(object, "dimension");
 		xDim = dims[0];

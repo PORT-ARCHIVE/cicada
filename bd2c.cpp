@@ -91,15 +91,6 @@ int main(int argc, char *argv[])
 			std::ifstream ifb;
 			open(ifb, options.bodyTextFile);
 			Logger::info() << "parse " << options.bodyTextFile;
-			// std::string jsonstr;
-			// jsonstr.assign((std::istreambuf_iterator<char>(ifb)), std::istreambuf_iterator<char>());
-			// ifb.close();
-
-			// auto v = ujson::parse(jsonstr);
-			// jsonstr.clear();
-			// if( !v.is_object() ) {
-			// 	throw std::invalid_argument("invalid JSON");
-			// }
 
 			auto v = JsonIO::parse(ifb);
 			auto object = object_cast(std::move(v));
@@ -117,15 +108,6 @@ int main(int argc, char *argv[])
 			std::ifstream ifb;
 			open(ifb, options.labelTableFile);
 			Logger::info() << "parse " << options.labelTableFile;
-			// std::string jsonstr;
-			// jsonstr.assign((std::istreambuf_iterator<char>(ifb)), std::istreambuf_iterator<char>());
-			// ifb.close();
-
-			// auto v = ujson::parse(jsonstr);
-			// jsonstr.clear();
-			// if( !v.is_object() ) {
-			// 	throw std::invalid_argument("invalid JSON");
-			// }
 
 			auto v = JsonIO::parse(ifb);
 			auto object = object_cast(std::move(v));

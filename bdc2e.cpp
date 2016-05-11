@@ -15,15 +15,16 @@
 class Options {
 public:
 	Options()
-		: predictionResultFile("")
+		: accPredictionResultFile("")
+		, bodyTextFile("")
 		, logLevel(2)
 		, logColor(true)
 		, logPattern("")
 		{};
 	void parse(int argc, char *argv[]);
 public:
-	std::string predictionResultFile;
-	std::string labelTableFile;
+	std::string accPredictionResultFile;
+	std::string bodyTextFile;
 	int logLevel;
 	bool logColor;
 	std::string logPattern;
@@ -36,7 +37,9 @@ void Options::parse(int argc, char *argv[])
 		for( int i = 1; i < argc; i++ ) {
 			std::string arg = argv[i];
 			if( arg == "-c" ) {
-				predictionResultFile = argv[++i];
+				accPredictionResultFile = argv[++i];
+			} else if( arg == "-b" ) {
+				bodyTextFile = argv[++i];				
 			} else if( arg == "--set-log-pattern" ) {
 				logPattern = argv[++i];
 			} else if( arg == "--disable-log-color" ) {
@@ -72,6 +75,28 @@ int main(int argc, char *argv[])
 
 		Logger::info("bd2c 0.0.1");
 
+		///////////////	body		
+
+		// std::string title;
+		// std::string body;
+		{
+			std::ifstream ifb;
+			open(ifb, options.bodyTextFile);
+			Logger::info() << "parse " << options.bodyTextFile;
+
+			auto v = JsonIO::parse(ifb);
+			if( !v.is_array() ) {
+				throw std::invalid_argument("invalid data format");				
+			}
+			// auto array = array_cast(std::move(v));
+			// title = JsonIO::readString(object, "title");
+			// body = JsonIO::readString(object, "body_text_split");
+			// if( body.empty() ) {
+			// 	Logger::warn() << "empty body";
+			// }
+		}		
+		
+#if 0
 		///////////////	prediction result
 
 		auto datas = SemiCrf::createTrainingDatas();
@@ -173,7 +198,7 @@ int main(int argc, char *argv[])
 			{ "crf_estimate", std::move(crf_estimate) }
 		};
 		std::cout << to_string(object) << std::endl;
-
+#endif
 	} catch(Error& e) {
 
 		Logger::error() << e.what();

@@ -4,20 +4,27 @@
 
 namespace JsonIO {
 
-	Object parse(std::istream& is)
+	decltype(ujson::parse("")) parse(std::istream& is)
 	{
 		std::string jsonstr;
 		jsonstr.assign((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-		auto v = ujson::parse(jsonstr);
-
-		if( !v.is_object() ) {
-			throw std::invalid_argument("object expected");
-		}
-
-		Object object = object_cast(std::move(v));
-		return std::move(object);
+		return std::move(ujson::parse(jsonstr));
 	}
+
+	// Object parse(std::istream& is)
+	// {
+	// 	std::string jsonstr;
+	// 	jsonstr.assign((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+
+	// 	auto v = ujson::parse(jsonstr);
+
+	// 	if( !v.is_object() ) {
+	// 		throw std::invalid_argument("object expected");
+	// 	}
+
+	// 	Object object = object_cast(std::move(v));
+	// 	return std::move(object);
+	// }
 
 	std::string readString(Object& object, const std::string& tag)
 	{

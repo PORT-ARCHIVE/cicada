@@ -12,7 +12,7 @@ namespace JsonIO {
 
 	typedef std::vector<std::pair<std::string, ujson::value>> Object;
 
-	Object parse(std::istream& ifs);
+	decltype(ujson::parse("")) parse(std::istream& is);
 	std::string readString(Object& object, const std::string& tag);
 	int readInt(Object& object, const std::string& tag);
 	std::vector<int> readIntAry(Object& object, const std::string& tag);
