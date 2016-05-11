@@ -76,6 +76,8 @@ void Options::parse(int argc, char *argv[])
 				flg |= SemiCrf::DISABLE_REGULARIZATION;
 			} else if( arg == "--disable-wg-cache" ) {
 				flg |= SemiCrf::DISABLE_WG_CACHE;
+			} else if( arg == "--enable-simple-prediction-output" ) {
+				flg |= SemiCrf::ENABLE_SIMPLE_PREDICTION_OUTPUT;
 			} else if( arg == "--disable-log-color" ) {
 				logColor = false;
 			} else if( arg == "--log-level" ) {

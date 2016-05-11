@@ -123,8 +123,9 @@ namespace SemiCrf {
 
 		virtual void read(std::istream& input) = 0;
 		virtual void readJson(std::istream& input);
-		virtual void write(std::ostream& output) const;
+		virtual void write(std::ostream& output, bool simple_prediction_output=false) const;
 		virtual void writeJson(std::ostream& output) const;
+		virtual void writeSimpleJson(std::ostream& output) const;
 		virtual void setXDim(decltype(xDim) arg) { xDim = arg; }
 		virtual void setYDim(decltype(yDim) arg) { yDim = arg; }
 		virtual decltype(xDim) getXDim() const { return xDim; }

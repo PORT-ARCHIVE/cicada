@@ -213,9 +213,95 @@ namespace SemiCrf {
 		output << to_string(object) << std::endl;
 	}
 
-	void Datas::write(std::ostream& output)  const {
+	void Datas::writeSimpleJson(std::ostream& output) const {
+		Logger::debug() << "Datas::writeSimpleJson()";
+
+		std::map<int, std::string> labels_map;
+		{
+			for( auto& i : labels ) {
+
+				if( !i.is_array() ) {
+					throw std::invalid_argument("invalid data format");
+				}
+
+				auto ary = array_cast(std::move(i));
+				auto it = ary.begin();
+
+				if( it == ary.end() || !it->is_string() ) {
+					throw std::invalid_argument("invalid data format");
+				}
+
+				auto label_id = boost::lexical_cast<int>(string_cast(std::move(*it)));
+
+				++it;
+
+				if( it == ary.end() || !it->is_string() ) {
+					throw std::invalid_argument("invalid data format");
+				}
+
+				auto key_jp = string_cast(std::move(*it));
+
+				++it;
+
+				if( it == ary.end() ) {
+					labels_map.insert( std::make_pair(label_id, key_jp) );
+					continue;
+				}
+
+				if( !it->is_string() ) {
+					throw std::invalid_argument("invalid data format");
+				}
+
+				auto key_en = string_cast(std::move(*it));
+				labels_map.insert( std::make_pair(label_id, key_en) );
+			}
+		}
+
+		ujson::array crf_estimate;
+
+		for( auto& data : *this ) {
+
+			ujson::array array;
+			auto strs = data->getStrs();
+
+			for( auto& seg : *data->getSegments() ) {
+
+				auto s = seg->getStart();
+				auto e = seg->getEnd();
+				auto label_id = seg->getLabel();
+				auto label = labels_map[label_id];
+
+				std::string word;
+				for( int i = s; i <= e; i++ ) {
+					word += strs->at(i).at(1);
+				}
+
+				if( label == "NONE" || label == "なし" ) {
+					continue;
+				}
+
+				auto v = ujson::object { { std::move(label), std::move(word) } };
+				array.push_back(v);
+			}
+
+			crf_estimate.push_back(std::move(array));
+		}
+
+		auto object = ujson::object {
+			{ "title", title },
+			{ "crf_estimate", std::move(crf_estimate) }
+		};
+
+		output << to_string(object) << std::endl;
+	}
+
+	void Datas::write(std::ostream& output, bool simple_prediction_output) const {
 		Logger::debug() << "Datas::write()";
-		writeJson(output);
+		if( simple_prediction_output ) {
+			writeSimpleJson(output);
+		} else {
+			writeJson(output);
+		}
 	}
 
 	void Datas::readJsonData(JsonIO::Object& object)

@@ -51,10 +51,10 @@ test3:
 		echo "diff -c a b"; \
 		diff -c a b && echo "OK" || echo "ERROR"; \
 		paste a b | awk '{ if( $$1 == $$2 ) count++; total++; } END{ print count/total*100,"%"; }'; \
-		echo "../bdc2e -c tmp2"; \
-		../bdc2e -c tmp2 > bdc2e.json && echo "OK" || echo "ERROR"; \
-		echo "diff -c answer/bdc2e.json bdc2e.json"; \
-		diff -c answer/bdc2e.json bdc2e.json && echo "OK" || echo "ERROR"; \
+		echo "$(SEMICRF) -i $$file -w tmp1 --log-level 2 --w2v-matrix ${MATRIX} --enable-simple-prediction-output" ; \
+		$(SEMICRF) -i $$file -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} --enable-simple-prediction-output > simple_output.json && echo "OK" || echo "ERROR"; \
+		echo "diff -c answer/simple_output.json simple_output.json"; \
+		diff -c answer/simple_output.json simple_output.json && echo "OK" || echo "ERROR"; \
 		rm tmp1 tmp2; \
 	done;
 
@@ -116,7 +116,7 @@ update:
 	-cp test18.json answer/test18.json
 	-cp test19.json answer/test19.json
 	-cp body1.txt answer/body1.txt
-	-cp bdc2e.json answer/bdc2e.json
+	-cp simple_output.json answer/simple_output.json
 
 clean:
 	rm -f a b r1 r2 tmp* log1 check8.json

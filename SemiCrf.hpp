@@ -20,6 +20,7 @@ namespace SemiCrf {
 		, ENABLE_LIKELIHOOD_ONLY = (0x1 << 2)
 		, DISABLE_REGULARIZATION = (0x1 << 3)
 		, DISABLE_WG_CACHE       = (0x1 << 4)
+		, ENABLE_SIMPLE_PREDICTION_OUTPUT = (0x1 << 5)
 	};
 
 	// 重みベクトル
