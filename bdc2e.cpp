@@ -103,6 +103,8 @@ int main(int argc, char *argv[])
 			}			
 		}
 
+		///////////////	transform
+
 		auto body_array = array_cast(std::move(body));
 		auto ib = body_array.begin();
 
@@ -117,132 +119,66 @@ int main(int argc, char *argv[])
 				throw std::invalid_argument("invalid data format");				
 			}
 
+			auto ob = object_cast( std::move(*ib) );
+
 			if( !ia->is_object() ) {
 				throw std::invalid_argument("invalid data format");				
 			}
 
-			auto ob = object_cast( std::move(*ib) );
 			auto oa = object_cast( std::move(*ia) );
 
-			auto itb = find(ob, "crf_estimate");
-			if( itb == ob.end() || !itb->second.is_string() ) {
-				throw std::invalid_argument("invalid data format");
+			// check title
+			{
+				auto t0 = find(ob, "title");
+				if( t0 == ob.end() || !t0->second.is_string() ) {
+					throw std::invalid_argument("invalid data format");
+				}
+
+				auto t = t0->second; // copy to keep the original
+				auto s0 = string_cast(std::move(t));
+
+				auto t1 = find(oa, "title");
+				if( t1 == ob.end() || !t1->second.is_string() ) {
+					throw std::invalid_argument("invalid data format");
+				}
+
+				auto s1 = string_cast(std::move(t1->second));
+
+				if( s0 != s1 ) {
+					throw std::invalid_argument("invalid data format");
+				}
 			}
 
-			auto ita = find(oa, "crf_estimate");
-			if( ita == oa.end() || !itb->second.is_string() ) {
-				throw std::invalid_argument("invalid data format");
+			// replace crf_estimate
+			{
+				auto itb = find(ob, "crf_estimate");
+				if( itb == ob.end() || !itb->second.is_string() ) {
+					throw std::invalid_argument("invalid data format");
+				}
+
+				auto ita = find(oa, "crf_estimate");
+				if( ita == oa.end() || !itb->second.is_string() ) {
+					throw std::invalid_argument("invalid data format");
+				}
+
+				*itb = *ita;
 			}
 
-			*itb = *ita;
+			// remove body_split_text
+			{
+				auto itb = find(ob, "body_split_text");
+				if( itb == ob.end() || !itb->second.is_string() ) {
+					throw std::invalid_argument("invalid data format");
+				}
+
+				itb->second = std::string("");
+			}
+
 			c.push_back(ob);
 		}
 
 		std::cout << to_string(c) << std::endl;
-		
-#if 0
-		///////////////	prediction result
 
-		auto datas = SemiCrf::createTrainingDatas();
-		{
-			std::ifstream ifs;
-			open(ifs, options.predictionResultFile);
-			Logger::info() << "parse " << options.predictionResultFile;
-
-			datas->readJson(ifs);
-			if( datas->empty() ) {
-				Logger::warn() << "empty prediction";
-			}
-		}
-
-		/////////////// labels
-
-		std::map<int, std::string> labels;
-		{
-			const auto& labelArray = datas->getLabels();
-
-			for( auto& i : labelArray ) {
-
-				if( !i.is_array() ) {
-					throw std::invalid_argument("invalid data format");
-				}
-
-				auto ary = array_cast(std::move(i));
-				auto it = ary.begin();
-
-				if( it == ary.end() || !it->is_string() ) {
-					throw std::invalid_argument("invalid data format");
-				}
-
-				auto label_id = boost::lexical_cast<int>(string_cast(std::move(*it)));
-
-				++it;
-
-				if( it == ary.end() || !it->is_string() ) {
-					throw std::invalid_argument("invalid data format");
-				}
-
-				auto key_jp = string_cast(std::move(*it));
-
-				++it;
-
-				if( it == ary.end() ) {
-					labels.insert( std::make_pair(label_id, key_jp) );
-					continue;
-				}
-
-				if( !it->is_string() ) {
-					throw std::invalid_argument("invalid data format");
-				}
-
-				auto key_en = string_cast(std::move(*it));
-				labels.insert( std::make_pair(label_id, key_en) );
-			}
-		}
-
-
-		///////////////	data
-
-		Logger::info("transform data...");
-
-		ujson::array crf_estimate;
-
-		for( auto& data : *datas ) {
-
-			ujson::array array;
-			auto strs = data->getStrs();
-
-			for( auto& seg : *data->getSegments() ) {
-
-				auto s = seg->getStart();
-				auto e = seg->getEnd();
-				auto label_id = seg->getLabel();
-				auto label = labels[label_id];
-
-				std::string word;
-				for( int i = s; i <= e; i++ ) {
-					word += strs->at(i).at(1);
-				}
-
-				if( label == "NONE" || label == "なし" ) {
-					continue;
-				}
-
-				auto v = ujson::object { { std::move(label), std::move(word) } };
-				array.push_back(v);
-			}
-
-			crf_estimate.push_back(std::move(array));
-		}
-
-		///////////////	output
-
-		auto object = ujson::object {
-			{ "title", std::move(datas->getTitle()) },
-			{ "crf_estimate", std::move(crf_estimate) }
-		};
-		std::cout << to_string(object) << std::endl;
-#endif
 	} catch(Error& e) {
 
 		Logger::error() << e.what();
