@@ -1,7 +1,7 @@
 
 SEMICRF=../semicrf
 
-all: test1 test2 gen_test bd2c_test bd2w_test test3 learn infer
+all: test1 test2 gen_test bd2c_test bd2w_test bdc2e_test test3 learn infer
 
 test1:
 	@echo "###### check0 ######"
@@ -108,6 +108,12 @@ bd2w_test:
 	@../bd2w body1.json > body1.txt && echo "OK" || echo "ERROR"
 	@diff answer/body1.txt body1.txt && echo "OK" || echo "ERROR"
 
+bdc2e_test:
+	@echo "###### bdc2e test 1 ######"
+	@echo "../bdc2e -b t0.json -c t1.json"
+	@../bdc2e -b t0.json -c t1.json > bdc2e_result.json && echo "OK" || echo "ERROR"
+	@diff answer/bdc2e_result.json bdc2e_result.json && echo "OK" || echo "ERROR"
+
 update:
 	-cp log1 answer/log1
 	-cp check8.json answer/check8.json
@@ -117,6 +123,7 @@ update:
 	-cp test19.json answer/test19.json
 	-cp body1.txt answer/body1.txt
 	-cp simple_output.json answer/simple_output.json
+	-cp bdc2e_result.json answer/bdc2e_result.json
 
 clean:
 	rm -f a b r1 r2 tmp* log1 check8.json

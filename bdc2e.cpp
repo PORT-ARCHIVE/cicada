@@ -81,10 +81,17 @@ int main(int argc, char *argv[])
 			std::ifstream ifs;
 			open(ifs, options.bodyTextFile);
 			Logger::info() << "parse " << options.bodyTextFile;
-
-			body = JsonIO::parse(ifs);
+			try {
+				body = JsonIO::parse(ifs);
+			} catch(...) {
+				std::stringstream ss;
+				ss << options.bodyTextFile << ": cannot parse";
+				throw Error(ss.str());
+			}
 			if( !body.is_array() ) {
-				throw std::invalid_argument("invalid data format");				
+				std::stringstream ss;
+				ss << options.bodyTextFile << ": top level is not an array";
+				throw Error(ss.str());
 			}
 		}
 
@@ -95,14 +102,23 @@ int main(int argc, char *argv[])
 			std::ifstream ifs;
 			open(ifs, options.accPredictionResultFile);
 			Logger::info() << "parse " << options.accPredictionResultFile;
-
-			acc_prediction_result = JsonIO::parse(ifs);
+			try {
+				acc_prediction_result = JsonIO::parse(ifs);
+			} catch(...) {
+				std::stringstream ss;
+				ss << options.accPredictionResultFile << ": cannot parse";
+				throw Error(ss.str());
+			}
 			if( !acc_prediction_result.is_array() ) {
-				throw std::invalid_argument("invalid data format");				
+				std::stringstream ss;
+				ss << options.accPredictionResultFile << ": top level is not an array";
+				throw Error(ss.str());
 			}			
 		}
 
 		///////////////	transform
+
+		Logger::info("transform data...");
 
 		auto body_array = array_cast(std::move(body));
 		auto ib = body_array.begin();
@@ -112,16 +128,20 @@ int main(int argc, char *argv[])
 
 		ujson::array c;
 
-		for( ; ib != body_array.end(); ib++, ia++ ) {
+		for( int i = 0; ib != body_array.end(); i++, ib++, ia++ ) {
 
 			if( !ib->is_object() ) {
-				throw std::invalid_argument("invalid data format");				
+				std::stringstream ss;
+				ss << options.bodyTextFile << ": " << i << "th element of the array is not a object";
+				throw Error(ss.str());
 			}
 
 			auto ob = object_cast( std::move(*ib) );
 
 			if( !ia->is_object() ) {
-				throw std::invalid_argument("invalid data format");				
+				std::stringstream ss;
+				ss << options.accPredictionResultFile << ": " << i << "th element of the array is not a object";
+				throw Error(ss.str());
 			}
 
 			auto oa = object_cast( std::move(*ia) );
@@ -130,7 +150,9 @@ int main(int argc, char *argv[])
 			{
 				auto t0 = find(ob, "title");
 				if( t0 == ob.end() || !t0->second.is_string() ) {
-					throw std::invalid_argument("invalid data format");
+					std::stringstream ss;
+					ss << options.bodyTextFile << ": no title found";
+					throw Error(ss.str());
 				}
 
 				auto t = t0->second; // copy to keep the original
@@ -138,36 +160,44 @@ int main(int argc, char *argv[])
 
 				auto t1 = find(oa, "title");
 				if( t1 == ob.end() || !t1->second.is_string() ) {
-					throw std::invalid_argument("invalid data format");
+					std::stringstream ss;
+					ss << options.accPredictionResultFile << ": no title found";
+					throw Error(ss.str());
 				}
 
 				auto s1 = string_cast(std::move(t1->second));
 
 				if( s0 != s1 ) {
-					throw std::invalid_argument("invalid data format");
+					std::stringstream ss;
+					ss << "titils of " << i << "th elements of arrays are different";
+					throw Error(ss.str());
 				}
 			}
 
 			// replace crf_estimate
 			{
 				auto itb = find(ob, "crf_estimate");
-				if( itb == ob.end() || !itb->second.is_string() ) {
-					throw std::invalid_argument("invalid data format");
+				if( itb == ob.end() ) {
+					std::stringstream ss;
+					ss << options.bodyTextFile << ": no crf_estimate found in " << i << "th element";
+					throw Error(ss.str());
 				}
 
 				auto ita = find(oa, "crf_estimate");
-				if( ita == oa.end() || !itb->second.is_string() ) {
-					throw std::invalid_argument("invalid data format");
+				if( ita == oa.end() ) {
+					std::stringstream ss;
+					ss << options.accPredictionResultFile << ": no crf_estimate found in " << i << "th element";
+					throw Error(ss.str());
 				}
 
-				*itb = *ita;
+				*itb = *ita; // replace
 			}
 
 			// remove body_split_text
 			{
 				auto itb = find(ob, "body_split_text");
 				if( itb == ob.end() || !itb->second.is_string() ) {
-					throw std::invalid_argument("invalid data format");
+					Logger::warn() << options.bodyTextFile << ": no body_split_text found in " << i << "th element";
 				}
 
 				itb->second = std::string("");

@@ -1,0 +1,18 @@
+[
+    {
+        "body_split_text" : "",
+        "crf_estimate" : {
+            "company_name" : "hoge Inc.",
+            "salary" : "100$"
+        },
+        "title" : "1"
+    },
+    {
+        "body_split_text" : "",
+        "crf_estimate" : {
+            "company_name" : "fuga Corp.",
+            "salary" : "200$"
+        },
+        "title" : "2"
+    }
+]
