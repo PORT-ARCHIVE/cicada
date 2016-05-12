@@ -71,7 +71,8 @@ int main(int argc, char *argv[])
 			Logger::setPattern(options.logPattern);
 		}
 
-		Logger::info("bd2c 0.0.1");
+		Logger::info() << "bdc2e 0.0.1";
+		Logger::info() << "Copyright (C) 2016 PORT, Inc.";
 
 		///////////////	body		
 
