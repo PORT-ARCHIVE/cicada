@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
 
 			*itb = *ita; // replace
 		}
-
+#if 0 // 分かち書き本文も残す
 		// remove body_split_text
 		{
 			auto itb = find(ob, "body_split_text");
@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
 
 			itb->second = std::string("");
 		}
-
+#endif
 		std::cout << to_string(ob) << std::endl;
 
 	} catch(Error& e) {

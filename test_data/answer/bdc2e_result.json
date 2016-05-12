@@ -1,5 +1,5 @@
 {
-    "body_split_text" : "",
+    "body_split_text" : "hogehogehoge",
     "crf_estimate" : {
         "company_name" : "hoge Inc.",
         "salary" : "100$"
