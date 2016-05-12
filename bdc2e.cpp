@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
 
 				if( s0 != s1 ) {
 					std::stringstream ss;
-					ss << "titils of " << i << "th elements of arrays are different";
+					ss << "titles of " << i << "th elements of arrays are different";
 					throw Error(ss.str());
 				}
 			}
