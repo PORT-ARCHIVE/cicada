@@ -9,8 +9,6 @@
 #include "FileIO.hpp"
 #include "ujson.hpp"
 #include "JsonIO.hpp"
-#include "SemiCrfData.hpp"
-
 
 class Options {
 public:
