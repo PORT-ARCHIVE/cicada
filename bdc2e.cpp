@@ -88,9 +88,9 @@ int main(int argc, char *argv[])
 				ss << options.bodyTextFile << ": cannot parse";
 				throw Error(ss.str());
 			}
-			if( !body.is_array() ) {
+			if( !body.is_object() ) {
 				std::stringstream ss;
-				ss << options.bodyTextFile << ": top level is not an array";
+				ss << options.bodyTextFile << ": top level is not an object";
 				throw Error(ss.str());
 			}
 		}
@@ -109,9 +109,9 @@ int main(int argc, char *argv[])
 				ss << options.accPredictionResultFile << ": cannot parse";
 				throw Error(ss.str());
 			}
-			if( !acc_prediction_result.is_array() ) {
+			if( !acc_prediction_result.is_object() ) {
 				std::stringstream ss;
-				ss << options.accPredictionResultFile << ": top level is not an array";
+				ss << options.accPredictionResultFile << ": top level is not an object";
 				throw Error(ss.str());
 			}			
 		}
@@ -120,93 +120,68 @@ int main(int argc, char *argv[])
 
 		Logger::info("transform data...");
 
-		auto body_array = array_cast(std::move(body));
-		auto ib = body_array.begin();
+		auto ob = object_cast(std::move(body));
+		auto oa = object_cast(std::move(acc_prediction_result));
 
-		auto acc_array = array_cast(std::move(acc_prediction_result));
-		auto ia = acc_array.begin();
 
-		ujson::array c;
-
-		for( int i = 0; ib != body_array.end(); i++, ib++, ia++ ) {
-
-			if( !ib->is_object() ) {
+		// check title
+		{
+			auto t0 = find(ob, "title");
+			if( t0 == ob.end() || !t0->second.is_string() ) {
 				std::stringstream ss;
-				ss << options.bodyTextFile << ": " << i << "th element of the array is not a object";
+				ss << options.bodyTextFile << ": no title found";
 				throw Error(ss.str());
 			}
 
-			auto ob = object_cast( std::move(*ib) );
+			auto t = t0->second; // copy to keep the original
+			auto s0 = string_cast(std::move(t));
 
-			if( !ia->is_object() ) {
+			auto t1 = find(oa, "title");
+			if( t1 == ob.end() || !t1->second.is_string() ) {
 				std::stringstream ss;
-				ss << options.accPredictionResultFile << ": " << i << "th element of the array is not a object";
+				ss << options.accPredictionResultFile << ": no title found";
 				throw Error(ss.str());
 			}
 
-			auto oa = object_cast( std::move(*ia) );
+			auto s1 = string_cast(std::move(t1->second));
 
-			// check title
-			{
-				auto t0 = find(ob, "title");
-				if( t0 == ob.end() || !t0->second.is_string() ) {
-					std::stringstream ss;
-					ss << options.bodyTextFile << ": no title found";
-					throw Error(ss.str());
-				}
-
-				auto t = t0->second; // copy to keep the original
-				auto s0 = string_cast(std::move(t));
-
-				auto t1 = find(oa, "title");
-				if( t1 == ob.end() || !t1->second.is_string() ) {
-					std::stringstream ss;
-					ss << options.accPredictionResultFile << ": no title found";
-					throw Error(ss.str());
-				}
-
-				auto s1 = string_cast(std::move(t1->second));
-
-				if( s0 != s1 ) {
-					std::stringstream ss;
-					ss << "titles of " << i << "th elements of arrays are different";
-					throw Error(ss.str());
-				}
+			if( s0 != s1 ) {
+				std::stringstream ss;
+				ss << "titles of objects are different";
+				throw Error(ss.str());
 			}
-
-			// replace crf_estimate
-			{
-				auto itb = find(ob, "crf_estimate");
-				if( itb == ob.end() ) {
-					std::stringstream ss;
-					ss << options.bodyTextFile << ": no crf_estimate found in " << i << "th element";
-					throw Error(ss.str());
-				}
-
-				auto ita = find(oa, "crf_estimate");
-				if( ita == oa.end() ) {
-					std::stringstream ss;
-					ss << options.accPredictionResultFile << ": no crf_estimate found in " << i << "th element";
-					throw Error(ss.str());
-				}
-
-				*itb = *ita; // replace
-			}
-
-			// remove body_split_text
-			{
-				auto itb = find(ob, "body_split_text");
-				if( itb == ob.end() || !itb->second.is_string() ) {
-					Logger::warn() << options.bodyTextFile << ": no body_split_text found in " << i << "th element";
-				}
-
-				itb->second = std::string("");
-			}
-
-			c.push_back(ob);
 		}
 
-		std::cout << to_string(c) << std::endl;
+		// replace crf_estimate
+		{
+			auto itb = find(ob, "crf_estimate");
+			if( itb == ob.end() ) {
+				std::stringstream ss;
+				ss << options.bodyTextFile << ": no crf_estimate found";
+				throw Error(ss.str());
+			}
+
+			auto ita = find(oa, "crf_estimate");
+			if( ita == oa.end() ) {
+				std::stringstream ss;
+				ss << options.accPredictionResultFile << ": no crf_estimate found";
+				throw Error(ss.str());
+			}
+
+			*itb = *ita; // replace
+		}
+
+		// remove body_split_text
+		{
+			auto itb = find(ob, "body_split_text");
+			if( itb == ob.end() || !itb->second.is_string() ) {
+				Logger::warn() << options.bodyTextFile << ": no body_split_text found";
+			}
+
+			itb->second = std::string("");
+		}
+
+		std::cout << to_string(ob) << std::endl;
 
 	} catch(Error& e) {
 
