@@ -116,7 +116,7 @@ namespace SemiCrf {
 	{
 		auto v = JsonIO::parse(is);
 		if( !v.is_object() ) {
-			throw std::invalid_argument("object expected");
+			throw Error("object expected");
 		}
 		auto object = object_cast(std::move(v));
 		title = JsonIO::readString(object, "title");
@@ -229,14 +229,14 @@ namespace SemiCrf {
 			for( auto& i : labels ) {
 
 				if( !i.is_array() ) {
-					throw std::invalid_argument("invalid data format");
+					throw Error("invalid data format");
 				}
 
 				auto ary = array_cast(std::move(i));
 				auto it = ary.begin();
 
 				if( it == ary.end() || !it->is_string() ) {
-					throw std::invalid_argument("invalid data format");
+					throw Error("invalid data format");
 				}
 
 				auto label_id = boost::lexical_cast<int>(string_cast(std::move(*it)));
@@ -244,7 +244,7 @@ namespace SemiCrf {
 				++it;
 
 				if( it == ary.end() || !it->is_string() ) {
-					throw std::invalid_argument("invalid data format");
+					throw Error("invalid data format");
 				}
 
 				auto key_jp = string_cast(std::move(*it));
@@ -257,7 +257,7 @@ namespace SemiCrf {
 				}
 
 				if( !it->is_string() ) {
-					throw std::invalid_argument("invalid data format");
+					throw Error("invalid data format");
 				}
 
 				auto key_en = string_cast(std::move(*it));
@@ -319,14 +319,14 @@ namespace SemiCrf {
 	{
 		auto it = find(object, "data");
 		if( it == object.end() || !it->second.is_array() ) {
-			throw std::invalid_argument("'data' with type string not found");
+			throw Error("'data' with type string not found");
 		}
 
 		auto array0 = array_cast(std::move(it->second));
 		for( auto& i : array0 ) {
 
 			if( !i.is_array() ) {
-				throw std::invalid_argument("invalid data format");
+				throw Error("invalid data format");
 			}
 
 			auto data = std::make_shared<Data>(); Logger::debug() << "BEGIN : data was created.";
@@ -379,13 +379,13 @@ namespace SemiCrf {
 			counter++;
 
 			if( !j.is_array() ) {
-				throw std::invalid_argument("invalid data format");
+				throw Error("invalid data format");
 			}
 
 			auto array2 = array_cast(std::move(j));
 			auto k = array2.begin();
 			if( !k->is_string() ) {
-				throw std::invalid_argument("invalid data format");
+				throw Error("invalid data format");
 			}
 
 			auto word_id = string_cast(std::move(*k)); Logger::debug() << word_id;
@@ -394,14 +394,14 @@ namespace SemiCrf {
 
 			k++;
 			if( !k->is_string() ) {
-				throw std::invalid_argument("invalid format");
+				throw Error("invalid format");
 			}
 
 			auto descriptor = string_cast(std::move(*k)); Logger::debug() << descriptor;
 
 			k++;
 			if( !k->is_string() ) {
-				throw std::invalid_argument("invalid format");
+				throw Error("invalid format");
 			}
 
 			auto label = string_cast(std::move(*k)); Logger::debug() << label;
@@ -493,13 +493,13 @@ namespace SemiCrf {
 			counter++;
 
 			if( !j.is_array() ) {
-				throw std::invalid_argument("invalid format");
+				throw Error("invalid format");
 			}
 
 			auto array2 = array_cast(std::move(j));
 			auto k = array2.begin();
 			if( !k->is_string() ) {
-				throw std::invalid_argument("invalid format");
+				throw Error("invalid format");
 			}
 
 

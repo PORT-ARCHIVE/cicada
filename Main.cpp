@@ -141,6 +141,10 @@ decltype( std::make_shared<SemiCrf::Algorithm>() ) createAlgorithm(const Options
 		std::stringstream ss;
 		ss << "failed to read " << file << ": " << e.what();
 		throw Error(ss.str());
+	} catch(...) {
+		std::stringstream ss;
+		ss << "failed to read " << file << ": " << "unexpected excption";
+		throw Error(ss.str());
 	}
 
 	// datas->write(std::cerr);

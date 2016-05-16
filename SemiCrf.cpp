@@ -59,10 +59,10 @@ namespace SemiCrf {
 	{
 		auto v = JsonIO::parse(is);
 		if( !v.is_object() ) {
-			throw std::invalid_argument("object expected");
+			throw Error("object expected");
 		}
 		auto object = object_cast(std::move(v));
-			auto title = JsonIO::readString(object, "title");
+		auto title = JsonIO::readString(object, "title");
 		auto dims = JsonIO::readIntAry(object, "dimension");
 		xDim = dims[0];
 		yDim = dims[1];
@@ -776,6 +776,10 @@ namespace SemiCrf {
 		} catch(Error& e) {
 			std::stringstream ss;
 			ss << "failed to read " << wfile << ": " << e.what();
+			throw Error(ss.str());
+		} catch(...) {
+			std::stringstream ss;
+			ss << "failed to read " << wfile << ": unexpectied excption";
 			throw Error(ss.str());
 		}
 		setWeights(weights);

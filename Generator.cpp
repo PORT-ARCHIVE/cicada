@@ -175,14 +175,14 @@ void make_array(const ujson::object::const_iterator& it, vector<vector<double>>&
     for( auto i = array0.begin(); i != array0.end(); ++i, ++p ) {
 
 		if( !i->is_array() ) {
-			throw std::invalid_argument("invalid format");
+			throw Error("invalid format");
 		}
 
 		std::vector<ujson::value> array1 = array_cast(std::move(*i));
 		for( auto j = array1.begin(); j != array1.end(); ++j ) {
 
 			if( !j->is_number() ) {
-				throw std::invalid_argument("invalid format");
+				throw Error("invalid format");
 			}
 
 			double v = double_cast(std::move(*j));
@@ -224,7 +224,7 @@ void make_array(const ujson::object::const_iterator& it, vector<vector<double>>&
 void make_arrays(ujson::value v, bool nomalize = false)
 {
 	if( !v.is_object() ) {
-		throw std::invalid_argument("object expected for make_book");
+		throw Error("object expected for make_book");
 	}
 
 	std::vector<std::pair<std::string, ujson::value>> object = object_cast(std::move(v));
@@ -232,14 +232,14 @@ void make_arrays(ujson::value v, bool nomalize = false)
 	{
 		auto it = find(object, "y2x");
 		if( it == object.end() || !it->second.is_array() ) {
-			throw std::invalid_argument("'y2x' with type array not found");
+			throw Error("'y2x' with type array not found");
 		}
 		make_array(it, y2x, nomalize);
 	}
 	{
 		auto it = find(object, "y2y");
 		if( it == object.end() || !it->second.is_array() ) {
-			throw std::invalid_argument("'y2y' with type array not found");
+			throw Error("'y2y' with type array not found");
 		}
 		make_array(it, y2y, nomalize);
 	}

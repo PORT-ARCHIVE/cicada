@@ -1,6 +1,8 @@
 // © 2016 PORT INC.
 
+#include <sstream>
 #include "JsonIO.hpp"
+#include "Error.hpp"
 
 namespace JsonIO {
 
@@ -15,7 +17,9 @@ namespace JsonIO {
 	{
 		auto it = find(object, tag.c_str());
 		if( it == object.end() || !it->second.is_string() ) {
-			throw std::invalid_argument("title' with type string not found"); // T.B.D.
+			std::stringstream ss;
+			ss << "'" << tag << "' with type string not found";
+			throw Error(ss.str());
 		}
 		auto str = string_cast(std::move(it->second));
 		return std::move(str);
@@ -25,7 +29,9 @@ namespace JsonIO {
 	{
 		auto it = find(object, tag.c_str());
 		if( it == object.end() || !it->second.is_number() ) {
-			throw std::invalid_argument("max_length' with type string not found"); // T.B.D
+			std::stringstream ss;
+			ss << "'" << tag << "' with type number not found";
+			throw Error(ss.str());
 		}
 		int value = int32_cast(std::move(it->second));
 		return value;
@@ -37,14 +43,16 @@ namespace JsonIO {
 
 		auto it = find(object, tag.c_str());
 		if( it == object.end() || !it->second.is_array() ) {
-			throw std::invalid_argument("'dimention' with type array not found"); // T.B.D
+			std::stringstream ss;
+			ss << "'" << tag << "' with type array not found";
+			throw Error(ss.str());
 		}
 
 		auto array = array_cast(std::move(it->second));
 		for( auto i = array.begin(); i != array.end(); ++i ) {
 
 			if( !i->is_number() ) {
-				throw std::invalid_argument("invalid data format");
+				throw Error("invalid data format");
 			}
 
 			ary.push_back(int32_cast(std::move(*i)));
@@ -59,14 +67,16 @@ namespace JsonIO {
 
 		auto it = find(object, tag.c_str());
 		if( it == object.end() || !it->second.is_array() ) {
-			throw std::invalid_argument("'weights' with type object not found"); // T.B.D
+			std::stringstream ss;
+			ss << "'" << tag << "' with type string not found";
+			throw Error(ss.str());
 		}
 
 		auto array = array_cast(std::move(it->second));
 		for( auto i = array.begin(); i != array.end(); ++i ) {
 
 			if( !i->is_number() ) {
-				throw std::invalid_argument("invalid data format");
+				throw Error("invalid data format");
 			}
 
 			ary.push_back(double_cast(std::move(*i)));
@@ -81,7 +91,9 @@ namespace JsonIO {
 
 		auto it = find(object, tag.c_str());
 		if( it == object.end() || !it->second.is_array() ) {
-			throw std::invalid_argument("'mean' with type object not found"); // T.B.D
+			std::stringstream ss;
+			ss << "'" << tag << "' with type array not found";
+			throw Error(ss.str());
 		}
 
 		auto array0 = array_cast(std::move(it->second));
@@ -91,7 +103,7 @@ namespace JsonIO {
 			auto j = array1.begin();
 
 			if( !j->is_number() ) {
-				throw std::invalid_argument("invalid data format");
+				throw Error("invalid data format");
 			}
 
 			int lb = int32_cast(std::move(*j));
@@ -99,7 +111,7 @@ namespace JsonIO {
 			j++;
 
 			if( !j->is_number() ) {
-				throw std::invalid_argument("invalid data format");
+				throw Error("invalid data format");
 			}
 
 			double m = double_cast(std::move(*j));
@@ -114,7 +126,9 @@ namespace JsonIO {
 	{
 		auto it = find(object, tag.c_str());
 		if( it == object.end() ) {
-			throw std::invalid_argument("labels' with type string not found"); // T.B.D
+			std::stringstream ss;
+			ss << "'" << tag << "' not found";
+			throw Error(ss.str());
 		}
 
 		auto ary = array_cast(std::move(it->second));
