@@ -5,6 +5,7 @@
 #include "Optimizer.hpp"
 #include "Error.hpp"
 #include "Logger.hpp"
+#include "Signal.hpp"
 
 namespace Optimizer {
 
@@ -92,6 +93,11 @@ namespace Optimizer {
 
 		if( !flg && itr == maxIteration ) {
 			throw Error("iteration limit");
+		}
+
+		if( Signal::getFlg() ) {
+			Logger::info() << "interrupt signal received";
+			flg = true;
 		}
 
 		return flg;
@@ -239,6 +245,11 @@ namespace Optimizer {
 
 		if( !flg && itr == maxIteration ) {
 			throw Error("iteration limit");
+		}
+
+		if( Signal::getFlg() ) {
+			Logger::info() << "interrupt signal received";
+			flg = true;
 		}
 
 		return flg;

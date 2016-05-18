@@ -10,7 +10,7 @@ gen_LDADD = -lstdc++
 bd2c_LDADD = -lstdc++
 bdc2e_LDADD = -lstdc++
 # ソースコード
-semicrf_SOURCES = Main.cpp SemiCrf.cpp SemiCrfData.cpp AppTest.cpp Logger.cpp MultiByteTokenizer.cpp Error.cpp Optimizer.cpp W2V.cpp ujson.cpp double-conversion.cc JsonIO.cpp
+semicrf_SOURCES = Main.cpp SemiCrf.cpp SemiCrfData.cpp AppTest.cpp Logger.cpp MultiByteTokenizer.cpp Error.cpp Optimizer.cpp W2V.cpp ujson.cpp double-conversion.cc JsonIO.cpp Signal.cpp
 gen_SOURCES = Generator.cpp Logger.cpp Error.cpp ujson.cpp double-conversion.cc
 bd2c_SOURCES = bd2c.cpp Logger.cpp MultiByteTokenizer.cpp Error.cpp W2V.cpp ujson.cpp double-conversion.cc JsonIO.cpp
 bdc2e_SOURCES = bdc2e.cpp SemiCrfData.cpp Logger.cpp MultiByteTokenizer.cpp Error.cpp W2V.cpp ujson.cpp double-conversion.cc JsonIO.cpp
