@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <regex>
 #include <boost/lexical_cast.hpp>
 #include "Logger.hpp"
 #include "Error.hpp"
@@ -139,16 +140,25 @@ int main(int argc, char *argv[])
 		ujson::array data;
 		ujson::array lines;
 		std::string tok = toknizer.get();
+		std::string tok0 = tok;
+		std::string tok1 = tok;
+
+		std::regex pattern("(diget_[0-9]+)\\\\\\:([0-9]+)");
+		std::smatch results;
+		if( std::regex_match( tok, results, pattern ) && results.size() == 3 ) {
+			tok0 = results.position(1);
+			tok1 = results.position(2);
+		}
 
 		while( !tok.empty() ) {
 
 			ujson::array line;
-			auto i = matrix->w2i(tok);
+			auto i = matrix->w2i(tok0);
 			std::string ID = boost::lexical_cast<std::string>(i);
 			line.push_back(ID);
 			line.push_back("*");
 			line.push_back("*");
-			line.push_back(tok);
+			line.push_back(tok1);
 			lines.push_back(std::move(line));
 			if( tok == "。" ){ // T.B.D.
 				data.push_back(std::move(lines));
@@ -156,6 +166,12 @@ int main(int argc, char *argv[])
 			}
 
 			tok = toknizer.get();
+			tok0 = tok;
+			tok1 = tok;
+			if( std::regex_match( tok, results, pattern ) && results.size() == 3 ) {
+				tok0 = results.position(1);
+				tok1 = results.position(2);
+			}
 		}
 
 		///////////////	output
