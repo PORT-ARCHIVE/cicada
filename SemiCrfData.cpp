@@ -1,5 +1,6 @@
 // © 2016 PORT INC.
 
+#include <map>
 #include "SemiCrfData.hpp"
 #include "Logger.hpp"
 #include "Error.hpp"
@@ -247,12 +248,12 @@ namespace SemiCrf {
 					throw Error("invalid data format");
 				}
 
-				auto key_jp = string_cast(std::move(*it));
+				auto kw_jp = string_cast(std::move(*it));
 
 				++it;
 
 				if( it == ary.end() ) {
-					labels_map.insert( std::make_pair(label_id, key_jp) );
+					labels_map.insert( std::make_pair(label_id, kw_jp) );
 					continue;
 				}
 
@@ -260,8 +261,8 @@ namespace SemiCrf {
 					throw Error("invalid data format");
 				}
 
-				auto key_en = string_cast(std::move(*it));
-				labels_map.insert( std::make_pair(label_id, key_en) );
+				auto kw_en = string_cast(std::move(*it));
+				labels_map.insert( std::make_pair(label_id, kw_en) );
 			}
 		}
 
@@ -271,6 +272,7 @@ namespace SemiCrf {
 
 			ujson::array array;
 			auto strs = data->getStrs();
+			std::multimap<std::string, std::string> mm;
 
 			for( auto& seg : *data->getSegments() ) {
 
@@ -291,8 +293,33 @@ namespace SemiCrf {
 					continue;
 				}
 
-				auto v = ujson::object { { std::move(label), std::move(word) } };
-				array.push_back(v);
+				mm.insert( std::move(std::make_pair(std::move(label), std::move(word))) );
+			}
+
+			for( auto& p : labels_map ) {
+
+				auto il = mm.lower_bound(p.second);
+				auto iu = mm.upper_bound(p.second);
+				auto d = std::distance(il, iu);
+
+				if( d == 0 ) {
+					continue;
+
+				} else if( d == 1 ) {
+
+					auto v = ujson::object { { il->first, il->second } };
+					array.push_back(v);
+
+				} else {
+
+					ujson::array inner_array;
+					for( auto i = il; i != iu; ++i ) {
+						inner_array.push_back(i->second);
+					}
+
+					auto v = ujson::object { { il->first,  std::move(inner_array) } };
+					array.push_back(v);
+				}
 			}
 
 			crf_estimate.push_back(std::move(array));
