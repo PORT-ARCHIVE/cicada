@@ -261,7 +261,7 @@ namespace SemiCrf {
 	{
 		Logger::debug() << "Learner()";
 		if( !(flg & ENABLE_LIKELIHOOD_ONLY) ) {
-			Logger::info() << "Learning ...";
+			Logger::info() << "Learning...";
 		}
 	}
 
@@ -759,7 +759,7 @@ namespace SemiCrf {
 		: Algorithm(arg)
 	{
 		Logger::debug() << "Predictor()";
-		Logger::info() << "Prediction ...";
+		Logger::info() << "Prediction...";
 	}
 
 	Predictor::~Predictor()
