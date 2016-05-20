@@ -10,7 +10,6 @@
 #include "Logger.hpp"
 #include "Error.hpp"
 #include "FileIO.hpp"
-#include "Signal.hpp"
 
 class Options {
 public:
@@ -170,10 +169,6 @@ int main(int argc, char *argv[])
 {
 	int ret = 0x0;
 	Logger::setName("cicada");
-
-	if( signal(SIGINT, Signal::handler) == SIG_ERR ) {
-		Logger::warn() << "failed to set signal handler";
-	}
 
 	try {
 

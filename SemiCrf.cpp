@@ -19,6 +19,7 @@
 #include "Error.hpp"
 #include "ujson.hpp"
 #include "JsonIO.hpp"
+#include "Signal.hpp"
 
 namespace SemiCrf {
 
@@ -358,6 +359,11 @@ namespace SemiCrf {
 			optimizer->setRe(e1);
 			optimizer->setAe(e1);
 			optimizer->setMaxIteration(maxIteration);
+
+			if( signal(SIGINT, Signal::handler) == SIG_ERR ) {
+				Logger::warn() << "failed to set signal handler";
+			}
+
 			optimizer->optimize();
 
 		} else {
