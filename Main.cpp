@@ -45,7 +45,9 @@ void Options::parse(int argc, char *argv[])
 			} else if( arg == "-i" ) {
 				predictionDataFile = argv[++i];
 			} else if( arg == "-l" || arg == "--max-length") {
-				maxLength = boost::lexical_cast<int>(argv[++i]);
+				std::string l(argv[++i]);
+				if( l == "auto") continue;
+				else maxLength = boost::lexical_cast<int>(l);
 			} else if( arg == "-r" || arg == "--max-iteration") {
 				maxIteration = boost::lexical_cast<int>(argv[++i]);
 			} else if( arg == "-e0" ) {
