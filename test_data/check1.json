@@ -1,11 +1,15 @@
 {
-	"title" : "check1",
 	"dimension" : [ 2, 2 ],
 	"feature" : "DIGIT",
 	"data" : [
-		[
-			["0",         "S/E",         "0"],
-			["1",         "S/E",         "1"]
-		]
+		{
+			"title" : "check1",
+			"data" : [
+				[
+					["0",         "S/E",         "0"],
+					["1",         "S/E",         "1"]
+				]
+			]
+		}
 	]
 }
