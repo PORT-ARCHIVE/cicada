@@ -103,7 +103,7 @@ namespace SemiCrf {
 	};
 
 	// データ集合
-	class Datas : public std::vector<std::shared_ptr<Data>> {
+	class Datas : public std::vector<std::pair<std::string,std::vector<std::shared_ptr<Data>>>> {
 	protected:
 
 		int xDim{-1};
@@ -143,7 +143,7 @@ namespace SemiCrf {
 
 	protected:
 
-		virtual void readJsonData(JsonIO::Object& object);
+		virtual void readJsonData(std::vector<ujson::value>& data);
 		virtual void readJsonDataCore(ujson::value& value, Data& data) = 0;
 		virtual void computeMeanLength();
 	};

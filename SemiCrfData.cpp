@@ -99,8 +99,10 @@ namespace SemiCrf {
 
 	void Datas::computeMeanLength()
 	{
-		for( auto& d : *this ) {
-			d->computeMeanLength(&count, &mean, &variance);
+		for( auto& file : *this ) {
+	    for( auto& data : file.second ) {
+			data->computeMeanLength(&count, &mean, &variance);
+		}
 		}
 
 		for( auto ic : count ) {
@@ -120,7 +122,6 @@ namespace SemiCrf {
 			throw Error("object expected");
 		}
 		auto object = object_cast(std::move(v));
-		title = JsonIO::readString(object, "title");
 		auto dims = JsonIO::readIntAry(object, "dimension");
 		xDim = dims[0];
 		yDim = dims[1];
@@ -132,7 +133,34 @@ namespace SemiCrf {
 				throw Error("no labels specified");
 			}
 		}
-		readJsonData(object);
+
+		auto array = JsonIO::readUAry(object, "data");
+		readJsonData(array);
+	}
+
+	void Datas::readJsonData(std::vector<ujson::value>& array0)
+	{
+		for( auto& value0 : array0 ) {
+
+			std::vector<std::shared_ptr<Data>> datas;
+
+			if( !value0.is_object() ) {
+				throw Error("invalid data format");
+			}
+
+			auto object = object_cast(std::move(value0));
+			auto title = JsonIO::readString(object, "title");
+			auto array1 = JsonIO::readUAry(object, "data");
+
+			for( auto& value1 : array1 ) {
+
+				auto data = std::make_shared<Data>(); Logger::debug() << "BEGIN : data was created.";
+				readJsonDataCore(value1, *data);
+				datas.push_back(data);                Logger::debug() << "END : data was pushed.";
+			}
+
+			push_back(std::move(std::make_pair(std::move(title),std::move(datas))));
+		}
 	}
 
 	void Data::writeJson(ujson::array& ary0) const
@@ -141,7 +169,7 @@ namespace SemiCrf {
 
 		ujson::array ary1;
 
-		for( auto s : *segs ) {
+		for( auto& s : *segs ) {
 
 			int start = s->getStart();
 			int end = s->getEnd();
@@ -200,8 +228,10 @@ namespace SemiCrf {
 		Logger::debug() << "Datas::writeJson()";
 
 		ujson::array datas;
-		for( auto d : *this ) {
-			d->writeJson(datas);
+		for( auto& file : *this ) {
+	    for( auto& data : file.second ) {
+			data->writeJson(datas);
+		}
 		}
 
 		auto object = ujson::object {
@@ -268,7 +298,8 @@ namespace SemiCrf {
 
 		ujson::array crf_estimate;
 
-		for( auto& data : *this ) {
+		for( auto& file : *this ) {
+		for( auto& data : file.second ) {
 
 			ujson::array array;
 			auto strs = data->getStrs();
@@ -324,6 +355,7 @@ namespace SemiCrf {
 
 			crf_estimate.push_back(std::move(array));
 		}
+		}
 
 		auto object = ujson::object {
 			{ "title", title },
@@ -342,37 +374,21 @@ namespace SemiCrf {
 		}
 	}
 
-	void Datas::readJsonData(JsonIO::Object& object)
-	{
-		auto it = find(object, "data");
-		if( it == object.end() || !it->second.is_array() ) {
-			throw Error("'data' with type string not found");
-		}
-
-		auto array0 = array_cast(std::move(it->second));
-		for( auto& i : array0 ) {
-
-			if( !i.is_array() ) {
-				throw Error("invalid data format");
-			}
-
-			auto data = std::make_shared<Data>(); Logger::debug() << "BEGIN : data was created.";
-			readJsonDataCore(i, *data);
-			push_back(std::move(data)); Logger::debug() << "END : data was pushed.";
-		}
-	}
-
 	void Datas::setMean(const std::map<int ,double>& arg) {
 		mean = arg;
-		for( auto& d : *this ) {
-			d->setMeans(&mean);
+		for( auto& file : *this ) {
+		for( auto& data : file.second ) {
+			data->setMeans(&mean);
+		}
 		}
 	}
 
 	void Datas::setVariance(const std::map<int ,double>& arg) {
 		variance = arg;
-		for( auto& d : *this ) {
-			d->setVariancies(&variance);
+		for( auto& file : *this ) {
+		for( auto& data : file.second ) {
+			data->setVariancies(&variance);
+		}
 		}
 	}
 

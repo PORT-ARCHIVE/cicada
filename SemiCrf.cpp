@@ -72,7 +72,7 @@ namespace SemiCrf {
 		mean = JsonIO::readIntDoubleMap(object, "mean");
 		variance = JsonIO::readIntDoubleMap(object, "variance");
 		auto weight = JsonIO::readDoubleAry(object, "weights");
-		for( auto w : weight ) push_back(w);
+		for( auto& w : weight ) push_back(w);
 	}
 
 	void Weights::read(std::istream& ifs)
@@ -376,7 +376,8 @@ namespace SemiCrf {
 
 	void Learner::computeGrad(double& L, std::vector<double>& dL, bool grad)
 	{
-		for( auto data : *datas ) {
+		for( auto& file : *datas ) {
+		for( auto& data : file.second ) {
 
 			current_data = data;
 			current_wgtab = createCacheTable(cacheSize);
@@ -390,7 +391,7 @@ namespace SemiCrf {
 
 			if( !(flg & DISABLE_REGULARIZATION) ) {
 				double w2 = 0.0;
-				for( auto w : *weights ) {
+				for( auto& w : *weights ) {
 					w2 += w*w;
 				}
 				w2 *= rp;
@@ -419,6 +420,7 @@ namespace SemiCrf {
 			}
 			Logger::debug() << "cache_hit_rate=" << (double)hit/(double)(miss+hit);
 		}
+		}
 	}
 
 	std::vector<double> Learner::computeG(double& WG)
@@ -444,7 +446,7 @@ namespace SemiCrf {
 		}
 
 		int k = 0;
-		for( auto g : Gs ) {
+		for( auto& g : Gs ) {
 			Logger::debug() << "G(" << k++ << ")=" << g;
 		}
 
@@ -847,7 +849,8 @@ namespace SemiCrf {
 	{
 		Logger::debug() << "Predictor::compute()";
 
-		for( auto data : *datas ) {
+		for( auto& file : *datas ) {
+		for( auto& data : file.second ) {
 
 			current_data = data;
 
@@ -880,6 +883,7 @@ namespace SemiCrf {
 			assert( 0 < maxd );
 			backtrack(maxy, maxd);
 			printV();
+		}
 		}
 	}
 
