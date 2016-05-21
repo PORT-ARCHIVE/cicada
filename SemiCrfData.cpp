@@ -100,9 +100,9 @@ namespace SemiCrf {
 	void Datas::computeMeanLength()
 	{
 		for( auto& file : *this ) {
-	    for( auto& data : file.second ) {
-			data->computeMeanLength(&count, &mean, &variance);
-		}
+			for( auto& data : file.second ) {
+				data->computeMeanLength(&count, &mean, &variance);
+			}
 		}
 
 		for( auto ic : count ) {
@@ -313,70 +313,69 @@ namespace SemiCrf {
 			ujson::array crf_estimate;
 			auto title = file.first;
 
-		for( auto& data : file.second ) {
+			for( auto& data : file.second ) {
 
-			ujson::array array;
-			auto strs = data->getStrs();
-			std::multimap<std::string, std::string> mm;
+				ujson::array array;
+				auto strs = data->getStrs();
+				std::multimap<std::string, std::string> mm;
 
-			for( auto& seg : *data->getSegments() ) {
+				for( auto& seg : *data->getSegments() ) {
 
-				auto s = seg->getStart();
-				auto e = seg->getEnd();
-				auto label_id = seg->getLabel();
-				auto label = labels_map[label_id];
+					auto s = seg->getStart();
+					auto e = seg->getEnd();
+					auto label_id = seg->getLabel();
+					auto label = labels_map[label_id];
 
-				std::string word;
-				for( int i = s; i <= e; i++ ) {
-					if( strs->at(i).size() < 2 ) {
-						throw Error("option '--enable-simple-prediction-output' not supported");
-					}
-					word += strs->at(i).at(1);
-				}
-
-				if( label == "NONE" || label == "なし" ) {
-					continue;
-				}
-
-				mm.insert( std::move(std::make_pair(std::move(label), std::move(word))) );
-			}
-
-			for( auto& p : labels_map ) {
-
-				auto il = mm.lower_bound(p.second);
-				auto iu = mm.upper_bound(p.second);
-				auto d = std::distance(il, iu);
-
-				if( d == 0 ) {
-					continue;
-
-				} else if( d == 1 ) {
-
-					auto v = ujson::object { { il->first, il->second } };
-					array.push_back(v);
-
-				} else {
-
-					ujson::array inner_array;
-					for( auto i = il; i != iu; ++i ) {
-						inner_array.push_back(i->second);
+					std::string word;
+					for( int i = s; i <= e; i++ ) {
+						if( strs->at(i).size() < 2 ) {
+							throw Error("option '--enable-simple-prediction-output' not supported");
+						}
+						word += strs->at(i).at(1);
 					}
 
-					auto v = ujson::object { { il->first,  std::move(inner_array) } };
-					array.push_back(v);
+					if( label == "NONE" || label == "なし" ) {
+						continue;
+					}
+
+					mm.insert( std::move(std::make_pair(std::move(label), std::move(word))) );
 				}
+
+				for( auto& p : labels_map ) {
+
+					auto il = mm.lower_bound(p.second);
+					auto iu = mm.upper_bound(p.second);
+					auto d = std::distance(il, iu);
+
+					if( d == 0 ) {
+						continue;
+
+					} else if( d == 1 ) {
+
+						auto v = ujson::object { { il->first, il->second } };
+						array.push_back(v);
+
+					} else {
+
+						ujson::array inner_array;
+						for( auto i = il; i != iu; ++i ) {
+							inner_array.push_back(i->second);
+						}
+
+						auto v = ujson::object { { il->first,  std::move(inner_array) } };
+						array.push_back(v);
+					}
+				}
+
+				crf_estimate.push_back(std::move(array));
 			}
 
-			crf_estimate.push_back(std::move(array));
-		}
+			auto object = ujson::object {
+				{ "title", title },
+				{ "crf_estimate", std::move(crf_estimate) }
+			};
 
-		auto object = ujson::object {
-			{ "title", title },
-			{ "crf_estimate", std::move(crf_estimate) }
-		};
-
-		array.push_back(object);
-
+			array.push_back(object);
 		}
 
 		output << to_string(array) << std::endl;
@@ -394,18 +393,18 @@ namespace SemiCrf {
 	void Datas::setMean(const std::map<int ,double>& arg) {
 		mean = arg;
 		for( auto& file : *this ) {
-		for( auto& data : file.second ) {
-			data->setMeans(&mean);
-		}
+			for( auto& data : file.second ) {
+				data->setMeans(&mean);
+			}
 		}
 	}
 
 	void Datas::setVariance(const std::map<int ,double>& arg) {
 		variance = arg;
 		for( auto& file : *this ) {
-		for( auto& data : file.second ) {
-			data->setVariancies(&variance);
-		}
+			for( auto& data : file.second ) {
+				data->setVariancies(&variance);
+			}
 		}
 	}
 

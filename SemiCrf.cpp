@@ -377,49 +377,49 @@ namespace SemiCrf {
 	void Learner::computeGrad(double& L, std::vector<double>& dL, bool grad)
 	{
 		for( auto& file : *datas ) {
-		for( auto& data : file.second ) {
+			for( auto& data : file.second ) {
 
-			current_data = data;
-			current_wgtab = createCacheTable(cacheSize);
-			hit = miss = 0;
+				current_data = data;
+				current_wgtab = createCacheTable(cacheSize);
+				hit = miss = 0;
 
-			double WG = 0.0;
-			auto Z = computeZ();
-			auto Gs = computeG(WG);
+				double WG = 0.0;
+				auto Z = computeZ();
+				auto Gs = computeG(WG);
 
-			L += WG - log(Z);
+				L += WG - log(Z);
 
-			if( !(flg & DISABLE_REGULARIZATION) ) {
-				double w2 = 0.0;
-				for( auto& w : *weights ) {
-					w2 += w*w;
-				}
-				w2 *= rp;
-				L -= w2;
-			}
-
-			if( flg & ENABLE_LIKELIHOOD_ONLY ) {
-				std::cerr << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z) << std::endl;
-			}
-
-			if( grad ) {
-
-				auto Gms = computeGm(Z);
-				auto idL = dL.begin();
-				auto iw = weights->begin();
-				for( int k = 0; k < dim; k++, idL++, iw++ ) {
-					(*idL) += Gs[k] - Gms[k];
-
-					if( !(flg & DISABLE_REGULARIZATION) ) {
-						double dw2 = 2.0 * rp * (*iw);
-						(*idL) -= dw2;
+				if( !(flg & DISABLE_REGULARIZATION) ) {
+					double w2 = 0.0;
+					for( auto& w : *weights ) {
+						w2 += w*w;
 					}
-
-					Logger::debug() << "dL(" << k << ")=" << *idL;
+					w2 *= rp;
+					L -= w2;
 				}
+
+				if( flg & ENABLE_LIKELIHOOD_ONLY ) {
+					std::cerr << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z) << std::endl;
+				}
+
+				if( grad ) {
+
+					auto Gms = computeGm(Z);
+					auto idL = dL.begin();
+					auto iw = weights->begin();
+					for( int k = 0; k < dim; k++, idL++, iw++ ) {
+						(*idL) += Gs[k] - Gms[k];
+
+						if( !(flg & DISABLE_REGULARIZATION) ) {
+							double dw2 = 2.0 * rp * (*iw);
+							(*idL) -= dw2;
+						}
+
+						Logger::debug() << "dL(" << k << ")=" << *idL;
+					}
+				}
+				Logger::debug() << "cache_hit_rate=" << (double)hit/(double)(miss+hit);
 			}
-			Logger::debug() << "cache_hit_rate=" << (double)hit/(double)(miss+hit);
-		}
 		}
 	}
 
@@ -850,40 +850,40 @@ namespace SemiCrf {
 		Logger::debug() << "Predictor::compute()";
 
 		for( auto& file : *datas ) {
-		for( auto& data : file.second ) {
+			for( auto& data : file.second ) {
 
-			current_data = data;
+				current_data = data;
 
-			int l = labels->size();
-			int s = current_data->getStrs()->size();
-			int capacity = l*s;
+				int l = labels->size();
+				int s = current_data->getStrs()->size();
+				int capacity = l*s;
 
-			current_vctab = createCheckTable(capacity);
-			current_wgtab = createCacheTable(cacheSize);
+				current_vctab = createCheckTable(capacity);
+				current_wgtab = createCacheTable(cacheSize);
 
-			int maxd = - 1;
-			Label maxy;
-			auto maxV = - std::numeric_limits<double>::max();
+				int maxd = - 1;
+				Label maxy;
+				auto maxV = - std::numeric_limits<double>::max();
 
-			for( auto y : *labels ) {
+				for( auto y : *labels ) {
 
-				int d = -1;
-				auto v = V(s-1, y, d);
+					int d = -1;
+					auto v = V(s-1, y, d);
 
-				if( maxV < v ) {
-					maxy = y;
-					maxV = v;
-					maxd = d;
+					if( maxV < v ) {
+						maxy = y;
+						maxV = v;
+						maxd = d;
+					}
 				}
-			}
 
-			if( flg & ENABLE_LIKELIHOOD_ONLY ) {
-				std::cerr << boost::format("WG(maxV)= %10.6e") % maxV << std::endl;
+				if( flg & ENABLE_LIKELIHOOD_ONLY ) {
+					std::cerr << boost::format("WG(maxV)= %10.6e") % maxV << std::endl;
+				}
+				assert( 0 < maxd );
+				backtrack(maxy, maxd);
+				printV();
 			}
-			assert( 0 < maxd );
-			backtrack(maxy, maxd);
-			printV();
-		}
 		}
 	}
 
