@@ -110,7 +110,6 @@ namespace SemiCrf {
 		int yDim{-1};
 		int maxLength{-std::numeric_limits<int>::max()};
 		std::string feature{""};
-		std::string title{""};
 		std::map<int,int> count;
 		std::map<int,double> mean;
 		std::map<int,double> variance;
@@ -131,7 +130,6 @@ namespace SemiCrf {
 		virtual decltype(xDim) getXDim() const { return xDim; }
 		virtual decltype(yDim) getYDim() const { return yDim; }
 		virtual decltype(maxLength) getMaxLength() const { return maxLength; }
-		virtual decltype(title) getTitle() const { return title; }
 
 		void setFeature(const std::string& arg) { feature = arg; }
 		void setMean(const std::map<int,double>& arg);

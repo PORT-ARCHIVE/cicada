@@ -227,18 +227,28 @@ namespace SemiCrf {
 	void Datas::writeJson(std::ostream& output) const {
 		Logger::debug() << "Datas::writeJson()";
 
-		ujson::array datas;
+		ujson::array array0;
 		for( auto& file : *this ) {
-	    for( auto& data : file.second ) {
-			data->writeJson(datas);
-		}
+
+			auto title = file.first;
+			ujson::array array1;
+
+			for( auto& data : file.second ) {
+				data->writeJson(array1);
+			}
+
+			auto obj = ujson::object {
+				{ "title", std::move(title) },
+				{ "data", std::move(array1) }
+			};
+
+			array0.push_back(std::move(obj));
 		}
 
 		auto object = ujson::object {
-			{ "title", title },
 			{ "dimension", std::move(ujson::array{ xDim, yDim }) },
 			{ "feature", feature },
-			{ "data", datas }
+			{ "data", std::move(array0) }
 		};
 
 		if( !labels.empty() ) {
@@ -296,9 +306,13 @@ namespace SemiCrf {
 			}
 		}
 
-		ujson::array crf_estimate;
+		ujson::array array;
 
 		for( auto& file : *this ) {
+
+			ujson::array crf_estimate;
+			auto title = file.first;
+
 		for( auto& data : file.second ) {
 
 			ujson::array array;
@@ -355,14 +369,17 @@ namespace SemiCrf {
 
 			crf_estimate.push_back(std::move(array));
 		}
-		}
 
 		auto object = ujson::object {
 			{ "title", title },
 			{ "crf_estimate", std::move(crf_estimate) }
 		};
 
-		output << to_string(object) << std::endl;
+		array.push_back(object);
+
+		}
+
+		output << to_string(array) << std::endl;
 	}
 
 	void Datas::write(std::ostream& output, bool simple_prediction_output) const {

@@ -22,8 +22,8 @@ test2:
 		$(SEMICRF) -t $$file -w tmp1 --log-level 3 -e0 2.0 -e1 1.0e-6 --disable-regularization && echo "OK" || echo "ERROR"; \
 		echo "$(SEMICRF) -i $$file -w tmp1 --log-level 3"; \
 		$(SEMICRF) -i $$file -w tmp1 --log-level 3 > tmp2 && echo "OK" || echo "ERROR"; \
-		cat $$file | jq '.data[][][]' > r1; \
-		cat tmp2 | jq '.data[][][]' > r2; \
+		cat $$file | jq '.data[].data[][][]' > r1; \
+		cat tmp2 | jq '.data[].data[][][]' > r2; \
 		echo "diff -c r1 r2"; \
 		diff -c r1 r2 && echo "OK" || echo "ERROR"; \
 		cat r1 | awk '{ if(k++ % 3 == 2) print $$1 }' > a; \
