@@ -3,10 +3,12 @@
 #ifndef SEMI_CRF_SIGNAL__HPP
 #define SEMI_CRF_SIGNAL__HPP
 
+#include <csignal>
+
 namespace Signal {
 
-	sig_atomic_t getFlg();
-	void handler(sig_atomic_t arg);
+	std::sig_atomic_t getFlg();
+	void handler(std::sig_atomic_t arg);
 }
 
 
