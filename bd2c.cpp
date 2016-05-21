@@ -85,24 +85,6 @@ int main(int argc, char *argv[])
 		Logger::info() << "bd2c 0.0.1";
 		Logger::info() << "Copyright (C) 2016 PORT, Inc.";
 
-		///////////////	body
-
-		std::string title;
-		std::string body;
-		{
-			std::ifstream ifb;
-			open(ifb, options.bodyTextFile);
-			Logger::info() << "parse " << options.bodyTextFile;
-
-			auto v = JsonIO::parse(ifb);
-			auto object = object_cast(std::move(v));
-			title = JsonIO::readString(object, "title");
-			body = JsonIO::readString(object, "body_text_split");
-			if( body.empty() ) {
-				Logger::warn() << "empty body";
-			}
-		}
-
 		/////////////// labels
 
 		std::vector<ujson::value> labelArray;
@@ -110,7 +92,6 @@ int main(int argc, char *argv[])
 			std::ifstream ifb;
 			open(ifb, options.labelTableFile);
 			Logger::info() << "parse " << options.labelTableFile;
-
 			auto v = JsonIO::parse(ifb);
 			auto object = object_cast(std::move(v));
 			labelArray = JsonIO::readUAry(object, "labels");
@@ -127,51 +108,96 @@ int main(int argc, char *argv[])
 			matrix->read(options.w2vMatrixFile);
 		}
 
-		///////////////	data
-		Logger::info("transform data...");
+		/////////////// bodies
 
-		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
-		MultiByteTokenizer toknizer(body);
-		toknizer.setSeparator(" ");
-		toknizer.setSeparator("　");
-		toknizer.setSeparator("\t");
-		toknizer.setSeparator("\n"); // T.B.D.
+		std::ifstream ifb;
+		open(ifb, options.bodyTextFile);
+		Logger::info() << "parse " << options.bodyTextFile;
+		auto v = JsonIO::parse(ifb);
 
-		ujson::array data;
-		ujson::array lines;
-		std::string tok = toknizer.get();
-		std::string tok0 = tok;
-		std::string tok1 = tok;
-
-		std::regex pattern("(diget_[0-9]+)\\\\\\:([0-9]+)");
-		std::smatch results;
-		if( std::regex_match( tok, results, pattern ) && results.size() == 3 ) {
-			tok0 = results.position(1);
-			tok1 = results.position(2);
+		if( !v.is_array() ) {
+			std::stringstream ss;
+			ss << options.bodyTextFile << ": ";
+			ss << "top level is not an array";
+			throw Error(ss.str());
 		}
 
-		while( !tok.empty() ) {
+		ujson::array out_array;
+		auto array = array_cast(std::move(v));
 
-			ujson::array line;
-			auto i = matrix->w2i(tok0);
-			std::string ID = boost::lexical_cast<std::string>(i);
-			line.push_back(ID);
-			line.push_back("*");
-			line.push_back("*");
-			line.push_back(tok1);
-			lines.push_back(std::move(line));
-			if( tok == "。" ){ // T.B.D.
-				data.push_back(std::move(lines));
-				lines.clear();
+		for( auto& value : array ) {
+
+			///////////////	body
+
+			if( !value.is_object() ) {
+				std::stringstream ss;
+				ss << options.bodyTextFile << ": ";
+				ss << "second level is not an object";
+				throw Error(ss.str());
 			}
 
-			tok = toknizer.get();
-			tok0 = tok;
-			tok1 = tok;
+			auto object = object_cast(std::move(value));
+			auto title = JsonIO::readString(object, "title");
+			auto body = JsonIO::readString(object, "body_text_split");
+			if( body.empty() ) {
+				Logger::warn() << title << ": empty body";
+				continue;
+			}
+
+			///////////////	data
+
+			Logger::info() << "transform " << title;
+
+			setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
+			MultiByteTokenizer toknizer(body);
+			toknizer.setSeparator(" ");
+			toknizer.setSeparator("　");
+			toknizer.setSeparator("\t");
+			toknizer.setSeparator("\n"); // T.B.D.
+
+			ujson::array data;
+			ujson::array lines;
+			std::string tok = toknizer.get();
+			std::string tok0 = tok;
+			std::string tok1 = tok;
+
+			std::regex pattern("(diget_[0-9]+)\\\\\\:([0-9]+)");
+			std::smatch results;
 			if( std::regex_match( tok, results, pattern ) && results.size() == 3 ) {
 				tok0 = results.position(1);
 				tok1 = results.position(2);
 			}
+
+			while( !tok.empty() ) {
+
+				ujson::array line;
+				auto i = matrix->w2i(tok0);
+				std::string ID = boost::lexical_cast<std::string>(i);
+				line.push_back(ID);
+				line.push_back("*");
+				line.push_back("*");
+				line.push_back(tok1);
+				lines.push_back(std::move(line));
+				if( tok == "。" ){ // T.B.D.
+					data.push_back(std::move(lines));
+					lines.clear();
+				}
+
+				tok = toknizer.get();
+				tok0 = tok;
+				tok1 = tok;
+				if( std::regex_match( tok, results, pattern ) && results.size() == 3 ) {
+					tok0 = results.position(1);
+					tok1 = results.position(2);
+				}
+			}
+
+			auto obj = ujson::object {
+				{ "title", title },
+				{ "data", std::move(data) }
+			};
+
+			out_array.push_back(std::move(obj));
 		}
 
 		///////////////	output
@@ -183,11 +209,10 @@ int main(int argc, char *argv[])
 			int dim0 = size; // !!! long long -> int !!!
 			int dim1 = labelArray.size();
 			auto object = ujson::object {
-				{ "title", title },
 				{ "feature", options.feature },
 				{ "dimension", std::move(ujson::array{ dim0, dim1 }) },
 				{ "labels", std::move(labelArray) },
-				{ "data", std::move(data) }
+				{ "data", out_array }
 			};
 			std::cout << to_string(object) << std::endl;
 		}
