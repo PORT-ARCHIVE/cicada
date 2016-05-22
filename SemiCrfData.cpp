@@ -224,7 +224,8 @@ namespace SemiCrf {
 		Logger::debug() << "~Datas()";
 	}
 
-	void Datas::writeJson(std::ostream& output) const {
+	void Datas::writeJson(std::ostream& output) const
+	{
 		Logger::debug() << "Datas::writeJson()";
 
 		ujson::array array0;
@@ -258,54 +259,88 @@ namespace SemiCrf {
 		output << to_string(object) << std::endl;
 	}
 
-	void Datas::writeSimpleJson(std::ostream& output) const {
-		Logger::debug() << "Datas::writeSimpleJson()";
-
-		if( labels.empty() ) {
-			throw Error("option '--enable-simple-prediction-output' not supported");
-		}
-
+	std::map<int, std::string> Datas::make_labels_map() const
+	{
 		std::map<int, std::string> labels_map;
-		{
-			for( auto& i : labels ) {
 
-				if( !i.is_array() ) {
-					throw Error("invalid data format");
-				}
+		for( auto& i : labels ) {
 
-				auto ary = array_cast(std::move(i));
-				auto it = ary.begin();
-
-				if( it == ary.end() || !it->is_string() ) {
-					throw Error("invalid data format");
-				}
-
-				auto label_id = boost::lexical_cast<int>(string_cast(std::move(*it)));
-
-				++it;
-
-				if( it == ary.end() || !it->is_string() ) {
-					throw Error("invalid data format");
-				}
-
-				auto kw_jp = string_cast(std::move(*it));
-
-				++it;
-
-				if( it == ary.end() ) {
-					labels_map.insert( std::make_pair(label_id, kw_jp) );
-					continue;
-				}
-
-				if( !it->is_string() ) {
-					throw Error("invalid data format");
-				}
-
-				auto kw_en = string_cast(std::move(*it));
-				labels_map.insert( std::make_pair(label_id, kw_en) );
+			if( !i.is_array() ) {
+				throw Error("invalid data format");
 			}
+
+			auto ary = array_cast(std::move(i));
+			auto it = ary.begin();
+
+			if( it == ary.end() || !it->is_string() ) {
+				throw Error("invalid data format");
+			}
+
+			auto label_id = boost::lexical_cast<int>(string_cast(std::move(*it)));
+
+			++it;
+
+			if( it == ary.end() || !it->is_string() ) {
+				throw Error("invalid data format");
+			}
+
+			auto kw_jp = string_cast(std::move(*it));
+
+			++it;
+
+			if( it == ary.end() ) {
+				labels_map.insert( std::make_pair(label_id, kw_jp) );
+				continue;
+			}
+
+			if( !it->is_string() ) {
+				throw Error("invalid data format");
+			}
+
+			auto kw_en = string_cast(std::move(*it));
+			labels_map.insert( std::make_pair(label_id, kw_en) );
 		}
 
+		return std::move(labels_map);
+	}
+
+	std::multimap<std::string, std::string>
+	Datas::make_label_word_map(std::shared_ptr<Data> data, std::map<int, std::string>& labels_map) const
+	{
+		std::multimap<std::string, std::string> mm;
+
+		for( auto& seg : *data->getSegments() ) {
+
+			auto s = seg->getStart();
+			auto e = seg->getEnd();
+			auto label_id = seg->getLabel();
+			auto label = labels_map[label_id];
+			auto strs = data->getStrs();
+
+			std::string word;
+			for( int i = s; i <= e; i++ ) {
+				if( strs->at(i).size() < 2 ) {
+					throw Error("option '--enable-simple-prediction-output' not supported");
+				}
+				word += strs->at(i).at(1);
+			}
+
+			if( label == "NONE" || label == "なし" ) {
+				continue;
+			}
+
+			mm.insert( std::move(std::make_pair(std::move(label), std::move(word))) );
+		}
+
+		return std::move(mm);
+	}
+
+	void Datas::writeSimpleJson(std::ostream& output) const
+	{
+		Logger::debug() << "Datas::writeSimpleJson()";
+		if( labels.empty() ) { throw Error("option '--enable-simple-prediction-output' not supported"); }
+
+		auto labels_map = make_labels_map();
 		ujson::array array;
 
 		for( auto& file : *this ) {
@@ -316,30 +351,7 @@ namespace SemiCrf {
 			for( auto& data : file.second ) {
 
 				ujson::array array;
-				auto strs = data->getStrs();
-				std::multimap<std::string, std::string> mm;
-
-				for( auto& seg : *data->getSegments() ) {
-
-					auto s = seg->getStart();
-					auto e = seg->getEnd();
-					auto label_id = seg->getLabel();
-					auto label = labels_map[label_id];
-
-					std::string word;
-					for( int i = s; i <= e; i++ ) {
-						if( strs->at(i).size() < 2 ) {
-							throw Error("option '--enable-simple-prediction-output' not supported");
-						}
-						word += strs->at(i).at(1);
-					}
-
-					if( label == "NONE" || label == "なし" ) {
-						continue;
-					}
-
-					mm.insert( std::move(std::make_pair(std::move(label), std::move(word))) );
-				}
+				auto mm = make_label_word_map(data, labels_map)
 
 				for( auto& p : labels_map ) {
 
@@ -348,33 +360,31 @@ namespace SemiCrf {
 					auto d = std::distance(il, iu);
 
 					if( d == 0 ) {
+
 						continue;
 
 					} else if( d == 1 ) {
 
-						auto v = ujson::object { { il->first, il->second } };
-						array.push_back(v);
+						auto v = ujson::object {{ il->first, il->second }};
+						array.push_back(std::move(v));
 
 					} else {
 
 						ujson::array inner_array;
+
 						for( auto i = il; i != iu; ++i ) {
 							inner_array.push_back(i->second);
 						}
 
-						auto v = ujson::object { { il->first,  std::move(inner_array) } };
-						array.push_back(v);
+						auto v = ujson::object {{ il->first, std::move(inner_array) }};
+						array.push_back(std::move(v));
 					}
 				}
 
 				crf_estimate.push_back(std::move(array));
 			}
 
-			auto object = ujson::object {
-				{ "title", title },
-				{ "crf_estimate", std::move(crf_estimate) }
-			};
-
+			auto object = ujson::object {{ "title", title }, { "crf_estimate", std::move(crf_estimate) }};
 			array.push_back(object);
 		}
 

@@ -144,6 +144,10 @@ namespace SemiCrf {
 		virtual void readJsonData(std::vector<ujson::value>& data);
 		virtual void readJsonDataCore(ujson::value& value, Data& data) = 0;
 		virtual void computeMeanLength();
+		virtual std::map<int, std::string> make_labels_map() const;
+		virtual std::multimap<std::string, std::string>
+			make_label_word_map(std::shared_ptr<Data> data, std::map<int, std::string>& labels_map) const;
+
 	};
 
 	// 教師データ集合
