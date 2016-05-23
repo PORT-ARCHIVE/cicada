@@ -351,7 +351,7 @@ namespace SemiCrf {
 			for( auto& data : file.second ) {
 
 				ujson::array array;
-				auto mm = make_label_word_map(data, labels_map)
+				auto mm = make_label_word_map(data, labels_map);
 
 				for( auto& p : labels_map ) {
 

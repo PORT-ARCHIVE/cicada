@@ -281,6 +281,7 @@ int main(int argc, char *argv[])
 
 		preProcess();
 
+		ujson::array ary0;
 		ujson::array datas;
 	
 		mt19937 mt(options.seed);
@@ -314,52 +315,58 @@ int main(int argc, char *argv[])
 			}
 
 			ary2.push_back(boost::lexical_cast<std::string>(*yi));
-			ary1.push_back(ary2);
-			ary2.resize(0);
+			ary1.push_back(std::move(ary2));
+			// ary2.resize(0);
+
+			ujson::array ary3;
 
 			++xi;
 			for( ; yk != y.end(); ++xi, ++yi, ++yj, ++yk ) {
-				ary2.push_back(boost::lexical_cast<std::string>(*xi));
+				ary3.push_back(boost::lexical_cast<std::string>(*xi));
 				if( *yi != *yj && *yj == *yk ) {
-					ary2.push_back("S");
+					ary3.push_back("S");
 				} else if( *yi == *yj && *yj == *yk ) {
-					ary2.push_back("M");
+					ary3.push_back("M");
 				} else if( *yi != *yj && *yj != *yk ) {
-					ary2.push_back("S/E");
+					ary3.push_back("S/E");
 				} else if( *yi == *yj && *yj != *yk ) {
-					ary2.push_back("E");
+					ary3.push_back("E");
 				} else {
 					assert(0);
 				}
-				ary2.push_back(boost::lexical_cast<std::string>(*yj));
-				ary1.push_back(ary2);
-				ary2.resize(0);
+				ary3.push_back(boost::lexical_cast<std::string>(*yj));
+				ary1.push_back(std::move(ary3));
+				// ary3.resize(0);
 			}
 
-			ary2.push_back(boost::lexical_cast<std::string>(*xi));
+			ujson::array ary4;
+
+			ary4.push_back(boost::lexical_cast<std::string>(*xi));
 
 			if( *yi != *yj ) {
-				ary2.push_back("S/E");
+				ary4.push_back("S/E");
 			} else if( *yi == *yj ) {
-				ary2.push_back("E");
+				ary4.push_back("E");
 			} else {
 				assert(0);
 			}
 
-			ary2.push_back(boost::lexical_cast<std::string>(*yj));
-			ary1.push_back(ary2);
-			ary2.resize(0);
-			datas.push_back(ary1);
+			ary4.push_back(boost::lexical_cast<std::string>(*yj));
+			ary1.push_back(std::move(ary4));
+			// ary4.resize(0);
+			datas.push_back(std::move(ary1));
 		}
 
-		auto object = ujson::object{
-			{ "title", "test" },
-			{ "dimension", ujson::array{ int(y2x.at(0).size()), int(y2y.size()) } },
+		auto object0 = ujson::object {{ "data", datas }, { "title", "test" }};
+		ary0.push_back(std::move(std::move(object0)));
+
+		auto object1 = ujson::object {
+			{ "dimension", std::move(ujson::array { int(y2x.at(0).size()), int(y2y.size()) }) },
 			{ "feature", "DIGIT" },
-			{ "data", datas }
+			{ "data", std::move(ary0) }
 		};
 
-		std::cout << "" << to_string(object) << std::endl;
+		std::cout << "" << to_string(object1) << std::endl;
 
 	} catch(Error& e) {
 

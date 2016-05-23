@@ -1,7 +1,7 @@
 
 SEMICRF=../semicrf
 
-all: test1 test2 gen_test bd2c_test bd2w_test bdc2e_test test3 learn infer
+all: test1 test2  test3 learn infer gen_test bd2c_test bd2w_test bdc2e_test
 
 test1:
 	@echo "###### check0 ######"
@@ -42,8 +42,8 @@ test3:
 	@echo "###### ${FILE1} ######"
 	time $(SEMICRF) -t ${FILE1} -w tmp1 --log-level 2 -e0 2.0 -e1 1.0e-6 --disable-regularization --w2v-matrix ${MATRIX} && echo "OK" || echo "ERROR"
 	$(SEMICRF) -i ${FILE1} -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} > tmp2 && echo "OK" || echo "ERROR"
-	cat ${FILE1} | jq '.data[][][]' > r1
-	cat tmp2 | jq '.data[][][]' > r2
+	jq '.data[].data[][][]' ${FILE1} > r1
+	jq '.data[].data[][][]' tmp2 > r2
 	cat r1 | awk '{ if(k++ % 4 == 2) print $$1 }' > a
 	cat r2 | awk '{ if(k++ % 4 == 2) print $$1 }' > b
 	echo "diff -c a b"
@@ -64,8 +64,8 @@ infer:
 	@for SEED in 1 2 3 4 5 6 7 8 9 10; do \
 		../gen -i p0.json -s $$SEED -r 32 -l 16 > tmp3; \
 		$(SEMICRF) -i tmp3 -w tmp2 --log-level 2 > tmp4 || echo "ERROR"; \
-		cat tmp3 | jq '.data[][][]' > r1; \
-		cat tmp4 | jq '.data[][][]' > r2; \
+		cat tmp3 | jq '.data[].data[][][]' > r1; \
+		cat tmp4 | jq '.data[].data[][][]' > r2; \
 		cat r1 | awk '{ if(k++ % 3 == 2) print $$1 }' > a; \
 		cat r2 | awk '{ if(k++ % 3 == 2) print $$1 }' > b; \
 		paste a b | awk '{ if( $$1 == $$2 ) count++; total++; } END{ print count/total*100,"%"; }' | tee -a tmp5; \
