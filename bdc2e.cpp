@@ -13,7 +13,7 @@
 class Options {
 public:
 	Options()
-		: accPredictionResultFile("")
+		: predictionResultFile("")
 		, bodyTextFile("")
 		, logLevel(2)
 		, logColor(true)
@@ -21,7 +21,7 @@ public:
 		{};
 	void parse(int argc, char *argv[]);
 public:
-	std::string accPredictionResultFile;
+	std::string predictionResultFile;
 	std::string bodyTextFile;
 	int logLevel;
 	bool logColor;
@@ -35,7 +35,7 @@ void Options::parse(int argc, char *argv[])
 		for( int i = 1; i < argc; i++ ) {
 			std::string arg = argv[i];
 			if( arg == "-c" ) {
-				accPredictionResultFile = argv[++i];
+				predictionResultFile = argv[++i];
 			} else if( arg == "-b" ) {
 				bodyTextFile = argv[++i];				
 			} else if( arg == "--set-log-pattern" ) {
@@ -88,30 +88,30 @@ int main(int argc, char *argv[])
 				ss << options.bodyTextFile << ": cannot parse";
 				throw Error(ss.str());
 			}
-			if( !body.is_object() ) {
+			if( !body.is_array() ) {
 				std::stringstream ss;
-				ss << options.bodyTextFile << ": top level is not an object";
+				ss << options.bodyTextFile << ": top level is not an array";
 				throw Error(ss.str());
 			}
 		}
 
-		///////////////	accumulated prediction result
+		///////////////	prediction result
 
-		ujson::value acc_prediction_result;
+		ujson::value prediction_result;
 		{
 			std::ifstream ifs;
-			open(ifs, options.accPredictionResultFile);
-			Logger::info() << "parse " << options.accPredictionResultFile;
+			open(ifs, options.predictionResultFile);
+			Logger::info() << "parse " << options.predictionResultFile;
 			try {
-				acc_prediction_result = JsonIO::parse(ifs);
+				prediction_result = JsonIO::parse(ifs);
 			} catch(...) {
 				std::stringstream ss;
-				ss << options.accPredictionResultFile << ": cannot parse";
+				ss << options.predictionResultFile << ": cannot parse";
 				throw Error(ss.str());
 			}
-			if( !acc_prediction_result.is_object() ) {
+			if( !prediction_result.is_array() ) {
 				std::stringstream ss;
-				ss << options.accPredictionResultFile << ": top level is not an object";
+				ss << options.predictionResultFile << ": top level is not an array";
 				throw Error(ss.str());
 			}			
 		}
@@ -120,68 +120,98 @@ int main(int argc, char *argv[])
 
 		Logger::info("transform data...");
 
-		auto ob = object_cast(std::move(body));
-		auto oa = object_cast(std::move(acc_prediction_result));
+		auto ob = array_cast(std::move(body));
+		auto oa = array_cast(std::move(prediction_result));
 
-
-		// check title
-		{
-			auto t0 = find(ob, "title");
-			if( t0 == ob.end() || !t0->second.is_string() ) {
-				std::stringstream ss;
-				ss << options.bodyTextFile << ": no title found";
-				throw Error(ss.str());
-			}
-
-			auto t = t0->second; // copy to keep the original
-			auto s0 = string_cast(std::move(t));
-
-			auto t1 = find(oa, "title");
-			if( t1 == ob.end() || !t1->second.is_string() ) {
-				std::stringstream ss;
-				ss << options.accPredictionResultFile << ": no title found";
-				throw Error(ss.str());
-			}
-
-			auto s1 = string_cast(std::move(t1->second));
-
-			if( s0 != s1 ) {
-				std::stringstream ss;
-				ss << "titles of objects are different";
-				throw Error(ss.str());
-			}
+		if( ob.size() != oa.size() ) {
+			std::stringstream ss;
+			ss << "size of data are different";
+			throw Error(ss.str());
 		}
 
-		// replace crf_estimate
-		{
-			auto itb = find(ob, "crf_estimate");
-			if( itb == ob.end() ) {
+		std::vector<ujson::value> ary;
+
+		auto ib = ob.begin();
+		auto ia = oa.begin();
+		for( int count = 0; ib != ob.end(); ++count, ++ib, ++ia ) {
+
+			if( !ib->is_object() ) {
 				std::stringstream ss;
-				ss << options.bodyTextFile << ": no crf_estimate found";
+				ss << options.bodyTextFile << ": " << count <<  "th element not an object";
 				throw Error(ss.str());
 			}
+			auto body_object = object_cast(std:::move(*ib));
 
-			auto ita = find(oa, "crf_estimate");
-			if( ita == oa.end() ) {
+			if( !ia->is_object() ) {
 				std::stringstream ss;
-				ss << options.accPredictionResultFile << ": no crf_estimate found";
+				ss << options.predictionResultFile << ": " << count <<  "th element not an object";
 				throw Error(ss.str());
 			}
+			auto prediction_object = object_cast(std::move(*ia));
 
-			*itb = *ita; // replace
-		}
+
+			// check title
+			{
+				auto t0 = find(body_object, "title");
+				if( t0 == body_object.end() || !t0->second.is_string() ) {
+					std::stringstream ss;
+					ss << options.bodyTextFile << ": no title found int " << count << " th element";
+					throw Error(ss.str());
+				}
+
+				auto t = t0->second; // copy to keep the original
+				auto s0 = string_cast(std::move(t));
+
+				auto t1 = find(prediction_object, "title");
+				if( t1 == prediction_object.end() || !t1->second.is_string() ) {
+					std::stringstream ss;
+					ss << options.predictionResultFile << ": no title found int " << count << " th element";
+					throw Error(ss.str());
+				}
+
+				auto s1 = string_cast(std::move(t1->second));
+
+				if( s0 != s1 ) {
+					std::stringstream ss;
+					ss << "titles of objects are different int " << count << " th element";
+					throw Error(ss.str());
+				}
+			}
+
+			// replace crf_estimate
+			{
+				auto itb = find(body_object, "crf_estimate");
+				if( itb == body_object.end() ) {
+					std::stringstream ss;
+					ss << options.bodyTextFile << ": no crf_estimate found " << count << " th element";
+					throw Error(ss.str());
+				}
+
+				auto ita = find(prediction_object, "crf_estimate");
+				if( ita == prediction_object.end() ) {
+					std::stringstream ss;
+					ss << options.predictionResultFile << ": no crf_estimate found " << count << " th element";
+					throw Error(ss.str());
+				}
+
+				*itb = *ita; // replace
+			}
+
 #if 0 // 分かち書き本文も残す
-		// remove body_split_text
-		{
-			auto itb = find(ob, "body_split_text");
-			if( itb == ob.end() || !itb->second.is_string() ) {
-				Logger::warn() << options.bodyTextFile << ": no body_split_text found";
+			// remove body_split_text
+			{
+				auto itb = find(body_object, "body_split_text");
+				if( itb == body_object.end() || !itb->second.is_string() ) {
+					Logger::warn() << options.bodyTextFile << ": no body_split_text found " << count << " th element";
+				}
+				itb->second = std::string("");
 			}
-
-			itb->second = std::string("");
-		}
 #endif
-		std::cout << to_string(ob) << std::endl;
+			ary.push_back(body_object);
+		}
+
+		// std::cout << to_string(ob) << std::endl;
+		std::cout << to_string(ary) << std::endl;
 
 	} catch(Error& e) {
 

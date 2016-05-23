@@ -1,8 +1,26 @@
-{
-    "body_split_text" : "hogehogehoge",
-    "crf_estimate" : {
-        "company_name" : "hoge Inc.",
-        "salary" : "100$"
+[
+    {
+        "body_split_text" : "hogehogehoge",
+        "crf_estimate" : {
+            "company_name" : "hoge Inc.",
+            "salary" : "100$"
+        },
+        "title" : "1"
     },
-    "title" : "1"
-}
+    {
+        "body_split_text" : "fugafugafuga",
+        "crf_estimate" : {
+            "company_name" : "fuga Inc.",
+            "salary" : "200$"
+        },
+        "title" : "2"
+    },
+    {
+        "body_split_text" : "chomechomechome",
+        "crf_estimate" : {
+            "company_name" : "chome Inc.",
+            "salary" : "300$"
+        },
+        "title" : "3"
+    }
+]
