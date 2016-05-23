@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 				ss << options.bodyTextFile << ": " << count <<  "th element not an object";
 				throw Error(ss.str());
 			}
-			auto body_object = object_cast(std:::move(*ib));
+			auto body_object = object_cast(std::move(*ib));
 
 			if( !ia->is_object() ) {
 				std::stringstream ss;
