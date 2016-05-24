@@ -1,4 +1,4 @@
 #!/bin/bash
 
 #jq -r '.[]'.body_text_split $1 | tr -d '\n'
-jq -r '.[]'.body_text_split $1 | perl -pe 's/\\\\:[0-9]+[^a-zA-Z0-9]+/ /g' | tr -d '\n'
+jq -r '.[]'.body_text_split $1 | perl -pe 's/[0-9]+\\://g' | tr -d '\n'
