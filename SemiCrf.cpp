@@ -11,7 +11,6 @@
 #include <cassert>
 #include <cmath>
 #include <clocale>
-#include <mecab.h>
 #include "SemiCrf.hpp"
 #include "AppTest.hpp"
 #include "MultiByteTokenizer.hpp"
