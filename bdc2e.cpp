@@ -210,7 +210,6 @@ int main(int argc, char *argv[])
 			ary.push_back(body_object);
 		}
 
-		// std::cout << to_string(ob) << std::endl;
 		std::cout << to_string(ary) << std::endl;
 
 	} catch(Error& e) {
