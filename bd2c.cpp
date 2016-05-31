@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
 				{ "feature", options.feature },
 				{ "dimension", std::move(ujson::array{ dim0, dim1 }) },
 				{ "labels", std::move(labelArray) },
-				{ "data", out_array }
+				{ "pages", out_array }
 			};
 			std::cout << to_string(object) << std::endl;
 		}
