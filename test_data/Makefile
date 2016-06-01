@@ -1,4 +1,6 @@
 
+CONTAINER_NAME=cicada_container
+
 SEMICRF=../semicrf
 
 all: test1 test2  test3 learn infer gen_test bd2c_test bd2w_test bdc2e_test
@@ -110,6 +112,17 @@ bdc2e_test:
 	@echo "../bdc2e -b t0.json -c t1.json"
 	@../bdc2e -b t0.json -c t1.json > bdc2e_result.json && echo "OK" || echo "ERROR"
 	@diff answer/bdc2e_result.json bdc2e_result.json && echo "OK" || echo "ERROR"
+
+docker_run:
+	docker run -v /home/vagrant/centos/research-playground/semi-crf/test_data:/home/docker_user/research-playground/semi-crf/test_data \
+	--name $(CONTAINER_NAME) -it `docker images | grep "docker_common/cicada" | awk '{ print $$3 }'` \
+	/bin/sh -c 'cd semi-crf/test_data && make test1 && make test2 && make gen_test && make bd2w_test && make bdc2e_test'
+	docker stop $(CONTAINER_NAME)
+	docker rm $(CONTAINER_NAME)
+
+docker_kill:
+	docker stop $(CONTAINER_NAME)
+	docker rm $(CONTAINER_NAME)
 
 update:
 	-cp log1 answer/log1
