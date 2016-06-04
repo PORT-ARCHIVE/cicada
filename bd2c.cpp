@@ -63,6 +63,22 @@ void Options::parse(int argc, char *argv[])
 	} catch(...) {
 		throw Error("invalid option specified");
 	}
+
+	if( bodyTextFile.empty() ) {
+		throw Error("no -b specified");
+	}
+
+	if( w2vMatrixFile.empty() ) {
+		throw Error("no -m specified");
+	}
+
+	if( labelTableFile.empty() ) {
+		throw Error("no -l specified");
+	}
+
+	if( feature.empty() ) {
+		throw Error("no -f specified");
+	}
 }
 
 int main(int argc, char *argv[])
