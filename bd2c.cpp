@@ -161,11 +161,12 @@ int main(int argc, char *argv[])
 			std::string tok0 = tok;
 			std::string tok1 = tok;
 
-			std::regex pattern("(diget_[0-9]+)\\\\\\:([0-9]+)");
+			std::regex pattern(R"(([0-9]+)\\:([0-9]+_digit))");
 			std::smatch results;
-			if( std::regex_match( tok, results, pattern ) && results.size() == 3 ) {
-				tok0 = results.position(1);
-				tok1 = results.position(2);
+			if( std::regex_match( tok, results, pattern ) &&
+				results.size() == 3 ) {
+				tok0 = results[1];
+				tok1 = results[2];
 			}
 
 			while( !tok.empty() ) {
@@ -186,9 +187,10 @@ int main(int argc, char *argv[])
 				tok = toknizer.get();
 				tok0 = tok;
 				tok1 = tok;
-				if( std::regex_match( tok, results, pattern ) && results.size() == 3 ) {
-					tok0 = results.position(1);
-					tok1 = results.position(2);
+				if( std::regex_match( tok, results, pattern ) &&
+					results.size() == 3 ) {
+					tok0 = results[1];
+					tok1 = results[2];
 				}
 			}
 
