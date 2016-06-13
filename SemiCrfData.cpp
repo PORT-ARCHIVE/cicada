@@ -134,7 +134,7 @@ namespace SemiCrf {
 			}
 		}
 
-		auto array = JsonIO::readUAry(object, "data");
+		auto array = JsonIO::readUAry(object, "pages");
 		readJsonData(array);
 	}
 
