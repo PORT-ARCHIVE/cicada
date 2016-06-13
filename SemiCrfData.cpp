@@ -284,12 +284,12 @@ namespace SemiCrf {
 				throw Error("invalid data format");
 			}
 
-			auto kw_jp = string_cast(std::move(*it));
+			auto japanese_keyword = string_cast(std::move(*it));
 
 			++it;
 
 			if( it == ary.end() ) {
-				labels_map.insert( std::make_pair(label_id, kw_jp) );
+				labels_map.insert( std::make_pair(label_id, japanese_keyword) );
 				continue;
 			}
 
@@ -297,18 +297,19 @@ namespace SemiCrf {
 				throw Error("invalid data format");
 			}
 
-			auto kw_en = string_cast(std::move(*it));
-			labels_map.insert( std::make_pair(label_id, kw_en) );
+			auto english_keyword = string_cast(std::move(*it));
+			labels_map.insert( std::make_pair(label_id, english_keyword) );
 		}
 
 		return std::move(labels_map);
 	}
 
-	std::multimap<std::string, std::string>
-	Datas::make_label_word_map(std::shared_ptr<Data> data, std::map<int, std::string>& labels_map) const
+	void Datas::make_label_word_map(
+		std::shared_ptr<Data> data,
+		std::map<int, std::string>& labels_map,
+		std::multimap<std::string, std::string>& mm
+		) const
 	{
-		std::multimap<std::string, std::string> mm;
-
 		for( auto& seg : *data->getSegments() ) {
 
 			auto s = seg->getStart();
@@ -329,10 +330,9 @@ namespace SemiCrf {
 				continue;
 			}
 
+			std::cout << label << " " << word << std::endl;
 			mm.insert( std::move(std::make_pair(std::move(label), std::move(word))) );
 		}
-
-		return std::move(mm);
 	}
 
 	void Datas::writeSimpleJson(std::ostream& output) const
@@ -345,43 +345,39 @@ namespace SemiCrf {
 
 		for( auto& file : *this ) {
 
-			ujson::array crf_estimate;
+			ujson::object crf_estimate;
 			auto title = file.first;
+			std::cout << title << std::endl;
 
+			std::multimap<std::string, std::string> mm;
 			for( auto& data : file.second ) {
+				make_label_word_map(data, labels_map, mm);
+			}
 
-				ujson::array array;
-				auto mm = make_label_word_map(data, labels_map);
+			for( auto& p : labels_map ) {
 
-				for( auto& p : labels_map ) {
+				auto il = mm.lower_bound(p.second);
+				auto iu = mm.upper_bound(p.second);
+				auto d = std::distance(il, iu);
 
-					auto il = mm.lower_bound(p.second);
-					auto iu = mm.upper_bound(p.second);
-					auto d = std::distance(il, iu);
+				if( d == 0 ) {
 
-					if( d == 0 ) {
+					continue;
 
-						continue;
+				} else if( d == 1 ) {
 
-					} else if( d == 1 ) {
+					crf_estimate.push_back( std::move( std::make_pair(il->first, il->second) ) );
 
-						auto v = ujson::object {{ il->first, il->second }};
-						array.push_back(std::move(v));
+				} else {
 
-					} else {
+					ujson::array inner_array;
 
-						ujson::array inner_array;
-
-						for( auto i = il; i != iu; ++i ) {
-							inner_array.push_back(i->second);
-						}
-
-						auto v = ujson::object {{ il->first, std::move(inner_array) }};
-						array.push_back(std::move(v));
+					for( auto i = il; i != iu; ++i ) {
+						inner_array.push_back(i->second);
 					}
-				}
 
-				crf_estimate.push_back(std::move(array));
+					crf_estimate.push_back( std::move( std::make_pair(il->first, std::move(inner_array)) ) );
+				}
 			}
 
 			auto object = ujson::object {{ "title", title }, { "crf_estimate", std::move(crf_estimate) }};
