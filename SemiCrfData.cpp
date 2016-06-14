@@ -329,7 +329,6 @@ namespace SemiCrf {
 				continue;
 			}
 
-			std::cout << label << " " << word << std::endl;
 			mm.insert( std::move(std::make_pair(std::move(label), std::move(word))) );
 		}
 	}
@@ -346,7 +345,6 @@ namespace SemiCrf {
 
 			ujson::object crf_estimate;
 			auto title = file.first;
-			std::cout << title << std::endl;
 
 			std::multimap<std::string, std::string> mm;
 			for( auto& data : file.second ) {
