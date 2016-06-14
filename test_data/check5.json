@@ -1,7 +1,7 @@
 {
 	"dimension" : [ 2, 2 ],
 	"feature" : "DIGIT",
-	"data" : [
+	"pages" : [
 		{
 			"title" : "check5",
 			"data" : [

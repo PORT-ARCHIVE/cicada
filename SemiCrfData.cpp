@@ -122,6 +122,8 @@ namespace SemiCrf {
 			throw Error("object expected");
 		}
 		auto object = object_cast(std::move(v));
+		auto array = JsonIO::readUAry(object, "pages");
+		readJsonData(array);
 		auto dims = JsonIO::readIntAry(object, "dimension");
 		xDim = dims[0];
 		yDim = dims[1];
@@ -133,9 +135,6 @@ namespace SemiCrf {
 				throw Error("no labels specified");
 			}
 		}
-
-		auto array = JsonIO::readUAry(object, "pages");
-		readJsonData(array);
 	}
 
 	void Datas::readJsonData(std::vector<ujson::value>& array0)
@@ -249,7 +248,7 @@ namespace SemiCrf {
 		auto object = ujson::object {
 			{ "dimension", std::move(ujson::array{ xDim, yDim }) },
 			{ "feature", feature },
-			{ "data", std::move(array0) }
+			{ "pages", std::move(array0) }
 		};
 
 		if( !labels.empty() ) {
