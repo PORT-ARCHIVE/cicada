@@ -44,8 +44,8 @@ test3:
 	@echo "###### ${FILE1} ######"
 	time $(SEMICRF) -t ${FILE1} -w tmp1 --log-level 2 -e0 2.0 -e1 1.0e-6 --disable-regularization --w2v-matrix ${MATRIX} && echo "OK" || echo "ERROR"
 	$(SEMICRF) -i ${FILE1} -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} > tmp2 && echo "OK" || echo "ERROR"
-	jq '.data[].data[][][]' ${FILE1} > r1
-	jq '.data[].data[][][]' tmp2 > r2
+	jq '.pages[].data[][][]' ${FILE1} > r1
+	jq '.pages[].data[][][]' tmp2 > r2
 	cat r1 | awk '{ if(k++ % 4 == 2) print $$1 }' > a
 	cat r2 | awk '{ if(k++ % 4 == 2) print $$1 }' > b
 	echo "diff -c a b"
@@ -66,8 +66,8 @@ infer:
 	@for SEED in 1 2 3 4 5 6 7 8 9 10; do \
 		../gen -i p0.json -s $$SEED -r 32 -l 16 > tmp3; \
 		$(SEMICRF) -i tmp3 -w tmp2 --log-level 2 > tmp4 || echo "ERROR"; \
-		cat tmp3 | jq '.data[].data[][][]' > r1; \
-		cat tmp4 | jq '.data[].data[][][]' > r2; \
+		cat tmp3 | jq '.pages[].data[][][]' > r1; \
+		cat tmp4 | jq '.pages[].data[][][]' > r2; \
 		cat r1 | awk '{ if(k++ % 3 == 2) print $$1 }' > a; \
 		cat r2 | awk '{ if(k++ % 3 == 2) print $$1 }' > b; \
 		paste a b | awk '{ if( $$1 == $$2 ) count++; total++; } END{ print count/total*100,"%"; }' | tee -a tmp5; \

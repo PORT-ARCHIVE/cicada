@@ -363,7 +363,7 @@ int main(int argc, char *argv[])
 		auto object1 = ujson::object {
 			{ "dimension", std::move(ujson::array { int(y2x.at(0).size()), int(y2y.size()) }) },
 			{ "feature", "DIGIT" },
-			{ "data", std::move(ary0) }
+			{ "pages", std::move(ary0) }
 		};
 
 		std::cout << "" << to_string(object1) << std::endl;

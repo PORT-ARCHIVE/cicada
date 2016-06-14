@@ -1,5 +1,10 @@
 {
-    "data" : [
+    "dimension" : [
+        5,
+        2
+    ],
+    "feature" : "DIGIT",
+    "pages" : [
         {
             "data" : [
                 [
@@ -2581,10 +2586,5 @@
             ],
             "title" : "test"
         }
-    ],
-    "dimension" : [
-        5,
-        2
-    ],
-    "feature" : "DIGIT"
+    ]
 }

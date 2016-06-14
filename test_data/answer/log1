@@ -5,7 +5,6 @@ Learning...
 Datas()
 TrainingDatas()
 TrainingDatas::read()
-Error()
 Data()
 BEGIN : data was created.
 0
