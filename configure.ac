@@ -12,14 +12,11 @@ AM_INIT_AUTOMAKE
 # Checks for programs.
 #AC_PROG_CC
 
-# デフォルトのコンパイルオプション -g -O2 を -g に変更する
 cxxflags_save="$CXXFLAGS"
 AC_PROG_CXX
 CXXFLAGS="$cxxflags_save"
-test -n "$CXXFLAGS" || CXXFLAGS="-g -std=c++11 -pthread -I../src/spdlog/include"
-#test -n "$CXXFLAGS" || CXXFLAGS="-g -std=c++11 -pthread -flto -I../src/spdlog/include"
-#test -n "$CXXFLAGS" || CXXFLAGS="-g -std=c++11"
-
+test -n "$CXXFLAGS" || CXXFLAGS="-O2 -std=c++11 -pthread -I../src/spdlog/include -DNDEBUG"
+#test -n "$CXXFLAGS" || CXXFLAGS="-g -std=c++11 -pthread -I../src/spdlog/include"
 
 # Checks for libraries.
 
