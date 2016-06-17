@@ -122,6 +122,22 @@ int main(int argc, char *argv[])
 			}
 			Logger::info() << "parse " << options.w2vMatrixFile;
 			matrix->read(options.w2vMatrixFile);
+
+			const long long wth0 = 100000;
+			if( matrix->getNumWords() < wth0 ) {
+				std::stringstream ss;
+				ss << "the number of words in word2vec vector less than ";
+				ss << wth0;
+				Logger::warn() << ss.str();
+			}
+
+			const long long wth1 = 10000;
+			if( matrix->getNumWords() < wth1 ) {
+				std::stringstream ss;
+				ss << "the number of words in word2vec vector less than ";
+				ss << wth1;
+				throw Error(ss.str());
+			}
 		}
 
 		/////////////// bodies
