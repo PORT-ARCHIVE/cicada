@@ -133,6 +133,7 @@ update:
 	-cp test19.json answer/test19.json
 	-cp body1.txt answer/body1.txt
 	-cp simple_output.json answer/simple_output.json
+	-cp check10_output.json answer/check10_output.json
 	-cp bdc2e_result.json answer/bdc2e_result.json
 
 clean:
