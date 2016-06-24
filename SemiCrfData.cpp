@@ -137,6 +137,27 @@ namespace SemiCrf {
 		}
 	}
 
+	void Datas::preReadJsonData(std::vector<ujson::value>& array0)
+	{
+		for( auto& value0 : array0 ) {
+
+			std::vector<std::shared_ptr<Data>> datas;
+
+			if( !value0.is_object() ) {
+				throw Error("invalid data format");
+			}
+
+			auto object = object_cast(std::move(value0));
+			auto array1 = JsonIO::readUAry(object, "data");
+
+			for( auto& value1 : array1 ) {
+
+				auto data = std::make_shared<Data>();
+				preReadJsonDataCore(value1, *data);
+			}
+		}
+	}
+
 	void Datas::readJsonData(std::vector<ujson::value>& array0)
 	{
 		for( auto& value0 : array0 ) {
@@ -427,6 +448,42 @@ namespace SemiCrf {
 	TrainingDatas::~TrainingDatas()
 	{
 		Logger::debug() << "~TrainingDatas()";
+	}
+
+	void TrainingDatas::preReadJsonDataCore(ujson::value& value, Data& data)
+	{
+		decltype(std::make_shared<Segment>()) seg;
+
+		auto array1 = array_cast(std::move(value));
+		for( auto& j : array1 ) {
+
+			if( !j.is_array() ) {
+				throw Error("invalid data format");
+			}
+
+			auto array2 = array_cast(std::move(j));
+			auto k = array2.begin();
+			if( !k->is_string() ) {
+				throw Error("invalid data format");
+			}
+
+			k++;
+			if( !k->is_string() ) {
+				throw Error("invalid format");
+			}
+
+			k++;
+			if( !k->is_string() ) {
+				throw Error("invalid format");
+			}
+
+			auto label = string_cast(std::move(*k));
+			auto lb = App::string2Label(label);
+
+			if( label_map.find(lb) == label_map.end() ) {
+				label_map.insert( std::make_pair(lb, yDim++) );
+			}
+		}
 	}
 
 	void TrainingDatas::readJsonDataCore(ujson::value& value, Data& data)

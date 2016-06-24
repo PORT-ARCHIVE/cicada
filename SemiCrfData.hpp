@@ -141,7 +141,9 @@ namespace SemiCrf {
 
 	protected:
 
+		virtual void preReadJsonData(std::vector<ujson::value>& data);
 		virtual void readJsonData(std::vector<ujson::value>& data);
+		virtual void preReadJsonDataCore(ujson::value& value, Data& data) {};
 		virtual void readJsonDataCore(ujson::value& value, Data& data) = 0;
 		virtual void computeMeanLength();
 		virtual std::map<int, std::string> make_labels_map() const;
@@ -163,7 +165,10 @@ namespace SemiCrf {
 
 	protected:
 
+		virtual void preReadJsonDataCore(ujson::value& value, Data& data);
 		virtual void readJsonDataCore(ujson::value& value, Data& data);
+
+		std::map<int,int> label_map;
 	};
 
 	decltype( std::make_shared<Datas>() ) createTrainingDatas();
