@@ -123,10 +123,11 @@ namespace SemiCrf {
 		}
 		auto object = object_cast(std::move(v));
 		auto array = JsonIO::readUAry(object, "pages");
+		preReadJsonData(array); // yDimを決める
 		readJsonData(array);
 		auto dims = JsonIO::readIntAry(object, "dimension");
 		xDim = dims[0];
-		yDim = dims[1];
+		//yDim = dims[1]; yDimは preReadJsonData で決まる
 		feature = JsonIO::readString(object, "feature");
 		try {
 			labels = JsonIO::readUAry(object, "labels");
@@ -147,7 +148,8 @@ namespace SemiCrf {
 				throw Error("invalid data format");
 			}
 
-			auto object = object_cast(std::move(value0));
+			//auto object = object_cast(std::move(value0));
+			auto object = object_cast(value0);
 			auto array1 = JsonIO::readUAry(object, "data");
 
 			for( auto& value1 : array1 ) {
@@ -156,6 +158,8 @@ namespace SemiCrf {
 				preReadJsonDataCore(value1, *data);
 			}
 		}
+
+		++yDim;
 	}
 
 	void Datas::readJsonData(std::vector<ujson::value>& array0)
@@ -432,6 +436,20 @@ namespace SemiCrf {
 		}
 	}
 
+	void Datas::setLabelMap(const std::map<int ,int>& arg) {
+		label_map = arg;
+		int size = 0;
+		for( auto& p : label_map ) {
+			if( size < p.second ) {
+				size = p.second;
+			}
+		}
+		reverse_label_map.resize(size+1);
+		for( auto& p : label_map ) {
+			reverse_label_map[p.second] = p.first;
+		}
+	}
+
 	//// TrainingDatas ////
 
 	decltype( std::make_shared<Datas>() )
@@ -481,7 +499,7 @@ namespace SemiCrf {
 			auto lb = App::string2Label(label);
 
 			if( label_map.find(lb) == label_map.end() ) {
-				label_map.insert( std::make_pair(lb, yDim++) );
+				label_map.insert( std::make_pair(lb, ++yDim) );
 			}
 		}
 	}
@@ -524,7 +542,7 @@ namespace SemiCrf {
 			}
 
 			auto label = string_cast(std::move(*k)); Logger::debug() << label;
-			auto lb = App::string2Label(label);
+			auto lb = label_map[ App::string2Label(label) ]; // labelを圧縮
 
 			if( descriptor == "N" ) {
 
@@ -620,7 +638,6 @@ namespace SemiCrf {
 			if( !k->is_string() ) {
 				throw Error("invalid format");
 			}
-
 
 			std::vector<std::string> ss;
 			auto word_id = string_cast(std::move(*k)); Logger::debug() << word_id;

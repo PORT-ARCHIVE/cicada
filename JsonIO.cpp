@@ -122,6 +122,43 @@ namespace JsonIO {
 		return std::move(idm);
 	}
 
+	std::map<int, int> readIntIntMap(Object& object, const std::string& tag)
+	{
+		std::map<int,int> iim;
+
+		auto it = find(object, tag.c_str());
+		if( it == object.end() || !it->second.is_array() ) {
+			std::stringstream ss;
+			ss << "'" << tag << "' with type array not found";
+			throw Error(ss.str());
+		}
+
+		auto array0 = array_cast(std::move(it->second));
+		for( auto i = array0.begin(); i != array0.end(); ++i ) {
+
+			auto array1 = array_cast(std::move(*i));
+			auto j = array1.begin();
+
+			if( !j->is_number() ) {
+				throw Error("invalid data format");
+			}
+
+			int lb = int32_cast(std::move(*j));
+
+			j++;
+
+			if( !j->is_number() ) {
+				throw Error("invalid data format");
+			}
+
+			double m = int32_cast(std::move(*j));
+
+			iim[lb] = m;
+		}
+
+		return std::move(iim);
+	}
+
 	std::vector<ujson::value> readUAry(Object& object, const std::string& tag)
 	{
 		auto it = find(object, tag.c_str());

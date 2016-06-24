@@ -33,6 +33,7 @@ namespace SemiCrf {
 		std::string feature{""};
 		std::map<int,double> mean;
 		std::map<int,double> variance;
+		std::map<int,int> label_map;
 
 	public:
 
@@ -49,12 +50,14 @@ namespace SemiCrf {
 		void setFeature(const std::string& arg) { feature = arg; }
 		void setMean(const std::map<int,double>& arg) { mean = arg; }
 		void setVariance(const std::map<int,double>& arg) { variance = arg; }
+		void setLabelMap(const std::map<int,int>& arg) { label_map = arg; }
 		decltype(xDim) getXDim() const { return xDim; }
 		decltype(yDim) getYDim() const { return yDim; }
 		decltype(maxLength) getMaxLength() const { return maxLength; }
 		std::add_const<decltype((mean))>::type getMean() { return mean; }
 		std::add_const<decltype((variance))>::type getVariance() { return variance; }
 		std::add_const<decltype((feature))>::type getFeature() { return feature; }
+		std::add_const<decltype((label_map))>::type getLabelMap() { return label_map; }
 	};
 
 	decltype(std::shared_ptr<Weights>()) createWeights(int dim = 0);

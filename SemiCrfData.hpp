@@ -114,6 +114,8 @@ namespace SemiCrf {
 		std::map<int,double> mean;
 		std::map<int,double> variance;
 		std::vector<ujson::value> labels;
+		std::map<int,int> label_map;
+		std::vector<int> reverse_label_map;
 
 	public:
 
@@ -134,10 +136,13 @@ namespace SemiCrf {
 		void setFeature(const std::string& arg) { feature = arg; }
 		void setMean(const std::map<int,double>& arg);
 		void setVariance(const std::map<int,double>& arg);
+		void setLabelMap(const std::map<int,int>& arg);
 		std::add_const<decltype((mean))>::type getMean() { return mean; }
 		std::add_const<decltype((variance))>::type getVariance() { return variance; }
 		std::add_const<decltype((feature))>::type getFeature() { return feature; }
 		std::add_const<decltype((labels))>::type getLabels() { return labels; }
+		std::add_const<decltype((label_map))>::type getLabelMap() { return label_map; }
+		std::add_const<decltype((reverse_label_map))>::type getReverseLabelMap() { return reverse_label_map; }
 
 	protected:
 
@@ -167,8 +172,6 @@ namespace SemiCrf {
 
 		virtual void preReadJsonDataCore(ujson::value& value, Data& data);
 		virtual void readJsonDataCore(ujson::value& value, Data& data);
-
-		std::map<int,int> label_map;
 	};
 
 	decltype( std::make_shared<Datas>() ) createTrainingDatas();

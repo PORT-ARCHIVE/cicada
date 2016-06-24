@@ -70,6 +70,7 @@ namespace SemiCrf {
 		maxLength = JsonIO::readInt(object, "max_length");
 		mean = JsonIO::readIntDoubleMap(object, "mean");
 		variance = JsonIO::readIntDoubleMap(object, "variance");
+		label_map = JsonIO::readIntIntMap(object, "label_map");
 		auto weight = JsonIO::readDoubleAry(object, "weights");
 		for( auto& w : weight ) push_back(w);
 	}
@@ -109,6 +110,14 @@ namespace SemiCrf {
 			jvariancies.push_back(std::move(jvariance));
 		}
 
+		ujson::array jlabelMaps;
+		for( auto& v : label_map ) {
+			ujson::array jlabelMap;
+			jlabelMap.push_back(v.first);
+			jlabelMap.push_back(v.second);
+			jlabelMaps.push_back(std::move(jlabelMap));
+		}
+
 		auto object = ujson::object {
 			{ "title", "Semi-CRF Weights" },
 			{ "dimension", std::move(ujson::array{ xDim, yDim }) },
@@ -116,6 +125,7 @@ namespace SemiCrf {
 			{ "max_length", maxLength },
 			{ "mean", jmeans },
 			{ "variance", jvariancies },
+			{ "label_map", jlabelMaps },
 			{ "weights", jweights }
 		};
 
@@ -325,6 +335,7 @@ namespace SemiCrf {
 			weights->setMaxLength(maxLength);
 			weights->setMean(datas->getMean());
 			weights->setVariance(datas->getVariance());
+			weights->setLabelMap(datas->getLabelMap());
 			weights->write(ofs);
 		}
 	}
@@ -807,6 +818,7 @@ namespace SemiCrf {
 		const auto& feature = weights->getFeature();
 		const auto& mean = weights->getMean();
 		const auto& variance = weights->getVariance();
+		const auto& label_map = weights->getLabelMap();
 
 		// feature関数を生成し、x,yの次元、feature、maxLengthを設定する
 		ff = App::createFeatureFunction(feature, w2vfile);
@@ -830,6 +842,7 @@ namespace SemiCrf {
 		datas->setFeature(feature);
 		datas->setMean(mean);
 		datas->setVariance(variance);
+		datas->setLabelMap(label_map);
 
 		// ラベルを生成
 		auto labels = createLabels(ydim);
@@ -956,10 +969,12 @@ namespace SemiCrf {
 		auto maxyd = std::get<3>(tp0);
 
 		std::list<decltype(std::make_shared<Segment>())> ls;
+		const auto& reverse_label_map = datas->getReverseLabelMap();
 
 		while(1) {
 
-			auto seg = createSegment(i-maxd+1, i, maxy);
+			int label = reverse_label_map[maxy];
+			auto seg = createSegment(i-maxd+1, i, label);
 			ls.push_front(seg);
 
 			i -= maxd;
