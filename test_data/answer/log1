@@ -6,6 +6,8 @@ Datas()
 TrainingDatas()
 TrainingDatas::read()
 Data()
+~Data()
+Data()
 BEGIN : data was created.
 0
 S/E
