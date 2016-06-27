@@ -7,6 +7,7 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/lexical_cast.hpp>
 #include <map>
+#include <set>
 #include "Error.hpp"
 #include "ujson.hpp"
 #include "JsonIO.hpp"
@@ -155,7 +156,8 @@ namespace SemiCrf {
 		void make_label_word_map(
 				std::shared_ptr<Data> data,
 				std::map<int, std::string>& labels_map,
-				std::multimap<std::string, std::string>& mm
+				std::multimap<std::string, std::string>& mm,
+				std::set<std::pair<std::string,std::string>>& check
 				) const;
 	};
 

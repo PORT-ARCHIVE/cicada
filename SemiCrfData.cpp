@@ -1,6 +1,7 @@
 // © 2016 PORT INC.
 
 #include <map>
+#include <set>
 #include "SemiCrfData.hpp"
 #include "Logger.hpp"
 #include "Error.hpp"
@@ -331,7 +332,8 @@ namespace SemiCrf {
 	void Datas::make_label_word_map(
 		std::shared_ptr<Data> data,
 		std::map<int, std::string>& labels_map,
-		std::multimap<std::string, std::string>& mm
+		std::multimap<std::string, std::string>& mm,
+		std::set<std::pair<std::string,std::string>>& check
 		) const
 	{
 		for( auto& seg : *data->getSegments() ) {
@@ -354,7 +356,11 @@ namespace SemiCrf {
 				continue;
 			}
 
-			mm.insert( std::move(std::make_pair(std::move(label), std::move(word))) );
+			const auto& p = std::make_pair(label, word);
+			if( check.find(p) == check.end() ) {
+				check.insert(p);
+				mm.insert( std::move(std::make_pair(std::move(label), std::move(word))) );
+			}
 		}
 	}
 
@@ -372,8 +378,9 @@ namespace SemiCrf {
 			auto title = file.first;
 
 			std::multimap<std::string, std::string> mm;
+			std::set<std::pair<std::string,std::string>> check;
 			for( auto& data : file.second ) {
-				make_label_word_map(data, labels_map, mm);
+				make_label_word_map(data, labels_map, mm, check);
 			}
 
 			for( auto& p : labels_map ) {
