@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
 				line.push_back(ID);
 				line.push_back("*");
 				line.push_back("*");
-				line.push_back(tok1);
+				line.push_back(tok0);
 				lines.push_back(std::move(line));
 				if( tok == "。" ){ // T.B.D.
 					data.push_back(std::move(lines));
