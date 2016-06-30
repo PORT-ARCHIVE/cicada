@@ -114,7 +114,7 @@ bdc2e_test:
 	@diff answer/bdc2e_result.json bdc2e_result.json && echo "OK" || echo "ERROR"
 
 docker_run:
-	docker run -v /home/vagrant/centos/research-playground/semi-crf/test_data:/home/docker_user/research-playground/semi-crf/test_data \
+	docker run -v /var/projects/research-playground/semi-crf/test_data:/home/docker_user/research-playground/semi-crf/test_data \
 	--name $(CONTAINER_NAME) -it `docker images | grep "docker_common/cicada" | awk '{ print $$3 }'` \
 	/bin/sh -c 'cd semi-crf/test_data && make test1 && make test2 && make gen_test && make bd2w_test && make bdc2e_test'
 	docker stop $(CONTAINER_NAME)
