@@ -310,6 +310,7 @@ namespace SemiCrf {
 		if( !w0file.empty() ) { // 初期重みが指定されている場合
 			std::ifstream ifs; // 入力
 			open(ifs, w0file);
+			Logger::info() << "read " << w0file;
 			weights->resize(0);
 			weights->read(ifs); // 重みを初期重みで初期化
 		}
@@ -330,6 +331,7 @@ namespace SemiCrf {
 		if( !(flg & ENABLE_LIKELIHOOD_ONLY) ) {
 			std::ofstream ofs; // 出力
 			open(ofs, wfile);
+			Logger::info() << "write " << wfile;
 			weights->setXDim(datas->getXDim());
 			weights->setYDim(datas->getYDim());
 			weights->setMaxLength(maxLength);
@@ -790,6 +792,7 @@ namespace SemiCrf {
 		std::ifstream ifs; // 入力
 		open(ifs, wfile);
 		try {
+			Logger::info() << "read " << wfile;
 			weights->read(ifs);
 		} catch(Error& e) {
 			std::stringstream ss;
@@ -862,7 +865,7 @@ namespace SemiCrf {
 		Logger::debug() << "Predictor::compute()";
 
 		for( auto& file : *datas ) {
-			Logger::info() << "predict " << file.first << std::endl;
+			Logger::info() << "predict " << file.first;
 			for( auto& data : file.second ) {
 
 				current_data = data;

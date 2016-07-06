@@ -138,6 +138,7 @@ decltype( std::make_shared<SemiCrf::Algorithm>() ) createAlgorithm(const Options
 	open(ifs, file);
 
 	try {
+		Logger::info() << "read " << file;
 		datas->read(ifs);
 	} catch(Error& e) {
 		std::stringstream ss;

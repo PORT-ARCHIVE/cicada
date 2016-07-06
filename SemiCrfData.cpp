@@ -118,16 +118,13 @@ namespace SemiCrf {
 
 	void Datas::readJson(std::istream& is)
 	{
-		Logger::info() << "parse json...";
 		auto v = JsonIO::parse(is);
 		if( !v.is_object() ) {
 			throw Error("object expected");
 		}
 		auto object = object_cast(std::move(v));
 		auto array = JsonIO::readUAry(object, "pages");
-		Logger::info() << "preread data...";
 		preReadJsonData(array); // yDimを決める
-		Logger::info() << "read data...";
 		readJsonData(array);
 		auto dims = JsonIO::readIntAry(object, "dimension");
 		xDim = dims[0];
