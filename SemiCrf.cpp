@@ -862,6 +862,7 @@ namespace SemiCrf {
 		Logger::debug() << "Predictor::compute()";
 
 		for( auto& file : *datas ) {
+			Logger::info() << "predict " << file.first << std::endl;
 			for( auto& data : file.second ) {
 
 				current_data = data;
