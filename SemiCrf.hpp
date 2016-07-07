@@ -170,6 +170,7 @@ namespace SemiCrf {
 		virtual void setFeatureFunction(decltype(ff) arg);
 
 		void setCacheSize(decltype(cacheSize) size) { cacheSize = size; }
+		decltype(maxLength) getMaxLength() const { return maxLength; }
 
 	protected:
 

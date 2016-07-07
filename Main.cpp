@@ -158,6 +158,10 @@ decltype( std::make_shared<SemiCrf::Algorithm>() ) createAlgorithm(const Options
 	} else {
 		alg->setMaxLength(datas->getMaxLength());
 	}
+	const int maxLengthLimit = 64;
+	if( maxLengthLimit < alg->getMaxLength() ) {
+		Logger::out()->warn("maxLength exceeds the limit of {}", maxLengthLimit);
+	}
 	alg->setMaxIteration(options.maxIteration);
 	alg->setE0(options.e0);
 	alg->setE1(options.e1);
