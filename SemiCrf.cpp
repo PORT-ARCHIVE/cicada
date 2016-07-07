@@ -47,12 +47,12 @@ namespace SemiCrf {
 	Weights::Weights(int dim)
 		: std::vector<double>(dim)
 	{
-		Logger::debug() << "Weights()";
+		Logger::trace() << "Weights()";
 	}
 
 	Weights::~Weights()
 	{
-		Logger::debug() << "~Weights()";
+		Logger::trace() << "~Weights()";
 	}
 
 	void Weights::readJson(std::istream& is)
@@ -77,7 +77,7 @@ namespace SemiCrf {
 
 	void Weights::read(std::istream& ifs)
 	{
-		Logger::debug() << "Weights::read()";
+		Logger::trace() << "Weights::read()";
 
 		readJson(ifs);
 		if( empty() ) {
@@ -87,7 +87,7 @@ namespace SemiCrf {
 
 	void Weights::writeJson(std::ostream& ofs)
 	{
-		Logger::debug() << "Weights::writeJson()";
+		Logger::trace() << "Weights::writeJson()";
 
 		ujson::array jweights;
 		for( auto& w : *this ) {
@@ -134,18 +134,18 @@ namespace SemiCrf {
 
 	void Weights::write(std::ostream& ofs)
 	{
-		Logger::debug() << "Weights::write()";
+		Logger::trace() << "Weights::write()";
 		writeJson(ofs);
 	}
 
 	FeatureFunction::FeatureFunction()
 	{
-		Logger::debug() << "FeatureFunction()";
+		Logger::trace() << "FeatureFunction()";
 	}
 
 	FeatureFunction::~FeatureFunction()
 	{
-		Logger::debug() << "~FeatureFunction()";
+		Logger::trace() << "~FeatureFunction()";
 	}
 
 	//// Algorithm ////
@@ -153,7 +153,7 @@ namespace SemiCrf {
 	Algorithm::Algorithm(int arg)
 		: flg(arg)
 	{
-		Logger::debug() << "Algorithm()";
+		Logger::trace() << "Algorithm()";
 		if( !(flg & DISABLE_DATE_VERSION) ) {
 			Logger::info() << "cicada 0.0.1";
 			Logger::info() << "Copyright (C) 2016 PORT, Inc.";
@@ -164,7 +164,7 @@ namespace SemiCrf {
 
 	Algorithm::~Algorithm()
 	{
-		Logger::debug() << "~Algorithm()";
+		Logger::trace() << "~Algorithm()";
 	}
 
 	void Algorithm::setLabels(decltype(labels) arg)
@@ -268,7 +268,7 @@ namespace SemiCrf {
 	Learner::Learner(int arg)
 		: Algorithm(arg)
 	{
-		Logger::debug() << "Learner()";
+		Logger::trace() << "Learner()";
 		if( !(flg & ENABLE_LIKELIHOOD_ONLY) ) {
 			Logger::info() << "Learning...";
 		}
@@ -276,7 +276,7 @@ namespace SemiCrf {
 
 	Learner::~Learner()
 	{
-		Logger::debug() << "~Learner()";
+		Logger::trace() << "~Learner()";
 	}
 
 	void Learner::preProcess
@@ -344,7 +344,7 @@ namespace SemiCrf {
 
 	void Learner::compute()
 	{
-		Logger::debug() << "Learner::compute()";
+		Logger::trace() << "Learner::compute()";
 
 		if( !(flg & ENABLE_LIKELIHOOD_ONLY) ){
 
@@ -427,10 +427,10 @@ namespace SemiCrf {
 							(*idL) -= dw2;
 						}
 
-						Logger::debug() << "dL(" << k << ")=" << *idL;
+						Logger::trace() << "dL(" << k << ")=" << *idL;
 					}
 				}
-				Logger::debug() << "cache_hit_rate=" << (double)hit/(double)(miss+hit);
+				Logger::trace() << "cache_hit_rate=" << (double)hit/(double)(miss+hit);
 			}
 		}
 	}
@@ -459,7 +459,7 @@ namespace SemiCrf {
 
 		int k = 0;
 		for( auto& g : Gs ) {
-			Logger::debug() << "G(" << k++ << ")=" << g;
+			Logger::trace() << "G(" << k++ << ")=" << g;
 		}
 
 		if( flg & ENABLE_LIKELIHOOD_ONLY ) {
@@ -500,7 +500,7 @@ namespace SemiCrf {
 			Z += alpha(s-1, y);
 		}
 
-		Logger::debug() << "Z=" << Z;
+		Logger::trace() << "Z=" << Z;
 		return Z;
 	}
 
@@ -523,7 +523,7 @@ namespace SemiCrf {
 			tmp /= Z;
 			for( int k = 0; k < dim; k++ ) {
 				Gms.push_back(tmp(k));
-				Logger::debug() << "Gm(" << k << ")=" << tmp(k);
+				Logger::trace() << "Gm(" << k << ")=" << tmp(k);
 			}
 		}
 
@@ -772,13 +772,13 @@ namespace SemiCrf {
 	Predictor::Predictor(int arg)
 		: Algorithm(arg)
 	{
-		Logger::debug() << "Predictor()";
+		Logger::trace() << "Predictor()";
 		Logger::info() << "Prediction...";
 	}
 
 	Predictor::~Predictor()
 	{
-		Logger::debug() << "~Predictor()";
+		Logger::trace() << "~Predictor()";
 	}
 
 	void Predictor::preProcess
@@ -862,7 +862,7 @@ namespace SemiCrf {
 
 	void Predictor::compute()
 	{
-		Logger::debug() << "Predictor::compute()";
+		Logger::trace() << "Predictor::compute()";
 
 		for( auto& file : *datas ) {
 			Logger::info() << "predict " << file.first;

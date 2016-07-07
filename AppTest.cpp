@@ -45,12 +45,12 @@ namespace App {
 	Digit::Digit()
 	{
 		feature = "DIGIT";
-		Logger::debug() << "Digit()";
+		Logger::trace() << "Digit()";
 	}
 
 	Digit::~Digit()
 	{
-		Logger::debug() << "~Digit()";
+		Logger::trace() << "~Digit()";
 	}
 
 	int Digit::getDim()
@@ -60,12 +60,12 @@ namespace App {
 
 	void Digit::read()
 	{
-		Logger::debug() << "Digit::read()";
+		Logger::trace() << "Digit::read()";
 	}
 
 	void Digit::write()
 	{
-		Logger::debug() << "Digit::write()";
+		Logger::trace() << "Digit::write()";
 	}
 
 	double Digit::wg (
@@ -137,12 +137,12 @@ namespace App {
 	Jpn::Jpn()
 	{
 		feature = "JPN";
-		Logger::debug() << "Jpn()";
+		Logger::trace() << "Jpn()";
 	}
 
 	Jpn::~Jpn()
 	{
-		Logger::debug() << "~Jpn()";
+		Logger::trace() << "~Jpn()";
 	}
 
 	int Jpn::getDim()
@@ -160,12 +160,12 @@ namespace App {
 
 	void Jpn::read()
 	{
-		Logger::debug() << "Jpn::read()";
+		Logger::trace() << "Jpn::read()";
 	}
 
 	void Jpn::write()
 	{
-		Logger::debug() << "Jpn::write()";
+		Logger::trace() << "Jpn::write()";
 	}
 
 	double Jpn::wg (

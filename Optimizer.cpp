@@ -37,6 +37,7 @@ namespace Optimizer {
 
 	double UnconstrainedNLP_::avoidDivergence(vector& d, double& f1)
 	{
+		int counter = 0;
 		double beta1 = beta;
 		vector x1 = x + beta1*d;
 
@@ -48,6 +49,12 @@ namespace Optimizer {
 				beta1 *= tau;
 				x1 = x + beta1*d;
 			}
+			if( counter++ == maxIteration ) {
+				throw Error("avoidDivergence: iteration limit");
+			}
+			if( Signal::getFlg() ) {
+				throw Error("interrupt signal received");
+			}
 		}
 
 		return beta1;
@@ -55,6 +62,7 @@ namespace Optimizer {
 
 	double UnconstrainedNLP_::linearSearch(vector& d)
 	{
+		int counter = 0;
 		vector x1;
 		double gd = inner_prod(g0, d);
 		double f0 = ofunc->value(x);
@@ -67,6 +75,12 @@ namespace Optimizer {
 			f1 = ofunc->value(x1);
 			if( beta1 < minBeta ) {
 				break;
+			}
+			if( counter++ == maxIteration ) {
+				throw Error("linearSearch: iteration limit");
+			}
+			if( Signal::getFlg() ) {
+				throw Error("interrupt signal received");
 			}
 		}
 
@@ -120,32 +134,32 @@ namespace Optimizer {
 	{
 		ofunc->preProcess(x);
 
-		g0 = ofunc->grad(x);                 Logger::debug() << "g0=" << g0;
+		g0 = ofunc->grad(x);                 Logger::trace() << "g0=" << g0;
 		double alpha = 1.0;
 
 		while(1) {
 
 			ofunc->beginLoopProcess(x);
 
-			d = - g0;                        Logger::debug() << "d=" << d;
+			d = - g0;                        Logger::trace() << "d=" << d;
 
 			if( flg & ENABLE_ADAGRAD ) {
 				auto iad = adagrad.begin();
 				auto id = d.begin();
 				for( auto& idx : dx ) {
 					idx = e0/(1.0+sqrt(*iad++))*(*id++);
-				}                            Logger::debug() << "dx=" << dx;
+				}                            Logger::trace() << "dx=" << dx;
 				double f1 = 0.0;
 				alpha = avoidDivergence(d, f1);
 			} else {
-				alpha = linearSearch(d);     Logger::debug() << "alpha=" << alpha;
+				alpha = linearSearch(d);     Logger::debug() << "linearSearch: alpha=" << alpha;
 			}
 
-			dx = alpha * d;                  Logger::debug() << "dx=" << dx;
-			x = x + dx;                      Logger::debug() << "x=" << x;
+			dx = alpha * d;                  Logger::trace() << "dx=" << dx;
+			x = x + dx;                      Logger::debug() << "update x";
 			ofunc->afterUpdateXProcess(x);
 			if( isConv() ) break;
-			g0 = ofunc->grad(x);             Logger::debug() << "g0=" << g0;
+			g0 = ofunc->grad(x);             Logger::trace() << "g0=" << g0;
 
 			ofunc->endLoopProcess(x);
 
@@ -204,23 +218,23 @@ namespace Optimizer {
 		ofunc->preProcess(x);
 
 		H0 = I;
-		g0 = ofunc->grad(x);                 Logger::debug() << "g0=" << g0;
+		g0 = ofunc->grad(x);                 Logger::trace() << "g0=" << g0;
 		double alpha = 1.0;
 
 		while(1) {
 
 			ofunc->beginLoopProcess(x);
 
-			d = - prod(H0, g0);              Logger::debug() << "d=" << d;
-			alpha = linearSearch(d);         Logger::debug() << "alpha=" << alpha;
-			dx = alpha * d;                  Logger::debug() << "dx=" << dx;
-			x = x + dx;                      Logger::debug() << "x=" << x;
-			ofunc->afterUpdateXProcess(x);
+			d = - prod(H0, g0);              Logger::trace() << "d=" << d;
+			alpha = linearSearch(d);         Logger::debug() << "linearSearch: alpha=" << alpha;
+			dx = alpha * d;                  Logger::trace() << "dx=" << dx;
+			x = x + dx;                      Logger::trace() << "x=" << x;
+			ofunc->afterUpdateXProcess(x);   Logger::debug() << "update x";
 			if( isConv() ) break;
-			g1 = ofunc->grad(x);             Logger::debug() << "g1=" << g1;
-			y = g1 - g0;                     Logger::debug() << "y=" << y;
+			g1 = ofunc->grad(x);             Logger::trace() << "g1=" << g1;
+			y = g1 - g0;                     Logger::trace() << "y=" << y;
 			g0 = g1;
-			updateMatrix();                  Logger::debug() << "H=" << H0;
+			updateMatrix();                  Logger::debug() << "update matrix";
 
 			ofunc->endLoopProcess(x);
 

@@ -56,7 +56,7 @@ namespace SemiCrf {
 
 	Labels::Labels(int size)
 	{
-		Logger::debug() << "Labels()";
+		Logger::trace() << "Labels()";
 		for( int i = 0; i < size; i++ ) {
 			push_back(i);
 		}
@@ -64,19 +64,19 @@ namespace SemiCrf {
 
 	Labels::~Labels()
 	{
-		Logger::debug() << "~Labels()";
+		Logger::trace() << "~Labels()";
 	}
 
 	//// Data ////
 
 	Data::Data()
 	{
-		Logger::debug() << "Data()";
+		Logger::trace() << "Data()";
 	}
 
 	Data::~Data()
 	{
-		Logger::debug() << "~Data()";
+		Logger::trace() << "~Data()";
 	}
 
 	void Data::computeMeanLength(
@@ -179,9 +179,9 @@ namespace SemiCrf {
 
 			for( auto& value1 : array1 ) {
 
-				auto data = std::make_shared<Data>(); Logger::debug() << "BEGIN : data was created.";
+				auto data = std::make_shared<Data>(); Logger::trace() << "BEGIN : data was created.";
 				readJsonDataCore(value1, *data);
-				datas.push_back(data);                Logger::debug() << "END : data was pushed.";
+				datas.push_back(data);                Logger::trace() << "END : data was pushed.";
 			}
 
 			push_back(std::move(std::make_pair(std::move(title),std::move(datas))));
@@ -190,7 +190,7 @@ namespace SemiCrf {
 
 	void Data::writeJson(ujson::array& ary0) const
 	{
-		Logger::debug() << "Data::writeJson()";
+		Logger::trace() << "Data::writeJson()";
 
 		ujson::array ary1;
 
@@ -241,17 +241,17 @@ namespace SemiCrf {
 
 	Datas::Datas()
 	{
-		Logger::debug() << "Datas()";
+		Logger::trace() << "Datas()";
 	}
 
 	Datas::~Datas()
 	{
-		Logger::debug() << "~Datas()";
+		Logger::trace() << "~Datas()";
 	}
 
 	void Datas::writeJson(std::ostream& output) const
 	{
-		Logger::debug() << "Datas::writeJson()";
+		Logger::trace() << "Datas::writeJson()";
 
 		ujson::array array0;
 		for( auto& file : *this ) {
@@ -366,7 +366,7 @@ namespace SemiCrf {
 
 	void Datas::writeSimpleJson(std::ostream& output) const
 	{
-		Logger::debug() << "Datas::writeSimpleJson()";
+		Logger::trace() << "Datas::writeSimpleJson()";
 		if( labels.empty() ) { throw Error("option '--enable-simple-prediction-output' not supported"); }
 
 		auto labels_map = make_labels_map();
@@ -417,7 +417,7 @@ namespace SemiCrf {
 	}
 
 	void Datas::write(std::ostream& output, bool simple_prediction_output) const {
-		Logger::debug() << "Datas::write()";
+		Logger::trace() << "Datas::write()";
 		if( simple_prediction_output ) {
 			writeSimpleJson(output);
 		} else {
@@ -467,12 +467,12 @@ namespace SemiCrf {
 
 	TrainingDatas::TrainingDatas()
 	{
-		Logger::debug() << "TrainingDatas()";
+		Logger::trace() << "TrainingDatas()";
 	}
 
 	TrainingDatas::~TrainingDatas()
 	{
-		Logger::debug() << "~TrainingDatas()";
+		Logger::trace() << "~TrainingDatas()";
 	}
 
 	void TrainingDatas::preReadJsonDataCore(ujson::value& value, Data& data)
@@ -532,7 +532,7 @@ namespace SemiCrf {
 				throw Error("invalid data format");
 			}
 
-			auto word_id = string_cast(std::move(*k)); Logger::debug() << word_id;
+			auto word_id = string_cast(std::move(*k)); Logger::trace() << word_id;
 			std::vector<std::string> vs;
 			vs.push_back(std::move(word_id));
 
@@ -541,14 +541,14 @@ namespace SemiCrf {
 				throw Error("invalid format");
 			}
 
-			auto descriptor = string_cast(std::move(*k)); Logger::debug() << descriptor;
+			auto descriptor = string_cast(std::move(*k)); Logger::trace() << descriptor;
 
 			k++;
 			if( !k->is_string() ) {
 				throw Error("invalid format");
 			}
 
-			auto label = string_cast(std::move(*k)); Logger::debug() << label;
+			auto label = string_cast(std::move(*k)); Logger::trace() << label;
 			auto lb = label_map[ App::string2Label(label) ]; // labelを圧縮
 
 			if( descriptor == "N" ) {
@@ -597,7 +597,7 @@ namespace SemiCrf {
 
 	void TrainingDatas::read(std::istream& strm)
 	{
-		Logger::debug() << "TrainingDatas::read()";
+		Logger::trace() << "TrainingDatas::read()";
 
 		readJson(strm);
 		if( empty() ) {
@@ -617,12 +617,12 @@ namespace SemiCrf {
 
 	PredictionDatas::PredictionDatas()
 	{
-		Logger::debug() << "PredictionDatas()";
+		Logger::trace() << "PredictionDatas()";
 	}
 
 	PredictionDatas::~PredictionDatas()
 	{
-		Logger::debug() << "~PredictionDatas()";
+		Logger::trace() << "~PredictionDatas()";
 	}
 
 	void PredictionDatas::readJsonDataCore(ujson::value& value, Data& data)
@@ -647,14 +647,14 @@ namespace SemiCrf {
 			}
 
 			std::vector<std::string> ss;
-			auto word_id = string_cast(std::move(*k)); Logger::debug() << word_id;
+			auto word_id = string_cast(std::move(*k)); Logger::trace() << word_id;
 			ss.push_back(std::move(word_id));
 
 			++k;
 			++k;
 			++k; // 第4カラムへ移動
 			if( k != array2.end() && k->is_string() ) {
-				auto word = string_cast(std::move(*k)); Logger::debug() << word;
+				auto word = string_cast(std::move(*k)); Logger::trace() << word;
 				ss.push_back(std::move(word));
 			}
 
@@ -664,7 +664,7 @@ namespace SemiCrf {
 
 	void PredictionDatas::read(std::istream& strm)
 	{
-		Logger::debug() << "PredictionDatas::read()";
+		Logger::trace() << "PredictionDatas::read()";
 
 		readJson(strm);
 		if( empty() ) {
