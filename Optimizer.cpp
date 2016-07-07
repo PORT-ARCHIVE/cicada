@@ -50,10 +50,9 @@ namespace Optimizer {
 				x1 = x + beta1*d;
 			}
 			if( counter++ == maxIteration ) {
-				throw Error("avoidDivergence: iteration limit");
-			}
-			if( Signal::getFlg() ) {
-				throw Error("interrupt signal received");
+				std::string msg("avoidDivergence: iteration limit");
+				Logger::info(msg.c_str());
+				throw Error(msg);
 			}
 		}
 
@@ -67,6 +66,7 @@ namespace Optimizer {
 		double gd = inner_prod(g0, d);
 		double f0 = ofunc->value(x);
 		double f1 = 0.0;
+		Logger::debug("avoidDivergence");
 		double beta1 = avoidDivergence(d, f1);
 
 		while( xi*beta1*gd < f1 - f0 ) { // Armijo's rule
@@ -77,10 +77,14 @@ namespace Optimizer {
 				break;
 			}
 			if( counter++ == maxIteration ) {
-				throw Error("linearSearch: iteration limit");
+				std::string msg("linearSearch: iteration limit");
+				Logger::info(msg.c_str());
+				throw Error(msg);
 			}
 			if( Signal::getFlg() ) {
-				throw Error("interrupt signal received");
+				std::string msg("interrupt signal received");
+				Logger::info(msg.c_str());
+				break;
 			}
 		}
 
@@ -106,7 +110,9 @@ namespace Optimizer {
 		}
 
 		if( !flg && itr == maxIteration ) {
-			throw Error("iteration limit");
+			std::string msg("iteration limit");
+			Logger::info(msg.c_str());
+			throw Error(msg);
 		}
 
 		if( Signal::getFlg() ) {
@@ -132,13 +138,16 @@ namespace Optimizer {
 
 	void SteepestDescent::optimize()
 	{
+		Logger::debug("preProcess");
 		ofunc->preProcess(x);
 
+		Logger::debug("grad");
 		g0 = ofunc->grad(x);                 Logger::trace() << "g0=" << g0;
 		double alpha = 1.0;
 
 		while(1) {
 
+			Logger::debug("beginLoopProcess");
 			ofunc->beginLoopProcess(x);
 
 			d = - g0;                        Logger::trace() << "d=" << d;
@@ -148,24 +157,33 @@ namespace Optimizer {
 				auto id = d.begin();
 				for( auto& idx : dx ) {
 					idx = e0/(1.0+sqrt(*iad++))*(*id++);
-				}                            Logger::trace() << "dx=" << dx;
+				}
 				double f1 = 0.0;
+				Logger::debug("avoidDivergence");
 				alpha = avoidDivergence(d, f1);
+				Logger::debug() << "alpha=" << alpha;
 			} else {
-				alpha = linearSearch(d);     Logger::debug() << "linearSearch: alpha=" << alpha;
+				Logger::debug("linearSearch");
+				alpha = linearSearch(d);
+				Logger::debug() << "alpha=" << alpha;
 			}
 
 			dx = alpha * d;                  Logger::trace() << "dx=" << dx;
-			x = x + dx;                      Logger::debug() << "update x";
+			Logger::debug("update x");
+			x = x + dx;                      Logger::trace() << "x=" << x;
+			Logger::debug("afterUpdateXProcess");
 			ofunc->afterUpdateXProcess(x);
 			if( isConv() ) break;
+			Logger::debug("grad");
 			g0 = ofunc->grad(x);             Logger::trace() << "g0=" << g0;
 
+			Logger::debug("endLoopProcess");
 			ofunc->endLoopProcess(x);
 
 			++itr;
 		}
 
+		Logger::debug("postProcess");
 		ofunc->postProcess(x);
 	}
 
@@ -189,7 +207,9 @@ namespace Optimizer {
 		}
 
 		if( !flg && itr == maxIteration ) {
-			throw Error("iteration limit");
+			std::string msg("iteration limit");
+			Logger::info(msg.c_str());
+			throw Error(msg);
 		}
 
 		if( Signal::getFlg() ) {
@@ -215,32 +235,43 @@ namespace Optimizer {
 
 	void QuasiNewton_::optimize()
 	{
+		Logger::debug("preProcess");
 		ofunc->preProcess(x);
 
 		H0 = I;
+		Logger::debug("grad");
 		g0 = ofunc->grad(x);                 Logger::trace() << "g0=" << g0;
 		double alpha = 1.0;
 
 		while(1) {
 
+			Logger::debug("beginLoopProcess");
 			ofunc->beginLoopProcess(x);
 
+			Logger::debug("prod");
 			d = - prod(H0, g0);              Logger::trace() << "d=" << d;
-			alpha = linearSearch(d);         Logger::debug() << "linearSearch: alpha=" << alpha;
+			Logger::debug("linearSearch");
+			alpha = linearSearch(d);         Logger::debug() << "alpha=" << alpha;
 			dx = alpha * d;                  Logger::trace() << "dx=" << dx;
+			Logger::debug("update x");
 			x = x + dx;                      Logger::trace() << "x=" << x;
-			ofunc->afterUpdateXProcess(x);   Logger::debug() << "update x";
+			Logger::debug("afterUpdateXProcess");
+			ofunc->afterUpdateXProcess(x);
 			if( isConv() ) break;
+			Logger::debug("grad");
 			g1 = ofunc->grad(x);             Logger::trace() << "g1=" << g1;
 			y = g1 - g0;                     Logger::trace() << "y=" << y;
 			g0 = g1;
-			updateMatrix();                  Logger::debug() << "update matrix";
+			Logger::debug("update matrix");
+			updateMatrix();
 
+			Logger::debug("endLoopProcess");
 			ofunc->endLoopProcess(x);
 
 			++itr;
 		}
 
+		Logger::debug("postProcess");
 		ofunc->postProcess(x);
 	}
 
@@ -263,7 +294,9 @@ namespace Optimizer {
 		}
 
 		if( !flg && itr == maxIteration ) {
-			throw Error("iteration limit");
+			std::string msg("iteration limit");
+			Logger::info(msg.c_str());
+			throw Error(msg);
 		}
 
 		if( Signal::getFlg() ) {

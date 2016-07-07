@@ -12,12 +12,12 @@ namespace W2V {
 		: words(-1)
 		, size(-1)
 	{
-		Logger::debug() << "Matrix_()";
+		Logger::trace( "Matrix_()" );
 	}
 
 	Matrix_::~Matrix_()
 	{
-		Logger::debug() << "~Matrix_()";
+		Logger::trace( "~Matrix_()" );
 	}
 
 	void Matrix_::read(const std::string& file)
