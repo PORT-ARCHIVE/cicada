@@ -150,6 +150,17 @@ decltype( std::make_shared<SemiCrf::Algorithm>() ) createAlgorithm(const Options
 		throw Error(ss.str());
 	}
 
+	const auto& lavelHistgram = SemiCrf::Segment::getLavelHistgram();
+	const auto& lavelLengthHistgram = SemiCrf::Segment::getLavelLengthHistgram();
+
+	for( auto& lv : lavelHistgram ) {
+		std::cout << lv.first << ":" << lv.second << std::endl;
+	}
+
+	for( auto& lvl : lavelLengthHistgram ) {
+		std::cout << lvl.first.first << ":" << lvl.first.second << ":" << lvl.second << std::endl;
+	}	
+
 	// datas->write(std::cerr);
 
 	alg->setDatas(datas);

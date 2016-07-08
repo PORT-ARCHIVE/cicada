@@ -47,14 +47,16 @@ namespace SemiCrf {
 		int end{-1};
 		Label label;
 
+		static std::map<int,int> lavelHistgram;
+		static std::map<std::pair<int,int>,int> lavelLengthHistgram;
+
 	public:
 
 		Segment(
 			decltype(start) start_,
 			decltype(end) end_,
-			decltype(label) label_ )
-			: start(start_), end(end_), label(label_) {}
-		virtual ~Segment(){}
+			decltype(label) label_ );
+		virtual ~Segment();
 
 		void setStart(decltype(start) arg) { start = arg; }
 		void setEnd(decltype(end) arg) { end = arg; }
@@ -62,6 +64,9 @@ namespace SemiCrf {
 		decltype(start) getStart() const { return start; }
 		decltype(end) getEnd() const { return end; }
 		decltype(label) getLabel() const { return label; }
+
+		static std::add_const<decltype((lavelHistgram))>::type getLavelHistgram() { return lavelHistgram; }
+		static std::add_const<decltype((lavelLengthHistgram))>::type getLavelLengthHistgram() { return lavelLengthHistgram; }		
 	};
 
 	decltype(std::make_shared<Segment>()) createSegment(int start, int end, Label label);

@@ -67,6 +67,29 @@ namespace SemiCrf {
 		Logger::trace() << "~Labels()";
 	}
 
+	//// Segment ////
+
+	std::map<int,int> Segment::lavelHistgram;
+	std::map<std::pair<int,int>,int> Segment::lavelLengthHistgram;
+
+	Segment::Segment(
+		decltype(start) start_,
+		decltype(end) end_,
+		decltype(label) label_ )
+		: start(start_)
+		, end(end_)
+		, label(label_)
+	{
+		lavelHistgram[label]++;
+		lavelLengthHistgram[std::make_pair(label,end-start+1)]++;
+	}
+
+	Segment::~Segment()
+	{
+		// lavelHistgram[label]--;
+		// lavelLengthHistgram[std::make_pair(label,end-start+1)]--;
+	}
+
 	//// Data ////
 
 	Data::Data()
