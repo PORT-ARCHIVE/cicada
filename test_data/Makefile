@@ -42,7 +42,7 @@ MATRIX=../../word2vec/wakati.bin
 
 test3:
 	@echo "###### ${FILE1} ######"
-	time $(SEMICRF) -t ${FILE1} -w tmp1 --log-level 2 -e0 2.0 -e1 1.0e-6 --disable-regularization --w2v-matrix ${MATRIX} && echo "OK" || echo "ERROR"
+	time $(SEMICRF) -t ${FILE1} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-6 --w2v-matrix ${MATRIX} && echo "OK" || echo "ERROR"
 	$(SEMICRF) -i ${FILE1} -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} > tmp2 && echo "OK" || echo "ERROR"
 	jq '.pages[].data[][][]' ${FILE1} > r1
 	jq '.pages[].data[][][]' tmp2 > r2
@@ -59,7 +59,7 @@ test3:
 
 learn:
 	../gen -i p0.json -r 32 -l 16 > tmp1
-	time $(SEMICRF) -t tmp1 -w tmp2 --log-level 2 -e0 1.0e-3 -e1 1.0e-3 && echo "OK" || echo "ERROR"
+	time $(SEMICRF) -t tmp1 -w tmp2 --log-level 2 -e0 1.0e-3 -e1 1.0e-4 --regularization-parameter 1e-3 && echo "OK" || echo "ERROR"
 
 infer:
 	@rm -f r1 r2 a b tmp5;
