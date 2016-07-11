@@ -63,6 +63,7 @@ namespace Optimizer {
 		int maxIteration;
 		ObjectiveFunction ofunc;
 		double e0;
+		double alpha;
 		double beta;
 		double minBeta;
 		double xi;

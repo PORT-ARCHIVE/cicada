@@ -20,10 +20,11 @@ namespace Optimizer {
 		, maxIteration(256)
 		, ofunc(f)
 		, e0(1.0e-2)
+		, alpha(1.0)
 		, beta(1.0)
-		, minBeta(1.0e-2)
+		, minBeta(1.0e-16)
 		, xi(0.5)
-		, tau(0.5)
+		, tau(0.125)
 		, r0(0.0)
 		, re(1.0e-6)
 		, ae(1.0e-6)
@@ -74,7 +75,9 @@ namespace Optimizer {
 			x1 = x + beta1*d;
 			f1 = ofunc->value(x1);
 			if( beta1 < minBeta ) {
-				break;
+				std::string msg("liner search stopped: too small alpha");
+				Logger::info(msg.c_str());
+			  	break;
 			}
 			if( counter++ == maxIteration ) {
 				std::string msg("linearSearch: iteration limit");
@@ -82,12 +85,13 @@ namespace Optimizer {
 				throw Error(msg);
 			}
 			if( Signal::getFlg() ) {
-				std::string msg("interrupt signal received");
+				std::string msg("liner search interrrputed");
 				Logger::info(msg.c_str());
 				break;
 			}
 		}
 
+		beta = std::min(beta1/tau, 1.0);
 		return beta1;
 	}
 
@@ -95,7 +99,6 @@ namespace Optimizer {
 	{
 		bool flg = false;
 		double r = sqrt(inner_prod(g0, g0));
-
 
 		if( itr == 0 ) {
 
@@ -106,7 +109,7 @@ namespace Optimizer {
 			double err = r/(r0*re + ae);
 			flg = ( err < 1.0 );
 			double f = ofunc->value(x);
-			Logger::info() << boost::format("f= %10.6e |∇f|= %10.6e") % f % err;
+			Logger::info() << boost::format("f= %10.6e |∇f|= %10.6e alp=%10.6e") % f % err % alpha;
 		}
 
 		if( !flg && itr == maxIteration ) {
@@ -143,7 +146,7 @@ namespace Optimizer {
 
 		Logger::debug("grad");
 		g0 = ofunc->grad(x);                 Logger::trace() << "g0=" << g0;
-		double alpha = 1.0;
+		alpha = 1.0;
 
 		while(1) {
 
@@ -161,11 +164,9 @@ namespace Optimizer {
 				double f1 = 0.0;
 				Logger::debug("avoidDivergence");
 				alpha = avoidDivergence(d, f1);
-				Logger::debug() << "alpha=" << alpha;
 			} else {
 				Logger::debug("linearSearch");
 				alpha = linearSearch(d);
-				Logger::debug() << "alpha=" << alpha;
 			}
 
 			dx = alpha * d;                  Logger::trace() << "dx=" << dx;
@@ -203,7 +204,7 @@ namespace Optimizer {
 			double err = r/(r0*re + ae);
 			flg = ( err < 1.0 );
 			double f = ofunc->savedValue();
-			Logger::info() << boost::format("f= %10.6e |∇f|= %10.6e") % f % err;
+			Logger::info() << boost::format("f= %10.6e |∇f|= %10.6e alp=%10.6e") % f % err % alpha;
 		}
 
 		if( !flg && itr == maxIteration ) {
@@ -241,7 +242,7 @@ namespace Optimizer {
 		H0 = I;
 		Logger::debug("grad");
 		g0 = ofunc->grad(x);                 Logger::trace() << "g0=" << g0;
-		double alpha = 1.0;
+		alpha = 1.0;
 
 		while(1) {
 
@@ -251,7 +252,7 @@ namespace Optimizer {
 			Logger::debug("prod");
 			d = - prod(H0, g0);              Logger::trace() << "d=" << d;
 			Logger::debug("linearSearch");
-			alpha = linearSearch(d);         Logger::debug() << "alpha=" << alpha;
+			alpha = linearSearch(d);
 			dx = alpha * d;                  Logger::trace() << "dx=" << dx;
 			Logger::debug("update x");
 			x = x + dx;                      Logger::trace() << "x=" << x;
@@ -290,7 +291,7 @@ namespace Optimizer {
 			double err = r/(r0*re + ae);
 			flg = ( err < 1.0 );
 			double f = ofunc->savedValue();
-			Logger::info() << boost::format("f= %10.6e |∇f|= %10.6e") % f % err;
+			Logger::info() << boost::format("f= %10.6e |∇f|= %10.6e alp=%10.6e") % f % err % alpha;
 		}
 
 		if( !flg && itr == maxIteration ) {
