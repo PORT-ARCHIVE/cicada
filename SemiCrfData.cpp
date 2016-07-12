@@ -480,6 +480,41 @@ namespace SemiCrf {
 		}
 	}
 
+	void Datas::reportStatistcs()
+	{
+		int nData = 0;
+		for( auto& d : *this ) {
+			nData += d.second.size();
+		}
+		Logger::out()->info( "### the number of sentences: {}", nData);
+
+		reverse_label_map.resize(label_map.size()+1);
+		for( auto& p : label_map ) {
+			reverse_label_map[p.second] = p.first;
+		}
+
+		Logger::out()->info( "### the number of lavels" );
+
+		const auto& lavelHistgram = SemiCrf::Segment::getLavelHistgram();
+		const auto& lavelLengthHistgram = SemiCrf::Segment::getLavelLengthHistgram();
+
+		for( auto& lv : lavelHistgram ) {
+			Logger::out()->info( "{}: {}", reverse_label_map[lv.first], lv.second );
+		}
+
+		std::map<int,int> total_length;
+		for( auto& lvl : lavelLengthHistgram ) {
+			total_length[lvl.first.first] += (lvl.first.second) * (lvl.second);
+		}
+
+		Logger::out()->info( "### avg length of lavels" );
+
+		for( auto& l : total_length ) {
+			int n = lavelHistgram.find(l.first)->second;
+			Logger::out()->info( "{}: {}", reverse_label_map[l.first], (double)l.second/n );
+		}
+	}
+
 	//// TrainingDatas ////
 
 	decltype( std::make_shared<Datas>() )
@@ -630,41 +665,6 @@ namespace SemiCrf {
 		computeMeanLength();
 
 		reportStatistcs();
-	}
-
-	void TrainingDatas::reportStatistcs()
-	{
-		int nData = 0;
-		for( auto& d : *this ) {
-			nData += d.second.size();
-		}
-		Logger::out()->info( "### the number of sentences: {}", nData);
-
-		reverse_label_map.resize(label_map.size()+1);
-		for( auto& p : label_map ) {
-			reverse_label_map[p.second] = p.first;
-		}
-
-		Logger::out()->info( "### the number of lavels" );
-
-		const auto& lavelHistgram = SemiCrf::Segment::getLavelHistgram();
-		const auto& lavelLengthHistgram = SemiCrf::Segment::getLavelLengthHistgram();
-
-		for( auto& lv : lavelHistgram ) {
-			Logger::out()->info( "{}: {}", reverse_label_map[lv.first], lv.second );
-		}
-
-		std::map<int,int> total_length;
-		for( auto& lvl : lavelLengthHistgram ) {
-			total_length[lvl.first.first] += (lvl.first.second) * (lvl.second);
-		}
-
-		Logger::out()->info( "### avg length of lavels" );
-
-		for( auto& l : total_length ) {
-			int n = lavelHistgram.find(l.first)->second;
-			Logger::out()->info( "{}: {}", reverse_label_map[l.first], (double)l.second/n );
-		}
 	}
 
 	//// PredictionDatas ////

@@ -149,6 +149,7 @@ namespace SemiCrf {
 		std::add_const<decltype((labels))>::type getLabels() { return labels; }
 		std::add_const<decltype((label_map))>::type getLabelMap() { return label_map; }
 		std::add_const<decltype((reverse_label_map))>::type getReverseLabelMap() { return reverse_label_map; }
+		void reportStatistcs();
 
 	protected:
 
@@ -179,7 +180,6 @@ namespace SemiCrf {
 
 		virtual void preReadJsonDataCore(ujson::value& value, Data& data);
 		virtual void readJsonDataCore(ujson::value& value, Data& data);
-		void reportStatistcs();
 	};
 
 	decltype( std::make_shared<Datas>() ) createTrainingDatas();

@@ -901,6 +901,7 @@ namespace SemiCrf {
 				printV();
 			}
 		}
+		datas->reportStatistcs();
 	}
 
 	double Predictor::V(int i, Label y, int& maxd)
