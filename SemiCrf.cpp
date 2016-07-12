@@ -792,7 +792,7 @@ namespace SemiCrf {
 		std::ifstream ifs; // 入力
 		open(ifs, wfile);
 		try {
-			Logger::info() << "read " << wfile;
+			Logger::out()->info( "read {}", wfile );
 			weights->read(ifs);
 		} catch(Error& e) {
 			std::stringstream ss;

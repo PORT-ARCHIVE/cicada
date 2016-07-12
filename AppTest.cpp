@@ -27,8 +27,10 @@ namespace App {
 			if( w2vmat.empty() ) {
 				throw Error("no w2v matrix file specifed");
 			}
-			Logger::info() << "read " << w2vmat;
+			Logger::out()->info( "read {}", w2vmat );
 			m->read(w2vmat);
+			Logger::out()->info( "the number of words: {}", m->getNumWords() );
+			Logger::out()->info( "dimension: {}", m->getSize() );
 			jpnff->setMatrix(m);
 			ff = jpnff;
 
