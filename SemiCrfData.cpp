@@ -539,6 +539,7 @@ namespace SemiCrf {
 		decltype(std::make_shared<Segment>()) seg;
 		int counter = -1;
 		int seg_start = -1;
+		std::string centence;
 
 		auto array1 = array_cast(std::move(value));
 		for( auto& j : array1 ) {
@@ -611,10 +612,17 @@ namespace SemiCrf {
 			k++; // 第4カラムを保存
 			if( k != array2.end() && k->is_string() ) {
 				auto word = string_cast(std::move(*k));
+				centence += " / ";
+				centence += word;
 				vs.push_back(std::move(word));
 			}
 
 			data.getStrs()->push_back(std::move(vs));
+
+		}
+		if( !centence.empty() ) {
+			centence += " / ";
+			Logger::out()->debug("{}", centence);
 		}
 	}
 
