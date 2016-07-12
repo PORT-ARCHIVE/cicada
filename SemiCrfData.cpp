@@ -363,7 +363,7 @@ namespace SemiCrf {
 
 			auto s = seg->getStart();
 			auto e = seg->getEnd();
-			auto label_id = seg->getLabel();
+			auto label_id = seg->getLabel(); // (圧縮されていない)元のラベル
 			auto label = labels_map[label_id];
 			auto strs = data->getStrs();
 
@@ -480,41 +480,6 @@ namespace SemiCrf {
 		}
 	}
 
-	void Datas::reportStatistcs()
-	{
-		int nData = 0;
-		for( auto& d : *this ) {
-			nData += d.second.size();
-		}
-		Logger::out()->info( "### the number of sentences: {}", nData);
-
-		reverse_label_map.resize(label_map.size()+1);
-		for( auto& p : label_map ) {
-			reverse_label_map[p.second] = p.first;
-		}
-
-		Logger::out()->info( "### the number of lavels" );
-
-		const auto& lavelHistgram = SemiCrf::Segment::getLavelHistgram();
-		const auto& lavelLengthHistgram = SemiCrf::Segment::getLavelLengthHistgram();
-
-		for( auto& lv : lavelHistgram ) {
-			Logger::out()->info( "{}: {}", reverse_label_map[lv.first], lv.second );
-		}
-
-		std::map<int,int> total_length;
-		for( auto& lvl : lavelLengthHistgram ) {
-			total_length[lvl.first.first] += (lvl.first.second) * (lvl.second);
-		}
-
-		Logger::out()->info( "### avg length of lavels" );
-
-		for( auto& l : total_length ) {
-			int n = lavelHistgram.find(l.first)->second;
-			Logger::out()->info( "{}: {}", reverse_label_map[l.first], (double)l.second/n );
-		}
-	}
-
 	//// TrainingDatas ////
 
 	decltype( std::make_shared<Datas>() )
@@ -607,7 +572,7 @@ namespace SemiCrf {
 			}
 
 			auto label = string_cast(std::move(*k)); Logger::trace() << label;
-			auto lb = label_map[ App::string2Label(label) ]; // labelを圧縮
+			auto lb = label_map[ App::string2Label(label) ]; // labelを圧縮、学習では segment に圧縮されたレベルが入る
 
 			if( descriptor == "N" ) {
 
@@ -650,6 +615,41 @@ namespace SemiCrf {
 			}
 
 			data.getStrs()->push_back(std::move(vs));
+		}
+	}
+
+	void TrainingDatas::reportStatistcs()
+	{
+		int nData = 0;
+		for( auto& d : *this ) {
+			nData += d.second.size();
+		}
+		Logger::out()->info( "### the number of sentences: {}", nData);
+
+		reverse_label_map.resize(label_map.size()+1);
+		for( auto& p : label_map ) {
+			reverse_label_map[p.second] = p.first;
+		}
+
+		Logger::out()->info( "### the number of lavels" );
+
+		const auto& lavelHistgram = SemiCrf::Segment::getLavelHistgram();
+		const auto& lavelLengthHistgram = SemiCrf::Segment::getLavelLengthHistgram();
+
+		for( auto& lv : lavelHistgram ) {
+			Logger::out()->info( "{}: {}", reverse_label_map[lv.first], lv.second );
+		}
+
+		std::map<int,int> total_length;
+		for( auto& lvl : lavelLengthHistgram ) {
+			total_length[lvl.first.first] += (lvl.first.second) * (lvl.second);
+		}
+
+		Logger::out()->info( "### avg length of lavels" );
+
+		for( auto& l : total_length ) {
+			int n = lavelHistgram.find(l.first)->second;
+			Logger::out()->info( "{}: {}", reverse_label_map[l.first], (double)l.second/n );
 		}
 	}
 
@@ -729,6 +729,43 @@ namespace SemiCrf {
 		readJson(strm);
 		if( empty() ) {
 			throw Error("empty prediction data");
+		}
+	}
+
+	void PredictionDatas::reportStatistcs()
+	{
+		int nData = 0;
+		for( auto& d : *this ) {
+			nData += d.second.size();
+		}
+		Logger::out()->info( "### the number of sentences: {}", nData);
+
+		// reverse_label_map.resize(label_map.size()+1);
+		// for( auto& p : label_map ) {
+		// 	reverse_label_map[p.second] = p.first;
+		// }
+
+		Logger::out()->info( "### the number of lavels" );
+
+		const auto& lavelHistgram = SemiCrf::Segment::getLavelHistgram();
+		const auto& lavelLengthHistgram = SemiCrf::Segment::getLavelLengthHistgram();
+
+		for( auto& lv : lavelHistgram ) {
+			// Logger::out()->info( "{}: {}", reverse_label_map[lv.first], lv.second );
+			Logger::out()->info( "{}: {}", lv.first, lv.second );
+		}
+
+		std::map<int,int> total_length;
+		for( auto& lvl : lavelLengthHistgram ) {
+			total_length[lvl.first.first] += (lvl.first.second) * (lvl.second);
+		}
+
+		Logger::out()->info( "### avg length of lavels" );
+
+		for( auto& l : total_length ) {
+			int n = lavelHistgram.find(l.first)->second;
+			// Logger::out()->info( "{}: {}", reverse_label_map[l.first], (double)l.second/n );
+			Logger::out()->info( "{}: {}", l.first, (double)l.second/n );
 		}
 	}
 }

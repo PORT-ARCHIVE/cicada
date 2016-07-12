@@ -138,6 +138,7 @@ namespace SemiCrf {
 		virtual decltype(xDim) getXDim() const { return xDim; }
 		virtual decltype(yDim) getYDim() const { return yDim; }
 		virtual decltype(maxLength) getMaxLength() const { return maxLength; }
+		virtual void reportStatistcs() = 0;
 
 		void setFeature(const std::string& arg) { feature = arg; }
 		void setMean(const std::map<int,double>& arg);
@@ -149,7 +150,7 @@ namespace SemiCrf {
 		std::add_const<decltype((labels))>::type getLabels() { return labels; }
 		std::add_const<decltype((label_map))>::type getLabelMap() { return label_map; }
 		std::add_const<decltype((reverse_label_map))>::type getReverseLabelMap() { return reverse_label_map; }
-		void reportStatistcs();
+
 
 	protected:
 
@@ -175,6 +176,7 @@ namespace SemiCrf {
 		virtual ~TrainingDatas();
 
 		virtual void read(std::istream& input);
+		virtual void reportStatistcs();
 
 	protected:
 
@@ -192,6 +194,7 @@ namespace SemiCrf {
 		virtual ~PredictionDatas();
 
 		virtual void read(std::istream& input);
+		virtual void reportStatistcs();
 
 	protected:
 

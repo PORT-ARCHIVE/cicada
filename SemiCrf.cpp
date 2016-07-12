@@ -979,6 +979,7 @@ namespace SemiCrf {
 		while(1) {
 
 			int label = reverse_label_map[maxy];
+			// 推論では segment に元のレベルが入る
 			auto seg = createSegment(i-maxd+1, i, label);
 			ls.push_front(seg);
 
