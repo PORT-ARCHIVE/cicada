@@ -179,6 +179,7 @@ namespace SemiCrf {
 
 		virtual void preReadJsonDataCore(ujson::value& value, Data& data);
 		virtual void readJsonDataCore(ujson::value& value, Data& data);
+		void reportStatistcs();
 	};
 
 	decltype( std::make_shared<Datas>() ) createTrainingDatas();
