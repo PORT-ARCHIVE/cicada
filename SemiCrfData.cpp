@@ -656,7 +656,7 @@ namespace SemiCrf {
 
 		std::map<int,int> total_length;
 		for( auto& lvl : lavelLengthHistgram ) {
-			total_length[lvl.first.first] += lvl.first.second;
+			total_length[lvl.first.first] += (lvl.first.second) * (lvl.second);
 		}
 
 		Logger::out()->info( "### avg length of lavels" );
