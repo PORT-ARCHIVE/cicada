@@ -9,6 +9,7 @@ namespace Logger
 	static decltype ( spd::stderr_logger_mt("", true) ) lg;
 	static std::string name = "console";
 	static bool flg = true;
+	static int lvl;
 
 	decltype ( spd::stderr_logger_mt("", true) ) out()
 	{
@@ -23,6 +24,12 @@ namespace Logger
 	void setLevel(int level)
 	{
 		spd::set_level((spd::level::level_enum)level);
+		lvl = level;
+	}
+
+	int getLevel()
+	{
+		return lvl;
 	}
 
 	void setName(const std::string& arg)

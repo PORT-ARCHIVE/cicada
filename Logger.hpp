@@ -15,6 +15,7 @@ namespace Logger
 	void setName(const std::string& name);
 	void setColor(bool flg);
 	void setPattern(const std::string& pattern);
+	int getLevel();
 
 	decltype(( out()->trace() )) trace();
 	decltype(( out()->debug() )) debug();

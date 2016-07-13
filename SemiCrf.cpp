@@ -998,12 +998,12 @@ namespace SemiCrf {
 
 		std::string centence;
 		for( auto s : ls ) {
-			centence += "[:";
-			centence += App::label2String(s->getLabel());
 
 			current_data->getSegments()->push_back(s);
 
-			if( datas->getFeature() == "JPN" ) {
+			if( datas->getFeature() == "JPN" && Logger::getLevel() < 2 ) {
+				centence += App::label2String(s->getLabel());
+				centence += "[:";
 				auto st = s->getStart();
 				auto ed = s->getEnd();
 				for( int i = st; i <= ed; ++i ) {
@@ -1013,7 +1013,7 @@ namespace SemiCrf {
 				centence += " ]";
 			}
 		}
-		if( !centence.empty() && datas->getFeature() == "JPN" ) {
+		if( !centence.empty() && datas->getFeature() == "JPN" && Logger::getLevel() < 2 ) {
 			Logger::out()->debug("{}", centence);
 		}
 	}
