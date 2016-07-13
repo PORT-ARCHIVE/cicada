@@ -1003,15 +1003,17 @@ namespace SemiCrf {
 
 			current_data->getSegments()->push_back(s);
 
-			auto st = s->getStart();
-			auto ed = s->getEnd();
-			for( int i = st; i <= ed; ++i ) {
-				centence += " ";
-				centence += current_data->getStrs()->at(i).at(1);
+			if( datas->getFeature() == "JPN" ) {
+				auto st = s->getStart();
+				auto ed = s->getEnd();
+				for( int i = st; i <= ed; ++i ) {
+					centence += " ";
+					centence += current_data->getStrs()->at(i).at(1);
+				}
+				centence += " ]";
 			}
-			centence += " ]";
 		}
-		if( !centence.empty() ) {
+		if( !centence.empty() && datas->getFeature() == "JPN" ) {
 			Logger::out()->debug("{}", centence);
 		}
 	}
