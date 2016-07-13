@@ -628,7 +628,6 @@ namespace SemiCrf {
 
 		}
 		if( !centence.empty() ) {
-			centence += " / ";
 			Logger::out()->debug("{}", centence);
 		}
 	}
