@@ -203,8 +203,10 @@ namespace App {
 				long long xval = boost::lexical_cast<long long>(str);
 				if( xval == -1 ) {
 					int s = x.getStrs()->at(j+l).size();
-					std::string unknown_word = x.getStrs()->at(j+l).at(s-1); // 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
-					Logger::out()->warn( "unknown word: {}", unknown_word );
+					std::string word = x.getStrs()->at(j+l).at(s-1); // 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
+					if( unknown_words.find(word) == unknown_words.end() ) {
+						Logger::out()->warn( "unknown word: {}", word );
+					}Ap
 					continue;
 				}
 				const auto& wvec = w2vmat->i2v(xval);

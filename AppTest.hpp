@@ -4,6 +4,7 @@
 #define APP_TEST__H
 
 #include <string>
+#include <set>
 #include "SemiCrf.hpp"
 #include "W2V.hpp"
 
@@ -41,6 +42,7 @@ namespace App {
 		void setMatrix(W2V::Matrix m) { w2vmat = m; }
 	private:
 		W2V::Matrix w2vmat;
+		std::set<std::string> unknown_words;
 	};
 }
 
