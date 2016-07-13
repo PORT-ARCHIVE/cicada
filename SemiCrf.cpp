@@ -1008,7 +1008,7 @@ namespace SemiCrf {
 				auto ed = s->getEnd();
 				for( int i = st; i <= ed; ++i ) {
 					centence += " ";
-					centence += current_data->getStrs()->at(i).at(1);
+					centence += current_data->getStrs()->at(i).at(1); // 推論では word は第二カラムに入っている
 				}
 				centence += " ]";
 			}

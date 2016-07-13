@@ -251,7 +251,7 @@ namespace SemiCrf {
 
 				ary2.push_back(App::label2String(l));
 				if( 1 < strs->at(i).size() ) {
-					ary2.push_back(strs->at(i).at(1));
+					ary2.push_back(strs->at(i).at(1)); // 推論では word は第二カラムに入っている
 				}
 				ary1.push_back(std::move(ary2));
 			}
@@ -372,7 +372,7 @@ namespace SemiCrf {
 				if( strs->at(i).size() < 2 ) {
 					throw Error("option '--enable-simple-prediction-output' not supported");
 				}
-				word += strs->at(i).at(1);
+				word += strs->at(i).at(1); // 推論では word は第二カラムに入っている
 			}
 
 			if( label == "NONE" || label == "なし" ) {
