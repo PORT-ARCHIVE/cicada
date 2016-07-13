@@ -996,8 +996,23 @@ namespace SemiCrf {
 			maxyd = std::get<3>(tp);
 		}
 
+		std::string centence;
 		for( auto s : ls ) {
+			centence += "[:";
+			centence += App::label2String(s->getLabel());
+
 			current_data->getSegments()->push_back(s);
+
+			auto st = s->getStart();
+			auto ed = s->getEnd();
+			for( int i = st; i <= ed; ++i ) {
+				centence += " ";
+				centence += current_data->getStrs()->at(i).at(1);
+			}
+			centence += " ]";
+		}
+		if( !centence.empty() ) {
+			Logger::out()->debug("{}", centence);
 		}
 	}
 
