@@ -204,7 +204,7 @@ namespace App {
 				if( xval == -1 ) {
 					int s = x.getStrs()->at(j+l).size();
 					std::string unknown_word = x.getStrs()->at(j+l).at(s-1); // 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
-					Logger::out()->warn( "unknown word: {}", unknown_word);
+					Logger::out()->warn( "unknown word: {}", unknown_word );
 					continue;
 				}
 				const auto& wvec = w2vmat->i2v(xval);
