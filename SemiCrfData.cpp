@@ -583,6 +583,8 @@ namespace SemiCrf {
 			} else if( descriptor == "S" ) {
 
 				seg_start = counter;
+				centence += "[:";
+				centence += label;
 
 			} else if( descriptor == "M" ) {
 
@@ -604,6 +606,8 @@ namespace SemiCrf {
 				if( maxLength < 1 ) {
 					maxLength = 1;
 				}
+				centence += "[:";
+				centence += label;
 
 			} else {
 				Logger::warn() << "unknown descriptor";
@@ -612,8 +616,11 @@ namespace SemiCrf {
 			k++; // 第4カラムを保存
 			if( k != array2.end() && k->is_string() ) {
 				auto word = string_cast(std::move(*k));
-				centence += " / ";
+				centence += " ";
 				centence += word;
+				if( descriptor == "S/E" || descriptor == "E" ) {
+					centence += " ]";
+				}
 				vs.push_back(std::move(word));
 			}
 
