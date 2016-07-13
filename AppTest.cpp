@@ -206,7 +206,8 @@ namespace App {
 					std::string word = x.getStrs()->at(j+l).at(s-1); // 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
 					if( unknown_words.find(word) == unknown_words.end() ) {
 						Logger::out()->warn( "unknown word: {}", word );
-					}Ap
+						unknown_words.insert(word);
+					}
 					continue;
 				}
 				const auto& wvec = w2vmat->i2v(xval);
