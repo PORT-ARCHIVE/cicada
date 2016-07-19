@@ -149,7 +149,7 @@ namespace App {
 
 	int Jpn::getDim()
 	{
-		return yDim * ( xDim + yDim + 1 );
+		return yDim * ( xDim + yDim + 4 );
 	}
 
 	void Jpn::setXDim(int arg)
@@ -191,9 +191,13 @@ namespace App {
 
 			int dim0 = yDim * xDim;
 			int dim1 = yDim * ( xDim + yDim );
-			int dim2 = yDim * ( xDim + yDim + 1 );
+			int dim2 = yDim * ( xDim + yDim + 4 );
 
 			uvector fvec(dim2, 0.0);
+
+			int is_area = 0;
+			int is_area_indicator = 0;
+			int is_address = 0;
 
 			// y2x
 			int d = i - j + 1;
@@ -201,9 +205,30 @@ namespace App {
 
 				const auto& str = x.getStrs()->at(j+l).at(0);
 				long long xval = boost::lexical_cast<long long>(str);
+				int s = x.getStrs()->at(j+l).size();
+				std::string word = x.getStrs()->at(j+l).at(s-1); // 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
+
+				// 地域
+				if(0) {
+					is_area = 1;
+				}
+
+				// 数字
+				if( word.find("digit") != std::string::npos ||
+					word.find("-") != std::string::npos ||
+					word.find("ー") != std::string::npos ) {
+					is_address = 1;
+				}
+
+				// 地域指示子
+				if( ( word.find("勤務") != std::string::npos && word.find("地") != std::string::npos ) ||
+					( word.find("勤務") != std::string::npos && word.find("先") != std::string::npos ) ||
+					word.find("アクセス") != std::string::npos ) {
+					is_area_indicator = 1;
+				}
+
+
 				if( xval == -1 ) {
-					int s = x.getStrs()->at(j+l).size();
-					std::string word = x.getStrs()->at(j+l).at(s-1); // 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
 					if( unknown_words.find(word) == unknown_words.end() ) {
 						Logger::out()->warn( "unknown word: {}", word );
 						unknown_words.insert(word);
@@ -232,6 +257,18 @@ namespace App {
 			}
 
 			fvec(dim1+yval) = f;
+
+			if( yval == 3 ) { // 勤務地 T.B.D.
+				fvec(dim1+yval+1) = i;
+			}
+
+			if( yval == 18 ) { // 番地 T.B.D.
+				fvec(dim1+yval+2) = is_address;
+			}
+
+			if( yval == 19 ) { // 勤務地指示子 T.B.D.
+				fvec(dim1+yval+3) = is_area_indicator;
+			}
 
 			int k = 0;
 			for( auto w : ws ) {
