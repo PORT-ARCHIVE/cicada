@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
 			while( !tok.empty() ) {
 
 				ujson::array line;
-				auto i = matrix->w2i(tok0);
+				auto i = matrix->w2i(tok1);
 				std::string ID = boost::lexical_cast<std::string>(i);
 				line.push_back(ID);
 				line.push_back("*");
