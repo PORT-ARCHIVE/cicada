@@ -3,6 +3,7 @@
 #ifndef APP_TEST__H
 #define APP_TEST__H
 
+#include <set>
 #include <string>
 #include <set>
 #include "SemiCrf.hpp"
@@ -18,7 +19,19 @@ namespace App {
 	const int ZERO = 0;
 
 	decltype( std::make_shared<FeatureFunction>() )
-	createFeatureFunction(const std::string& feature, const std::string& w2vmat);
+	createFeatureFunction(const std::string& feature, const std::string& w2vmat, const std::string& areaDic);
+
+	class AreaDic_ {
+	public:
+		AreaDic_();
+		virtual ~AreaDic_();
+		virtual void read(std::string file);
+		bool exist(std::string word);
+	private:
+		std::set<std::string> dic;
+	};
+
+	typedef std::shared_ptr<AreaDic_> AreaDic;
 
 	class Digit : public FeatureFunction {
 	public:
@@ -40,8 +53,10 @@ namespace App {
 		virtual void write();
 		virtual double wg(Weights& ws, Label y, Label yd, Data& x, int j, int i, uvector& gs);
 		void setMatrix(W2V::Matrix m) { w2vmat = m; }
+		void setAreaDic(AreaDic dic) { areadic = dic; }
 	private:
 		W2V::Matrix w2vmat;
+		AreaDic	areadic;
 		std::set<std::string> unknown_words;
 	};
 }

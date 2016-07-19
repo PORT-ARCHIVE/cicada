@@ -154,7 +154,8 @@ namespace SemiCrf {
 		virtual void preProcess (
 			const std::string& wfile,
 			const std::string& w0file,
-			const std::string& w2vfile ) = 0;
+			const std::string& w2vfile,
+			const std::string& areaDicfile ) = 0;
 		virtual void postProcess(const std::string& wfile) = 0;
 
 		virtual void setDimension(decltype(dim) arg);
@@ -195,7 +196,8 @@ namespace SemiCrf {
 		virtual void preProcess (
 			const std::string& wfile,
 			const std::string& w0file,
-			const std::string& w2vfile );
+			const std::string& w2vfile,
+			const std::string& areaDicFile );
 		virtual void postProcess(const std::string& wfile);
 
 	private:
@@ -246,7 +248,8 @@ namespace SemiCrf {
 		virtual void preProcess (
 			const std::string& wfile,
 			const std::string& w0file,
-			const std::string& w2vfile );
+			const std::string& w2vfile,
+			const std::string& areaDicfile );
 		virtual void postProcess(const std::string& wfile);
 
 	private:

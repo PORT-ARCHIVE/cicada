@@ -283,6 +283,7 @@ namespace SemiCrf {
 	(     const std::string& wfile
 		, const std::string& w0file
 		, const std::string& w2vfile
+		, const std::string& areaDicfile
 		)
 	{
 		// datasからx,yの次元、featureを取得する
@@ -291,7 +292,7 @@ namespace SemiCrf {
 		const auto& feature = datas->getFeature();
 
 		// feature関数を生成し、x,yの次元、feature、maxLengthを設定する
-		ff = App::createFeatureFunction(feature, w2vfile);
+		ff = App::createFeatureFunction(feature, w2vfile, areaDicfile);
 		try {
 			ff->setXDim(xdim);
 		} catch (Error& e) {
@@ -785,6 +786,7 @@ namespace SemiCrf {
 	(   const std::string& wfile
 	  , const std::string& w0file
 	  , const std::string& w2vfile
+	  , const std::string& areaDicfile
 		)
 	{
 		// 重みを生成しファイルから読み込む
@@ -824,7 +826,7 @@ namespace SemiCrf {
 		const auto& label_map = weights->getLabelMap();
 
 		// feature関数を生成し、x,yの次元、feature、maxLengthを設定する
-		ff = App::createFeatureFunction(feature, w2vfile);
+		ff = App::createFeatureFunction(feature, w2vfile, areaDicfile);
 		ff->setXDim(xdim);
 		ff->setYDim(ydim);
 		ff->setMaxLength(maxLength);

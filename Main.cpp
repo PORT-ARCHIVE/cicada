@@ -32,6 +32,7 @@ public:
 	std::string initWeightsFile{""};
 	std::string trainingDataFile{""};
 	std::string predictionDataFile{""};
+	std::string areaDicFile{""};
 };
 
 void Options::parse(int argc, char *argv[])
@@ -62,6 +63,8 @@ void Options::parse(int argc, char *argv[])
 				initWeightsFile = argv[++i];
 			} else if( arg == "-m" || arg == "--w2v-matrix" ) {
 				w2vMatrixFile = argv[++i];
+			} else if( arg == "-a" || arg == "--area-dictionary" ) {
+				areaDicFile = argv[++i];
 			} else if( arg == "--set-optimizer" ) {
 				method = argv[++i];
 			} else if( arg == "--set-log-pattern" ) {
@@ -188,7 +191,7 @@ int main(int argc, char *argv[])
 		}
 
 		auto alg = createAlgorithm(options);
-		alg->preProcess(options.weightsFile, options.initWeightsFile, options.w2vMatrixFile);
+		alg->preProcess(options.weightsFile, options.initWeightsFile, options.w2vMatrixFile, options.areaDicFile);
 		alg->compute();
 		alg->postProcess(options.weightsFile);
 

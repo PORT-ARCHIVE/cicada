@@ -29,6 +29,8 @@ namespace W2V {
 			throw Error(ss.str());
         }
 
+		Logger::out()->info( "read {}", file );
+
         //long long words;
      	fscanf(f, "%lld", &words);
 
@@ -67,6 +69,9 @@ namespace W2V {
 		}
 
         std::fclose(f);
+
+		Logger::out()->info( "the number of words: {}", getNumWords() );
+		Logger::out()->info( "dimension: {}", getSize() );
 	}
 
 	long long Matrix_::w2i(const std::string& w)

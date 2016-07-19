@@ -1,8 +1,11 @@
 // © 2016 PORT INC.
 
+#include <fstream>
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/lexical_cast.hpp>
 #include "AppTest.hpp"
 #include "Logger.hpp"
 #include "Error.hpp"
@@ -11,8 +14,82 @@
 
 namespace App {
 
+	AreaDic_::AreaDic_()
+	{
+		Logger::trace() << "AreaDic_()";
+	}
+
+	AreaDic_::~AreaDic_()
+	{
+		Logger::trace() << "~AreaDic_()";
+	}
+
+	void AreaDic_::read(std::string file)
+	{
+		Logger::trace() << "AreaDic_::read()";
+
+		typedef boost::char_separator<char> char_separator;
+		typedef boost::tokenizer<char_separator> tokenizer;
+
+		std::ifstream ifs;
+		open(ifs, file);
+		Logger::out()->info( "read {}", file );
+
+		std::string line;
+		while( std::getline(ifs, line) ) {
+
+			//std::cout << line << std::endl;
+
+			char_separator sep(",", "", boost::keep_empty_tokens);
+			tokenizer tokens(line, sep);
+
+			tokenizer::iterator tok_iter = tokens.begin();
+
+			// 8カラムまでとばす
+			for(int i = 0; i < 7; ++i) {
+				tok_iter++;
+			}
+
+			if( dic.find(*tok_iter) == dic.end() ){
+				dic.insert(*tok_iter);
+				Logger::out()->trace( "area word: {}", *tok_iter );
+				//std::cout << *tok_iter << std::endl;
+			}
+
+			// 10カラムまでとばす
+			tok_iter++;
+			tok_iter++;
+
+			if( dic.find(*tok_iter) == dic.end() ){
+				dic.insert(*tok_iter);
+				Logger::out()->trace( "area word: {}", *tok_iter );
+				//std::cout << *tok_iter << std::endl;
+			}
+
+			// 12カラムまでとばす
+		    tok_iter++;
+			tok_iter++;
+
+			if( *tok_iter == "" ) {
+				continue;
+			}
+
+			Logger::out()->trace( "area word: {}", *tok_iter );
+
+			if( dic.find(*tok_iter) == dic.end() ){
+				dic.insert(*tok_iter);
+				Logger::out()->trace( "area word: {}", *tok_iter );
+				//std::cout << *tok_iter << std::endl;
+			}
+		}
+
+		Logger::out()->info( "the number of words: {}", dic.size() );
+	}
+
+	///////////////
+
 	decltype( std::make_shared<FeatureFunction>() )
-	createFeatureFunction(const std::string& feature, const std::string& w2vmat)
+	createFeatureFunction(const std::string& feature, const std::string& w2vmat, const std::string& areaDic)
 	{
 		decltype( std::make_shared<FeatureFunction>() ) ff;
 
@@ -23,15 +100,21 @@ namespace App {
 		} else if( feature == "JPN" ) {
 			
 			auto jpnff = std::make_shared<Jpn>();
+
 			auto m = std::make_shared<W2V::Matrix_>();
 			if( w2vmat.empty() ) {
 				throw Error("no w2v matrix file specifed");
 			}
-			Logger::out()->info( "read {}", w2vmat );
 			m->read(w2vmat);
-			Logger::out()->info( "the number of words: {}", m->getNumWords() );
-			Logger::out()->info( "dimension: {}", m->getSize() );
 			jpnff->setMatrix(m);
+
+			auto dic = std::make_shared<AreaDic_>();
+			if( areaDic.empty() ) {
+				throw Error("no area dictionary file specifed");
+			}
+			dic->read(areaDic);
+			jpnff->setAreaDic(dic);
+
 			ff = jpnff;
 
 		} else {
@@ -40,6 +123,15 @@ namespace App {
 		}
 
 		return ff;
+	}
+
+	bool AreaDic_::exist(std::string word)
+	{
+		bool ret = true;
+		if( dic.find(word) == dic.end() ) {
+			ret = false;
+		}
+		return ret;
 	}
 
 	///////////////
@@ -209,7 +301,7 @@ namespace App {
 				std::string word = x.getStrs()->at(j+l).at(s-1); // 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
 
 				// 地域
-				if(0) {
+				if( areadic->exist(word) ) {
 					is_area = 1;
 				}
 

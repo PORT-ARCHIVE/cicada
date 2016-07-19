@@ -2,6 +2,7 @@
 CONTAINER_NAME=cicada_container
 
 SEMICRF=../semicrf
+DIC=../../elastic-search/test/key_word/zenkoku_utf8.csv
 
 all: test1 test2  test3 learn infer gen_test bd2c_test bd2w_test bdc2e_test
 
@@ -42,8 +43,8 @@ MATRIX=../../word2vec/wakati.bin
 
 test3:
 	@echo "###### ${FILE1} ######"
-	time $(SEMICRF) -t ${FILE1} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-6 --w2v-matrix ${MATRIX} && echo "OK" || echo "ERROR"
-	$(SEMICRF) -i ${FILE1} -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} > tmp2 && echo "OK" || echo "ERROR"
+	time $(SEMICRF) -t ${FILE1} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-6 --w2v-matrix ${MATRIX} -a ${DIC} && echo "OK" || echo "ERROR"
+	$(SEMICRF) -i ${FILE1} -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} > tmp2 && echo "OK" || echo "ERROR"
 	jq '.pages[].data[][][]' ${FILE1} > r1
 	jq '.pages[].data[][][]' tmp2 > r2
 	cat r1 | awk '{ if(k++ % 4 == 2) print $$1 }' > a
@@ -51,9 +52,9 @@ test3:
 	echo "diff -c a b"
 	diff -c a b && echo "OK" || echo "ERROR"
 	paste a b | awk '{ if( $$1 == $$2 ) count++; total++; } END{ print count/total*100,"%"; }'
-	$(SEMICRF) -i ${FILE1} -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} --enable-simple-prediction-output > simple_output.json && echo "OK" || echo "ERROR"
+	$(SEMICRF) -i ${FILE1} -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} --enable-simple-prediction-output > simple_output.json && echo "OK" || echo "ERROR"
 	diff -c answer/simple_output.json simple_output.json && echo "OK" || echo "ERROR"
-	$(SEMICRF) -i check10.json -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} --enable-simple-prediction-output > check10_output.json && echo "OK" || echo "ERROR"
+	$(SEMICRF) -i check10.json -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} --enable-simple-prediction-output > check10_output.json && echo "OK" || echo "ERROR"
 	diff -c answer/check10_output.json check10_output.json && echo "OK" || echo "ERROR"
 	rm tmp1 tmp2
 
