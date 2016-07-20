@@ -365,6 +365,11 @@ namespace App {
 				}
 			}
 
+			// 平均化
+			for( int k = 0; k < xDim; k++ ) {
+				fvec(yval*xDim+k) /= d;
+			}
+
             // y2y
 			fvec(dim0+ydval*yDim+yval) = 1.0;
 
