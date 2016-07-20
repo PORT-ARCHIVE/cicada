@@ -28,6 +28,7 @@ namespace App {
 		virtual void read(std::string file);
 		bool exist(std::string word);
 	private:
+		std::string removePrefecture(std::string area, bool& is_remove);
 		std::set<std::string> dic;
 	};
 

@@ -1,5 +1,6 @@
 // © 2016 PORT INC.
 
+#include <cstdlib>
 #include <fstream>
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -24,6 +25,27 @@ namespace App {
 		Logger::trace() << "~AreaDic_()";
 	}
 
+	std::string AreaDic_::removePrefecture(std::string area, bool& is_remove) {
+		is_remove = false;
+		area = area.substr(1, area.size()-2); // 先頭、末尾の"を削除
+		int l = area.size();
+		//const char* dist[] = { "都","県","府","道","市","区","町","村","郡","字" };
+		const char* dist[] = { "都","県","府","道","市" };
+		int size = sizeof(dist)/sizeof(char*);
+
+		for( int i = 0; i < size; ++i ) {
+			int s = mblen(dist[i], MB_CUR_MAX);
+			std::string distcpp(dist[i]);
+			if( area.find(distcpp, l-s) != std::string::npos ) {
+				area = area.substr(0, l-s); // 末尾の行政区分を削除
+				is_remove = true;
+				break;
+			}
+		}
+
+		return std::move(area);
+	}
+
 	void AreaDic_::read(std::string file)
 	{
 		Logger::trace() << "AreaDic_::read()";
@@ -34,6 +56,7 @@ namespace App {
 		std::ifstream ifs;
 		open(ifs, file);
 		Logger::out()->info( "read {}", file );
+		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
 
 		std::string line;
 		while( std::getline(ifs, line) ) {
@@ -50,9 +73,12 @@ namespace App {
 				tok_iter++;
 			}
 
-			if( dic.find(*tok_iter) == dic.end() ){
-				dic.insert(*tok_iter);
-				Logger::out()->trace( "area word: {}", *tok_iter );
+			bool flg0 = false;
+			std::string word0 = removePrefecture(*tok_iter, flg0);
+
+			if( dic.find(word0) == dic.end() && flg0 ){
+				dic.insert(word0);
+				Logger::out()->trace( "area word: {}", word0 );
 				//std::cout << *tok_iter << std::endl;
 			}
 
@@ -60,27 +86,16 @@ namespace App {
 			tok_iter++;
 			tok_iter++;
 
-			if( dic.find(*tok_iter) == dic.end() ){
-				dic.insert(*tok_iter);
-				Logger::out()->trace( "area word: {}", *tok_iter );
+			bool flg1 = false;
+			std::string word1 = removePrefecture(*tok_iter, flg1);
+
+			if( dic.find(word1) == dic.end() && flg1 ){
+				dic.insert(word1);
+				Logger::out()->trace( "area word: {}", word1 );
 				//std::cout << *tok_iter << std::endl;
 			}
 
-			// 12カラムまでとばす
-		    tok_iter++;
-			tok_iter++;
-
-			if( *tok_iter == "" ) {
-				continue;
-			}
-
-			Logger::out()->trace( "area word: {}", *tok_iter );
-
-			if( dic.find(*tok_iter) == dic.end() ){
-				dic.insert(*tok_iter);
-				Logger::out()->trace( "area word: {}", *tok_iter );
-				//std::cout << *tok_iter << std::endl;
-			}
+			// 以降のデータは使わない(暫定)
 		}
 
 		Logger::out()->info( "the number of words: {}", dic.size() );
@@ -299,22 +314,39 @@ namespace App {
 				long long xval = boost::lexical_cast<long long>(str);
 				int s = x.getStrs()->at(j+l).size();
 				std::string word = x.getStrs()->at(j+l).at(s-1); // 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
+				//std::cout << word << std::endl;
 
 				// 地域
-				if( areadic->exist(word) ) {
+				if( areadic->exist(word) ||
+					word.find("都") != std::string::npos ||
+					word.find("県") != std::string::npos ||
+					word.find("府") != std::string::npos ||
+					word.find("道") != std::string::npos ||
+					word.find("市") != std::string::npos ||
+					word.find("区") != std::string::npos ||
+					word.find("町") != std::string::npos ||
+					word.find("村") != std::string::npos ||
+					word.find("郡") != std::string::npos ||
+					word.find("字") != std::string::npos ) {
 					is_area = 1;
 				}
 
 				// 数字
 				if( word.find("digit") != std::string::npos ||
+					word.find("丁") != std::string::npos ||
+					word.find("目") != std::string::npos ||
+					word.find("番") != std::string::npos ||
+					word.find("地") != std::string::npos ||
+					word.find("号") != std::string::npos ||
 					word.find("-") != std::string::npos ||
 					word.find("ー") != std::string::npos ) {
 					is_address = 1;
 				}
 
 				// 地域指示子
-				if( ( word.find("勤務") != std::string::npos && word.find("地") != std::string::npos ) ||
-					( word.find("勤務") != std::string::npos && word.find("先") != std::string::npos ) ||
+				if( word.find("勤務") != std::string::npos ||
+					word.find("地") != std::string::npos ||
+					word.find("先") != std::string::npos ||
 					word.find("アクセス") != std::string::npos ) {
 					is_area_indicator = 1;
 				}
@@ -351,7 +383,7 @@ namespace App {
 			fvec(dim1+yval) = f;
 
 			if( yval == 3 ) { // 勤務地 T.B.D.
-				fvec(dim1+yval+1) = i;
+				fvec(dim1+yval+1) = is_area;
 			}
 
 			if( yval == 18 ) { // 番地 T.B.D.
