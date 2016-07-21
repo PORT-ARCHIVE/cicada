@@ -70,6 +70,7 @@ namespace SemiCrf {
 		int yDim{-1};
 		int maxLength{-1};
 		std::string feature{""};
+		std::map<int,int> label_map;
 
 	public:
 
@@ -93,6 +94,7 @@ namespace SemiCrf {
 		void setMaxLength(decltype(maxLength) arg) { maxLength = arg; }
 		decltype(maxLength) getMaxLength() const { return maxLength; }
 		std::add_const<decltype((feature))>::type getFeature() { return feature; }
+		void setLabelMap(decltype((label_map)) arg) { label_map = arg; }
 	};
 
 	decltype( std::make_shared<FeatureFunction>() ) createFeatureFunction();

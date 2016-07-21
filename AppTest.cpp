@@ -407,15 +407,15 @@ namespace App {
 		// area
 		try {
 
-			if( yval == 3 ) { // 勤務地 T.B.D.
+			if( yval == label_map[3] ) { // 勤務地 T.B.D.
 				fvec(dim2) = is_area;
 			}
 
-			if( yval == 18 ) { // 番地 T.B.D.
+			if( yval == label_map[18] ) { // 番地 T.B.D.
 				fvec(dim2+1) = is_address;
 			}
 
-			if( yval == 19 ) { // 勤務地指示子 T.B.D.
+			if( yval == label_map[19] ) { // 勤務地指示子 T.B.D.
 				fvec(dim2+2) = is_area_indicator;
 			}
 
