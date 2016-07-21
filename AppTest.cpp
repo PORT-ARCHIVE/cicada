@@ -244,7 +244,6 @@ namespace App {
 	///////////////
 
 	Jpn::Jpn()
-		: considerArea(false)
 	{
 		feature = "JPN";
 		Logger::trace() << "Jpn()";

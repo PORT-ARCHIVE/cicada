@@ -21,6 +21,7 @@ namespace SemiCrf {
 		, DISABLE_REGULARIZATION = (0x1 << 3)
 		, DISABLE_WG_CACHE       = (0x1 << 4)
 		, ENABLE_SIMPLE_PREDICTION_OUTPUT = (0x1 << 5)
+		, ENABLE_AREA_FEATURE    = (0x1 << 6)
 	};
 
 	// 重みベクトル
@@ -71,6 +72,7 @@ namespace SemiCrf {
 		int maxLength{-1};
 		std::string feature{""};
 		std::map<int,int> label_map;
+		bool considerArea;
 
 	public:
 
@@ -95,6 +97,7 @@ namespace SemiCrf {
 		decltype(maxLength) getMaxLength() const { return maxLength; }
 		std::add_const<decltype((feature))>::type getFeature() { return feature; }
 		void setLabelMap(decltype((label_map)) arg) { label_map = arg; }
+		void setAreFeature(decltype(considerArea) arg) { considerArea = arg; }
 	};
 
 	decltype( std::make_shared<FeatureFunction>() ) createFeatureFunction();

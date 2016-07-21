@@ -59,7 +59,6 @@ namespace App {
 		W2V::Matrix w2vmat;
 		AreaDic	areadic;
 		std::set<std::string> unknown_words;
-		bool considerArea;
 	};
 }
 

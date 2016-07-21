@@ -139,6 +139,7 @@ namespace SemiCrf {
 	}
 
 	FeatureFunction::FeatureFunction()
+		: considerArea(false)
 	{
 		Logger::trace() << "FeatureFunction()";
 	}
@@ -291,7 +292,7 @@ namespace SemiCrf {
 		int ydim = datas->getYDim();
 		const auto& feature = datas->getFeature();
 
-		// feature関数を生成し、x,yの次元、feature、maxLength, label_mapを設定する
+		// feature関数を生成し、x,yの次元、feature、maxLength, label_map, area featureを設定する
 		ff = App::createFeatureFunction(feature, w2vfile, areaDicfile);
 		try {
 			ff->setXDim(xdim);
@@ -301,6 +302,7 @@ namespace SemiCrf {
 		ff->setYDim(ydim);
 		ff->setMaxLength(maxLength); // maxLengthはdatasをreadした直後に設定されている
 		ff->setLabelMap(datas->getLabelMap());
+		ff->setAreFeature(flg & ENABLE_AREA_FEATURE);
 
 		// featureから次元を取得しアルゴリズムに設定
 		dim = ff->getDim();
@@ -826,12 +828,13 @@ namespace SemiCrf {
 		const auto& variance = weights->getVariance();
 		const auto& label_map = weights->getLabelMap();
 
-		// feature関数を生成し、x,yの次元、feature、maxLength, label_mapを設定する
+		// feature関数を生成し、x,yの次元、feature、maxLength, label_map, area featureを設定する
 		ff = App::createFeatureFunction(feature, w2vfile, areaDicfile);
 		ff->setXDim(xdim);
 		ff->setYDim(ydim);
 		ff->setMaxLength(maxLength);
 		ff->setLabelMap(datas->getLabelMap());
+		ff->setAreFeature(flg & ENABLE_AREA_FEATURE);
 
 		// featureから次元を取得しアルゴリズムに設定
 		dim = ff->getDim();
