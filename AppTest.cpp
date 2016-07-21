@@ -256,7 +256,7 @@ namespace App {
 
 	int Jpn::getDim()
 	{
-		return yDim * ( xDim + yDim + 4 );
+		return yDim * ( xDim + yDim ) + yDim + 3;
 	}
 
 	void Jpn::setXDim(int arg)
@@ -291,23 +291,25 @@ namespace App {
 
 		double v = 0.0;
 
+		int yval = static_cast<int>(y);
+		int ydval = static_cast<int>(yd);
+
+		int dim0 = yDim * xDim;        // y2x
+		int dim1 = dim0 + yDim * yDim; // y2x + y2y
+		int dim2 = dim1 + yDim;        // y2x + y2y + l
+		int dim3 = dim2 + 3;           // y2x + y2y + l + "地名関連"
+
+		uvector fvec(dim3, 0.0);
+
+		int is_area = 0;
+		int is_address = 0;
+		int is_area_indicator = 0;
+
+		int d = i - j + 1;
+
+		// y2x
 		try {
 
-			int yval = static_cast<int>(y);
-			int ydval = static_cast<int>(yd);
-
-			int dim0 = yDim * xDim;
-			int dim1 = yDim * ( xDim + yDim );
-			int dim2 = yDim * ( xDim + yDim + 4 );
-
-			uvector fvec(dim2, 0.0);
-
-			int is_area = 0;
-			int is_area_indicator = 0;
-			int is_address = 0;
-
-			// y2x
-			int d = i - j + 1;
 			for( int l = 0; l < d; l++ ) {
 
 				const auto& str = x.getStrs()->at(j+l).at(0);
@@ -351,7 +353,6 @@ namespace App {
 					is_area_indicator = 1;
 				}
 
-
 				if( xval == -1 ) {
 					if( unknown_words.find(word) == unknown_words.end() ) {
 						Logger::out()->warn( "unknown word: {}", word );
@@ -370,10 +371,22 @@ namespace App {
 				fvec(yval*xDim+k) /= d;
 			}
 
-            // y2y
+		} catch (...) {
+			throw Error("Jpn::wg: y2x: unexpected exception");
+		}
+
+		// y2y
+		try {
+
 			fvec(dim0+ydval*yDim+yval) = 1.0;
 
-			// y2l
+		} catch (...) {
+			throw Error("Jpn::wg: y2y: unexpected exception");
+		}
+
+		// y2l
+		try {
+
 			auto m = x.getMean(static_cast<int>(y));
 			auto s = x.getVariance(static_cast<int>(y));
 			const double eps = 1.0e-5;
@@ -387,17 +400,31 @@ namespace App {
 
 			fvec(dim1+yval) = f;
 
+		} catch (...) {
+			throw Error("Jpn::wg: y2l: unexpected exception");
+		}
+
+		// area
+		try {
+
 			if( yval == 3 ) { // 勤務地 T.B.D.
-				fvec(dim1+yval+1) = is_area;
+				fvec(dim2) = is_area;
 			}
 
 			if( yval == 18 ) { // 番地 T.B.D.
-				fvec(dim1+yval+2) = is_address;
+				fvec(dim2+1) = is_address;
 			}
 
 			if( yval == 19 ) { // 勤務地指示子 T.B.D.
-				fvec(dim1+yval+3) = is_area_indicator;
+				fvec(dim2+2) = is_area_indicator;
 			}
+
+		} catch (...) {
+			throw Error("Jpn::wg: area: unexpected exception");
+		}
+
+		// innner product
+		try {
 
 			int k = 0;
 			for( auto w : ws ) {
@@ -406,7 +433,7 @@ namespace App {
 			}
 
 		} catch (...) {
-			throw Error("Jpn::wg: unexpected exception");
+			throw Error("Jpn::wg: innner product: unexpected exception");
 		}
 
 		return v;
