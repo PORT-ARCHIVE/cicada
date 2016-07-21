@@ -123,12 +123,11 @@ namespace App {
 			m->read(w2vmat);
 			jpnff->setMatrix(m);
 
-			auto dic = std::make_shared<AreaDic_>();
-			if( areaDic.empty() ) {
-				throw Error("no area dictionary file specifed");
+			if( !areaDic.empty() ) {
+				auto dic = std::make_shared<AreaDic_>();
+				dic->read(areaDic);
+				jpnff->setAreaDic(dic);
 			}
-			dic->read(areaDic);
-			jpnff->setAreaDic(dic);
 
 			ff = jpnff;
 

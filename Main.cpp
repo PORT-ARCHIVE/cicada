@@ -65,6 +65,7 @@ void Options::parse(int argc, char *argv[])
 				w2vMatrixFile = argv[++i];
 			} else if( arg == "-a" || arg == "--area-dictionary" ) {
 				areaDicFile = argv[++i];
+				flg |= SemiCrf::ENABLE_AREA_FEATURE;
 			} else if( arg == "--set-optimizer" ) {
 				method = argv[++i];
 			} else if( arg == "--set-log-pattern" ) {
@@ -83,8 +84,6 @@ void Options::parse(int argc, char *argv[])
 				flg |= SemiCrf::DISABLE_WG_CACHE;
 			} else if( arg == "--enable-simple-prediction-output" ) {
 				flg |= SemiCrf::ENABLE_SIMPLE_PREDICTION_OUTPUT;
-			} else if( arg == "--enable-area-feature" ) {
-				flg |= SemiCrf::ENABLE_AREA_FEATURE;
 			} else if( arg == "--disable-log-color" ) {
 				logColor = false;
 			} else if( arg == "--log-level" ) {
