@@ -244,6 +244,7 @@ namespace App {
 	///////////////
 
 	Jpn::Jpn()
+		: considerArea(false)
 	{
 		feature = "JPN";
 		Logger::trace() << "Jpn()";
@@ -256,7 +257,11 @@ namespace App {
 
 	int Jpn::getDim()
 	{
-		return yDim * ( xDim + yDim ) + yDim + 3;
+		int dim = yDim * ( xDim + yDim ) + yDim;
+		if( considerArea ) {
+			dim += 3;
+		}
+		return dim;
 	}
 
 	void Jpn::setXDim(int arg)
@@ -299,7 +304,12 @@ namespace App {
 		int dim2 = dim1 + yDim;        // y2x + y2y + l
 		int dim3 = dim2 + 3;           // y2x + y2y + l + "地名関連"
 
-		uvector fvec(dim3, 0.0);
+		int dim = dim2;
+		if( considerArea ) {
+			dim = dim3;
+		}
+
+		uvector fvec(dim, 0.0);
 
 		int is_area = 0;
 		int is_address = 0;
@@ -318,39 +328,42 @@ namespace App {
 				std::string word = x.getStrs()->at(j+l).at(s-1); // 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
 				//std::cout << word << std::endl;
 
-				// 地域
-				if( areadic->exist(word) ||
-					word.find("都") != std::string::npos ||
-					word.find("県") != std::string::npos ||
-					word.find("府") != std::string::npos ||
-					word.find("道") != std::string::npos ||
-					word.find("市") != std::string::npos ||
-					word.find("区") != std::string::npos ||
-					word.find("町") != std::string::npos ||
-					word.find("村") != std::string::npos ||
-					word.find("郡") != std::string::npos ||
-					word.find("字") != std::string::npos ) {
-					is_area = 1;
-				}
+				if( considerArea ) {
 
-				// 数字
-				if( word.find("digit") != std::string::npos ||
-					word.find("丁") != std::string::npos ||
-					word.find("目") != std::string::npos ||
-					word.find("番") != std::string::npos ||
-					word.find("地") != std::string::npos ||
-					word.find("号") != std::string::npos ||
-					word.find("-") != std::string::npos ||
-					word.find("ー") != std::string::npos ) {
-					is_address = 1;
-				}
+					// 地域
+					if( areadic->exist(word) ||
+						word.find("都") != std::string::npos ||
+						word.find("県") != std::string::npos ||
+						word.find("府") != std::string::npos ||
+						word.find("道") != std::string::npos ||
+						word.find("市") != std::string::npos ||
+						word.find("区") != std::string::npos ||
+						word.find("町") != std::string::npos ||
+						word.find("村") != std::string::npos ||
+						word.find("郡") != std::string::npos ||
+						word.find("字") != std::string::npos ) {
+						is_area = 1;
+					}
 
-				// 地域指示子
-				if( word.find("勤務") != std::string::npos ||
-					word.find("地") != std::string::npos ||
-					word.find("先") != std::string::npos ||
-					word.find("アクセス") != std::string::npos ) {
-					is_area_indicator = 1;
+					// 数字
+					if( word.find("digit") != std::string::npos ||
+						word.find("丁") != std::string::npos ||
+						word.find("目") != std::string::npos ||
+						word.find("番") != std::string::npos ||
+						word.find("地") != std::string::npos ||
+						word.find("号") != std::string::npos ||
+						word.find("-") != std::string::npos ||
+						word.find("ー") != std::string::npos ) {
+						is_address = 1;
+					}
+
+					// 地域指示子
+					if( word.find("勤務") != std::string::npos ||
+						word.find("地") != std::string::npos ||
+						word.find("先") != std::string::npos ||
+						word.find("アクセス") != std::string::npos ) {
+						is_area_indicator = 1;
+					}
 				}
 
 				if( xval == -1 ) {
@@ -404,23 +417,26 @@ namespace App {
 			throw Error("Jpn::wg: y2l: unexpected exception");
 		}
 
-		// area
-		try {
+		if( considerArea ) {
 
-			if( yval == label_map[3] ) { // 勤務地 T.B.D.
-				fvec(dim2) = is_area;
+			// area
+			try {
+
+				if( yval == label_map[3] ) { // 勤務地 T.B.D.
+					fvec(dim2) = is_area;
+				}
+
+				if( yval == label_map[18] ) { // 番地 T.B.D.
+					fvec(dim2+1) = is_address;
+				}
+
+				if( yval == label_map[19] ) { // 勤務地指示子 T.B.D.
+					fvec(dim2+2) = is_area_indicator;
+				}
+
+			} catch (...) {
+				throw Error("Jpn::wg: area: unexpected exception");
 			}
-
-			if( yval == label_map[18] ) { // 番地 T.B.D.
-				fvec(dim2+1) = is_address;
-			}
-
-			if( yval == label_map[19] ) { // 勤務地指示子 T.B.D.
-				fvec(dim2+2) = is_area_indicator;
-			}
-
-		} catch (...) {
-			throw Error("Jpn::wg: area: unexpected exception");
 		}
 
 		// innner product
