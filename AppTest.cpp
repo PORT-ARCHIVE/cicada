@@ -257,7 +257,7 @@ namespace App {
 	{
 		int dim = yDim * ( xDim + yDim ) + yDim;
 		if( considerArea ) {
-			dim += 3;
+			dim += yDim * 3;
 		}
 		return dim;
 	}
@@ -297,17 +297,20 @@ namespace App {
 		int yval = static_cast<int>(y);
 		int ydval = static_cast<int>(yd);
 
-		int dim0 = yDim * xDim;        // y2x
-		int dim1 = dim0 + yDim * yDim; // y2x + y2y
-		int dim2 = dim1 + yDim;        // y2x + y2y + l
-		int dim3 = dim2 + 3;           // y2x + y2y + l + "地名関連"
+		int dim0 = 0;
+		if( !considerArea ) {
 
-		int dim = dim2;
-		if( considerArea ) {
-			dim = dim3;
+			dim0 = yDim * xDim;         // y2x
+
+		} else {
+
+			dim0 = yDim * ( xDim + 3 ); // y2x
 		}
 
-		uvector fvec(dim, 0.0);
+		int dim1 = dim0 + yDim * yDim;  // y2x + y2y
+		int dim2 = dim1 + yDim;         // y2x + y2y + l
+
+		uvector fvec(dim2, 0.0);
 
 		int is_area = 0;
 		int is_address = 0;
@@ -382,6 +385,30 @@ namespace App {
 				fvec(yval*xDim+k) /= d;
 			}
 
+			// area
+			if( considerArea ) {
+
+				try {
+
+					int base = yval*xDim+xDim;
+
+					if( yval == label_map[3] ) { // 勤務地 T.B.D.
+						fvec(base) = is_area;
+					}
+
+					if( yval == label_map[18] ) { // 番地 T.B.D.
+						fvec(base+1) = is_address;
+					}
+
+					if( yval == label_map[19] ) { // 勤務地指示子 T.B.D.
+						fvec(base+2) = is_area_indicator;
+					}
+
+				} catch (...) {
+					throw Error("Jpn::wg: area: unexpected exception");
+				}
+			}
+
 		} catch (...) {
 			throw Error("Jpn::wg: y2x: unexpected exception");
 		}
@@ -413,28 +440,6 @@ namespace App {
 
 		} catch (...) {
 			throw Error("Jpn::wg: y2l: unexpected exception");
-		}
-
-		if( considerArea ) {
-
-			// area
-			try {
-
-				if( yval == label_map[3] ) { // 勤務地 T.B.D.
-					fvec(dim2) = is_area;
-				}
-
-				if( yval == label_map[18] ) { // 番地 T.B.D.
-					fvec(dim2+1) = is_address;
-				}
-
-				if( yval == label_map[19] ) { // 勤務地指示子 T.B.D.
-					fvec(dim2+2) = is_area_indicator;
-				}
-
-			} catch (...) {
-				throw Error("Jpn::wg: area: unexpected exception");
-			}
 		}
 
 		// innner product
