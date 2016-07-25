@@ -173,7 +173,6 @@ int main(int argc, char *argv[])
 			auto body = JsonIO::readString(object, "body_text_split");
 			if( body.empty() ) {
 				Logger::warn() << title << ": empty body";
-				continue;
 			}
 
 			///////////////	data
