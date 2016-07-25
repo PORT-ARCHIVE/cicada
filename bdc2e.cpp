@@ -152,29 +152,35 @@ int main(int argc, char *argv[])
 
 			// check title
 			{
+				bool flg0 = true;
 				auto t0 = find(body_object, "title");
 				if( t0 == body_object.end() || !t0->second.is_string() ) {
 					std::stringstream ss;
-					ss << options.bodyTextFile << ": no title found int " << count << " th element";
-					throw Error(ss.str());
+					ss << options.bodyTextFile << ": no title found in " << count << " th element";
+					Logger::out()->warn("{}", ss.str());
+					flg0 = false;
 				}
 
-				auto t = t0->second; // copy to keep the original
-				auto s0 = string_cast(std::move(t));
-
+				bool flg1 = true;
 				auto t1 = find(prediction_object, "title");
 				if( t1 == prediction_object.end() || !t1->second.is_string() ) {
 					std::stringstream ss;
-					ss << options.predictionResultFile << ": no title found int " << count << " th element";
-					throw Error(ss.str());
+					ss << options.predictionResultFile << ": no title found in " << count << " th element";
+					Logger::out()->warn("{}", ss.str());
+					flg1 = false;
 				}
 
-				auto s1 = string_cast(std::move(t1->second));
+				if( flg0 && flg1 ) {
 
-				if( s0 != s1 ) {
-					std::stringstream ss;
-					ss << "titles of objects are different int " << count << " th element";
-					throw Error(ss.str());
+					auto tmp = t0->second; // copy to keep the original
+					auto s0 = string_cast(std::move(tmp));
+					auto s1 = string_cast(std::move(t1->second));
+
+					if( s0 != s1 ) {
+						std::stringstream ss;
+						ss << "titles of objects are different in " << count << " th element";
+						throw Error(ss.str());
+					}
 				}
 			}
 

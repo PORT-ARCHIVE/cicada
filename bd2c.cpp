@@ -169,7 +169,12 @@ int main(int argc, char *argv[])
 			}
 
 			auto object = object_cast(std::move(value));
-			auto title = JsonIO::readString(object, "title");
+			std::string title;
+			try {
+				title = JsonIO::readString(object, "title");
+			} catch(Error& e) {
+				Logger::out()->warn("{}", e.what());
+			}
 			auto body = JsonIO::readString(object, "body_text_split");
 			if( body.empty() ) {
 				Logger::warn() << title << ": empty body";
