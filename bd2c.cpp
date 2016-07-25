@@ -120,7 +120,6 @@ int main(int argc, char *argv[])
 			if( options.w2vMatrixFile.empty() ) {
 				throw Error("no w2v matrix file specifed");
 			}
-			Logger::info() << "parse " << options.w2vMatrixFile;
 			matrix->read(options.w2vMatrixFile);
 
 			const long long wth0 = 100000;
