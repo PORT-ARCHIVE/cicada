@@ -62,40 +62,11 @@ namespace App {
 		while( std::getline(ifs, line) ) {
 
 			//std::cout << line << std::endl;
-
 			char_separator sep(",", "", boost::keep_empty_tokens);
 			tokenizer tokens(line, sep);
-
-			tokenizer::iterator tok_iter = tokens.begin();
-
-			// 8カラムまでとばす
-			for(int i = 0; i < 7; ++i) {
-				tok_iter++;
-			}
-
-			bool flg0 = false;
-			std::string word0 = removePrefecture(*tok_iter, flg0);
-
-			if( dic.find(word0) == dic.end() && flg0 ){
-				dic.insert(word0);
-				Logger::out()->trace( "area word: {}", word0 );
-				//std::cout << *tok_iter << std::endl;
-			}
-
-			// 10カラムまでとばす
-			tok_iter++;
-			tok_iter++;
-
-			bool flg1 = false;
-			std::string word1 = removePrefecture(*tok_iter, flg1);
-
-			if( dic.find(word1) == dic.end() && flg1 ){
-				dic.insert(word1);
-				Logger::out()->trace( "area word: {}", word1 );
-				//std::cout << *tok_iter << std::endl;
-			}
-
-			// 以降のデータは使わない(暫定)
+			std::string word = *tokens.begin();
+			dic.insert(word);
+			Logger::out()->trace( "{}", word );
 		}
 
 		Logger::out()->info( "the number of words: {}", dic.size() );
