@@ -226,10 +226,7 @@ namespace App {
 
 	int Jpn::getDim()
 	{
-		int dim = yDim * ( xDim + yDim ) + yDim;
-		if( considerArea ) {
-			dim += yDim * 3;
-		}
+		int dim = xDim + yDim;
 		return dim;
 	}
 
@@ -264,120 +261,96 @@ namespace App {
 		assert(0 < yDim);
 
 		double v = 0.0;
-
 		int yval = static_cast<int>(y);
 		int ydval = static_cast<int>(yd);
-
-		int dim0 = 0;
-		if( !considerArea ) {
-
-			dim0 = yDim * xDim;         // y2x
-
-		} else {
-
-			dim0 = yDim * ( xDim + 3 ); // y2x
-		}
-
-		int dim1 = dim0 + yDim * yDim;  // y2x + y2y
-		int dim2 = dim1 + yDim;         // y2x + y2y + l
-
-		uvector fvec(dim2, 0.0);
-
-		int is_area = 0;
-		int is_address = 0;
-		int is_area_indicator = 0;
-
+		int dim = yDim * xDim;
 		int d = i - j + 1;
+		uvector fvec(dim, 0.0);
 
-		// y2x
 		try {
 
+			std::vector<std::string> word;
+
 			for( int l = 0; l < d; l++ ) {
-
-				const auto& str = x.getStrs()->at(j+l).at(0);
-				long long xval = boost::lexical_cast<long long>(str);
 				int s = x.getStrs()->at(j+l).size();
-				std::string word = x.getStrs()->at(j+l).at(s-1); // 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
-				//std::cout << word << std::endl;
+				word.push_back(x.getStrs()->at(j+l).at(s-1)); // 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
+			}
 
-				if( considerArea ) {
+			// 勤務地指示子
+			if( yval == label_map[***] && ydval == label_map[0] ) {
 
-					// 地域
-					if( areadic->exist(word) ||
-						word.find("都") != std::string::npos ||
-						word.find("県") != std::string::npos ||
-						word.find("府") != std::string::npos ||
-						word.find("道") != std::string::npos ||
-						word.find("市") != std::string::npos ||
-						word.find("区") != std::string::npos ||
-						word.find("町") != std::string::npos ||
-						word.find("村") != std::string::npos ||
-						word.find("郡") != std::string::npos ||
-						word.find("字") != std::string::npos ) {
-						is_area = 1;
-					}
+				std::string chi("地");
+				std::string kinmu("勤務");
+				std::string syozai("所在");
 
-					// 数字
-					if( word.find("digit") != std::string::npos ||
-						word.find("丁") != std::string::npos ||
-						word.find("目") != std::string::npos ||
-						word.find("番") != std::string::npos ||
-						word.find("地") != std::string::npos ||
-						word.find("号") != std::string::npos ||
-						word.find("-") != std::string::npos ||
-						word.find("ー") != std::string::npos ) {
-						is_address = 1;
-					}
-
-					// 地域指示子
-					if( word.find("勤務") != std::string::npos ||
-						word.find("地") != std::string::npos ||
-						word.find("先") != std::string::npos ||
-						word.find("アクセス") != std::string::npos ) {
-						is_area_indicator = 1;
-					}
-				}
-
-				if( xval == -1 ) {
-					if( unknown_words.find(word) == unknown_words.end() ) {
-						Logger::out()->warn( "unknown word: {}", word );
-						unknown_words.insert(word);
-					}
-					continue;
-				}
-				const auto& wvec = w2vmat->i2v(xval);
-				for( int k = 0; k < xDim; k++ ) {
-					fvec(yval*xDim+k) += wvec(k);
+				// WIP
+				if( ( 2 < d && word[0] == kinmu  && word[1] == chi ) ||
+					( 2 < d && word[0] == syozai && word[1] == chi ) ) {
+					fvec(0) = 1.0;
 				}
 			}
 
-			// 平均化
-			for( int k = 0; k < xDim; k++ ) {
-				fvec(yval*xDim+k) /= d;
+			// 勤務地
+			else if( yval == label_map[***] && ydval == label_map[***] ) {
+
+				if( areadic->exist(word[0]) ) {
+
+					if( d == 1 ) {
+
+						fvec(1) = 1.0;
+
+					} else {
+
+						std::vector<std::string> key { "都", "道", "府","県","市","区","町","郡","字" };
+						for( auto& w : word ) {
+							if( areadic->exist(w) ) {
+								fvec(1) += 1.0;
+							}
+							for( auto& k : key ) {
+								if( w == k ) {
+									fvec(1) += 1.0;
+								}
+							}
+						}
+					}
+				}
 			}
 
-			// area
-			if( considerArea ) {
+			// 番地
+			else if( yval == label_map[***] && ydval == label_map[***] ) {
 
-				try {
-
-					int base = yval*xDim+xDim;
-
-					if( yval == label_map[3] ) { // 勤務地 T.B.D.
-						fvec(base) = is_area;
-					}
-
-					if( yval == label_map[18] ) { // 番地 T.B.D.
-						fvec(base+1) = is_address;
-					}
-
-					if( yval == label_map[19] ) { // 勤務地指示子 T.B.D.
-						fvec(base+2) = is_area_indicator;
-					}
-
-				} catch (...) {
-					throw Error("Jpn::wg: area: unexpected exception");
+				if( word[0].find("_digit") != std::string::npos ) {
+					fvec(2) = 1.0;
 				}
+
+				std::vector<std::string> key { "_digit", "丁", "目","地","号","ー","-" };
+				for( auto& w : word ) {
+					for( auto& k : key ) {
+						if( w == k ) {
+							fvec(2) += 1.0;
+						}
+					}
+				}
+			}
+
+			// 施設名
+			else if(　yval == label_map[***] && ydval == label_map[***]　) {
+				fvec(3) = 1.0;
+			}
+
+			// 階数 (WIP)
+			else if(　yval == label_map[***] && ydval == label_map[***]　) {
+				fvec(4) = 1.0;
+			}
+
+			// デリミタ (WIP)
+			else if(　yval == label_map[***] && ydval == label_map[***]　) {
+				fvec(5) = 1.0;
+			}
+
+			// 無し (WIP)
+			else if(　yval == label_map[***] && ydval == label_map[***]　) {
+				fvec(6) = 1.0;
 			}
 
 		} catch (...) {
