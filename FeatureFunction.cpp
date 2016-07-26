@@ -7,7 +7,7 @@
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/lexical_cast.hpp>
-#include "AppTest.hpp"
+#include "FeatureFunction.hpp"
 #include "Logger.hpp"
 #include "Error.hpp"
 #include "MultiByteTokenizer.hpp"

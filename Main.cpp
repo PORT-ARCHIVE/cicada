@@ -6,7 +6,7 @@
 #include <exception>
 #include <boost/lexical_cast.hpp>
 #include "SemiCrf.hpp"
-#include "AppTest.hpp"
+#include "FeatureFunction.hpp"
 #include "Logger.hpp"
 #include "Error.hpp"
 #include "FileIO.hpp"

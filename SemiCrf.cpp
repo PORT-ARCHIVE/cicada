@@ -12,7 +12,7 @@
 #include <cmath>
 #include <clocale>
 #include "SemiCrf.hpp"
-#include "AppTest.hpp"
+#include "FeatureFunction.hpp"
 #include "MultiByteTokenizer.hpp"
 #include "Logger.hpp"
 #include "Error.hpp"
