@@ -833,7 +833,7 @@ namespace SemiCrf {
 		ff->setXDim(xdim);
 		ff->setYDim(ydim);
 		ff->setMaxLength(maxLength);
-		ff->setLabelMap(datas->getLabelMap());
+		ff->setLabelMap(label_map);
 		ff->setAreFeature(flg & ENABLE_AREA_FEATURE);
 
 		// featureから次元を取得しアルゴリズムに設定
