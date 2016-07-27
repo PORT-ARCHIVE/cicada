@@ -264,7 +264,8 @@ namespace App {
 		int yval = static_cast<int>(y);
 		int ydval = static_cast<int>(yd);
 		int d = i - j + 1;
-		uvector fvec(xDim+yDim, 0.0);
+		uvector fvec(xDim, 0.0);
+		//uvector fvec(xDim+yDim, 0.0);
 
 		try {
 
@@ -296,7 +297,7 @@ namespace App {
 				}
 			}
 
-			else if( yval == label_map[6] ) {  // 勤務地
+			else if( yval == label_map[6] ) { // 勤務地
 
 				if( ydval == label_map[5] ) { // 勤務地指示子
 					fvec(1) += 1.0;
@@ -325,10 +326,10 @@ namespace App {
 				}
 			}
 
-			else if( yval == label_map[2] ) {  // 番地
+			else if( yval == label_map[2] ) { // 番地
 
 				if( ydval == label_map[6] ) { // 勤務地
-						fvec(2) += 1.0;
+					fvec(2) += 1.0;
 				}
 
 				std::vector<std::string> key { "_digit", "丁", "目","地","号","ー","-" };
@@ -341,7 +342,7 @@ namespace App {
 					}
 
 					for( auto& k : key ) {
-						if( w == k ) {
+						if( w.find(k) != std::string::npos ) {
 							fvec(2) += 1.0;
 							break;
 						}
@@ -353,11 +354,11 @@ namespace App {
 
 				fvec(3) += 1.0;
 
-				if( ydval == label_map[2] ) {  // 番地
+				if( ydval == label_map[2] ) { // 番地
 
 					fvec(3) += 2.0;
 
-				} else if( ydval == label_map[5] ||  // 勤務地指示子
+				} else if( ydval == label_map[5] || // 勤務地指示子
 						   ydval == label_map[6] ) { // 勤務地
 
 					fvec(3) += 1.0;
@@ -369,10 +370,12 @@ namespace App {
 						fvec(3) = 0.0;
 						break;
 					}
+
+					// wordについての素性が必要
 				}
 			}
 
-			else if( yval  == label_map[4] ) {  // 階数
+			else if( yval  == label_map[4] ) { // 階数
 
 				if( ydval == label_map[3] ) { // 施設名
 					fvec(4) += 1.0;
@@ -388,7 +391,7 @@ namespace App {
 					}
 
 					for( auto& k : key ) {
-						if( w == k ) {
+						if( w.find(k) != std::string::npos ) {
 							fvec(4) += 1.0;
 						}
 					}
@@ -412,6 +415,7 @@ namespace App {
 		}
 
 		// y2l
+		/*
 		try {
 
 			auto m = x.getMean(static_cast<int>(y));
@@ -430,6 +434,7 @@ namespace App {
 		} catch (...) {
 			throw Error("Jpn::wg: y2l: unexpected exception");
 		}
+		*/
 
 		// innner product
 		try {
