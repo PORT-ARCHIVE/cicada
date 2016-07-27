@@ -263,107 +263,152 @@ namespace App {
 		double v = 0.0;
 		int yval = static_cast<int>(y);
 		int ydval = static_cast<int>(yd);
-		int dim = yDim * xDim;
 		int d = i - j + 1;
-		uvector fvec(dim, 0.0);
+		uvector fvec(xDim+yDim, 0.0);
 
 		try {
 
 			std::vector<std::string> word;
-
 			for( int l = 0; l < d; l++ ) {
 				int s = x.getStrs()->at(j+l).size();
-				word.push_back(x.getStrs()->at(j+l).at(s-1)); // 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
+				word.push_back(x.getStrs()->at(j+l).at(s-1));
+				// 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
 			}
 
-			// 勤務地指示子
-			if( yval == label_map[***] && ydval == label_map[0] ) {
+			if( yval == label_map[5] ) { // 勤務地指示子
+
+				if( ydval == label_map[0] ) { // 無し
+					fvec(0) += 1.0;
+				}
 
 				std::string chi("地");
 				std::string kinmu("勤務");
 				std::string syozai("所在");
 
-				// WIP
-				if( ( 2 < d && word[0] == kinmu  && word[1] == chi ) ||
-					( 2 < d && word[0] == syozai && word[1] == chi ) ) {
-					fvec(0) = 1.0;
+				if( word[0] == kinmu || word[0] == syozai ) {
+
+					fvec(0) += 1.0;
+
+					if( 2 < d && word[1] == chi ) {
+
+						fvec(0) += 1.0;
+					}
 				}
 			}
 
-			// 勤務地
-			else if( yval == label_map[***] && ydval == label_map[***] ) {
+			else if( yval == label_map[6] ) {  // 勤務地
 
-				if( areadic->exist(word[0]) ) {
+				if( ydval == label_map[5] ) { // 勤務地指示子
+					fvec(1) += 1.0;
+				}
 
-					if( d == 1 ) {
+				std::vector<std::string> key { "都", "道", "府","県","市","区","町","郡","字" };
 
-						fvec(1) = 1.0;
+				for( auto& w : word ) {
 
-					} else {
+					if( w == "," || w == "、" ) {
+						fvec(1) = 0.0;
+						break;
+					}
 
-						std::vector<std::string> key { "都", "道", "府","県","市","区","町","郡","字" };
-						for( auto& w : word ) {
-							if( areadic->exist(w) ) {
-								fvec(1) += 1.0;
-							}
-							for( auto& k : key ) {
-								if( w == k ) {
-									fvec(1) += 1.0;
-								}
-							}
+					if( areadic->exist(w) ) {
+						fvec(1) += 1.0;
+						continue;
+					}
+
+					for( auto& k : key ) {
+						if( w == k ) {
+							fvec(1) += 1.0;
+							break;
 						}
 					}
 				}
 			}
 
-			// 番地
-			else if( yval == label_map[***] && ydval == label_map[***] ) {
+			else if( yval == label_map[2] ) {  // 番地
 
-				if( word[0].find("_digit") != std::string::npos ) {
-					fvec(2) = 1.0;
+				if( ydval == label_map[6] ) { // 勤務地
+						fvec(2) += 1.0;
 				}
 
 				std::vector<std::string> key { "_digit", "丁", "目","地","号","ー","-" };
+
 				for( auto& w : word ) {
+
+					if( w == "," || w == "、" ) {
+						fvec(2) = 0.0;
+						break;
+					}
+
 					for( auto& k : key ) {
 						if( w == k ) {
 							fvec(2) += 1.0;
+							break;
 						}
 					}
 				}
 			}
 
-			// 施設名
-			else if(　yval == label_map[***] && ydval == label_map[***]　) {
-				fvec(3) = 1.0;
+			else if( yval == label_map[3] ) { // 施設名
+
+				fvec(3) += 1.0;
+
+				if( ydval == label_map[2] ) {  // 番地
+
+					fvec(3) += 2.0;
+
+				} else if( ydval == label_map[5] ||  // 勤務地指示子
+						   ydval == label_map[6] ) { // 勤務地
+
+					fvec(3) += 1.0;
+				}
+
+				for( auto& w : word ) {
+
+					if( w == "," || w == "、" ) {
+						fvec(3) = 0.0;
+						break;
+					}
+				}
 			}
 
-			// 階数 (WIP)
-			else if(　yval == label_map[***] && ydval == label_map[***]　) {
-				fvec(4) = 1.0;
+			else if( yval  == label_map[4] ) {  // 階数
+
+				if( ydval == label_map[3] ) { // 施設名
+					fvec(4) += 1.0;
+				}
+
+				std::vector<std::string> key { "_digit", "F", "階" };
+
+				for( auto& w : word ) {
+
+					if( w == "," || w == "、" ) {
+						fvec(4) = 0.0;
+						break;
+					}
+
+					for( auto& k : key ) {
+						if( w == k ) {
+							fvec(4) += 1.0;
+						}
+					}
+				}
 			}
 
-			// デリミタ (WIP)
-			else if(　yval == label_map[***] && ydval == label_map[***]　) {
-				fvec(5) = 1.0;
+			else if( yval == label_map[1] ) { // デリミタ
+
+				if( d == 1 && ( word[0] == "," || word[0] == "、" ) ) {
+					fvec(5) += 1.0;
+				}
 			}
 
-			// 無し (WIP)
-			else if(　yval == label_map[***] && ydval == label_map[***]　) {
-				fvec(6) = 1.0;
+			else if( yval == label_map[0] ) { // 無し
+
+				fvec(6) += 1.0;
 			}
 
 		} catch (...) {
 			throw Error("Jpn::wg: y2x: unexpected exception");
-		}
-
-		// y2y
-		try {
-
-			fvec(dim0+ydval*yDim+yval) = 1.0;
-
-		} catch (...) {
-			throw Error("Jpn::wg: y2y: unexpected exception");
 		}
 
 		// y2l
@@ -380,7 +425,7 @@ namespace App {
 				f = 1.0;
 			}
 
-			fvec(dim1+yval) = f;
+			fvec(xDim+yval) = f;
 
 		} catch (...) {
 			throw Error("Jpn::wg: y2l: unexpected exception");
