@@ -87,12 +87,12 @@ namespace App {
 			
 			auto jpnff = std::make_shared<Jpn>();
 
-			auto m = std::make_shared<W2V::Matrix_>();
-			if( w2vmat.empty() ) {
-				throw Error("no w2v matrix file specifed");
-			}
-			m->read(w2vmat);
-			jpnff->setMatrix(m);
+			// auto m = std::make_shared<W2V::Matrix_>();
+			// if( w2vmat.empty() ) {
+			// 	throw Error("no w2v matrix file specifed");
+			// }
+			// m->read(w2vmat);
+			// jpnff->setMatrix(m);
 
 			if( !areaDic.empty() ) {
 				auto dic = std::make_shared<AreaDic_>();
@@ -226,15 +226,15 @@ namespace App {
 
 	int Jpn::getDim()
 	{
-		int dim = xDim + yDim;
-		return dim;
+		return xDim;
+		// return (xDim+yDim);
 	}
 
 	void Jpn::setXDim(int arg)
 	{
-		if( w2vmat->getSize() != arg ) {
-			throw Error("dimension mismatch");
-		}
+		// if( w2vmat->getSize() != arg ) {
+		// 	throw Error("dimension mismatch");
+		// }
 		xDim = arg;
 	}
 
@@ -266,20 +266,26 @@ namespace App {
 		int d = i - j + 1;
 		uvector fvec(xDim, 0.0);
 		//uvector fvec(xDim+yDim, 0.0);
+		std::vector<std::string> word;
 
 		try {
 
-			std::vector<std::string> word;
 			for( int l = 0; l < d; l++ ) {
 				int s = x.getStrs()->at(j+l).size();
 				word.push_back(x.getStrs()->at(j+l).at(s-1));
 				// 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
 			}
 
-			if( yval == label_map[5] ) { // 勤務地指示子
+			if( word[0] == "県" ) {
+				int i = 0;
+				i++;
+			}
 
-				if( ydval == label_map[0] ) { // 無し
-					fvec(0) += 1.0;
+			if( label_map.find(5) != label_map.end() && yval == label_map[5] ) { // 勤務地指示子
+
+				if( word[0] == "県" ) {
+					int i = 0;
+					i++;
 				}
 
 				std::string chi("地");
@@ -290,18 +296,17 @@ namespace App {
 
 					fvec(0) += 1.0;
 
-					if( 2 < d && word[1] == chi ) {
+					if( 1 < d && word[1] == chi ) {
 
 						fvec(0) += 1.0;
 					}
 				}
 			}
 
-			else if( yval == label_map[6] ) { // 勤務地
-
-				if( ydval == label_map[5] ) { // 勤務地指示子
-					fvec(1) += 1.0;
-				}
+			else if( label_map.find(6) != label_map.end() && yval == label_map[6] && // 勤務地
+					 ( (label_map.find(5) != label_map.end() && ydval == label_map[5]) || // 勤務地指示子
+					   (label_map.find(1) != label_map.end() && ydval == label_map[1]) ) ) {  // デリミタ
+//					   (label_map.find(0) != label_map.end() && ydval == label_map[0]) ) ) { // 無し
 
 				std::vector<std::string> key { "都", "道", "府","県","市","区","町","郡","字" };
 
@@ -326,13 +331,10 @@ namespace App {
 				}
 			}
 
-			else if( yval == label_map[2] ) { // 番地
+			else if( label_map.find(2) != label_map.end() && yval == label_map[2] && // 番地
+					 label_map.find(6) != label_map.end() && ydval == label_map[6] ) { // 勤務地
 
-				if( ydval == label_map[6] ) { // 勤務地
-					fvec(2) += 1.0;
-				}
-
-				std::vector<std::string> key { "_digit", "丁", "目","地","号","ー","-" };
+				std::vector<std::string> key { "丁","目","番","地","号","ー","-","0","1","2","3","4","5","6","7","8","9" };
 
 				for( auto& w : word ) {
 
@@ -350,19 +352,10 @@ namespace App {
 				}
 			}
 
-			else if( yval == label_map[3] ) { // 施設名
+			else if( label_map.find(3) != label_map.end() && yval  == label_map[3] && // 施設名
+					 label_map.find(2) != label_map.end() && ydval == label_map[2] ) { // 番地
 
-				fvec(3) += 1.0;
-
-				if( ydval == label_map[2] ) { // 番地
-
-					fvec(3) += 2.0;
-
-				} else if( ydval == label_map[5] || // 勤務地指示子
-						   ydval == label_map[6] ) { // 勤務地
-
-					fvec(3) += 1.0;
-				}
+				fvec(3) = d; // できるだけ長く
 
 				for( auto& w : word ) {
 
@@ -375,13 +368,10 @@ namespace App {
 				}
 			}
 
-			else if( yval  == label_map[4] ) { // 階数
+			else if( label_map.find(4) != label_map.end() && yval  == label_map[4] && // 階数
+					 label_map.find(3) != label_map.end() && ydval == label_map[3] ) { // 施設名
 
-				if( ydval == label_map[3] ) { // 施設名
-					fvec(4) += 1.0;
-				}
-
-				std::vector<std::string> key { "_digit", "F", "階" };
+				std::vector<std::string> key { "F","階","0","1","2","3","4","5","6","7","8","9" };
 
 				for( auto& w : word ) {
 
@@ -393,19 +383,20 @@ namespace App {
 					for( auto& k : key ) {
 						if( w.find(k) != std::string::npos ) {
 							fvec(4) += 1.0;
+							break;
 						}
 					}
 				}
 			}
 
-			else if( yval == label_map[1] ) { // デリミタ
+			else if( label_map.find(1) != label_map.end() && yval == label_map[1] ) { // デリミタ
 
 				if( d == 1 && ( word[0] == "," || word[0] == "、" ) ) {
 					fvec(5) += 1.0;
 				}
 			}
 
-			else if( yval == label_map[0] ) { // 無し
+			else if( label_map.find(0) != label_map.end() && yval == label_map[0] ) { // 無し
 
 				fvec(6) += 1.0;
 			}
@@ -415,29 +406,45 @@ namespace App {
 		}
 
 		// y2l
-		/*
-		try {
+		// try {
 
-			auto m = x.getMean(static_cast<int>(y));
-			auto s = x.getVariance(static_cast<int>(y));
-			const double eps = 1.0e-5;
-			double f = 0.0;
-			if( eps < s ) {
-				auto dm = d - m;
-				f = dm*dm/(2.0*s);
-			} else {
-				f = 1.0;
-			}
+		// 	auto m = x.getMean(static_cast<int>(y));
+		// 	auto s = x.getVariance(static_cast<int>(y));
+		// 	const double eps = 1.0e-5;
+		// 	double f = 0.0;
+		// 	if( eps < s ) {
+		// 		auto dm = d - m;
+		// 		f = dm*dm/(2.0*s);
+		// 	} else {
+		// 		f = 1.0;
+		// 	}
 
-			fvec(xDim+yval) = f;
+		// 	fvec(xDim+yval) = f;
 
-		} catch (...) {
-			throw Error("Jpn::wg: y2l: unexpected exception");
-		}
-		*/
+		// } catch (...) {
+		// 	throw Error("Jpn::wg: y2l: unexpected exception");
+		// }
 
 		// innner product
 		try {
+
+			// if( Logger::getLevel() < 2 ) {
+
+			// 	std::string segw {""};
+			// 	for( auto& w : word ) {
+			// 		segw += w;
+			// 	}
+
+			// 	Logger::out()->debug( "word: {}", segw );
+
+			// 	std::stringstream ss;
+			// 	ss << ydval << " " << yval << " : " ;
+			// 	for( int i = 0; i < xDim; i++ ) {
+			// 		ss << fvec(i) << " ";
+			// 	}
+
+			// 	Logger::out()->debug( "word: {}", ss.str() );
+			// }
 
 			int k = 0;
 			for( auto w : ws ) {
