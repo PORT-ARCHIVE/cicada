@@ -96,7 +96,7 @@ namespace SemiCrf {
 		void setMaxLength(decltype(maxLength) arg) { maxLength = arg; }
 		decltype(maxLength) getMaxLength() const { return maxLength; }
 		std::add_const<decltype((feature))>::type getFeature() { return feature; }
-		void setLabelMap(decltype((label_map)) arg) { label_map = arg; }
+		void setLabelMap(const std::map<int,int>& arg) { label_map = arg; }
 		void setAreFeature(decltype(considerArea) arg) { considerArea = arg; }
 	};
 
