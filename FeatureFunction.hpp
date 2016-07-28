@@ -56,6 +56,8 @@ namespace App {
 		void setMatrix(W2V::Matrix m) { w2vmat = m; }
 		void setAreaDic(AreaDic dic) { areadic = dic; }
 	private:
+		bool isDelimiter(const std::string& word);
+	private:
 		W2V::Matrix w2vmat;
 		AreaDic	areadic;
 		std::set<std::string> unknown_words;

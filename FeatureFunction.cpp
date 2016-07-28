@@ -248,6 +248,17 @@ namespace App {
 		Logger::trace() << "Jpn::write()";
 	}
 
+	bool Jpn::isDelimiter(const std::string& word)
+	{
+		static std::vector<std::string> delmiters { ",","、",":","：","/","／" };
+		for( auto d : delmiters	) {
+			if( word.find(d) != std::string::npos ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	double Jpn::wg (
 		Weights& ws,
 		Label y,
@@ -276,17 +287,7 @@ namespace App {
 				// 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
 			}
 
-			if( word[0] == "県" ) {
-				int i = 0;
-				i++;
-			}
-
 			if( label_map.find(5) != label_map.end() && yval == label_map[5] ) { // 勤務地指示子
-
-				if( word[0] == "県" ) {
-					int i = 0;
-					i++;
-				}
 
 				std::string chi("地");
 				std::string kinmu("勤務");
@@ -338,7 +339,7 @@ namespace App {
 
 				for( auto& w : word ) {
 
-					if( w == "," || w == "、" ) {
+					if( isDelimiter(w) ) {
 						fvec(2) = 0.0;
 						break;
 					}
@@ -359,7 +360,7 @@ namespace App {
 
 				for( auto& w : word ) {
 
-					if( w == "," || w == "、" ) {
+					if( isDelimiter(w) ) {
 						fvec(3) = 0.0;
 						break;
 					}
@@ -375,7 +376,7 @@ namespace App {
 
 				for( auto& w : word ) {
 
-					if( w == "," || w == "、" ) {
+					if( isDelimiter(w) ) {
 						fvec(4) = 0.0;
 						break;
 					}
@@ -391,7 +392,7 @@ namespace App {
 
 			else if( label_map.find(1) != label_map.end() && yval == label_map[1] ) { // デリミタ
 
-				if( d == 1 && ( word[0] == "," || word[0] == "、" ) ) {
+				if( d == 1 && isDelimiter(word[0]) ) {
 					fvec(5) += 1.0;
 				}
 			}
