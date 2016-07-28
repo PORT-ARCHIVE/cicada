@@ -1009,8 +1009,9 @@ namespace SemiCrf {
 			current_data->getSegments()->push_back(s);
 
 			if( datas->getFeature() == "JPN" && Logger::getLevel() < 2 ) {
+				centence += "[";
 				centence += App::label2String(s->getLabel());
-				centence += "[:";
+				centence += ":";
 				auto st = s->getStart();
 				auto ed = s->getEnd();
 				for( int i = st; i <= ed; ++i ) {
