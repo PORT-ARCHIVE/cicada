@@ -1,5 +1,5 @@
 {
-	"dimension" : [ 25, 3 ],
+	"dimension" : [ 7, 7 ],
 	"feature" : "JPN",
 	"labels" : [
 		["0",  "無し",  "NONE"],
