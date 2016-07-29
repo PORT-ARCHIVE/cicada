@@ -226,8 +226,7 @@ namespace App {
 
 	int Jpn::getDim()
 	{
-		return xDim;
-		// return (xDim+yDim);
+		return (6 + yDim)*yDim;
 	}
 
 	void Jpn::setXDim(int arg)
@@ -275,8 +274,7 @@ namespace App {
 		int yval = static_cast<int>(y);
 		int ydval = static_cast<int>(yd);
 		int d = i - j + 1;
-		uvector fvec(xDim, 0.0);
-		//uvector fvec(xDim+yDim, 0.0);
+		uvector fvec(getDim(), 0.0);
 		std::vector<std::string> word;
 
 		try {
@@ -287,7 +285,7 @@ namespace App {
 				// 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
 			}
 
-			if( label_map.find(5) != label_map.end() && yval == label_map[5] ) { // 勤務地指示子
+			{ // 勤務地指示子
 
 				std::string chi("地");
 				std::string kinmu("勤務");
@@ -295,70 +293,65 @@ namespace App {
 
 				if( word[0] == kinmu || word[0] == syozai ) {
 
-					fvec(0) += 1.0;
+					fvec(yval*6+0) += 1.0;
 
 					if( 1 < d && word[1] == chi ) {
 
-						fvec(0) += 1.0;
+						fvec(yval*6+0) += 1.0;
 					}
 				}
 			}
 
-			else if( label_map.find(6) != label_map.end() && yval == label_map[6] && // 勤務地
-					 ( (label_map.find(5) != label_map.end() && ydval == label_map[5]) || // 勤務地指示子
-					   (label_map.find(1) != label_map.end() && ydval == label_map[1]) ) ) {  // デリミタ
-//					   (label_map.find(0) != label_map.end() && ydval == label_map[0]) ) ) { // 無し ⇒　この条件があると収束性が悪くなる
+			{ // 勤務地
 
 				static std::vector<std::string> key { "都", "道", "府","県","市","区","町","郡","字" };
 
 				for( auto& w : word ) {
 
-					if( w == "," || w == "、" ) {
-						fvec(1) = 0.0;
+					if( isDelimiter(w) ) {
+						fvec(yval*6+1) = 0.0;
 						break;
 					}
 
 					if( areadic->exist(w) ) {
-						fvec(1) += 1.0;
+						fvec(yval*6+1) += 1.0;
 						continue;
 					}
 
 					for( auto& k : key ) {
 						if( w == k ) {
-							fvec(1) += 1.0;
+							fvec(yval*6+1) += 1.0;
 							break;
 						}
 					}
 				}
 			}
 
-			else if( label_map.find(2) != label_map.end() && yval == label_map[2] && // 番地
-					 label_map.find(6) != label_map.end() && ydval == label_map[6] ) { // 勤務地
+			{ // 番地
 
 				static std::vector<std::string> key { "丁目","番","地","号","ー","-","0","1","2","3","4","5","6","7","8","9" };
 
-				fvec(2) = d; // できるだけ長く
+				//fvec(yval*6+2) = d; // できるだけ長く
 
 				for( auto& w : word ) {
 
 					if( isDelimiter(w) ) {
-						fvec(2) = 0.0;
+						fvec(yval*6+2) = 0.0;
 						break;
 					}
 
 					for( auto& k : key ) {
-						if( w == k ) {
-							fvec(2) += 1.0;
+						if( w.find(k) == std::string::npos ) {
+							fvec(yval*6+2) += 1.0;
 							break;
 						}
 					}
 				}
 			}
 
-			else if( label_map.find(3) != label_map.end() && yval  == label_map[3] && // 施設名
-					 label_map.find(2) != label_map.end() && ydval == label_map[2] ) { // 番地
+			{ // 施設名
 
-				fvec(3) = d; // できるだけ長く
+				fvec(yval*6+3) = d; // できるだけ長く
 
 				for( auto& w : word ) {
 
@@ -367,48 +360,49 @@ namespace App {
 					// }
 
 					if( isDelimiter(w) ) {
-						fvec(3) = 0.0;
+						fvec(yval*6+3) = 0.0;
 						break;
 					}
 				}
 			}
 
-			else if( label_map.find(4) != label_map.end() && yval  == label_map[4] && // 階数
-					 label_map.find(3) != label_map.end() && ydval == label_map[3] ) { // 施設名
+			{ // 階数
 
 				static std::vector<std::string> key { "F","階","0","1","2","3","4","5","6","7","8","9" };
 
 				for( auto& w : word ) {
 
 					if( isDelimiter(w) ) {
-						fvec(4) = 0.0;
+						fvec(yval*6+4) = 0.0;
 						break;
 					}
 
 					for( auto& k : key ) {
 						if( w == k ) {
-							fvec(4) += 1.0;
+							fvec(yval*6+4) += 1.0;
 							break;
 						}
 					}
 				}
 			}
 
-			else if( label_map.find(1) != label_map.end() && yval == label_map[1] ) { // デリミタ
+			{ // デリミタ
 
 				if( d == 1 && isDelimiter(word[0]) ) {
-					fvec(5) += 1.0;
+					fvec(yval*6+5) += 1.0;
 				}
 			}
 
-			else if( label_map.find(0) != label_map.end() && yval == label_map[0] ) { // 無し
-
-				fvec(6) += 1.0;
-			}
+			// else if( label_map.find(0) != label_map.end() && yval == label_map[0] ) { // 無し
+			// 	fvec(6) += 1.0;
+		    // }
 
 		} catch (...) {
 			throw Error("Jpn::wg: y2x: unexpected exception");
 		}
+
+		// y2y
+		fvec(yDim*6+ydval*yDim+yval) = 1.0;
 
 		// y2l
 		// try {
