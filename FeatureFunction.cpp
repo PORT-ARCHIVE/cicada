@@ -307,9 +307,9 @@ namespace App {
 			else if( label_map.find(6) != label_map.end() && yval == label_map[6] && // 勤務地
 					 ( (label_map.find(5) != label_map.end() && ydval == label_map[5]) || // 勤務地指示子
 					   (label_map.find(1) != label_map.end() && ydval == label_map[1]) ) ) {  // デリミタ
-//					   (label_map.find(0) != label_map.end() && ydval == label_map[0]) ) ) { // 無し
+//					   (label_map.find(0) != label_map.end() && ydval == label_map[0]) ) ) { // 無し ⇒　この条件があると収束性が悪くなる
 
-				std::vector<std::string> key { "都", "道", "府","県","市","区","町","郡","字" };
+				static std::vector<std::string> key { "都", "道", "府","県","市","区","町","郡","字" };
 
 				for( auto& w : word ) {
 
@@ -335,7 +335,9 @@ namespace App {
 			else if( label_map.find(2) != label_map.end() && yval == label_map[2] && // 番地
 					 label_map.find(6) != label_map.end() && ydval == label_map[6] ) { // 勤務地
 
-				std::vector<std::string> key { "丁","目","番","地","号","ー","-","0","1","2","3","4","5","6","7","8","9" };
+				static std::vector<std::string> key { "丁目","番","地","号","ー","-","0","1","2","3","4","5","6","7","8","9" };
+
+				fvec(2) = d; // できるだけ長く
 
 				for( auto& w : word ) {
 
@@ -345,7 +347,7 @@ namespace App {
 					}
 
 					for( auto& k : key ) {
-						if( w.find(k) != std::string::npos ) {
+						if( w == k ) {
 							fvec(2) += 1.0;
 							break;
 						}
@@ -360,19 +362,21 @@ namespace App {
 
 				for( auto& w : word ) {
 
+					// if( w.find("タワー") != std::string::npos ) {
+					// 	fvec(3) += 1.0;
+					// }
+
 					if( isDelimiter(w) ) {
 						fvec(3) = 0.0;
 						break;
 					}
-
-					// wordについての素性が必要
 				}
 			}
 
 			else if( label_map.find(4) != label_map.end() && yval  == label_map[4] && // 階数
 					 label_map.find(3) != label_map.end() && ydval == label_map[3] ) { // 施設名
 
-				std::vector<std::string> key { "F","階","0","1","2","3","4","5","6","7","8","9" };
+				static std::vector<std::string> key { "F","階","0","1","2","3","4","5","6","7","8","9" };
 
 				for( auto& w : word ) {
 
@@ -382,7 +386,7 @@ namespace App {
 					}
 
 					for( auto& k : key ) {
-						if( w.find(k) != std::string::npos ) {
+						if( w == k ) {
 							fvec(4) += 1.0;
 							break;
 						}
