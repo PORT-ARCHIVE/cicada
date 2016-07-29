@@ -1,9 +1,12 @@
 [
     {
         "crf_estimate" : {
-            "年収" : "1500万円",
-            "職種" : "人工知能エンジニア"
+            "address" : "3丁目2番18号",
+            "faclity" : "NBF芝公園ビル",
+            "floor" : "8階",
+            "place" : "東京都港区芝",
+            "place_indicator" : "勤務地"
         },
-        "title" : "check7"
+        "title" : "check7-0"
     }
 ]
