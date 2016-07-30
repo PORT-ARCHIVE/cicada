@@ -276,6 +276,7 @@ namespace App {
 		int d = i - j + 1;
 		uvector fvec(getDim(), 0.0);
 		std::vector<std::string> word;
+		const int FEATURE_DIM = 6;
 
 		try {
 
@@ -285,22 +286,26 @@ namespace App {
 				// 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
 			}
 
+			int fd = yval*FEATURE_DIM;
+
 			{ // 勤務地指示子
 
-				std::string chi("地");
-				std::string kinmu("勤務");
-				std::string syozai("所在");
+				static std::string chi("地");
+				static std::string kinmu("勤務");
+				static std::string syozai("所在");
 
 				if( word[0] == kinmu || word[0] == syozai ) {
 
-					fvec(yval*6+0) += 1.0;
+					fvec(fd) += 1.0;
 
 					if( 1 < d && word[1] == chi ) {
 
-						fvec(yval*6+0) += 1.0;
+						fvec(fd) += 1.0;
 					}
 				}
 			}
+
+			fd++;
 
 			{ // 勤務地
 
@@ -309,49 +314,57 @@ namespace App {
 				for( auto& w : word ) {
 
 					if( isDelimiter(w) ) {
-						fvec(yval*6+1) = 0.0;
+						fvec(fd) = 0.0;
 						break;
 					}
 
 					if( areadic->exist(w) ) {
-						fvec(yval*6+1) += 1.0;
+						fvec(fd) += 1.0;
 						continue;
 					}
 
 					for( auto& k : key ) {
 						if( w == k ) {
-							fvec(yval*6+1) += 1.0;
+							fvec(fd) += 1.0;
 							break;
 						}
 					}
 				}
 			}
+
+			fd++;
 
 			{ // 番地
 
 				static std::vector<std::string> key { "丁目","番","地","号","ー","-","0","1","2","3","4","5","6","7","8","9" };
 
-				//fvec(yval*6+2) = d; // できるだけ長く
+				fvec(fd) = d; // できるだけ長く
 
 				for( auto& w : word ) {
 
 					if( isDelimiter(w) ) {
-						fvec(yval*6+2) = 0.0;
+						fvec(fd) = 0.0;
 						break;
 					}
 
 					for( auto& k : key ) {
 						if( w.find(k) == std::string::npos ) {
-							fvec(yval*6+2) += 1.0;
+							fvec(fd) += 1.0;
 							break;
+						} else {
+							fvec(fd) = 0.0;
+							goto EXIT;
 						}
 					}
 				}
+			EXIT:;
 			}
+
+			fd++;
 
 			{ // 施設名
 
-				fvec(yval*6+3) = d; // できるだけ長く
+				fvec(fd) = d; // できるだけ長く
 
 				for( auto& w : word ) {
 
@@ -360,11 +373,13 @@ namespace App {
 					// }
 
 					if( isDelimiter(w) ) {
-						fvec(yval*6+3) = 0.0;
+						fvec(fd) = 0.0;
 						break;
 					}
 				}
 			}
+
+			fd++;
 
 			{ // 階数
 
@@ -373,13 +388,13 @@ namespace App {
 				for( auto& w : word ) {
 
 					if( isDelimiter(w) ) {
-						fvec(yval*6+4) = 0.0;
+						fvec(fd) = 0.0;
 						break;
 					}
 
 					for( auto& k : key ) {
 						if( w == k ) {
-							fvec(yval*6+4) += 1.0;
+							fvec(fd) += 1.0;
 							break;
 						}
 					}
@@ -389,7 +404,7 @@ namespace App {
 			{ // デリミタ
 
 				if( d == 1 && isDelimiter(word[0]) ) {
-					fvec(yval*6+5) += 1.0;
+					fvec(fd) += 1.0;
 				}
 			}
 
@@ -402,7 +417,7 @@ namespace App {
 		}
 
 		// y2y
-		fvec(yDim*6+ydval*yDim+yval) = 1.0;
+		fvec(yDim*FEATURE_DIM+ydval*yDim+yval) = 1.0;
 
 		// y2l
 		// try {

@@ -40,25 +40,20 @@ FILES1=check6.json
 MATRIX=../../word2vec/wakati.bin
 
 test3:
-	@for file in $(FILES1); do \
-		echo "###### $$file ######"; \
-	 	echo "$(SEMICRF) -t $$file -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-6 --w2v-matrix ${MATRIX} -a ${DIC} && echo"; \
-	 	time $(SEMICRF) -t $$file -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-6 --w2v-matrix ${MATRIX} -a ${DIC} && echo "OK" || echo "ERROR"; \
-	 	echo "$(SEMICRF) -i $$file -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} > tmp2"; \
-	 	$(SEMICRF) -i $$file -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} > tmp2 && echo "OK" || echo "ERROR"; \
-	 	jq '.pages[].data[][][]' $$file > r1; \
-	 	jq '.pages[].data[][][]' tmp2 > r2; \
-	 	cat r1 | awk '{ if(k++ % 4 == 2) print $$1 }' > a; \
-	 	cat r2 | awk '{ if(k++ % 4 == 2) print $$1 }' > b; \
-	 	echo "diff -c a b"; \
-	 	diff -c a b && echo "OK" || echo "ERROR"; \
-	 	paste a b | awk '{ if( $$1 == $$2 ) count++; total++; } END{ print count/total*100,"%"; }'; \
-	 	$(SEMICRF) -i $$file -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} --enable-simple-prediction-output > simple_output.json && echo "OK" || echo "ERROR"; \
-	 	diff -c answer/simple_output.json simple_output.json && echo "OK" || echo "ERROR"; \
-	 	$(SEMICRF) -i check10.json -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} --enable-simple-prediction-output > check10_output.json && echo "OK" || echo "ERROR"; \
-	 	diff -c answer/check10_output.json check10_output.json && echo "OK" || echo "ERROR"; \
-	 	rm tmp1 tmp2; \
-	done;
+	time $(SEMICRF) -t ${FILES1} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-6 --w2v-matrix ${MATRIX} -a ${DIC} && echo "OK" || echo "ERROR"
+	$(SEMICRF) -i ${FILES1} -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} > tmp2 && echo "OK" || echo "ERROR"
+	jq '.pages[].data[][][]' ${FILES1} > r1
+	jq '.pages[].data[][][]' tmp2 > r2
+	cat r1 | awk '{ if(k++ % 4 == 2) print $$1 }' > a
+	cat r2 | awk '{ if(k++ % 4 == 2) print $$1 }' > b
+	echo "diff -c a b"
+	diff -c a b && echo "OK" || echo "ERROR"
+	paste a b | awk '{ if( $$1 == $$2 ) count++; total++; } END{ print count/total*100,"%"; }'
+	$(SEMICRF) -i ${FILES1} -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} --enable-simple-prediction-output > simple_output.json && echo "OK" || echo "ERROR"
+	diff -c answer/simple_output.json simple_output.json && echo "OK" || echo "ERROR"
+	$(SEMICRF) -i check10.json -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} --enable-simple-prediction-output > check10_output.json && echo "OK" || echo "ERROR"
+	diff -c answer/check10_output.json check10_output.json && echo "OK" || echo "ERROR"
+	rm tmp1 tmp2
 
 learn:
 	../gen -i p0.json -r 32 -l 16 > tmp1
