@@ -55,6 +55,14 @@ test3:
 	diff -c answer/check10_output.json check10_output.json && echo "OK" || echo "ERROR"
 	rm tmp1 tmp2
 
+FILES2=check7.json
+
+test4:
+	time $(SEMICRF) -t ${FILES2} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-6 --w2v-matrix ${MATRIX} -a ${DIC} && echo "OK" || echo "ERROR"
+	$(SEMICRF) -i check10.json -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} --enable-simple-prediction-output > check11_output.json && echo "OK" || echo "ERROR"
+	diff -c answer/check11_output.json check11_output.json && echo "OK" || echo "ERROR"
+	rm tmp1
+
 learn:
 	../gen -i p0.json -r 32 -l 16 > tmp1
 	time $(SEMICRF) -t tmp1 -w tmp2 --log-level 2 -e0 1.0e-3 -e1 1.0e-4 --regularization-parameter 1e-3 && echo "OK" || echo "ERROR"
@@ -132,6 +140,7 @@ update:
 	-cp body1.txt answer/body1.txt
 	-cp simple_output.json answer/simple_output.json
 	-cp check10_output.json answer/check10_output.json
+	-cp check11_output.json answer/check11_output.json
 	-cp bdc2e_result.json answer/bdc2e_result.json
 
 clean:
