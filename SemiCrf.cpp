@@ -403,48 +403,57 @@ namespace SemiCrf {
 	void Learner::computeGrad(double& L, std::vector<double>& dL, bool grad)
 	{
 		for( auto& file : *datas ) {
-			for( auto& data : file.second ) {
 
-				current_data = data;
-				current_wgtab = createCacheTable(cacheSize);
-				hit = miss = 0;
+			try {
 
-				double WG = 0.0;
-				auto Z = computeZ();
-				auto Gs = computeG(WG);
+				for( auto& data : file.second ) {
 
-				L += WG - log(Z);
+					current_data = data;
+					current_wgtab = createCacheTable(cacheSize);
+					hit = miss = 0;
 
-				if( !(flg & DISABLE_REGULARIZATION) ) {
-					double w2 = 0.0;
-					for( auto& w : *weights ) {
-						w2 += w*w;
-					}
-					w2 *= rp;
-					L -= w2;
-				}
+					double WG = 0.0;
+					auto Z = computeZ();
+					auto Gs = computeG(WG);
 
-				if( flg & ENABLE_LIKELIHOOD_ONLY ) {
-					std::cerr << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z) << std::endl;
-				}
+					L += WG - log(Z);
 
-				if( grad ) {
-
-					auto Gms = computeGm(Z);
-					auto idL = dL.begin();
-					auto iw = weights->begin();
-					for( int k = 0; k < dim; k++, idL++, iw++ ) {
-						(*idL) += Gs[k] - Gms[k];
-
-						if( !(flg & DISABLE_REGULARIZATION) ) {
-							double dw2 = 2.0 * rp * (*iw);
-							(*idL) -= dw2;
+					if( !(flg & DISABLE_REGULARIZATION) ) {
+						double w2 = 0.0;
+						for( auto& w : *weights ) {
+							w2 += w*w;
 						}
-
-						Logger::trace() << "dL(" << k << ")=" << *idL;
+						w2 *= rp;
+						L -= w2;
 					}
+
+					if( flg & ENABLE_LIKELIHOOD_ONLY ) {
+						std::cerr << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z) << std::endl;
+					}
+
+					if( grad ) {
+
+						auto Gms = computeGm(Z);
+						auto idL = dL.begin();
+						auto iw = weights->begin();
+						for( int k = 0; k < dim; k++, idL++, iw++ ) {
+							(*idL) += Gs[k] - Gms[k];
+
+							if( !(flg & DISABLE_REGULARIZATION) ) {
+								double dw2 = 2.0 * rp * (*iw);
+								(*idL) -= dw2;
+							}
+
+							Logger::trace() << "dL(" << k << ")=" << *idL;
+						}
+					}
+					Logger::trace() << "cache_hit_rate=" << (double)hit/(double)(miss+hit);
 				}
-				Logger::trace() << "cache_hit_rate=" << (double)hit/(double)(miss+hit);
+
+			} catch(Error& e) {
+				std::stringstream ss;
+				ss << file.first << ": " << e.what();
+				throw Error(ss.str());
 			}
 		}
 	}
