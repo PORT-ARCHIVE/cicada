@@ -91,7 +91,9 @@ void Options::parse(int argc, char *argv[])
 			} else if( arg == "--log-level" ) {
 				logLevel = boost::lexical_cast<int>(argv[++i]);
 			} else {
-				throw Error("unknown option specified");
+				std::stringstream ss;
+				ss << "unknown option specified: " << arg;
+				throw Error(ss.str());
 			}
 		}
 
