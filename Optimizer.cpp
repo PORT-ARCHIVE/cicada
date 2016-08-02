@@ -1,5 +1,6 @@
 // © 2016 PORT INC.
 
+#include <sstream>
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/format.hpp>
 #include "Optimizer.hpp"
@@ -51,9 +52,13 @@ namespace Optimizer {
 				x1 = x + beta1*d;
 			}
 			if( counter++ == maxIteration ) {
-				std::string msg("avoidDivergence: iteration limit");
-				Logger::info(msg.c_str());
-				throw Error(msg);
+				std::stringstream ss;
+				ss << "avoidDivergence: iteration limit: alpha=" << beta1;
+				throw Error(ss.str());
+			} else if( beta1 < minBeta ) {
+				std::stringstream ss;
+				ss << "avoidDivergence: too small alpha";
+				throw Error(ss.str());
 			}
 		}
 
