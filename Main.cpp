@@ -74,6 +74,8 @@ void Options::parse(int argc, char *argv[])
 				cacheSize = boost::lexical_cast<int>(argv[++i]);
 			} else if( arg == "--enable-likelihood-only" ) {
 				flg |= SemiCrf::ENABLE_LIKELIHOOD_ONLY;
+			} else if( arg == "--enable-exp-limit" ) {
+				flg |= SemiCrf::ENABLE_EXP_LIMIT;
 			} else if( arg == "--disable-adagrad" ) {
 				flg |= SemiCrf::DISABLE_ADAGRAD;
 			} else if( arg == "--disable-date-version" ) {
