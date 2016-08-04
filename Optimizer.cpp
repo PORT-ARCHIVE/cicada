@@ -42,6 +42,7 @@ namespace Optimizer {
 		int counter = 0;
 		double beta1 = beta;
 		vector x1 = x + beta1*d;
+		std::string msg;
 
 		while(1) {
 			try {
@@ -50,13 +51,16 @@ namespace Optimizer {
 			} catch(Error& e) {
 				beta1 *= tau;
 				x1 = x + beta1*d;
+				msg = e.what();
 			}
 			if( counter++ == maxIteration ) {
 				std::stringstream ss;
+				ss << msg << ": ";
 				ss << "avoidDivergence: iteration limit: alpha=" << beta1;
 				throw Error(ss.str());
 			} else if( beta1 < minBeta ) {
 				std::stringstream ss;
+				ss << msg << ": ";
 				ss << "avoidDivergence: too small alpha";
 				throw Error(ss.str());
 			}
