@@ -186,6 +186,8 @@ namespace SemiCrf {
 			int i,
 			int d,
 			uvector& gs	);
+
+		void exp_numerical_error(double arg);
 	};
 
 	// 学習器

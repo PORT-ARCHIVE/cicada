@@ -259,6 +259,23 @@ namespace SemiCrf {
 		return v;
 	}
 
+	void Algorithm::exp_numerical_error(double arg)
+	{
+		std::stringstream ss;
+		ss << "numerical error: large arg of exp: " << arg;
+		ss << ", w: ";
+		for( auto w : *weights ) {
+			ss << w << ",";
+		}
+		ss << " v: ";
+		int s = weights->size();
+		for( int i = 0; i < s; i++ ) {
+			ss << gs[i];
+			if( i != s-1 ) ss << ",";
+		}
+		throw Error(ss.str());
+	}
+
 	//// Learner ////
 
 	decltype( std::make_shared<Algorithm>() ) createLearner(int arg)
@@ -393,48 +410,57 @@ namespace SemiCrf {
 	void Learner::computeGrad(double& L, std::vector<double>& dL, bool grad)
 	{
 		for( auto& file : *datas ) {
-			for( auto& data : file.second ) {
 
-				current_data = data;
-				current_wgtab = createCacheTable(cacheSize);
-				hit = miss = 0;
+			try {
 
-				double WG = 0.0;
-				auto Z = computeZ();
-				auto Gs = computeG(WG);
+				for( auto& data : file.second ) {
 
-				L += WG - log(Z);
+					current_data = data;
+					current_wgtab = createCacheTable(cacheSize);
+					hit = miss = 0;
 
-				if( !(flg & DISABLE_REGULARIZATION) ) {
-					double w2 = 0.0;
-					for( auto& w : *weights ) {
-						w2 += w*w;
-					}
-					w2 *= rp;
-					L -= w2;
-				}
+					double WG = 0.0;
+					auto Z = computeZ();
+					auto Gs = computeG(WG);
 
-				if( flg & ENABLE_LIKELIHOOD_ONLY ) {
-					std::cerr << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z) << std::endl;
-				}
+					L += WG - log(Z);
 
-				if( grad ) {
-
-					auto Gms = computeGm(Z);
-					auto idL = dL.begin();
-					auto iw = weights->begin();
-					for( int k = 0; k < dim; k++, idL++, iw++ ) {
-						(*idL) += Gs[k] - Gms[k];
-
-						if( !(flg & DISABLE_REGULARIZATION) ) {
-							double dw2 = 2.0 * rp * (*iw);
-							(*idL) -= dw2;
+					if( !(flg & DISABLE_REGULARIZATION) ) {
+						double w2 = 0.0;
+						for( auto& w : *weights ) {
+							w2 += w*w;
 						}
-
-						Logger::trace() << "dL(" << k << ")=" << *idL;
+						w2 *= rp;
+						L -= w2;
 					}
+
+					if( flg & ENABLE_LIKELIHOOD_ONLY ) {
+						std::cerr << boost::format("L= %+10.6e WG= %+10.6e logZ= %+10.6e") % L % WG % log(Z) << std::endl;
+					}
+
+					if( grad ) {
+
+						auto Gms = computeGm(Z);
+						auto idL = dL.begin();
+						auto iw = weights->begin();
+						for( int k = 0; k < dim; k++, idL++, iw++ ) {
+							(*idL) += Gs[k] - Gms[k];
+
+							if( !(flg & DISABLE_REGULARIZATION) ) {
+								double dw2 = 2.0 * rp * (*iw);
+								(*idL) -= dw2;
+							}
+
+							Logger::trace() << "dL(" << k << ")=" << *idL;
+						}
+					}
+					Logger::trace() << "cache_hit_rate=" << (double)hit/(double)(miss+hit);
 				}
-				Logger::trace() << "cache_hit_rate=" << (double)hit/(double)(miss+hit);
+
+			} catch(Error& e) {
+				std::stringstream ss;
+				ss << file.first << ": " << e.what();
+				throw Error(ss.str());
 			}
 		}
 	}
@@ -526,7 +552,13 @@ namespace SemiCrf {
 
 			tmp /= Z;
 			for( int k = 0; k < dim; k++ ) {
-				Gms.push_back(tmp(k));
+				double v = tmp(k);
+				if( std::isinf(v) || std::isnan(v) ) {
+					std::stringstream ss;
+					ss << "numerical problem in " << k << "th component of Gm: " << v;
+					throw Error(ss.str());
+				}
+				Gms.push_back(v);
 				Logger::trace() << "Gm(" << k << ")=" << tmp(k);
 			}
 		}
@@ -560,7 +592,7 @@ namespace SemiCrf {
 						auto wg = computeWG(y, yd, i, d, gs);
 						v += alp*exp(wg);
 						if( std::isinf(v) || std::isnan(v) ) {
-							throw Error("numerical problem");
+							exp_numerical_error(wg);
 						}
 					}
 				}
@@ -608,7 +640,7 @@ namespace SemiCrf {
 						double cof = eta(i-d, yd, k) + alpha(i-d, yd) * gsk;
 						v += cof*exp(wg);
 						if( std::isinf(v) || std::isnan(v) ) {
-							throw Error("numerical problem");
+							exp_numerical_error(wg);
 						}
 					}
 				}
@@ -658,7 +690,7 @@ namespace SemiCrf {
 						uvector cof = (*eta(i-d, yd)) + alpha(i-d, yd) * gs;
 						auto ex = exp(wg);
 						if( std::isinf(ex) || std::isnan(ex) ) {
-							throw Error("numerical problem");
+							exp_numerical_error(wg);
 						}
 						(*sv) += cof*ex;
 					}

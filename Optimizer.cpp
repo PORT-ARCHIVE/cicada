@@ -37,6 +37,22 @@ namespace Optimizer {
 	{
 	}
 
+	void UnconstrainedNLP_::iteration_limit_error(std::string msg, double beta)
+	{
+		std::stringstream ss;
+		if( !msg.empty() ) ss << msg << ": ";
+		ss << "avoidDivergence: iteration limit " << maxIteration << " exceeded: alpha=" << beta;
+		throw Error(ss.str());
+	}
+
+	void UnconstrainedNLP_::minimum_limit_error(std::string msg, double beta)
+	{
+		std::stringstream ss;
+		if( !msg.empty() ) ss << msg << ": ";
+		ss << "avoidDivergence: minimum value limet " << minBeta << " excceded: alpha=" << beta;
+		throw Error(ss.str());
+	}
+
 	double UnconstrainedNLP_::avoidDivergence(vector& d, double& f1)
 	{
 		int counter = 0;
@@ -44,25 +60,39 @@ namespace Optimizer {
 		vector x1 = x + beta1*d;
 		std::string msg;
 
+		// 目的関数で数値的な問題が発生しないかチェックする
 		while(1) {
 			try {
 				f1 = ofunc->value(x1);
 				break;
 			} catch(Error& e) {
+				// 問題があれば beta1 を小さくして再試行
 				beta1 *= tau;
 				x1 = x + beta1*d;
 				msg = e.what();
 			}
 			if( counter++ == maxIteration ) {
-				std::stringstream ss;
-				ss << msg << ": ";
-				ss << "avoidDivergence: iteration limit: alpha=" << beta1;
-				throw Error(ss.str());
+				iteration_limit_error(msg, beta1);
 			} else if( beta1 < minBeta ) {
-				std::stringstream ss;
-				ss << msg << ": ";
-				ss << "avoidDivergence: too small alpha";
-				throw Error(ss.str());
+				minimum_limit_error(msg, beta1);
+			}
+		}
+
+		// 目的関数の勾配で数値的な問題が発生しないかチェックする
+		while(1) {
+			try {
+				ofunc->grad(x1);
+				break;
+			} catch(Error& e) {
+				// 問題があれば beta1 を小さくして再試行
+				beta1 *= tau;
+				x1 = x + beta1*d;
+				msg = e.what();
+			}
+			if( counter++ == maxIteration ) {
+				iteration_limit_error(msg, beta1);
+			} else if( beta1 < minBeta ) {
+				minimum_limit_error(msg, beta1);
 			}
 		}
 
@@ -83,15 +113,10 @@ namespace Optimizer {
 			beta1 *= tau;
 			x1 = x + beta1*d;
 			f1 = ofunc->value(x1);
-			if( beta1 < minBeta ) {
-				std::string msg("liner search stopped: too small alpha");
-				Logger::info(msg.c_str());
-			  	break;
-			}
 			if( counter++ == maxIteration ) {
-				std::string msg("linearSearch: iteration limit");
-				Logger::info(msg.c_str());
-				throw Error(msg);
+				iteration_limit_error("", beta1);
+			} else if( beta1 < minBeta ) {
+				minimum_limit_error("", beta1);
 			}
 			if( Signal::getFlg() ) {
 				std::string msg("liner search interrrputed");

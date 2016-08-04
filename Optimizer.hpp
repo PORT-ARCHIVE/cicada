@@ -54,6 +54,8 @@ namespace Optimizer {
 
 		virtual double avoidDivergence(vector& g, double& f1);
 		virtual double linearSearch(vector& g);
+		void iteration_limit_error(std::string msg, double beta);
+		void minimum_limit_error(std::string msg, double beta);
 
 	protected:
 
