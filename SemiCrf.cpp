@@ -22,12 +22,6 @@
 
 namespace SemiCrf {
 
-	const double limit_value = 512.0;
-
-	double limit(double arg, double lower, double upper) {
-		return std::min(std::max(lower, arg), upper);
-	}
-
 	CheckTable createCheckTable(int capacity)
 	{
 		return std::make_shared<CheckTable_>(capacity, CheckTuple());
@@ -564,7 +558,7 @@ namespace SemiCrf {
 
 						auto alp = alpha(i-d, yd);
 						auto wg = computeWG(y, yd, i, d, gs);
-						v += alp*exp( limit(wg, -limit_value, limit_value) );
+						v += alp*exp(wg);
 						if( std::isinf(v) || std::isnan(v) ) {
 							throw Error("numerical problem");
 						}
@@ -612,7 +606,7 @@ namespace SemiCrf {
 						double wg = computeWG(y, yd, i, d, gs);
 						double gsk = gs(k); // alphaでもgsを使うので書き変わる前にすぐ保存する
 						double cof = eta(i-d, yd, k) + alpha(i-d, yd) * gsk;
-						v += cof*exp( limit(wg, -limit_value, limit_value) );
+						v += cof*exp(wg);
 						if( std::isinf(v) || std::isnan(v) ) {
 							throw Error("numerical problem");
 						}
@@ -662,7 +656,7 @@ namespace SemiCrf {
 						uvector gs(dim, 0.0); // alphaでもgsを使うのでローカルで領域を確保
 						auto wg = computeWG(y, yd, i, d, gs);
 						uvector cof = (*eta(i-d, yd)) + alpha(i-d, yd) * gs;
-						auto ex = exp( limit(wg, -limit_value, limit_value) );
+						auto ex = exp(wg);
 						if( std::isinf(ex) || std::isnan(ex) ) {
 							throw Error("numerical problem");
 						}
