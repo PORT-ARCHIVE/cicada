@@ -291,6 +291,7 @@ namespace App {
 			static std::string city("市");
 			static std::string ward("区");
 			static std::string town("町");
+			static std::string village("村");
 			static std::string county("郡");
 			static std::string sub_ward("字");
 
@@ -304,6 +305,7 @@ namespace App {
 			int is_city = 0;
 			int is_ward = 0;
 			int is_town = 0;
+			int is_village = 0;
 			int is_county = 0;
 			int is_sub_ward = 0;
 
@@ -351,6 +353,13 @@ namespace App {
 					}
 				}
 
+				if( w == village ) {
+					is_village++;
+					if( is_first ) {
+						is_head_prefecture = 1;
+					}
+				}
+
 				if( w == county ) {
 					is_county++;
 					if( is_first ) {
@@ -373,6 +382,7 @@ namespace App {
 			feature += is_city;
 			feature += is_ward;
 			feature += is_town;
+			feature += is_village;
 			feature += is_county;
 			feature += is_sub_ward;
 
@@ -384,6 +394,7 @@ namespace App {
 			} else if( 1 < is_prefecture || // 都,道,府,県を2以上含む
 				1 < is_city || // 市を2以上含む
 				1 < is_town || // 町を2以上含む
+				1 < is_village || // 村を2以上含む
 				1 < is_county || // 郡を2以上含む
 				1 < is_sub_ward || // 区を2以上含む
 				is_head_prefecture ) { // 先頭が行政区分
