@@ -213,6 +213,8 @@ namespace App {
 
 	///////////////
 
+	const int Jpn::FEATURE_DIM = 2;
+
 	Jpn::Jpn()
 	{
 		feature = "JPN";
@@ -276,7 +278,6 @@ namespace App {
 		int d = i - j + 1;
 		uvector fvec(getDim(), 0.0);
 		std::vector<std::string> word;
-		const int FEATURE_DIM = 2;
 
 		try {
 
