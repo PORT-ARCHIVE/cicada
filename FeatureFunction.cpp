@@ -276,7 +276,7 @@ namespace App {
 		int d = i - j + 1;
 		uvector fvec(getDim(), 0.0);
 		std::vector<std::string> word;
-		const int FEATURE_DIM = 6;
+		const int FEATURE_DIM = 2;
 
 		try {
 
@@ -286,131 +286,121 @@ namespace App {
 				// 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
 			}
 
+			static std::vector<std::string> prefectures { "都", "道", "府","県" };
+			static std::string city("市");
+			static std::string ward("区");
+			static std::string town("町");
+			static std::string county("郡");
+			static std::string sub_ward("字");
+
 			int fd = yval*FEATURE_DIM;
+			int feature = 0;
+			int is_delimiter = 0;
+			int is_area = 0;
+			int is_head_area = 0;
+			int is_prefecture = 0;
+			int is_head_prefecture = 0;
+			int is_city = 0;
+			int is_ward = 0;
+			int is_town = 0;
+			int is_county = 0;
+			int is_sub_ward = 0;
 
-			{ // 勤務地指示子
+			bool is_first = true;
+			for( auto& w : word ) {
 
-				static std::string chi("地");
-				static std::string kinmu("勤務");
-				static std::string syozai("所在");
+				if( isDelimiter(w) ) {
+					is_delimiter++;
+				}
 
-				if( word[0] == kinmu || word[0] == syozai ) {
-
-					fvec(fd) += 1.0;
-
-					if( 1 < d && word[1] == chi ) {
-
-						fvec(fd) += 1.0;
+				if( areadic->exist(w) ) {
+					is_area++;
+					if( is_first ) {
+						is_head_area = 1;
 					}
 				}
-			}
 
-			fd++;
-
-			{ // 勤務地
-
-				static std::vector<std::string> key { "都", "道", "府","県","市","区","町","郡","字" };
-
-				for( auto& w : word ) {
-
-					if( isDelimiter(w) ) {
-						fvec(fd) = 0.0;
-						break;
-					}
-
-					if( areadic->exist(w) ) {
-						fvec(fd) += 1.0;
-						continue;
-					}
-
-					for( auto& k : key ) {
-						if( w == k ) {
-							fvec(fd) += 1.0;
-							break;
+				for( auto& p : prefectures ) {
+					if( w == p ) {
+						is_prefecture++;
+						if( is_first ) {
+							is_head_prefecture = 1;
 						}
 					}
 				}
+
+				if( w == city ) {
+					is_city++;
+					if( is_first ) {
+						is_head_prefecture = 1;
+					}
+				}
+
+				if( w == ward ) {
+					is_ward++;
+					if( is_first ) {
+						is_head_prefecture = 1;
+					}
+				}
+
+				if( w == town ) {
+					is_town++;
+					if( is_first ) {
+						is_head_prefecture = 1;
+					}
+				}
+
+				if( w == county ) {
+					is_county++;
+					if( is_first ) {
+						is_head_prefecture = 1;
+					}
+				}
+
+				if( w == sub_ward ) {
+					is_sub_ward++;
+					if( is_first ) {
+						is_head_prefecture = 1;
+					}
+				}
+
+				is_first = false;
+			}
+
+			feature += is_area;
+			feature += is_prefecture;
+			feature += is_city;
+			feature += is_ward;
+			feature += is_town;
+			feature += is_county;
+			feature += is_sub_ward;
+
+			// デリミタを含む、先頭は地名でない　
+			if( 0 < is_delimiter || (!is_head_area ) ) {
+
+				feature = 0; // あり得ない
+
+			} else if( 1 < is_prefecture || // 都,道,府,県を2以上含む
+				1 < is_city || // 市を2以上含む
+				1 < is_town || // 町を2以上含む
+				1 < is_county || // 郡を2以上含む
+				1 < is_sub_ward || // 区を2以上含む
+				is_head_prefecture ) { // 先頭が行政区分
+
+				feature *= 0.1; // 可能性は低い
+			}
+
+			if( 0 < feature ) { // "地名"
+
+				fvec(fd) = feature;
 			}
 
 			fd++;
 
-			{ // 番地
+			if( v == 0 ) { // "なし"
 
-				static std::vector<std::string> key { "丁目","番","地","号","ー","-","0","1","2","3","4","5","6","7","8","9" };
-
-				fvec(fd) = d; // できるだけ長く
-
-				for( auto& w : word ) {
-
-					if( isDelimiter(w) ) {
-						fvec(fd) = 0.0;
-						break;
-					}
-
-					for( auto& k : key ) {
-						if( w.find(k) == std::string::npos ) {
-							fvec(fd) += 1.0;
-							break;
-						} else {
-							fvec(fd) = 0.0;
-							goto EXIT;
-						}
-					}
-				}
-			EXIT:;
+				fvec(fd) = 1;
 			}
-
-			fd++;
-
-			{ // 施設名
-
-				fvec(fd) = d; // できるだけ長く
-
-				for( auto& w : word ) {
-
-					// if( w.find("タワー") != std::string::npos ) {
-					// 	fvec(3) += 1.0;
-					// }
-
-					if( isDelimiter(w) ) {
-						fvec(fd) = 0.0;
-						break;
-					}
-				}
-			}
-
-			fd++;
-
-			{ // 階数
-
-				static std::vector<std::string> key { "F","階","0","1","2","3","4","5","6","7","8","9" };
-
-				for( auto& w : word ) {
-
-					if( isDelimiter(w) ) {
-						fvec(fd) = 0.0;
-						break;
-					}
-
-					for( auto& k : key ) {
-						if( w == k ) {
-							fvec(fd) += 1.0;
-							break;
-						}
-					}
-				}
-			}
-
-			{ // デリミタ
-
-				if( d == 1 && isDelimiter(word[0]) ) {
-					fvec(fd) += 1.0;
-				}
-			}
-
-			// else if( label_map.find(0) != label_map.end() && yval == label_map[0] ) { // 無し
-			// 	fvec(6) += 1.0;
-		    // }
 
 		} catch (...) {
 			throw Error("Jpn::wg: y2x: unexpected exception");
@@ -419,46 +409,8 @@ namespace App {
 		// y2y
 		fvec(yDim*FEATURE_DIM+ydval*yDim+yval) = 1.0;
 
-		// y2l
-		// try {
-
-		// 	auto m = x.getMean(static_cast<int>(y));
-		// 	auto s = x.getVariance(static_cast<int>(y));
-		// 	const double eps = 1.0e-5;
-		// 	double f = 0.0;
-		// 	if( eps < s ) {
-		// 		auto dm = d - m;
-		// 		f = dm*dm/(2.0*s);
-		// 	} else {
-		// 		f = 1.0;
-		// 	}
-
-		// 	fvec(xDim+yval) = f;
-
-		// } catch (...) {
-		// 	throw Error("Jpn::wg: y2l: unexpected exception");
-		// }
-
 		// innner product
 		try {
-
-			// if( Logger::getLevel() < 2 ) {
-
-			// 	std::string segw {""};
-			// 	for( auto& w : word ) {
-			// 		segw += w;
-			// 	}
-
-			// 	Logger::out()->debug( "word: {}", segw );
-
-			// 	std::stringstream ss;
-			// 	ss << ydval << " " << yval << " : " ;
-			// 	for( int i = 0; i < xDim; i++ ) {
-			// 		ss << fvec(i) << " ";
-			// 	}
-
-			// 	Logger::out()->debug( "word: {}", ss.str() );
-			// }
 
 			int k = 0;
 			for( auto w : ws ) {
