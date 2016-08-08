@@ -1,7 +1,10 @@
 [
     {
         "crf_estimate" : {
-            "place" : "高知県高知市"
+            "place" : [
+                "高知県高知市",
+                "車"
+            ]
         },
         "title" : "check10"
     }

@@ -1,42 +1,38 @@
 [
     {
         "crf_estimate" : {
-            "place" : [
-                "熊本県熊本市",
-                "東京都港区芝",
-                "神奈川県横浜市港北区"
-            ]
+            "place" : "東京都世田谷区代田"
         },
         "title" : "check6-0"
     },
     {
         "crf_estimate" : {
-            "place" : "岡山県"
+            "place" : "東京都世田谷区"
         },
         "title" : "check6-1"
     },
     {
         "crf_estimate" : {
-            "place" : [
-                "東京都渋谷区桜丘町",
-                "福岡県福岡市中央区天神"
-            ]
+            "place" : "東京都"
         },
         "title" : "check6-2"
     },
     {
         "crf_estimate" : {
-            "place" : [
-                "神奈川県",
-                "神奈川県三浦市三崎町諸磯"
-            ]
+            "place" : "東京"
         },
         "title" : "check6-3"
     },
     {
         "crf_estimate" : {
-            "place" : "東京都大田区"
+            "place" : "世田谷"
         },
         "title" : "check6-4"
+    },
+    {
+        "crf_estimate" : {
+            "place" : "代田"
+        },
+        "title" : "check6-5"
     }
 ]
