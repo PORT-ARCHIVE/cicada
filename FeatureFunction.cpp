@@ -228,7 +228,7 @@ namespace App {
 
 	int Jpn::getDim()
 	{
-		return (6 + yDim)*yDim;
+		return (FEATURE_DIM + yDim)*yDim;
 	}
 
 	void Jpn::setXDim(int arg)
