@@ -1,0 +1,50 @@
+[
+    {
+        "crf_estimate" : {
+            "place" : "神奈川県横浜市港北"
+        },
+        "title" : "check6-0"
+    },
+    {
+        "crf_estimate" : {
+            "place" : "神奈川県横浜市"
+        },
+        "title" : "check6-0"
+    },
+    {
+        "crf_estimate" : {
+            "place" : "神奈川県"
+        },
+        "title" : "check6-0"
+    },
+    {
+        "crf_estimate" : {
+            "place" : "神奈川"
+        },
+        "title" : "check6-0"
+    },
+    {
+        "crf_estimate" : {
+            "place" : "横浜"
+        },
+        "title" : "check6-0"
+    },
+    {
+        "crf_estimate" : {
+            "place" : "港北"
+        },
+        "title" : "check6-0"
+    },
+    {
+        "crf_estimate" : {
+            "place" : "京都"
+        },
+        "title" : "check6-0"
+    },
+    {
+        "crf_estimate" : {
+            "place" : "大阪"
+        },
+        "title" : "check6-0"
+    }
+]
