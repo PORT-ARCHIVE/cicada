@@ -287,7 +287,7 @@ namespace App {
 				// 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
 			}
 
-			static std::vector<std::string> prefectures { "都", "道", "府","県" };
+			static std::vector<std::string> prefectures { "都","道","府","県" };
 			static std::string city("市");
 			static std::string ward("区");
 			static std::string town("町");
@@ -386,7 +386,7 @@ namespace App {
 			feature += is_county;
 			feature += is_sub_ward;
 
-			// デリミタを含む、先頭は地名でない　
+			// デリミタを含む、先頭は地名でない
 			if( 0 < is_delimiter || (!is_head_area ) ) {
 
 				feature = 0; // あり得ない
@@ -409,7 +409,7 @@ namespace App {
 
 			fd++;
 
-			if( v == 0 ) { // "なし"
+			if( feature == 0 ) { // "なし"
 
 				fvec(fd) = 1;
 			}
