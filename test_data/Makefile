@@ -2,7 +2,7 @@
 CONTAINER_NAME=cicada_container
 
 SEMICRF=../semicrf
-DIC=../../src/mecab/mecab-ipadic-2.7.0-20070801/Noun.place.utf8.csv
+DIC=../dic/Noun.place.utf8.csv
 
 all: test1 test2 test3 test4 learn infer gen_test bd2c_test bd2w_test bdc2e_test
 
