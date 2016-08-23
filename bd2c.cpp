@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
 			} catch(Error& e) {
 				Logger::out()->warn("{}", e.what());
 			}
-			auto body = JsonIO::readString(object, "body_text_split");
+			auto body = JsonIO::readString(object, "body_text");
 			if( body.empty() ) {
 				Logger::warn() << title << ": empty body";
 			}
@@ -184,7 +184,21 @@ int main(int argc, char *argv[])
 			Logger::info() << "transform " << title;
 
 			setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
-			MultiByteTokenizer toknizer(body);
+
+			// mecabのライブラリをコールすると落ちるので仕方なくsystemを使いファイルでやり取りする
+			std::stringstream ss;
+			ss << "echo ";
+			ss << "\"" << body << "\" | mecab -Owakati > tmp.txt";
+			int ret = system(ss.str().c_str());
+			if( WEXITSTATUS(ret) ) {
+				throw Error("failed to invoke mecab");
+			}
+			std::ifstream tmp;
+			open(tmp, "tmp.txt");
+			std::string line;
+			std::getline(tmp, line);
+
+			MultiByteTokenizer toknizer(line);
 			toknizer.setSeparator(" ");
 			toknizer.setSeparator("　");
 			toknizer.setSeparator("\t");
