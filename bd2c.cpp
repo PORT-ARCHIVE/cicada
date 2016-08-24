@@ -216,16 +216,21 @@ int main(int argc, char *argv[])
 			}
 			ss << "echo ";
 			ss << "\"" << body << "\" | mecab -Owakati >";
-			ss << options.tmp_file_path << "/tmp" << options.suffix << ".txt";
+			std::string tmp_file;
+			tmp_file += options.tmp_file_path;
+			tmp_file += "/tmp";
+			tmp_file += options.suffix;
+			tmp_file += ".txt";
+			ss << tmp_file;
 			int ret = system(ss.str().c_str());
 			if( WEXITSTATUS(ret) ) {
 				ss << ": failed to invoke mecab";
 				throw Error(ss.str());
 			}
-			std::ifstream tmp;
-			open(tmp, "tmp.txt");
+			std::ifstream tmp_ifs;
+			open(tmp_ifs, tmp_file.c_str());
 			std::string line;
-			std::getline(tmp, line);
+			std::getline(tmp_ifs, line);
 
 			MultiByteTokenizer toknizer(line);
 			toknizer.setSeparator(" ");
