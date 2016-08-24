@@ -23,6 +23,7 @@ public:
 		, logLevel(2)
 		, logColor(true)
 		, logPattern("")
+		, suffix("")
 		{};
 	void parse(int argc, char *argv[]);
 public:
@@ -33,6 +34,7 @@ public:
 	int logLevel;
 	bool logColor;
 	std::string logPattern;
+	std::string suffix;
 };
 
 void Options::parse(int argc, char *argv[])
@@ -49,6 +51,8 @@ void Options::parse(int argc, char *argv[])
 				labelTableFile = argv[++i];
 			} else if( arg == "-f" ) {
 				feature = argv[++i];
+			} else if( arg == "--set-suffix" ) {
+				suffix = argv[++i];
 			} else if( arg == "--set-log-pattern" ) {
 				logPattern = argv[++i];
 			} else if( arg == "--disable-log-color" ) {
@@ -188,7 +192,8 @@ int main(int argc, char *argv[])
 			// mecabのライブラリをコールすると落ちるので仕方なくsystemを使いファイルでやり取りする
 			std::stringstream ss;
 			ss << "echo ";
-			ss << "\"" << body << "\" | mecab -Owakati > tmp.txt";
+			ss << "\"" << body << "\" | mecab -Owakati >";
+			ss << "tmp" << options.suffix << ".txt";
 			int ret = system(ss.str().c_str());
 			if( WEXITSTATUS(ret) ) {
 				throw Error("failed to invoke mecab");
