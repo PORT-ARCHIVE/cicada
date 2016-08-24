@@ -191,6 +191,13 @@ int main(int argc, char *argv[])
 
 			// mecabのライブラリをコールすると落ちるので仕方なくsystemを使いファイルでやり取りする
 			std::stringstream ss;
+			std::string from("\"");
+			std::string to("\\\"");
+			std::string::size_type pos = body.find("\"");
+			while(pos != std::string::npos){
+				body.replace(pos, from.size(), to);
+				pos = body.find(from, pos + to.size());
+			}
 			ss << "echo ";
 			ss << "\"" << body << "\" | mecab -Owakati >";
 			ss << "tmp" << options.suffix << ".txt";
