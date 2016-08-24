@@ -196,7 +196,8 @@ int main(int argc, char *argv[])
 			ss << "tmp" << options.suffix << ".txt";
 			int ret = system(ss.str().c_str());
 			if( WEXITSTATUS(ret) ) {
-				throw Error("failed to invoke mecab");
+				ss << ": failed to invoke mecab";
+				throw Error(ss.str());
 			}
 			std::ifstream tmp;
 			open(tmp, "tmp.txt");
