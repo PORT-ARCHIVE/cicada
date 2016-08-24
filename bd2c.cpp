@@ -85,6 +85,15 @@ void Options::parse(int argc, char *argv[])
 	}
 }
 
+void replace_string(std::string& body, const std::string& from, const std::string& to)
+{
+	std::string::size_type pos = body.find(from);
+	while(pos != std::string::npos){
+		body.replace(pos, from.size(), to);
+		pos = body.find(from, pos + to.size());
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	int ret = 0x0;
@@ -191,12 +200,15 @@ int main(int argc, char *argv[])
 
 			// mecabのライブラリをコールすると落ちるので仕方なくsystemを使いファイルでやり取りする
 			std::stringstream ss;
-			std::string from("\"");
-			std::string to("\\\"");
-			std::string::size_type pos = body.find("\"");
-			while(pos != std::string::npos){
-				body.replace(pos, from.size(), to);
-				pos = body.find(from, pos + to.size());
+			{
+				std::string from("\"");
+				std::string to("\\\"");
+				replace_string(body, from, to);
+			}
+			{
+				std::string from("!");
+				std::string to("\\!");
+				replace_string(body, from, to);
 			}
 			ss << "echo ";
 			ss << "\"" << body << "\" | mecab -Owakati >";
