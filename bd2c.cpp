@@ -24,6 +24,7 @@ public:
 		, logColor(true)
 		, logPattern("")
 		, suffix("")
+		, tmp_file_path("")
 		{};
 	void parse(int argc, char *argv[]);
 public:
@@ -35,6 +36,7 @@ public:
 	bool logColor;
 	std::string logPattern;
 	std::string suffix;
+	std::string tmp_file_path;
 };
 
 void Options::parse(int argc, char *argv[])
@@ -53,6 +55,8 @@ void Options::parse(int argc, char *argv[])
 				feature = argv[++i];
 			} else if( arg == "--set-suffix" ) {
 				suffix = argv[++i];
+			} else if( arg == "--set-tmp-file-path" ) {
+				tmp_file_path = argv[++i];
 			} else if( arg == "--set-log-pattern" ) {
 				logPattern = argv[++i];
 			} else if( arg == "--disable-log-color" ) {
@@ -212,7 +216,7 @@ int main(int argc, char *argv[])
 			}
 			ss << "echo ";
 			ss << "\"" << body << "\" | mecab -Owakati >";
-			ss << "tmp" << options.suffix << ".txt";
+			ss << options.tmp_file_path << "/tmp" << options.suffix << ".txt";
 			int ret = system(ss.str().c_str());
 			if( WEXITSTATUS(ret) ) {
 				ss << ": failed to invoke mecab";
