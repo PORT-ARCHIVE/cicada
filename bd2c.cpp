@@ -216,7 +216,7 @@ int main(int argc, char *argv[])
 			}
 			{
 				std::string from("`");
-				std::string to("\`");
+				std::string to("\\`");
 				replace_string(body, from, to);
 			}
 			ss << "echo ";
