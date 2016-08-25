@@ -214,6 +214,11 @@ int main(int argc, char *argv[])
 				std::string to("\\!");
 				replace_string(body, from, to);
 			}
+			{
+				std::string from("`");
+				std::string to("\`");
+				replace_string(body, from, to);
+			}
 			ss << "echo ";
 			ss << "\"" << body << "\" | mecab -Owakati >";
 			std::string tmp_file;
