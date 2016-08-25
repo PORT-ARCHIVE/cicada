@@ -195,6 +195,10 @@ int main(int argc, char *argv[])
 			if( body.empty() ) {
 				Logger::warn() << title << ": empty body";
 			}
+			// bodyの中のシングルクォート ' を '"'"' に置き換える
+			std::string from("'");
+			std::string to("'\"'\"'");
+			replace_string(body, from, to);
 
 			///////////////	data
 
@@ -203,34 +207,20 @@ int main(int argc, char *argv[])
 			setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
 
 			// mecabのライブラリをコールすると落ちるので仕方なくsystemを使いファイルでやり取りする
-			std::stringstream ss;
-			{
-				std::string from("\"");
-				std::string to("\\\"");
-				replace_string(body, from, to);
-			}
-			{
-				std::string from("!");
-				std::string to("\\!");
-				replace_string(body, from, to);
-			}
-			{
-				std::string from("`");
-				std::string to("\\`");
-				replace_string(body, from, to);
-			}
-			ss << "echo ";
-			ss << "\"" << body << "\" | mecab -Owakati >";
+			std::stringstream command;
+			command << "echo ";
+			command << "'" << body << "'"; // body を シングルクォート ' で囲む
+			command << " | mecab -Owakati > ";
 			std::string tmp_file;
 			tmp_file += options.tmp_file_path;
 			tmp_file += "/tmp";
 			tmp_file += options.suffix;
 			tmp_file += ".txt";
-			ss << tmp_file;
-			int ret = system(ss.str().c_str());
+			command << tmp_file;
+			int ret = system(command.str().c_str());
 			if( WEXITSTATUS(ret) ) {
-				ss << ": failed to invoke mecab";
-				throw Error(ss.str());
+				command << ": failed to invoke mecab";
+				throw Error(command.str());
 			}
 			std::ifstream tmp_ifs;
 			open(tmp_ifs, tmp_file.c_str());
