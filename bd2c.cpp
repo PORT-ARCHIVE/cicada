@@ -253,10 +253,6 @@ int main(int argc, char *argv[])
 
 			///////////////	data
 
-			// bodyの中のシングルクォート ' を '"'"' に置き換える
-			std::string from("'");
-			std::string to("'\"'\"'");
-			replace_string(body, from, to);
 
 			// body分割
 			std::vector<std::string> bodies;
@@ -265,6 +261,11 @@ int main(int argc, char *argv[])
 			setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
 
 			for( auto& sbd : bodies ) {
+
+				// sbdの中のシングルクォート ' を '"'"' に置き換える
+				std::string from("'");
+				std::string to("'\"'\"'");
+				replace_string(sbd, from, to);
 
 				// mecabのライブラリをコールすると落ちるので仕方なくsystemを使いファイルでやり取りする
 				std::stringstream command;
