@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
 				// std::cout << command.str() << std::endl;
 				int ret = system(command.str().c_str());
 				if( WEXITSTATUS(ret) ) {
-					command << ": failed to invoke mecab";
+					command << ": return value " << WEXITSTATUS(ret) << ": failed to invoke mecab";
 					throw Error(command.str());
 				}
 				std::ifstream tmp_ifs;
