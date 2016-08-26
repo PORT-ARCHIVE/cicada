@@ -1,8 +1,11 @@
 // © 2016 PORT INC.
 
+#include <cstring>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <deque>
+#include <numeric>
 #include <regex>
 #include <boost/lexical_cast.hpp>
 #include "Logger.hpp"
@@ -25,6 +28,8 @@ public:
 		, logPattern("")
 		, suffix("")
 		, tmp_file_path("")
+		, sentence_size(1024)
+		, overlap_size(8)
 		{};
 	void parse(int argc, char *argv[]);
 public:
@@ -37,6 +42,8 @@ public:
 	std::string logPattern;
 	std::string suffix;
 	std::string tmp_file_path;
+	int sentence_size;
+	int overlap_size;
 };
 
 void Options::parse(int argc, char *argv[])
@@ -57,6 +64,10 @@ void Options::parse(int argc, char *argv[])
 				suffix = argv[++i];
 			} else if( arg == "--set-tmp-file-path" ) {
 				tmp_file_path = argv[++i];
+			} else if( arg == "--set-sentence-size" ) {
+				sentence_size = boost::lexical_cast<int>(argv[++i]);
+			} else if( arg == "--set-overlap-size" ) {
+				overlap_size = boost::lexical_cast<int>(argv[++i]);
 			} else if( arg == "--set-log-pattern" ) {
 				logPattern = argv[++i];
 			} else if( arg == "--disable-log-color" ) {
@@ -95,6 +106,49 @@ void replace_string(std::string& body, const std::string& from, const std::strin
 	while(pos != std::string::npos){
 		body.replace(pos, from.size(), to);
 		pos = body.find(from, pos + to.size());
+	}
+}
+
+// bodyを [max_splited_body_size]文字オーバーラップさせて [max_splited_body_size]byte 毎に分割する
+void split_body(std::string& body, std::vector<std::string>& bodies, int max_offset_size, int max_splited_body_size)
+{
+	const char* p = body.c_str();
+	std::string splited_body;
+	std::deque<int> offsets;
+
+	setlocale(LC_CTYPE, "ja_JP.UTF-8");
+
+	int i = 0;
+	while( i < body.size() ) {
+
+		int s = mblen(p, MB_CUR_MAX);
+
+		offsets.push_back(s);
+		if( max_offset_size < offsets.size() ) {
+			offsets.pop_front();
+		}
+
+		int t = i;
+		for( int j = 0; j < s; j++ ) {
+			splited_body.push_back(body[t++]);
+		}
+
+		p += s;
+		i += s;
+
+		if( max_splited_body_size <= splited_body.size() ) {
+			// std::cout << splited_body << std::endl;
+			bodies.push_back(splited_body);
+			splited_body.clear();
+			int offset = std::accumulate(offsets.begin(), offsets.end(), 0);
+			offsets.clear();
+			p -= offset;
+			i -= offset;
+		}
+	}
+
+	if( !splited_body.empty() ) {
+		bodies.push_back(splited_body);
 	}
 }
 
@@ -188,6 +242,7 @@ int main(int argc, char *argv[])
 			std::string title;
 			try {
 				title = JsonIO::readString(object, "title");
+				Logger::info() << "transform " << title;
 			} catch(Error& e) {
 				Logger::out()->warn("{}", e.what());
 			}
@@ -195,89 +250,92 @@ int main(int argc, char *argv[])
 			if( body.empty() ) {
 				Logger::warn() << title << ": empty body";
 			}
+
+			///////////////	data
+
 			// bodyの中のシングルクォート ' を '"'"' に置き換える
 			std::string from("'");
 			std::string to("'\"'\"'");
 			replace_string(body, from, to);
 
-			///////////////	data
-
-			Logger::info() << "transform " << title;
+			// body分割
+			std::vector<std::string> bodies;
+			split_body(body, bodies, options.overlap_size, options.sentence_size);
 
 			setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
 
-			// mecabのライブラリをコールすると落ちるので仕方なくsystemを使いファイルでやり取りする
-			std::stringstream command;
-			command << "echo ";
-			command << "'" << body << "'"; // body を シングルクォート ' で囲む
-			command << " | mecab -Owakati > ";
-			std::string tmp_file;
-			tmp_file += options.tmp_file_path;
-			tmp_file += "/tmp";
-			tmp_file += options.suffix;
-			tmp_file += ".txt";
-			command << tmp_file;
-			int ret = system(command.str().c_str());
-			if( WEXITSTATUS(ret) ) {
-				command << ": failed to invoke mecab";
-				throw Error(command.str());
-			}
-			std::ifstream tmp_ifs;
-			open(tmp_ifs, tmp_file.c_str());
-			std::string line;
-			std::getline(tmp_ifs, line);
+			for( auto& sbd : bodies ) {
 
-			MultiByteTokenizer toknizer(line);
-			toknizer.setSeparator(" ");
-			toknizer.setSeparator("　");
-			toknizer.setSeparator("\t");
-			toknizer.setSeparator("\n"); // T.B.D.
-
-			ujson::array data;
-			ujson::array lines;
-			std::string tok = toknizer.get();
-			std::string tok0 = tok;
-			std::string tok1 = tok;
-
-			std::regex pattern(R"(([0-9]+)\\:([0-9]+_digit))");
-			std::smatch results;
-			if( std::regex_match( tok, results, pattern ) &&
-				results.size() == 3 ) {
-				tok0 = results[1];
-				tok1 = results[2];
-			}
-
-			while( !tok.empty() ) {
-
-				ujson::array line;
-				auto i = matrix->w2i(tok1);
-				std::string ID = boost::lexical_cast<std::string>(i);
-				line.push_back(ID);
-				line.push_back("*");
-				line.push_back("*");
-				line.push_back(tok0);
-				lines.push_back(std::move(line));
-				if( tok == "。" ){ // T.B.D.
-					data.push_back(std::move(lines));
-					lines.clear();
+				// mecabのライブラリをコールすると落ちるので仕方なくsystemを使いファイルでやり取りする
+				std::stringstream command;
+				command << "echo '" << sbd << "' | mecab -Owakati > ";
+				std::string tmp_file;
+				tmp_file += options.tmp_file_path;
+				tmp_file += "/tmp";
+				tmp_file += options.suffix;
+				tmp_file += ".txt";
+				command << tmp_file;
+				// std::cout << command.str() << std::endl;
+				int ret = system(command.str().c_str());
+				if( WEXITSTATUS(ret) ) {
+					command << ": failed to invoke mecab";
+					throw Error(command.str());
 				}
+				std::ifstream tmp_ifs;
+				open(tmp_ifs, tmp_file.c_str());
+				std::string line;
+				std::getline(tmp_ifs, line);
 
-				tok = toknizer.get();
-				tok0 = tok;
-				tok1 = tok;
+				MultiByteTokenizer toknizer(line);
+				toknizer.setSeparator(" ");
+				toknizer.setSeparator("　");
+				toknizer.setSeparator("\t");
+				toknizer.setSeparator("\n"); // T.B.D.
+
+				ujson::array data;
+				ujson::array lines;
+				std::string tok = toknizer.get();
+				std::string tok0 = tok;
+				std::string tok1 = tok;
+
+				std::regex pattern(R"(([0-9]+)\\:([0-9]+_digit))");
+				std::smatch results;
 				if( std::regex_match( tok, results, pattern ) &&
 					results.size() == 3 ) {
 					tok0 = results[1];
 					tok1 = results[2];
 				}
-			}
 
-			auto obj = ujson::object {
-				{ "title", title },
-				{ "data", std::move(data) }
-			};
+				while( !tok.empty() ) {
 
-			out_array.push_back(std::move(obj));
+					ujson::array line;
+					auto i = matrix->w2i(tok1);
+					std::string ID = boost::lexical_cast<std::string>(i);
+					line.push_back(ID);
+					line.push_back("*");
+					line.push_back("*");
+					line.push_back(tok0);
+					lines.push_back(std::move(line));
+
+					tok = toknizer.get();
+					tok0 = tok;
+					tok1 = tok;
+					if( std::regex_match( tok, results, pattern ) &&
+						results.size() == 3 ) {
+						tok0 = results[1];
+						tok1 = results[2];
+					}
+				}
+
+				data.push_back(std::move(lines));
+
+				auto obj = ujson::object {
+					{ "title", title },
+					{ "data", std::move(data) }
+				};
+
+				out_array.push_back(std::move(obj));
+		    }
 		}
 
 		///////////////	output
