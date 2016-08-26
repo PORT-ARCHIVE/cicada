@@ -253,6 +253,8 @@ int main(int argc, char *argv[])
 
 			///////////////	data
 
+			ujson::array data;
+			ujson::array lines;
 
 			// body分割
 			std::vector<std::string> bodies;
@@ -293,8 +295,6 @@ int main(int argc, char *argv[])
 				toknizer.setSeparator("\t");
 				toknizer.setSeparator("\n"); // T.B.D.
 
-				ujson::array data;
-				ujson::array lines;
 				std::string tok = toknizer.get();
 				std::string tok0 = tok;
 				std::string tok1 = tok;
@@ -327,16 +327,16 @@ int main(int argc, char *argv[])
 						tok1 = results[2];
 					}
 				}
-
-				data.push_back(std::move(lines));
-
-				auto obj = ujson::object {
-					{ "title", title },
-					{ "data", std::move(data) }
-				};
-
-				out_array.push_back(std::move(obj));
 		    }
+
+			data.push_back(std::move(lines));
+
+			auto obj = ujson::object {
+				{ "title", title },
+				{ "data", std::move(data) }
+			};
+
+			out_array.push_back(std::move(obj));
 		}
 
 		///////////////	output
