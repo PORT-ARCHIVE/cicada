@@ -911,6 +911,9 @@ namespace SemiCrf {
 
 				int l = labels->size();
 				int s = current_data->getStrs()->size();
+				if( s == 0 ) {
+					continue;
+				}
 				int capacity = l*s;
 
 				current_vctab = createCheckTable(capacity);
