@@ -282,7 +282,8 @@ int main(int argc, char *argv[])
 				int ret = system(command.str().c_str());
 				if( WEXITSTATUS(ret) ) {
 					command << ": return value " << WEXITSTATUS(ret) << ": failed to invoke mecab";
-					throw Error(command.str());
+					Logger::out()->warn(command.str());
+					continue;
 				}
 				std::ifstream tmp_ifs;
 				open(tmp_ifs, tmp_file.c_str());
