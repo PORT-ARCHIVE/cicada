@@ -15,6 +15,7 @@
 #include "JsonIO.hpp"
 #include "W2V.hpp"
 #include "MultiByteTokenizer.hpp"
+#include <mecab.h>
 
 class Options {
 public:
@@ -172,6 +173,10 @@ int main(int argc, char *argv[])
 		Logger::info() << "bd2c 0.0.1";
 		Logger::info() << "Copyright (C) 2016 PORT, Inc.";
 
+		/////////////// mecab
+
+		std::shared_ptr<MeCab::Tagger> tagger(MeCab::createTagger("-Owakati"));
+
 		/////////////// labels
 
 		std::vector<ujson::value> labelArray;
@@ -268,8 +273,10 @@ int main(int argc, char *argv[])
 				std::string from("'");
 				std::string to("'\"'\"'");
 				replace_string(sbd, from, to);
-
-				// mecabのライブラリをコールすると落ちるので仕方なくsystemを使いファイルでやり取りする
+#if 1
+				std::string line(tagger->parse(sbd.c_str()));
+#else
+				// systemを使いファイルでやり取りする
 				std::stringstream command;
 				command << "echo '" << sbd << "' | mecab -Owakati > ";
 				std::string tmp_file;
@@ -289,7 +296,7 @@ int main(int argc, char *argv[])
 				open(tmp_ifs, tmp_file.c_str());
 				std::string line;
 				std::getline(tmp_ifs, line);
-
+#endif
 				MultiByteTokenizer toknizer(line);
 				toknizer.setSeparator(" ");
 				toknizer.setSeparator("　");

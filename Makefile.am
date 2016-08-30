@@ -7,7 +7,7 @@ semicrf_LDFLAGS = -L/usr/local/lib
 #semicrf_LDADD = -lmecab -lstdc++
 semicrf_LDADD = -lstdc++
 gen_LDADD = -lstdc++
-bd2c_LDADD = -lstdc++
+bd2c_LDADD = -L/usr/local/lib -lmecab -lstdc++
 bdc2e_LDADD = -lstdc++
 # ソースコード
 semicrf_SOURCES = Main.cpp SemiCrf.cpp SemiCrfData.cpp FeatureFunction.cpp Logger.cpp MultiByteTokenizer.cpp Error.cpp Optimizer.cpp W2V.cpp ujson.cpp double-conversion.cc JsonIO.cpp Signal.cpp

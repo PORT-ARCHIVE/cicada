@@ -15,8 +15,8 @@ AM_INIT_AUTOMAKE
 cxxflags_save="$CXXFLAGS"
 AC_PROG_CXX
 CXXFLAGS="$cxxflags_save"
-test -n "$CXXFLAGS" || CXXFLAGS="-O2 -std=c++11 -pthread -I../src/spdlog/include -DNDEBUG"
-#test -n "$CXXFLAGS" || CXXFLAGS="-g -std=c++11 -pthread -I../src/spdlog/include"
+test -n "$CXXFLAGS" || CXXFLAGS="-O2 -std=c++11 -pthread -I../src/spdlog/include -I/usr/local/include -DNDEBUG"
+#test -n "$CXXFLAGS" || CXXFLAGS="-g -std=c++11 -pthread -I../src/spdlog/include -I/usr/local/include"
 
 # Checks for libraries.
 
