@@ -1038,26 +1038,26 @@ namespace SemiCrf {
 			maxyd = std::get<3>(tp);
 		}
 
-		std::string centence;
+		std::string sentence;
 		for( auto s : ls ) {
 
 			current_data->getSegments()->push_back(s);
 
 			if( datas->getFeature() == "JPN" && Logger::getLevel() < 2 ) {
-				centence += "[";
-				centence += App::label2String(s->getLabel());
-				centence += ":";
+				sentence += "[";
+				sentence += App::label2String(s->getLabel());
+				sentence += ":";
 				auto st = s->getStart();
 				auto ed = s->getEnd();
 				for( int i = st; i <= ed; ++i ) {
-					centence += " ";
-					centence += current_data->getStrs()->at(i).at(1); // 推論では word は第二カラムに入っている
+					sentence += " ";
+					sentence += current_data->getStrs()->at(i).at(1); // 推論では word は第二カラムに入っている
 				}
-				centence += " ]";
+				sentence += " ]";
 			}
 		}
-		if( !centence.empty() && datas->getFeature() == "JPN" && Logger::getLevel() < 2 ) {
-			Logger::out()->debug("{}", centence);
+		if( !sentence.empty() && datas->getFeature() == "JPN" && Logger::getLevel() < 2 ) {
+			Logger::out()->debug("{}", sentence);
 		}
 	}
 
