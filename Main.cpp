@@ -203,10 +203,15 @@ int main(int argc, char *argv[])
 		Logger::error() << e.what();
 		ret = 0x1;
 
+	} catch(std::bad_alloc) {
+
+		Logger::error() << "memory exhausted";
+		ret = 0x2;
+
 	} catch(std::exception& e) {
 
 		Logger::error() << e.what();
-		ret = 0x2;
+		ret = 0x3;
 
 	} catch(...) {
 
