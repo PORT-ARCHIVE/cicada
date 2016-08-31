@@ -338,9 +338,9 @@ int main(int argc, char *argv[])
 						tok1 = results[2];
 					}
 				}
-		    }
 
-			data.push_back(std::move(lines));
+				data.push_back(std::move(lines));
+		    }
 
 			auto obj = ujson::object {
 				{ "title", title },
