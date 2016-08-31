@@ -269,6 +269,9 @@ int main(int argc, char *argv[])
 
 			for( auto& sbd : bodies ) {
 
+				Logger::out()->trace("sbd size = {}", sbd.size());
+				Logger::out()->trace(sbd);
+
 				// sbdの中のシングルクォート ' を '"'"' に置き換える
 				std::string from("'");
 				std::string to("'\"'\"'");
