@@ -369,17 +369,17 @@ int main(int argc, char *argv[])
 	
 	} catch(Error& e) {
 
-		Logger::error() << e.what();
+		Logger::out()->error("{}", e.what());
 		ret = 0x1;
 
-	} catch(std::bad_alloc) {
+	} catch(std::exception& e) {
 
-		Logger::error() << "memory exhausted";
+		Logger::out()->error("{}", e.what());
 		ret = 0x2;
 
 	} catch(...) {
 
-		Logger::error() << "unexpected exception";
+		Logger::out()->error("unexpected exception");
 		ret = 0x3;
 	}
 

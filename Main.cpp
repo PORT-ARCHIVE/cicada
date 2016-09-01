@@ -200,22 +200,17 @@ int main(int argc, char *argv[])
 
 	} catch(Error& e) {
 
-		Logger::error() << e.what();
+		Logger::out()->error("{}", e.what());
 		ret = 0x1;
-
-	} catch(std::bad_alloc) {
-
-		Logger::error() << "memory exhausted";
-		ret = 0x2;
 
 	} catch(std::exception& e) {
 
-		Logger::error() << e.what();
-		ret = 0x3;
+		Logger::out()->error("{}", e.what());
+		ret = 0x2;
 
 	} catch(...) {
 
-		Logger::error() << "unexpected exception";
+		Logger::out()->error("unexpected exception");
 		ret = 0x3;
 	}
 
