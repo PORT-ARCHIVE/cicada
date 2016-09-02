@@ -270,7 +270,6 @@ namespace App {
 		static std::string county("郡");
 		static std::string sub_ward("字");
 
-		//int fd = yval*FEATURE_DIM;
 		double feature = 0;
 		int is_delimiter = 0;
 		int is_area = 0;
@@ -418,9 +417,9 @@ namespace App {
 			double pf = place_feature(word);
 			double pif = place_indicator_feature(word);
 
-			if( eps < pf ) { // "地名"
+			if( pf < eps && pif < eps ) { // "なし"
 
-				fvec(fd) = pf;
+				fvec(fd) = 1;
 			}
 
 			fd++;
@@ -432,9 +431,9 @@ namespace App {
 
 			fd++;
 
-			if( pf < eps && pif < eps ) { // "なし"
+			if( eps < pf ) { // "地名"
 
-				fvec(fd) = 1;
+				fvec(fd) = pf;
 			}
 
 		} catch (...) {
