@@ -213,7 +213,7 @@ namespace App {
 
 	///////////////
 
-	const int Jpn::FEATURE_DIM = 2;
+	const int Jpn::FEATURE_DIM = 3;
 
 	Jpn::Jpn()
 	{
@@ -260,6 +260,126 @@ namespace App {
 		return false;
 	}
 
+	double Jpn::place_feature(const std::vector<std::string>& word)
+	{
+		static std::vector<std::string> prefectures { "都","道","府","県" };
+		static std::string city("市");
+		static std::string ward("区");
+		static std::string town("町");
+		static std::string village("村");
+		static std::string county("郡");
+		static std::string sub_ward("字");
+
+		//int fd = yval*FEATURE_DIM;
+		double feature = 0;
+		int is_delimiter = 0;
+		int is_area = 0;
+		int is_head_area = 0;
+		int is_prefecture = 0;
+		int is_head_prefecture = 0;
+		int is_city = 0;
+		int is_ward = 0;
+		int is_town = 0;
+		int is_village = 0;
+		int is_county = 0;
+		int is_sub_ward = 0;
+
+		bool is_first = true;
+		for( auto& w : word ) {
+
+			if( isDelimiter(w) ) {
+				is_delimiter++;
+			}
+
+			if( areadic->exist(w) ) {
+				is_area++;
+				if( is_first ) {
+					is_head_area = 1;
+				}
+			}
+
+			for( auto& p : prefectures ) {
+				if( w == p ) {
+					is_prefecture++;
+					if( is_first ) {
+						is_head_prefecture = 1;
+					}
+				}
+			}
+
+			if( w == city ) {
+				is_city++;
+				if( is_first ) {
+					is_head_prefecture = 1;
+				}
+			}
+
+			if( w == ward ) {
+				is_ward++;
+				if( is_first ) {
+					is_head_prefecture = 1;
+				}
+			}
+
+			if( w == town ) {
+				is_town++;
+				if( is_first ) {
+					is_head_prefecture = 1;
+				}
+			}
+
+			if( w == village ) {
+				is_village++;
+				if( is_first ) {
+					is_head_prefecture = 1;
+				}
+			}
+
+			if( w == county ) {
+				is_county++;
+				if( is_first ) {
+					is_head_prefecture = 1;
+				}
+			}
+
+			if( w == sub_ward ) {
+				is_sub_ward++;
+				if( is_first ) {
+					is_head_prefecture = 1;
+				}
+			}
+
+			is_first = false;
+		}
+
+		feature += is_area;
+		feature += is_prefecture;
+		feature += is_city;
+		feature += is_ward;
+		feature += is_town;
+		feature += is_village;
+		feature += is_county;
+		feature += is_sub_ward;
+
+		// デリミタを含む、先頭は地名でない
+		if( 0 < is_delimiter || (!is_head_area ) ) {
+
+			feature = 0; // あり得ない
+
+		} else if( 1 < is_prefecture || // 都,道,府,県を2以上含む
+				   1 < is_city || // 市を2以上含む
+				   1 < is_town || // 町を2以上含む
+				   1 < is_village || // 村を2以上含む
+				   1 < is_county || // 郡を2以上含む
+				   1 < is_sub_ward || // 区を2以上含む
+				   is_head_prefecture ) { // 先頭が行政区分
+
+			feature *= 0.1; // 可能性は低い
+		}
+
+		return feature;
+	}
+
 	double Jpn::wg (
 		Weights& ws,
 		Label y,
@@ -287,120 +407,8 @@ namespace App {
 				// 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
 			}
 
-			static std::vector<std::string> prefectures { "都","道","府","県" };
-			static std::string city("市");
-			static std::string ward("区");
-			static std::string town("町");
-			static std::string village("村");
-			static std::string county("郡");
-			static std::string sub_ward("字");
-
 			int fd = yval*FEATURE_DIM;
-			int feature = 0;
-			int is_delimiter = 0;
-			int is_area = 0;
-			int is_head_area = 0;
-			int is_prefecture = 0;
-			int is_head_prefecture = 0;
-			int is_city = 0;
-			int is_ward = 0;
-			int is_town = 0;
-			int is_village = 0;
-			int is_county = 0;
-			int is_sub_ward = 0;
-
-			bool is_first = true;
-			for( auto& w : word ) {
-
-				if( isDelimiter(w) ) {
-					is_delimiter++;
-				}
-
-				if( areadic->exist(w) ) {
-					is_area++;
-					if( is_first ) {
-						is_head_area = 1;
-					}
-				}
-
-				for( auto& p : prefectures ) {
-					if( w == p ) {
-						is_prefecture++;
-						if( is_first ) {
-							is_head_prefecture = 1;
-						}
-					}
-				}
-
-				if( w == city ) {
-					is_city++;
-					if( is_first ) {
-						is_head_prefecture = 1;
-					}
-				}
-
-				if( w == ward ) {
-					is_ward++;
-					if( is_first ) {
-						is_head_prefecture = 1;
-					}
-				}
-
-				if( w == town ) {
-					is_town++;
-					if( is_first ) {
-						is_head_prefecture = 1;
-					}
-				}
-
-				if( w == village ) {
-					is_village++;
-					if( is_first ) {
-						is_head_prefecture = 1;
-					}
-				}
-
-				if( w == county ) {
-					is_county++;
-					if( is_first ) {
-						is_head_prefecture = 1;
-					}
-				}
-
-				if( w == sub_ward ) {
-					is_sub_ward++;
-					if( is_first ) {
-						is_head_prefecture = 1;
-					}
-				}
-
-				is_first = false;
-			}
-
-			feature += is_area;
-			feature += is_prefecture;
-			feature += is_city;
-			feature += is_ward;
-			feature += is_town;
-			feature += is_village;
-			feature += is_county;
-			feature += is_sub_ward;
-
-			// デリミタを含む、先頭は地名でない
-			if( 0 < is_delimiter || (!is_head_area ) ) {
-
-				feature = 0; // あり得ない
-
-			} else if( 1 < is_prefecture || // 都,道,府,県を2以上含む
-				1 < is_city || // 市を2以上含む
-				1 < is_town || // 町を2以上含む
-				1 < is_village || // 村を2以上含む
-				1 < is_county || // 郡を2以上含む
-				1 < is_sub_ward || // 区を2以上含む
-				is_head_prefecture ) { // 先頭が行政区分
-
-				feature *= 0.1; // 可能性は低い
-			}
+			double feature = place_feature(word);
 
 			if( 0 < feature ) { // "地名"
 
