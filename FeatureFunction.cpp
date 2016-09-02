@@ -380,6 +380,11 @@ namespace App {
 		return feature;
 	}
 
+	double Jpn::place_indicator_feature(const std::vector<std::string>& word)
+	{
+		return 0.0;
+	}
+
 	double Jpn::wg (
 		Weights& ws,
 		Label y,
@@ -391,6 +396,8 @@ namespace App {
 	{
 		assert(0 < xDim);
 		assert(0 < yDim);
+
+		const double eps = 1e-3;
 
 		double v = 0.0;
 		int yval = static_cast<int>(y);
@@ -408,16 +415,24 @@ namespace App {
 			}
 
 			int fd = yval*FEATURE_DIM;
-			double feature = place_feature(word);
+			double pf = place_feature(word);
+			double pif = place_indicator_feature(word);
 
-			if( 0 < feature ) { // "地名"
+			if( eps < pf ) { // "地名"
 
-				fvec(fd) = feature;
+				fvec(fd) = pf;
 			}
 
 			fd++;
 
-			if( feature == 0 ) { // "なし"
+			if( eps < pif ) { // "地名指示子"
+
+				fvec(fd) = pif;
+			}
+
+			fd++;
+
+			if( pf < eps && pif < eps ) { // "なし"
 
 				fvec(fd) = 1;
 			}

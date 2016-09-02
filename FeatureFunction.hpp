@@ -58,6 +58,7 @@ namespace App {
 	private:
 		bool isDelimiter(const std::string& word);
 		double place_feature(const std::vector<std::string>& word);
+		double place_indicator_feature(const std::vector<std::string>& word);
 	private:
 		W2V::Matrix w2vmat;
 		AreaDic	areadic;
