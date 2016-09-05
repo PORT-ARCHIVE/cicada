@@ -381,6 +381,36 @@ namespace App {
 
 	double Jpn::place_indicator_feature(const std::vector<std::string>& word)
 	{
+		static std::string kinmu("勤務");
+		static std::string chi("地");
+		static std::string basyo("場所");
+		static std::string moyorieki0("最寄駅");
+		static std::string moyorieki1("最寄り駅");
+		static std::string access("アクセス");
+		static std::string syozaichi("所在地");
+
+		double feature = 0;
+
+		int i = 0;
+		int s = word.size();
+		for( auto& w : word ) {
+
+			if( w == kinmu && i+1 < s && (
+				word[i+1] == chi ||
+				word[i+1] == basyo ) ) {
+				feature += 1.0;
+			}
+
+			if( w == moyorieki0 ||
+				w == moyorieki1 ||
+				w == access ||
+				w == syozaichi ) {
+				feature += 1.0;
+			}
+
+			i++;
+		}
+
 		return 0.0;
 	}
 
