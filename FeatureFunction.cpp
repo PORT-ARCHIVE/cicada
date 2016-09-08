@@ -384,10 +384,16 @@ namespace App {
 		static std::string kinmu("勤務");
 		static std::string chi("地");
 		static std::string basyo("場所");
+		static std::string saki("先");
+
 		static std::string moyorieki0("最寄駅");
 		static std::string moyorieki1("最寄り駅");
 		static std::string access("アクセス");
 		static std::string syozaichi("所在地");
+		static std::string honnsya("本社");
+		static std::string shisya("支社");
+		static std::string office("オフィス");
+		static std::string jyusyo("住所");
 
 		double feature = 0;
 
@@ -397,21 +403,26 @@ namespace App {
 
 			if( w == kinmu && i+1 < s && (
 				word[i+1] == chi ||
-				word[i+1] == basyo ) ) {
+				word[i+1] == basyo ||
+				word[i+1] == saki ) ) {
 				feature += 1.0;
 			}
 
 			if( w == moyorieki0 ||
 				w == moyorieki1 ||
 				w == access ||
-				w == syozaichi ) {
+				w == syozaichi ||
+				w == honnsya ||
+				w == shisya ||
+				w == office ||
+				w == jyusyo ) {
 				feature += 1.0;
 			}
 
 			i++;
 		}
 
-		return 0.0;
+		return feature;
 	}
 
 	double Jpn::wg (
@@ -454,7 +465,7 @@ namespace App {
 
 			fd++;
 
-			if( eps < pif ) { // "地名指示子"
+			if( eps < pif ) { // "勤務地指示子"
 
 				fvec(fd) = pif;
 			}
