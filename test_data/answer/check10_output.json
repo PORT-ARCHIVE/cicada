@@ -2,8 +2,12 @@
     {
         "crf_estimate" : {
             "place" : [
-                "高知県高知市",
+                "高知県高知",
                 "車"
+            ],
+            "place_indicator" : [
+                "勤務地",
+                "アクセス"
             ]
         },
         "title" : "check10"
