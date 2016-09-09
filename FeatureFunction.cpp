@@ -262,7 +262,8 @@ namespace App {
 
 	double Jpn::place_feature(const std::vector<std::string>& word)
 	{
-		static std::vector<std::string> prefectures { "都","道","府","県" };
+		static std::vector<std::string> prefecture_divisions { "都","道","府","県" };
+		static std::set<std::string> prefecture_names { "北海","青森","岩手","宮城","秋田","山形","福島","茨城","栃木","群馬","埼玉","千葉","東京都","神奈川","新潟","富山","石川","福井","山梨","長野","岐阜","静岡","愛知","三重","滋賀","京都","大阪","兵庫","奈良","和歌山","鳥取","島根","岡山","広島","山口","徳島","香川","愛媛","高知","福岡","佐賀","長崎","熊本","大分","宮崎","鹿児島","沖縄" };
 		static std::string city("市");
 		static std::string ward("区");
 		static std::string town("町");
@@ -283,13 +284,15 @@ namespace App {
 		int is_county = 0;
 		int is_sub_ward = 0;
 		int is_none_area_relate	= 0;
+		int is_prefecture_name = 0;
+		std::string prefecture_name;
 
 		bool is_first = true;
 		for( auto& w : word ) {
 
 			bool is_none_area_relate_check = true;
 
-			for( auto& p : prefectures ) {
+			for( auto& p : prefecture_divisions ) {
 				if( w == p ) {
 					is_prefecture++;
 					if( is_first ) {
@@ -307,6 +310,12 @@ namespace App {
 				if( is_first ) {
 					is_head_area = 1;
 				}
+
+				if( prefecture_names.find(w) != prefecture_names.end() && prefecture_name != w ) {
+					prefecture_name = w;
+				 	is_prefecture_name++;
+				}
+
 				is_none_area_relate_check = false;
 			}
 
@@ -386,7 +395,8 @@ namespace App {
 				   1 < is_village || // 村を2以上含む
 				   1 < is_county || // 郡を2以上含む
 				   1 < is_sub_ward || // 区を2以上含む
-				   is_head_prefecture ) { // 先頭が行政区分
+				   is_head_prefecture || // 先頭が行政区分
+				   1 < is_prefecture_name ) { // 異なる都道府県名を含む
 
 			feature *= 0.1; // 可能性は低い
 		}
@@ -495,7 +505,7 @@ namespace App {
 
 			fd++;
 
-			if( eps < pif ) { // "勤務地指示子"
+			if( eps < pif && pf < eps ) { // "勤務地指示子" ( 勤務地は地名を含まない )
 
 				fvec(fd) = pif;
 			}
