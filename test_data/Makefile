@@ -55,8 +55,6 @@ test3:
 
 FILES2=check12.json
 
-MATRIX=../../word2vec/wakati.bin
-
 test4:
 	time $(SEMICRF) -t ${FILES2} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-4 --regularization-parameter 1e-8 --w2v-matrix ${MATRIX} -a ${DIC} && echo "OK" || echo "ERROR"
 	$(SEMICRF) -i ${FILES2} -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} > tmp2 && echo "OK" || echo "ERROR"
@@ -70,6 +68,20 @@ test4:
 	diff -c answer/check13_output.json check13_output.json && echo "OK" || echo "ERROR"
 	rm tmp1 tmp2
 
+FILES3=check14.json
+
+test4:
+	time $(SEMICRF) -t ${FILES3} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 --w2v-matrix ${MATRIX} -a ${DIC} && echo "OK" || echo "ERROR"
+	$(SEMICRF) -i ${FILES3} -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} > tmp2 && echo "OK" || echo "ERROR"
+	jq '.pages[].data[][][2]' ${FILES3} > r1
+	jq '.pages[].data[][][2]' tmp2 > r2
+	echo "diff -c r1 r2"
+	diff -c r1 r2 && echo "OK" || echo "ERROR"
+#	$(SEMICRF) -i ${FILES3} -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} --enable-simple-prediction-output > simple_output4.json && echo "OK" || echo "ERROR"
+#	diff -c answer/simple_output4.json simple_output4.json && echo "OK" || echo "ERROR"
+#	$(SEMICRF) -i check13.json -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} --enable-simple-prediction-output > check13_output.json && echo "OK" || echo "ERROR"
+#	diff -c answer/check13_output.json check13_output.json && echo "OK" || echo "ERROR"
+#	rm tmp1 tmp2
 
 learn:
 	../gen -i p0.json -r 32 -l 16 > tmp1

@@ -298,6 +298,8 @@ namespace App {
 					if( is_first ) {
 						is_head_prefecture = 1;
 					}
+					is_none_area_relate_check = false;
+					break;
 				}
 			}
 
@@ -516,6 +518,11 @@ namespace App {
 
 				fvec(fd) = pf;
 			}
+
+			// for( auto& s : word ) {
+			// 	std::cout << s;
+			// }
+			// std::cout << " " << pf << " " << pif << std::endl;
 
 		} catch (...) {
 			throw Error("Jpn::wg: y2x: unexpected exception");
