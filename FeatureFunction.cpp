@@ -251,7 +251,7 @@ namespace App {
 
 	bool Jpn::isDelimiter(const std::string& word)
 	{
-		static std::vector<std::string> delmiters { ",","、",":","：","/","／" };
+		static std::vector<std::string> delmiters { ",","、",":","：","/","／","・" };
 		for( auto d : delmiters	) {
 			if( word.find(d) != std::string::npos ) {
 				return true;
@@ -282,20 +282,12 @@ namespace App {
 		int is_village = 0;
 		int is_county = 0;
 		int is_sub_ward = 0;
+		int is_none_area_relate	= 0;
 
 		bool is_first = true;
 		for( auto& w : word ) {
 
-			if( isDelimiter(w) ) {
-				is_delimiter++;
-			}
-
-			if( areadic->exist(w) ) {
-				is_area++;
-				if( is_first ) {
-					is_head_area = 1;
-				}
-			}
+			bool is_none_area_relate_check = true;
 
 			for( auto& p : prefectures ) {
 				if( w == p ) {
@@ -306,11 +298,24 @@ namespace App {
 				}
 			}
 
+			if( isDelimiter(w) ) {
+				is_delimiter++;
+			}
+
+			if( areadic->exist(w) ) {
+				is_area++;
+				if( is_first ) {
+					is_head_area = 1;
+				}
+				is_none_area_relate_check = false;
+			}
+
 			if( w == city ) {
 				is_city++;
 				if( is_first ) {
 					is_head_prefecture = 1;
 				}
+				is_none_area_relate_check = false;
 			}
 
 			if( w == ward ) {
@@ -318,6 +323,7 @@ namespace App {
 				if( is_first ) {
 					is_head_prefecture = 1;
 				}
+				is_none_area_relate_check = false;
 			}
 
 			if( w == town ) {
@@ -325,6 +331,7 @@ namespace App {
 				if( is_first ) {
 					is_head_prefecture = 1;
 				}
+				is_none_area_relate_check = false;
 			}
 
 			if( w == village ) {
@@ -332,6 +339,7 @@ namespace App {
 				if( is_first ) {
 					is_head_prefecture = 1;
 				}
+				is_none_area_relate_check = false;
 			}
 
 			if( w == county ) {
@@ -339,6 +347,7 @@ namespace App {
 				if( is_first ) {
 					is_head_prefecture = 1;
 				}
+				is_none_area_relate_check = false;
 			}
 
 			if( w == sub_ward ) {
@@ -346,9 +355,15 @@ namespace App {
 				if( is_first ) {
 					is_head_prefecture = 1;
 				}
+				is_none_area_relate_check = false;
+			}
+
+			if( is_none_area_relate_check ) {
+				is_none_area_relate++;
 			}
 
 			is_first = false;
+
 		}
 
 		feature += is_area;
@@ -360,8 +375,8 @@ namespace App {
 		feature += is_county;
 		feature += is_sub_ward;
 
-		// デリミタを含む、先頭は地名でない
-		if( 0 < is_delimiter || (!is_head_area ) ) {
+		// デリミタを含む、先頭が地名でない、地名関連語以外を含む
+		if( 0 < is_delimiter || (!is_head_area ) || is_none_area_relate ) {
 
 			feature = 0; // あり得ない
 
@@ -395,7 +410,10 @@ namespace App {
 		static std::string office("オフィス");
 		static std::string jyusyo("住所");
 
-		double feature = 0;
+		static std::vector<std::string> brakets { "(",")","{","}","[","]","（","）","｛","｝","「","」","【","】" };
+
+		double feature = 0.0;
+		unsigned int num_of_brakets = 0;
 
 		int i = 0;
 		int s = word.size();
@@ -419,7 +437,19 @@ namespace App {
 				feature += 1.0;
 			}
 
+			for( auto& b : brakets ) {
+				if( b == w ) {
+					num_of_brakets++;
+					break;
+				}
+			}
+
 			i++;
+		}
+
+		// 括弧が奇数はあり得ない
+		if( num_of_brakets & 0x1 ) {
+			feature	= 0.0;
 		}
 
 		return feature;
