@@ -4,7 +4,7 @@ CONTAINER_NAME=cicada_container
 SEMICRF=../semicrf
 DIC=../dic/Noun.place.utf8.csv
 
-all: test1 test2 test3 test4 learn infer gen_test bd2c_test bd2w_test bdc2e_test
+all: test1 test2 test3 test4 test5 learn infer gen_test bd2c_test bd2w_test bdc2e_test
 
 test1:
 	@echo "###### check0 ######"
@@ -70,7 +70,7 @@ test4:
 
 FILES3=check14.json
 
-test4:
+test5:
 	time $(SEMICRF) -t ${FILES3} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 --w2v-matrix ${MATRIX} -a ${DIC} && echo "OK" || echo "ERROR"
 	$(SEMICRF) -i ${FILES3} -w tmp1 --log-level 3 --w2v-matrix ${MATRIX} -a ${DIC} > tmp2 && echo "OK" || echo "ERROR"
 	jq '.pages[].data[][][2]' ${FILES3} > r1
