@@ -1,6 +1,8 @@
 [
     {
         "crf_estimate" : {
+            "job" : "エンジニア",
+            "job_indicator" : "職種",
             "place" : [
                 "熊本県熊本市",
                 "東京都港区芝",
@@ -12,6 +14,8 @@
     },
     {
         "crf_estimate" : {
+            "job" : "アートディレクター",
+            "job_indicator" : "職種",
             "place" : "岡山県",
             "place_indicator" : "勤務地"
         },
@@ -19,6 +23,8 @@
     },
     {
         "crf_estimate" : {
+            "job" : "メディカルドクター",
+            "job_indicator" : "職務区分",
             "place" : [
                 "東京都渋谷区桜丘町",
                 "福岡県福岡市中央区天神"
@@ -32,6 +38,8 @@
     },
     {
         "crf_estimate" : {
+            "job" : "研究開発エンジニア",
+            "job_indicator" : "業務内容",
             "place" : [
                 "神奈川県",
                 "神奈川県三浦市三崎町諸磯"
