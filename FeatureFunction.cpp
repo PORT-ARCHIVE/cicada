@@ -15,17 +15,17 @@
 
 namespace App {
 
-	AreaDic_::AreaDic_()
+	Dictonary_::Dictonary_()
 	{
-		Logger::trace() << "AreaDic_()";
+		Logger::trace() << "Dictonary_()";
 	}
 
-	AreaDic_::~AreaDic_()
+	Dictonary_::~Dictonary_()
 	{
-		Logger::trace() << "~AreaDic_()";
+		Logger::trace() << "~Dictonary_()";
 	}
 
-	std::string AreaDic_::removePrefecture(std::string area, bool& is_remove) {
+	std::string Dictonary_::removePrefecture(std::string area, bool& is_remove) {
 		is_remove = false;
 		area = area.substr(1, area.size()-2); // 先頭、末尾の"を削除
 		int l = area.size();
@@ -46,9 +46,9 @@ namespace App {
 		return std::move(area);
 	}
 
-	void AreaDic_::read(std::string file)
+	void Dictonary_::read(std::string file)
 	{
-		Logger::trace() << "AreaDic_::read()";
+		Logger::trace() << "Dictonary_::read()";
 
 		typedef boost::char_separator<char> char_separator;
 		typedef boost::tokenizer<char_separator> tokenizer;
@@ -61,7 +61,6 @@ namespace App {
 		std::string line;
 		while( std::getline(ifs, line) ) {
 
-			//std::cout << line << std::endl;
 			char_separator sep(",", "", boost::keep_empty_tokens);
 			tokenizer tokens(line, sep);
 			std::string word = *tokens.begin();
@@ -75,7 +74,7 @@ namespace App {
 	///////////////
 
 	decltype( std::make_shared<FeatureFunction>() )
-	createFeatureFunction(const std::string& feature, const std::string& w2vmat, const std::string& areaDic)
+	createFeatureFunction(const std::string& feature, const std::string& w2vmat, const std::string& areaDic, const std::string& jobDic)
 	{
 		decltype( std::make_shared<FeatureFunction>() ) ff;
 
@@ -95,9 +94,15 @@ namespace App {
 			// jpnff->setMatrix(m);
 
 			if( !areaDic.empty() ) {
-				auto dic = std::make_shared<AreaDic_>();
+				auto dic = std::make_shared<Dictonary_>();
 				dic->read(areaDic);
 				jpnff->setAreaDic(dic);
+			}
+
+			if( !jobDic.empty() ) {
+				auto dic = std::make_shared<Dictonary_>();
+				dic->read(jobDic);
+				jpnff->setJobDic(dic);
 			}
 
 			ff = jpnff;
@@ -110,7 +115,7 @@ namespace App {
 		return ff;
 	}
 
-	bool AreaDic_::exist(std::string word)
+	bool Dictonary_::exist(std::string word)
 	{
 		bool ret = true;
 		if( dic.find(word) == dic.end() ) {
@@ -399,7 +404,17 @@ namespace App {
 
 	double Jpn::job_feature(const std::vector<std::string>& word)
 	{
-		return 0.0;
+		double feature = 0;
+
+		for( auto& w : word ) {
+
+			// 職種
+			if( jobdic.get() && jobdic->exist(w) ) {
+				feature++;
+			}
+		}
+
+		return feature;
 	}
 
 	double Jpn::job_indicator_feature(const std::vector<std::string>& word)

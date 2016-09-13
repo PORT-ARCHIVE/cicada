@@ -19,12 +19,12 @@ namespace App {
 	const int ZERO = 0;
 
 	decltype( std::make_shared<FeatureFunction>() )
-	createFeatureFunction(const std::string& feature, const std::string& w2vmat, const std::string& areaDic);
+	createFeatureFunction(const std::string& feature, const std::string& w2vmat, const std::string& areaDic, const std::string& jobDic);
 
-	class AreaDic_ {
+	class Dictonary_ {
 	public:
-		AreaDic_();
-		virtual ~AreaDic_();
+		Dictonary_();
+		virtual ~Dictonary_();
 		virtual void read(std::string file);
 		bool exist(std::string word);
 	private:
@@ -32,7 +32,8 @@ namespace App {
 		std::set<std::string> dic;
 	};
 
-	typedef std::shared_ptr<AreaDic_> AreaDic;
+	typedef std::shared_ptr<Dictonary_> AreaDic;
+	typedef std::shared_ptr<Dictonary_> JobDic;
 
 	class Digit : public FeatureFunction {
 	public:
@@ -55,6 +56,7 @@ namespace App {
 		virtual double wg(Weights& ws, Label y, Label yd, Data& x, int j, int i, uvector& gs);
 		void setMatrix(W2V::Matrix m) { w2vmat = m; }
 		void setAreaDic(AreaDic dic) { areadic = dic; }
+		void setJobDic(JobDic dic) { jobdic = dic; }
 	private:
 		bool isDelimiter(const std::string& word);
 		double place_feature(const std::vector<std::string>& word);
@@ -64,6 +66,7 @@ namespace App {
 	private:
 		W2V::Matrix w2vmat;
 		AreaDic	areadic;
+		JobDic jobdic;
 		std::set<std::string> unknown_words;
 		const static int FEATURE_DIM;
 		static std::set<std::string> brakets;

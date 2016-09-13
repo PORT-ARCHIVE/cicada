@@ -33,6 +33,7 @@ public:
 	std::string trainingDataFile{""};
 	std::string predictionDataFile{""};
 	std::string areaDicFile{""};
+	std::string jobDicFile{""};
 };
 
 void Options::parse(int argc, char *argv[])
@@ -65,7 +66,8 @@ void Options::parse(int argc, char *argv[])
 				w2vMatrixFile = argv[++i];
 			} else if( arg == "-a" || arg == "--area-dictionary" ) {
 				areaDicFile = argv[++i];
-				flg |= SemiCrf::ENABLE_AREA_FEATURE;
+			} else if( arg == "-j" || arg == "--job-dictionary" ) {
+				jobDicFile = argv[++i];
 			} else if( arg == "--set-optimizer" ) {
 				method = argv[++i];
 			} else if( arg == "--set-log-pattern" ) {
@@ -194,7 +196,7 @@ int main(int argc, char *argv[])
 		}
 
 		auto alg = createAlgorithm(options);
-		alg->preProcess(options.weightsFile, options.initWeightsFile, options.w2vMatrixFile, options.areaDicFile);
+		alg->preProcess(options.weightsFile, options.initWeightsFile, options.w2vMatrixFile, options.areaDicFile, options.jobDicFile);
 		alg->compute();
 		alg->postProcess(options.weightsFile);
 

@@ -21,7 +21,6 @@ namespace SemiCrf {
 		, DISABLE_REGULARIZATION = (0x1 << 3)
 		, DISABLE_WG_CACHE       = (0x1 << 4)
 		, ENABLE_SIMPLE_PREDICTION_OUTPUT = (0x1 << 5)
-		, ENABLE_AREA_FEATURE    = (0x1 << 6)
 	};
 
 	// 重みベクトル
@@ -72,7 +71,6 @@ namespace SemiCrf {
 		int maxLength{-1};
 		std::string feature{""};
 		std::map<int,int> label_map;
-		bool considerArea;
 
 	public:
 
@@ -97,7 +95,6 @@ namespace SemiCrf {
 		decltype(maxLength) getMaxLength() const { return maxLength; }
 		std::add_const<decltype((feature))>::type getFeature() { return feature; }
 		void setLabelMap(const std::map<int,int>& arg) { label_map = arg; }
-		void setAreFeature(decltype(considerArea) arg) { considerArea = arg; }
 	};
 
 	decltype( std::make_shared<FeatureFunction>() ) createFeatureFunction();
@@ -160,7 +157,8 @@ namespace SemiCrf {
 			const std::string& wfile,
 			const std::string& w0file,
 			const std::string& w2vfile,
-			const std::string& areaDicfile ) = 0;
+			const std::string& areaDicfile,
+			const std::string& jobDicfile ) = 0;
 		virtual void postProcess(const std::string& wfile) = 0;
 
 		virtual void setDimension(decltype(dim) arg);
@@ -204,7 +202,8 @@ namespace SemiCrf {
 			const std::string& wfile,
 			const std::string& w0file,
 			const std::string& w2vfile,
-			const std::string& areaDicFile );
+			const std::string& areaDicFile,
+			const std::string& jobDicFile );
 		virtual void postProcess(const std::string& wfile);
 
 	private:
@@ -256,7 +255,8 @@ namespace SemiCrf {
 			const std::string& wfile,
 			const std::string& w0file,
 			const std::string& w2vfile,
-			const std::string& areaDicfile );
+			const std::string& areaDicfile,
+			const std::string& jobDicfile );
 		virtual void postProcess(const std::string& wfile);
 
 	private:
