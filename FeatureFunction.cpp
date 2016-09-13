@@ -213,7 +213,7 @@ namespace App {
 
 	///////////////
 
-	const int Jpn::FEATURE_DIM = 3;
+	const int Jpn::FEATURE_DIM = 5;
 
 	Jpn::Jpn()
 	{
@@ -396,6 +396,16 @@ namespace App {
 		return feature;
 	}
 
+	double Jpn::job_feature(const std::vector<std::string>& word)
+	{
+		return 0.0;
+	}
+
+	double Jpn::job_indicator_feature(const std::vector<std::string>& word)
+	{
+		return 0.0;
+	}
+
 	double Jpn::wg (
 		Weights& ws,
 		Label y,
@@ -428,24 +438,33 @@ namespace App {
 			int fd = yval*FEATURE_DIM;
 			double pf = place_feature(word);
 			double pif = place_indicator_feature(word);
+			double jf = job_feature(word);
+			double jif = job_indicator_feature(word);
 
-			if( pf < eps && pif < eps ) { // "なし"
-
+			if( pf < eps && pif < eps && jf < eps && jif < eps ) { // "なし"
 				fvec(fd) = 1;
 			}
 
 			fd++;
 
-			if( eps < pif && pf < eps ) { // "勤務地指示子" ( 勤務地は地名を含まない )
-
+			if( eps < pif && pf < eps ) { // "勤務地指示子" ( 勤務地は勤務地を含まない )
 				fvec(fd) = pif;
 			}
 
 			fd++;
 
-			if( eps < pf ) { // "地名"
-
+			if( eps < pf ) { // "勤務地"
 				fvec(fd) = pf;
+			}
+
+			if( eps < jif && jf < eps ) { // "職種指示子" ( 職種指示子は職種を含まない )
+				fvec(fd) = jif;
+			}
+
+			fd++;
+
+			if( eps < jf ) { // "職種"
+				fvec(fd) = jf;
 			}
 
 			// for( auto& s : word ) {
