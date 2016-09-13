@@ -66,6 +66,7 @@ namespace App {
 		AreaDic	areadic;
 		std::set<std::string> unknown_words;
 		const static int FEATURE_DIM;
+		static std::set<std::string> brakets;
 	};
 }
 

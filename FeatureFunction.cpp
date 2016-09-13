@@ -249,6 +249,8 @@ namespace App {
 		Logger::trace() << "Jpn::write()";
 	}
 
+	std::set<std::string> Jpn::brakets { "(",")","{","}","[","]","（","）","｛","｝","「","」","【","】" };
+
 	bool Jpn::isDelimiter(const std::string& word)
 	{
 		static std::vector<std::string> delmiters { ",","、",":","：","/","／","・" };
@@ -361,7 +363,6 @@ namespace App {
 		static std::string basyo("場所");
 		static std::string saki("先");
 		static std::set<std::string> place_indicators { "最寄駅", "最寄り駅", "アクセス", "所在地", "本社", "支社", "オフィス", "住所" };
-		static std::set<std::string> brakets { "(",")","{","}","[","]","（","）","｛","｝","「","」","【","】" };
 
 		double feature = 0.0;
 		unsigned int num_of_brakets = 0;
@@ -403,7 +404,32 @@ namespace App {
 
 	double Jpn::job_indicator_feature(const std::vector<std::string>& word)
 	{
-		return 0.0;
+		static std::set<std::string> job_indicators { "募集", "仕事", "業務", "職務", "職種", "区分", "内容", "カテゴリ" };
+
+		double feature = 0.0;
+		unsigned int num_of_brakets = 0;
+
+		int i = 0;
+		int s = word.size();
+		for( auto& w : word ) {
+
+			if( job_indicators.find(w) != job_indicators.end() ) {
+				feature += 1.0;
+			}
+
+			if( brakets.find(w) != brakets.end() ) {
+				num_of_brakets++;
+			}
+
+			i++;
+		}
+
+		// 括弧が奇数はあり得ない
+		if( num_of_brakets & 0x1 ) {
+			feature	= 0.0;
+		}
+
+		return feature;
 	}
 
 	double Jpn::wg (
