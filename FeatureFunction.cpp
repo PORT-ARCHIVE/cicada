@@ -356,6 +356,7 @@ namespace App {
 	double Jpn::place_indicator_feature(const std::vector<std::string>& word)
 	{
 		static std::string kinmu("勤務");
+		static std::string syuugyou("就業");
 		static std::string chi("地");
 		static std::string basyo("場所");
 		static std::string saki("先");
@@ -369,7 +370,7 @@ namespace App {
 		int s = word.size();
 		for( auto& w : word ) {
 
-			if( w == kinmu && i+1 < s && (
+			if( ( w == kinmu || w == syuugyou ) && i+1 < s && (
 				word[i+1] == chi ||
 				word[i+1] == basyo ||
 				word[i+1] == saki ) ) {
