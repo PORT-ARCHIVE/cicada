@@ -424,8 +424,6 @@ namespace App {
 		double feature = 0.0;
 		unsigned int num_of_brakets = 0;
 
-		int i = 0;
-		int s = word.size();
 		for( auto& w : word ) {
 
 			if( job_indicators.find(w) != job_indicators.end() ) {
@@ -435,8 +433,6 @@ namespace App {
 			if( brakets.find(w) != brakets.end() ) {
 				num_of_brakets++;
 			}
-
-			i++;
 		}
 
 		// 括弧が奇数はあり得ない
@@ -498,7 +494,9 @@ namespace App {
 				fvec(fd) = pf;
 			}
 
-			if( eps < jif && jf < eps ) { // "職種指示子" ( 職種指示子は職種を含まない )
+			fd++;
+
+			if( eps < jif ) { // "職種指示子"
 				fvec(fd) = jif;
 			}
 
@@ -507,12 +505,16 @@ namespace App {
 			if( eps < jf ) { // "職種"
 				fvec(fd) = jf;
 			}
-
-			// for( auto& s : word ) {
-			// 	std::cout << s;
-			// }
-			// std::cout << " " << pf << " " << pif << std::endl;
-
+#if 0
+			for( auto& s : word ) {
+				std::cout << s;
+			}
+			std::cout << " ";
+			for( int i = yval*FEATURE_DIM; i < yval*FEATURE_DIM+FEATURE_DIM; i++ ) {
+				std::cout << fvec(i) << " ";
+			}
+			std::cout << std::endl;
+#endif
 		} catch (...) {
 			throw Error("Jpn::wg: y2x: unexpected exception");
 		}
