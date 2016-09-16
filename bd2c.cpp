@@ -27,8 +27,6 @@ public:
 		, logLevel(2)
 		, logColor(true)
 		, logPattern("")
-		, suffix("")
-		, tmp_file_path("")
 		, sentence_size(1024)
 		, overlap_size(8)
 		{};
@@ -41,8 +39,6 @@ public:
 	int logLevel;
 	bool logColor;
 	std::string logPattern;
-	std::string suffix;
-	std::string tmp_file_path;
 	int sentence_size;
 	int overlap_size;
 };
@@ -61,10 +57,6 @@ void Options::parse(int argc, char *argv[])
 				labelTableFile = argv[++i];
 			} else if( arg == "-f" ) {
 				feature = argv[++i];
-			} else if( arg == "--set-suffix" ) {
-				suffix = argv[++i];
-			} else if( arg == "--set-tmp-file-path" ) {
-				tmp_file_path = argv[++i];
 			} else if( arg == "--set-sentence-size" ) {
 				sentence_size = boost::lexical_cast<int>(argv[++i]);
 			} else if( arg == "--set-overlap-size" ) {
@@ -276,30 +268,8 @@ int main(int argc, char *argv[])
 				std::string from("'");
 				std::string to("'\"'\"'");
 				replace_string(sbd, from, to);
-#if 1
+
 				std::string line(tagger->parse(sbd.c_str()));
-#else
-				// systemを使いファイルでやり取りする
-				std::stringstream command;
-				command << "echo '" << sbd << "' | mecab -Owakati > ";
-				std::string tmp_file;
-				tmp_file += options.tmp_file_path;
-				tmp_file += "/tmp";
-				tmp_file += options.suffix;
-				tmp_file += ".txt";
-				command << tmp_file;
-				// std::cout << command.str() << std::endl;
-				int ret = system(command.str().c_str());
-				if( WEXITSTATUS(ret) ) {
-					command << ": return value " << WEXITSTATUS(ret) << ": failed to invoke mecab";
-					Logger::out()->warn(command.str());
-					continue;
-				}
-				std::ifstream tmp_ifs;
-				open(tmp_ifs, tmp_file.c_str());
-				std::string line;
-				std::getline(tmp_ifs, line);
-#endif
 				MultiByteTokenizer toknizer(line);
 				toknizer.setSeparator(" ");
 				toknizer.setSeparator("　");
