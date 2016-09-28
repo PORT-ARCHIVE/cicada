@@ -1,57 +1,89 @@
 [
     {
         "crf_estimate" : {
-            "place" : "神奈川県横浜市港北",
-            "place_indicator" : "勤務地"
+            "place" : [
+                "神奈川県横浜市港北"
+            ],
+            "place_indicator" : [
+                "勤務地"
+            ]
         },
         "title" : "check6-0"
     },
     {
         "crf_estimate" : {
-            "place" : "神奈川県横浜市",
-            "place_indicator" : "勤務先"
+            "place" : [
+                "神奈川県横浜市"
+            ],
+            "place_indicator" : [
+                "勤務先"
+            ]
         },
         "title" : "check6-0"
     },
     {
         "crf_estimate" : {
-            "place" : "神奈川県",
-            "place_indicator" : "所在地"
+            "place" : [
+                "神奈川県"
+            ],
+            "place_indicator" : [
+                "所在地"
+            ]
         },
         "title" : "check6-0"
     },
     {
         "crf_estimate" : {
-            "place" : "神奈川",
-            "place_indicator" : "支社"
+            "place" : [
+                "神奈川"
+            ],
+            "place_indicator" : [
+                "支社"
+            ]
         },
         "title" : "check6-0"
     },
     {
         "crf_estimate" : {
-            "place" : "横浜",
-            "place_indicator" : "アクセス"
+            "place" : [
+                "横浜"
+            ],
+            "place_indicator" : [
+                "アクセス"
+            ]
         },
         "title" : "check6-0"
     },
     {
         "crf_estimate" : {
-            "place" : "港北",
-            "place_indicator" : "勤務地"
+            "place" : [
+                "港北"
+            ],
+            "place_indicator" : [
+                "勤務地"
+            ]
         },
         "title" : "check6-0"
     },
     {
         "crf_estimate" : {
-            "place" : "京都",
-            "place_indicator" : "本社"
+            "place" : [
+                "京都"
+            ],
+            "place_indicator" : [
+                "本社"
+            ]
         },
         "title" : "check6-0"
     },
     {
         "crf_estimate" : {
-            "place" : "大阪",
-            "place_indicator" : "勤務場所"
+            "place" : [
+                "大阪"
+            ],
+            "place_indicator" : [
+                "勤務場所"
+            ]
         },
         "title" : "check6-0"
     }

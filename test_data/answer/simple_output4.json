@@ -1,43 +1,67 @@
 [
     {
         "crf_estimate" : {
-            "place" : "東京都世田谷区代田",
-            "place_indicator" : "勤務地"
+            "place" : [
+                "東京都世田谷区代田"
+            ],
+            "place_indicator" : [
+                "勤務地"
+            ]
         },
         "title" : "check6-0"
     },
     {
         "crf_estimate" : {
-            "place" : "東京都世田谷区",
-            "place_indicator" : "所在地"
+            "place" : [
+                "東京都世田谷区"
+            ],
+            "place_indicator" : [
+                "所在地"
+            ]
         },
         "title" : "check6-1"
     },
     {
         "crf_estimate" : {
-            "place" : "東京都",
-            "place_indicator" : "本社"
+            "place" : [
+                "東京都"
+            ],
+            "place_indicator" : [
+                "本社"
+            ]
         },
         "title" : "check6-2"
     },
     {
         "crf_estimate" : {
-            "place" : "東京",
-            "place_indicator" : "オフィス"
+            "place" : [
+                "東京"
+            ],
+            "place_indicator" : [
+                "オフィス"
+            ]
         },
         "title" : "check6-3"
     },
     {
         "crf_estimate" : {
-            "place" : "世田谷",
-            "place_indicator" : "勤務先"
+            "place" : [
+                "世田谷"
+            ],
+            "place_indicator" : [
+                "勤務先"
+            ]
         },
         "title" : "check6-4"
     },
     {
         "crf_estimate" : {
-            "place" : "代田",
-            "place_indicator" : "勤務場所"
+            "place" : [
+                "代田"
+            ],
+            "place_indicator" : [
+                "勤務場所"
+            ]
         },
         "title" : "check6-5"
     }

@@ -416,10 +416,6 @@ namespace SemiCrf {
 
 					continue;
 
-				} else if( d == 1 ) {
-
-					crf_estimate.push_back( std::move( std::make_pair(il->first, il->second) ) );
-
 				} else {
 
 					ujson::array inner_array;

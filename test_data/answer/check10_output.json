@@ -1,10 +1,18 @@
 [
     {
         "crf_estimate" : {
-            "job" : "機械学習エンジニア",
-            "job_indicator" : "業務内容",
-            "place" : "高知県高知市",
-            "place_indicator" : "(勤務地)"
+            "job" : [
+                "機械学習エンジニア"
+            ],
+            "job_indicator" : [
+                "業務内容"
+            ],
+            "place" : [
+                "高知県高知市"
+            ],
+            "place_indicator" : [
+                "(勤務地)"
+            ]
         },
         "title" : "check10"
     }
