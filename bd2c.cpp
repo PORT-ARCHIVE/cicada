@@ -8,6 +8,7 @@
 #include <numeric>
 #include <regex>
 #include <boost/lexical_cast.hpp>
+#include "mecab.h"
 #include "Logger.hpp"
 #include "Error.hpp"
 #include "FileIO.hpp"
@@ -15,7 +16,6 @@
 #include "JsonIO.hpp"
 #include "W2V.hpp"
 #include "MultiByteTokenizer.hpp"
-#include <mecab.h>
 
 class Options {
 public:
@@ -80,9 +80,9 @@ void Options::parse(int argc, char *argv[])
 		throw Error("no -b specified");
 	}
 
-	if( w2vMatrixFile.empty() ) {
-		throw Error("no -m specified");
-	}
+	// if( w2vMatrixFile.empty() ) {
+	// 	throw Error("no -m specified");
+	// }
 
 	if( labelTableFile.empty() ) {
 		throw Error("no -l specified");
@@ -184,10 +184,8 @@ int main(int argc, char *argv[])
 		/////////////// w2v
 
 		W2V::Matrix matrix(new W2V::Matrix_());
-		{
-			if( options.w2vMatrixFile.empty() ) {
-				throw Error("no w2v matrix file specifed");
-			}
+		if( !options.w2vMatrixFile.empty() ) {
+
 			matrix->read(options.w2vMatrixFile);
 
 			const long long wth0 = 100000;
