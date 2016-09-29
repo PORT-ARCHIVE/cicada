@@ -124,8 +124,8 @@ gen_test:
 
 bd2c_test:
 	@echo "###### bd2c test 1 ######"
-	@echo "../bd2c -b body0.json -w ../../word2vec/wakati.bin -l labels0.json --set-overlap-size 8 --set-sentence-size 1024 > check8.json"
-	@../bd2c -b body0.json -w ../../word2vec/wakati.bin -l labels0.json --set-overlap-size 8 --set-sentence-size 1024 > check8.json && echo "OK" || echo "ERROR"
+	@echo "../bd2c -b body0.json -l labels0.json --set-overlap-size 8 --set-sentence-size 1024 > check8.json"
+	@../bd2c -b body0.json -l labels0.json --set-overlap-size 8 --set-sentence-size 1024 > check8.json && echo "OK" || echo "ERROR"
 	@diff -c answer/check8.json check8.json && echo "OK" || echo "ERROR"
 
 bd2w_test:
