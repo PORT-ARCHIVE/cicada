@@ -145,6 +145,12 @@ void split_body(std::string& body, std::vector<std::string>& bodies, int max_off
 	}
 }
 
+std::string normalize(std::string& body)
+{
+	std::string nbody = body;
+	return std::move(nbody);
+}
+
 int main(int argc, char *argv[])
 {
 	int ret = 0x0;
@@ -241,10 +247,12 @@ int main(int argc, char *argv[])
 			} catch(Error& e) {
 				Logger::out()->warn("{}", e.what());
 			}
-			auto body = JsonIO::readString(object, "body_text");
-			if( body.empty() ) {
+			auto tbody = JsonIO::readString(object, "body_text");
+			if( tbody.empty() ) {
 				Logger::warn() << title << ": empty body";
 			}
+
+			auto body = normalize(tbody);
 
 			///////////////	data
 
