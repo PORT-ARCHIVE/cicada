@@ -29,6 +29,7 @@ public:
 		, logPattern("")
 		, sentence_size(1024)
 		, overlap_size(8)
+		, normalize(true)
 		{};
 	void parse(int argc, char *argv[]);
 public:
@@ -41,6 +42,7 @@ public:
 	std::string logPattern;
 	int sentence_size;
 	int overlap_size;
+	bool normalize;
 };
 
 void Options::parse(int argc, char *argv[])
@@ -65,6 +67,8 @@ void Options::parse(int argc, char *argv[])
 				logPattern = argv[++i];
 			} else if( arg == "--disable-log-color" ) {
 				logColor = false;
+			} else if( arg == "--disable-normalize" ) {
+				normalize = false;
 			} else if( arg == "--log-level" ) {
 				logLevel = boost::lexical_cast<int>(argv[++i]);
 			} else {
@@ -243,13 +247,15 @@ static std::map<std::string,std::string> zen2han_map =
 	{"｝","}"}
 };
 
-std::string zen2han(const std::string& body)
+std::string zen2han(const std::string& body, bool flg)
 {
 	std::string result = body;
-	for( auto& kv : zen2han_map ) {
-		std::string from = kv.first;
-		std::string to = kv.second;
-		replace_string(result, from, to);
+	if( flg ) {
+		for( auto& kv : zen2han_map ) {
+			std::string from = kv.first;
+			std::string to = kv.second;
+			replace_string(result, from, to);
+		}
 	}
 	return std::move(result);
 }
@@ -371,19 +377,15 @@ int main(int argc, char *argv[])
 				Logger::out()->trace("sbd size = {}", sbd.size());
 				Logger::out()->trace(sbd);
 
-				// sbdの中のシングルクォート ' を '"'"' に置き換える
-				std::string from("'");
-				std::string to("'\"'\"'");
-				replace_string(sbd, from, to);
-
 				std::string line(tagger->parse(sbd.c_str()));
 				MultiByteTokenizer toknizer(line);
 				toknizer.setSeparator(" ");
 				toknizer.setSeparator("　");
 				toknizer.setSeparator("\t");
-				toknizer.setSeparator("\n"); // T.B.D.
+				toknizer.setSeparator("\n");
+				toknizer.setSeparator("\r");
 
-				std::string tok = zen2han(toknizer.get());
+				std::string tok = zen2han(toknizer.get(), options.normalize);
 				std::string tok0 = tok;
 				std::string tok1 = tok;
 
@@ -406,7 +408,7 @@ int main(int argc, char *argv[])
 					line.push_back(tok0);
 					lines.push_back(std::move(line));
 
-					tok = zen2han(toknizer.get());
+					tok = zen2han(toknizer.get(), options.normalize);
 					tok0 = tok;
 					tok1 = tok;
 					if( std::regex_match( tok, results, pattern ) &&
