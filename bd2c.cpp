@@ -145,10 +145,113 @@ void split_body(std::string& body, std::vector<std::string>& bodies, int max_off
 	}
 }
 
-std::string normalize(std::string& body)
+static std::map<std::string,std::string> zen2han_map =
 {
-	std::string nbody = body;
-	return std::move(nbody);
+	{"　"," "},
+	{"！","!"},
+	{"”","\""},
+	{"＃","#"},
+	{"＄","$"},
+	{"％","%"},
+	{"＆","&"},
+	{"’","\""},
+	{"（","("},
+	{"）",")"},
+	{"＊","*"},
+	{"＋","+"},
+	{"，",","},
+	{"－","-"},
+	{"．","."},
+	{"／","/"},
+	{"０","0"},
+	{"１","1"},
+	{"２","2"},
+	{"３","3"},
+	{"４","4"},
+	{"５","5"},
+	{"６","6"},
+	{"７","7"},
+	{"８","8"},
+	{"９","9"},
+	{"：",":"},
+	{"；","},"},
+	{"＜","<"},
+	{"＝","="},
+	{"＞",">"},
+	{"？","?"},
+	{"＠","@"},
+	{"Ａ","A"},
+	{"Ｂ","B"},
+	{"Ｃ","C"},
+	{"Ｄ","D"},
+	{"Ｅ","E"},
+	{"Ｆ","F"},
+	{"Ｇ","G"},
+	{"Ｈ","H"},
+	{"Ｉ","I"},
+	{"Ｊ","J"},
+	{"Ｋ","K"},
+	{"Ｌ","L"},
+	{"Ｍ","M"},
+	{"Ｎ","N"},
+	{"Ｏ","O"},
+	{"Ｐ","P"},
+	{"Ｑ","Q"},
+	{"Ｒ","R"},
+	{"Ｓ","S"},
+	{"Ｔ","T"},
+	{"Ｕ","U"},
+	{"Ｖ","V"},
+	{"Ｗ","W"},
+	{"Ｘ","X"},
+	{"Ｙ","Y"},
+	{"Ｚ","Z"},
+	{"［","["},
+	{"￥","\\"},
+	{"］","]"},
+	{"＾","^"},
+	{"＿","_"},
+	{"‘","`"},
+	{"ａ","a"},
+	{"ｂ","b"},
+	{"ｃ","c"},
+	{"ｄ","d"},
+	{"ｅ","e"},
+	{"ｆ","f"},
+	{"ｇ","g"},
+	{"ｈ","h"},
+	{"ｉ","i"},
+	{"ｊ","j"},
+	{"ｋ","k"},
+	{"ｌ","l"},
+	{"ｍ","m"},
+	{"ｎ","n"},
+	{"ｏ","o"},
+	{"ｐ","p"},
+	{"ｑ","q"},
+	{"ｒ","r"},
+	{"ｓ","s"},
+	{"ｔ","t"},
+	{"ｕ","u"},
+	{"ｖ","v"},
+	{"ｗ","w"},
+	{"ｘ","x"},
+	{"ｙ","y"},
+	{"ｚ","z"},
+	{"｛","{"},
+	{"｜","|"},
+	{"｝","}"}
+};
+
+std::string zen2han(const std::string& body)
+{
+	std::string result = body;
+	for( auto& kv : zen2han_map ) {
+		std::string from = kv.first;
+		std::string to = kv.second;
+		replace_string(result, from, to);
+	}
+	return std::move(result);
 }
 
 int main(int argc, char *argv[])
@@ -247,12 +350,10 @@ int main(int argc, char *argv[])
 			} catch(Error& e) {
 				Logger::out()->warn("{}", e.what());
 			}
-			auto tbody = JsonIO::readString(object, "body_text");
-			if( tbody.empty() ) {
+			auto body = JsonIO::readString(object, "body_text");
+			if( body.empty() ) {
 				Logger::warn() << title << ": empty body";
 			}
-
-			auto body = normalize(tbody);
 
 			///////////////	data
 
@@ -282,7 +383,7 @@ int main(int argc, char *argv[])
 				toknizer.setSeparator("\t");
 				toknizer.setSeparator("\n"); // T.B.D.
 
-				std::string tok = toknizer.get();
+				std::string tok = zen2han(toknizer.get());
 				std::string tok0 = tok;
 				std::string tok1 = tok;
 
@@ -305,7 +406,7 @@ int main(int argc, char *argv[])
 					line.push_back(tok0);
 					lines.push_back(std::move(line));
 
-					tok = toknizer.get();
+					tok = zen2han(toknizer.get());
 					tok0 = tok;
 					tok1 = tok;
 					if( std::regex_match( tok, results, pattern ) &&
