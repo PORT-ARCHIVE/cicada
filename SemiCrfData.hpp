@@ -143,6 +143,7 @@ namespace SemiCrf {
 		virtual void write(std::ostream& output, unsigned int flg) const;
 		virtual void writeJson(std::ostream& output) const;
 		virtual void writeSimpleJson(std::ostream& output) const;
+		virtual void writeDebug(std::ostream& output) const;
 		virtual void setXDim(decltype(xDim) arg) { xDim = arg; }
 		virtual void setYDim(decltype(yDim) arg) { yDim = arg; }
 		virtual decltype(xDim) getXDim() const { return xDim; }
