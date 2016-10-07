@@ -895,7 +895,7 @@ namespace SemiCrf {
 
 	void Predictor::postProcess(const std::string& wfile)
 	{
-		datas->write(std::cout, (flg & ENABLE_SIMPLE_PREDICTION_OUTPUT));
+		datas->write(std::cout, flg);
 	}
 
 	void Predictor::compute()

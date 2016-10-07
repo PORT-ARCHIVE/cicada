@@ -370,7 +370,7 @@ namespace SemiCrf {
 			std::string word;
 			for( int i = s; i <= e; i++ ) {
 				if( strs->at(i).size() < 2 ) {
-					throw Error("option '--enable-simple-prediction-output' not supported");
+					throw Error("option '--output-format 1' not supported");
 				}
 				word += strs->at(i).at(1); // 推論では word は第二カラムに入っている
 			}
@@ -437,6 +437,35 @@ namespace SemiCrf {
 
 	void Datas::writeDebug(std::ostream& output) const
 	{
+		for( auto& file : *this ) {
+
+			ujson::object crf_estimate;
+			auto title = file.first;
+			output << "[" << title  << "]" << std::endl;
+
+			std::multimap<std::string, std::string> mm;
+			std::set<std::pair<std::string,std::string>> check;
+			for( auto& data : file.second ) {
+
+				for( auto& seg : *data->getSegments() ) {
+
+					auto s = seg->getStart();
+					auto e = seg->getEnd();
+					auto label_id = seg->getLabel(); // (圧縮されていない)元のラベル
+					auto strs = data->getStrs();
+
+					std::string word;
+					for( int i = s; i <= e; i++ ) {
+						if( strs->at(i).size() < 2 ) {
+							throw Error("option '--output-format 2' not supported");
+						}
+						word += strs->at(i).at(1); // 推論では word は第二カラムに入っている
+					}
+
+					output << label_id << ": " << word << std::endl;
+				}
+			}
+		}
 	}
 
 	void Datas::write(std::ostream& output, unsigned int flg) const {
