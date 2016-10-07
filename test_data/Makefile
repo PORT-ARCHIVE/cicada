@@ -47,9 +47,9 @@ test3:
 	jq '.pages[].data[][][2]' tmp2 > r2
 	echo "diff -c r1 r2"
 	diff -c r1 r2 && echo "OK" || echo "ERROR"
-	$(SEMICRF) -i ${FILES1} -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --enable-simple-prediction-output > simple_output3.json && echo "OK" || echo "ERROR"
+	$(SEMICRF) -i ${FILES1} -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --output-format 1 > simple_output3.json && echo "OK" || echo "ERROR"
 	diff -c answer/simple_output3.json simple_output3.json && echo "OK" || echo "ERROR"
-	$(SEMICRF) -i check10.json -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --enable-simple-prediction-output > check10_output.json && echo "OK" || echo "ERROR"
+	$(SEMICRF) -i check10.json -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --output-format 1 > check10_output.json && echo "OK" || echo "ERROR"
 	diff -c answer/check10_output.json check10_output.json && echo "OK" || echo "ERROR"
 	rm tmp1 tmp2
 
@@ -63,9 +63,9 @@ test4:
 	jq '.pages[].data[][][2]' tmp2 > r2
 	echo "diff -c r1 r2"
 	diff -c r1 r2 && echo "OK" || echo "ERROR"
-	$(SEMICRF) -i ${FILES2} -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --enable-simple-prediction-output > simple_output4.json && echo "OK" || echo "ERROR"
+	$(SEMICRF) -i ${FILES2} -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --output-format 1 > simple_output4.json && echo "OK" || echo "ERROR"
 	diff -c answer/simple_output4.json simple_output4.json && echo "OK" || echo "ERROR"
-	$(SEMICRF) -i check13.json -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --enable-simple-prediction-output > check13_output.json && echo "OK" || echo "ERROR"
+	$(SEMICRF) -i check13.json -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --output-format 1 > check13_output.json && echo "OK" || echo "ERROR"
 	diff -c answer/check13_output.json check13_output.json && echo "OK" || echo "ERROR"
 	rm tmp1 tmp2
 
@@ -78,9 +78,9 @@ test5:
 	jq '.pages[].data[][][2]' tmp2 > r2
 	echo "diff -c r1 r2"
 	diff -c r1 r2 && echo "OK" || echo "ERROR"
-#	$(SEMICRF) -i ${FILES3} -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --enable-simple-prediction-output > simple_output4.json && echo "OK" || echo "ERROR"
+#	$(SEMICRF) -i ${FILES3} -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --output-format 1 > simple_output4.json && echo "OK" || echo "ERROR"
 #	diff -c answer/simple_output4.json simple_output4.json && echo "OK" || echo "ERROR"
-#	$(SEMICRF) -i check13.json -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --enable-simple-prediction-output > check13_output.json && echo "OK" || echo "ERROR"
+#	$(SEMICRF) -i check13.json -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --output-format 1 > check13_output.json && echo "OK" || echo "ERROR"
 #	diff -c answer/check13_output.json check13_output.json && echo "OK" || echo "ERROR"
 #	rm tmp1 tmp2
 

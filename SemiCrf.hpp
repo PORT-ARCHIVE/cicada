@@ -21,6 +21,7 @@ namespace SemiCrf {
 		, DISABLE_REGULARIZATION = (0x1 << 3)
 		, DISABLE_WG_CACHE       = (0x1 << 4)
 		, ENABLE_SIMPLE_PREDICTION_OUTPUT = (0x1 << 5)
+		, ENABLE_DEBUG_PREDICTION_OUTPUT = (0x1 << 6)
 	};
 
 	// 重みベクトル
