@@ -17,7 +17,7 @@ public:
 	void parse(int argc, char *argv[]);
 public:
 	bool logColor{true};
-	int flg{0};
+	unsigned int flg{0};
 	int logLevel{2};
 	int maxLength{0};
 	int cacheSize{0xff};

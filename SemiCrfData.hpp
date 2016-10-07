@@ -26,6 +26,16 @@ namespace App {
 
 namespace SemiCrf {
 
+	enum {
+		DISABLE_ADAGRAD          =  0x1
+		, DISABLE_DATE_VERSION   = (0x1 << 1)
+		, ENABLE_LIKELIHOOD_ONLY = (0x1 << 2)
+		, DISABLE_REGULARIZATION = (0x1 << 3)
+		, DISABLE_WG_CACHE       = (0x1 << 4)
+		, ENABLE_SIMPLE_PREDICTION_OUTPUT = (0x1 << 5)
+		, ENABLE_DEBUG_PREDICTION_OUTPUT = (0x1 << 6)
+	};
+
     using uvector = boost::numeric::ublas::vector<double>;
 	using Label = App::Label;
 
@@ -130,7 +140,7 @@ namespace SemiCrf {
 
 		virtual void read(std::istream& input) = 0;
 		virtual void readJson(std::istream& input);
-		virtual void write(std::ostream& output, bool simple_prediction_output=false) const;
+		virtual void write(std::ostream& output, unsigned int flg) const;
 		virtual void writeJson(std::ostream& output) const;
 		virtual void writeSimpleJson(std::ostream& output) const;
 		virtual void setXDim(decltype(xDim) arg) { xDim = arg; }

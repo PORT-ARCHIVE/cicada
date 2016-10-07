@@ -14,16 +14,6 @@
 
 namespace SemiCrf {
 
-	enum {
-		DISABLE_ADAGRAD          =  0x1
-		, DISABLE_DATE_VERSION   = (0x1 << 1)
-		, ENABLE_LIKELIHOOD_ONLY = (0x1 << 2)
-		, DISABLE_REGULARIZATION = (0x1 << 3)
-		, DISABLE_WG_CACHE       = (0x1 << 4)
-		, ENABLE_SIMPLE_PREDICTION_OUTPUT = (0x1 << 5)
-		, ENABLE_DEBUG_PREDICTION_OUTPUT = (0x1 << 6)
-	};
-
 	// 重みベクトル
 	class Weights : public std::vector<double> {
 	protected:

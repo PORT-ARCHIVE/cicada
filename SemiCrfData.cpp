@@ -435,9 +435,9 @@ namespace SemiCrf {
 		output << to_string(array) << std::endl;
 	}
 
-	void Datas::write(std::ostream& output, bool simple_prediction_output) const {
+	void Datas::write(std::ostream& output, unsigned int flg) const {
 		Logger::trace() << "Datas::write()";
-		if( simple_prediction_output ) {
+		if( flg & SemiCrf::ENABLE_SIMPLE_PREDICTION_OUTPUT ) {
 			writeSimpleJson(output);
 		} else {
 			writeJson(output);
