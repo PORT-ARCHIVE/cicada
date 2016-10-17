@@ -43,6 +43,9 @@ namespace App {
 			char_separator sep(",", "", boost::keep_empty_tokens);
 			tokenizer tokens(line, sep);
 			std::string word = *tokens.begin();
+			if( word[0] == '#' ) {
+				continue;
+			}
 			dic.insert(word);
 			Logger::out()->trace( "{}", word );
 		}
