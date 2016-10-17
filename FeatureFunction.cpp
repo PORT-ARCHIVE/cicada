@@ -25,27 +25,6 @@ namespace App {
 		Logger::trace() << "~Dictonary_()";
 	}
 
-	std::string Dictonary_::removePrefecture(std::string area, bool& is_remove) {
-		is_remove = false;
-		area = area.substr(1, area.size()-2); // 先頭、末尾の"を削除
-		int l = area.size();
-		//const char* dist[] = { "都","県","府","道","市","区","町","村","郡","字" };
-		const char* dist[] = { "都","県","府","道","市" };
-		int size = sizeof(dist)/sizeof(char*);
-
-		for( int i = 0; i < size; ++i ) {
-			int s = mblen(dist[i], MB_CUR_MAX);
-			std::string distcpp(dist[i]);
-			if( area.find(distcpp, l-s) != std::string::npos ) {
-				area = area.substr(0, l-s); // 末尾の行政区分を削除
-				is_remove = true;
-				break;
-			}
-		}
-
-		return std::move(area);
-	}
-
 	void Dictonary_::read(std::string file)
 	{
 		Logger::trace() << "Dictonary_::read()";
@@ -64,6 +43,9 @@ namespace App {
 			char_separator sep(",", "", boost::keep_empty_tokens);
 			tokenizer tokens(line, sep);
 			std::string word = *tokens.begin();
+			if( word[0] == '#' ) {
+				continue;
+			}
 			dic.insert(word);
 			Logger::out()->trace( "{}", word );
 		}
