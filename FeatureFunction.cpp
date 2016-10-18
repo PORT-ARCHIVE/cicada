@@ -353,12 +353,8 @@ namespace App {
 
 	double Jpn::place_indicator_feature(const std::vector<std::string>& word)
 	{
-		static std::string kinmu("勤務");
-		static std::string syuugyou("就業");
-		static std::string chi("地");
-		static std::string basyo("場所");
-		static std::string saki("先");
-		static std::set<std::string> place_indicators { "最寄駅", "最寄り駅", "アクセス", "所在地", "本社", "支社", "オフィス", "住所" };
+		static std::set<std::string> place_indicators { "最寄駅", "最寄り駅", "アクセス", "所在地", "本社", "支社", "オフィス", "住所",
+				"勤務地", "勤務先", "勤務場所", "就業先", "就業場所" };
 
 		double feature = 0.0;
 		unsigned int num_of_brakets = 0;
@@ -366,13 +362,6 @@ namespace App {
 		int i = 0;
 		int s = word.size();
 		for( auto& w : word ) {
-
-			if( ( w == kinmu || w == syuugyou ) && i+1 < s && (
-				word[i+1] == chi ||
-				word[i+1] == basyo ||
-				word[i+1] == saki ) ) {
-				feature += 1.0;
-			}
 
 			if( place_indicators.find(w) != place_indicators.end() ) {
 				feature += 1.0;
@@ -396,12 +385,20 @@ namespace App {
 	double Jpn::job_feature(const std::vector<std::string>& word)
 	{
 		double feature = 0;
+		static std::vector<std::string> job_features { "ー", "スト", "シャン", "スタッフ", "エンジニア", "師", "士", "員", "職", "種" };
 
 		for( auto& w : word ) {
 
 			// 職種
 			if( jobdic.get() && jobdic->exist(w) ) {
 				feature++;
+			}
+
+			for( auto& k : job_features ) {
+				if( w.find_last_of(k) == w.size() - k.size() ) {
+					feature += 1.0;
+					break;
+				}
 			}
 		}
 
