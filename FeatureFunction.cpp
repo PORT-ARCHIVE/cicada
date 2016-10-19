@@ -385,6 +385,7 @@ namespace App {
 	double Jpn::job_feature(const std::vector<std::string>& word)
 	{
 		double feature = 0;
+		unsigned int num_of_brakets = 0;
 		static std::vector<std::string> job_features { "ー", "スト", "シャン", "スタッフ", "エンジニア", "師", "士", "員", "職", "種" };
 
 		for( auto& w : word ) {
@@ -400,6 +401,15 @@ namespace App {
 					break;
 				}
 			}
+
+			if( brakets.find(w) != brakets.end() ) {
+				num_of_brakets++;
+			}
+		}
+
+		// 括弧が奇数はあり得ない
+		if( num_of_brakets & 0x1 ) {
+			feature	= 0.0;
 		}
 
 		return feature;
@@ -407,7 +417,7 @@ namespace App {
 
 	double Jpn::job_indicator_feature(const std::vector<std::string>& word)
 	{
-		static std::set<std::string> job_indicators { "募集", "仕事", "業務", "職務", "職種", "区分", "内容", "カテゴリ" };
+		static std::set<std::string> job_indicators { "募集", "仕事", "業務", "職務", "職種", "区分", "内容", "カテゴリ", "科目" };
 
 		double feature = 0.0;
 		unsigned int num_of_brakets = 0;
