@@ -25,7 +25,7 @@ namespace App {
 		Logger::trace() << "~Dictonary_()";
 	}
 
-	void Dictonary_::read(std::string file)
+	void Dictonary_::read(const std::string& file)
 	{
 		Logger::trace() << "Dictonary_::read()";
 
@@ -51,6 +51,70 @@ namespace App {
 		}
 
 		Logger::out()->info( "the number of words: {}", dic.size() );
+	}
+
+	bool Dictonary_::exist(const std::string& word)
+	{
+		bool ret = true;
+		if( dic.find(word) == dic.end() ) {
+			ret = false;
+		}
+		return ret;
+	}
+
+	JobDictonary_::JobDictonary_()
+	{
+		Logger::trace() << "JobDictonary_()";
+	}
+
+	JobDictonary_::~JobDictonary_()
+	{
+		Logger::trace() << "~JobDictonary_()";
+	}
+
+	void JobDictonary_::read(const std::string& file)
+	{
+		Logger::trace() << "Dictonary_::read()";
+
+		typedef boost::char_separator<char> char_separator;
+		typedef boost::tokenizer<char_separator> tokenizer;
+
+		std::ifstream ifs;
+		open(ifs, file);
+		Logger::out()->info( "read {}", file );
+		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
+
+		std::string line;
+		while( std::getline(ifs, line) ) {
+
+			char_separator sep(",","", boost::keep_empty_tokens);
+			tokenizer tokens(line, sep);
+			auto it = tokens.begin();
+			std::string word = *it++;
+			if( word[0] == '#' ) {
+				continue;
+			}
+			std::string flg = *it++;
+			dic.insert(std::make_pair(word,flg));
+			Logger::out()->trace( "{}", word );
+		}
+
+		Logger::out()->info( "the number of words: {}", dic.size() );
+	}
+
+	bool JobDictonary_::exist(const std::string& word, bool& is_person)
+	{
+		bool ret = true;
+		is_person = false;
+
+		auto it = dic.find(word);
+		if( it == dic.end() ) {
+			ret = false;
+		} else if( it->second == "1" ) {
+			is_person = true;
+		}
+
+		return ret;
 	}
 
 	///////////////
@@ -82,7 +146,7 @@ namespace App {
 			}
 
 			if( !jobDic.empty() ) {
-				auto dic = std::make_shared<Dictonary_>();
+				auto dic = std::make_shared<JobDictonary_>();
 				dic->read(jobDic);
 				jpnff->setJobDic(dic);
 			}
@@ -95,15 +159,6 @@ namespace App {
 		}
 
 		return ff;
-	}
-
-	bool Dictonary_::exist(std::string word)
-	{
-		bool ret = true;
-		if( dic.find(word) == dic.end() ) {
-			ret = false;
-		}
-		return ret;
 	}
 
 	///////////////
@@ -200,7 +255,7 @@ namespace App {
 
 	///////////////
 
-	const int Jpn::FEATURE_DIM = 5;
+	const int Jpn::FEATURE_DIM = 6;
 
 	Jpn::Jpn()
 	{
@@ -382,37 +437,49 @@ namespace App {
 		return feature;
 	}
 
-	double Jpn::job_feature(const std::vector<std::string>& word)
+	void Jpn::job_feature(const std::vector<std::string>& word, double& jfp, double& jfw)
 	{
-		double feature = 0;
+		jfp = 0.0;
+		jfw = 0.0;
+
 		unsigned int num_of_brakets = 0;
 		static std::vector<std::string> job_features { "ー", "スト", "シャン", "スタッフ", "エンジニア", "師", "士", "員", "職", "種" };
 
 		for( auto& w : word ) {
 
 			// 職種
-			if( jobdic.get() && jobdic->exist(w) ) {
-				feature++;
+			bool is_person = false;
+			if( jobdic.get() && jobdic->exist(w, is_person) ) {
+				jfp++;
 			}
 
-			for( auto& k : job_features ) {
-				if( w.find_last_of(k) == w.size() - k.size() ) {
-					feature += 1.0;
-					break;
-				}
+			if( is_person ) {
+				jfw++;
 			}
+
+  			// for( auto& k : job_features ) {
+			// 	size_t p = w.find_last_of(k);
+			// 	if( p != std::string::npos & p == w.size() - k.size() ) {
+			// 		feature += 1.0;
+			// 		break;
+			// 	}
+			// }
 
 			if( brakets.find(w) != brakets.end() ) {
 				num_of_brakets++;
 			}
 		}
 
-		// 括弧が奇数はあり得ない
-		if( num_of_brakets & 0x1 ) {
-			feature	= 0.0;
+		if( 1.0 < jfp ) { // 人は表す語は一つ
+			jfp	= 1.0;
 		}
 
-		return feature;
+		// 括弧が奇数はあり得ない
+		// if( num_of_brakets & 0x1 ) {
+		// 	feature	= 0.0;
+		// }
+
+		// return feature;
 	}
 
 	double Jpn::job_indicator_feature(const std::vector<std::string>& word)
@@ -450,7 +517,7 @@ namespace App {
 		int i,
 		uvector& gs )
 	{
-		assert(0 < xDim);
+		//assert(0 < xDim);
 		assert(0 < yDim);
 
 		const double eps = 1e-3;
@@ -473,10 +540,14 @@ namespace App {
 			int fd = yval*FEATURE_DIM;
 			double pf = place_feature(word);
 			double pif = place_indicator_feature(word);
-			double jf = job_feature(word);
+			// double jf = job_feature(word);
+			double jfp = 0.0;
+			double jfw = 0.0;
+			job_feature(word, jfp, jfw);
 			double jif = job_indicator_feature(word);
 
-			if( pf < eps && pif < eps && jf < eps && jif < eps ) { // "なし"
+			// if( pf < eps && pif < eps && jf < eps && jif < eps ) { // "なし"
+			if( pf < eps && pif < eps && jfp < eps && jfw < eps && jif < eps ) { // "なし"
 				fvec(fd) = 1;
 			}
 
@@ -500,8 +571,12 @@ namespace App {
 
 			fd++;
 
-			if( eps < jf ) { // "職種"
-				fvec(fd) = jf;
+			if( eps < jfp ) { // "職種(人)"
+				fvec(fd) = jfp;
+			}
+
+			if( eps < jfw ) { // "職種関連語"
+				fvec(fd) = jfw;
 			}
 #if 0
 			for( auto& s : word ) {

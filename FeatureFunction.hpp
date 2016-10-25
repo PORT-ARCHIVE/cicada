@@ -25,15 +25,24 @@ namespace App {
 	public:
 		Dictonary_();
 		virtual ~Dictonary_();
-		virtual void read(std::string file);
-		bool exist(std::string word);
+		virtual void read(const std::string& file);
+		bool exist(const std::string& word);
 	private:
-		std::string removePrefecture(std::string area, bool& is_remove);
 		std::set<std::string> dic;
 	};
 
-	typedef std::shared_ptr<Dictonary_> AreaDic;
-	typedef std::shared_ptr<Dictonary_> JobDic;
+	class JobDictonary_ : public Dictonary_ {
+	public:
+		JobDictonary_();
+		virtual ~JobDictonary_();
+		virtual void read(const std::string& file);
+		bool exist(const std::string& word, bool& is_person);
+	private:
+		std::map<std::string,std::string> dic;
+	};
+
+	typedef std::shared_ptr<Dictonary_> Dictonary;
+	typedef std::shared_ptr<JobDictonary_> JobDictonary;
 
 	class Digit : public FeatureFunction {
 	public:
@@ -55,18 +64,18 @@ namespace App {
 		virtual void write();
 		virtual double wg(Weights& ws, Label y, Label yd, Data& x, int j, int i, uvector& gs);
 		void setMatrix(W2V::Matrix m) { w2vmat = m; }
-		void setAreaDic(AreaDic dic) { areadic = dic; }
-		void setJobDic(JobDic dic) { jobdic = dic; }
+		void setAreaDic(Dictonary dic) { areadic = dic; }
+		void setJobDic(JobDictonary dic) { jobdic = dic; }
 	private:
 		bool isDelimiter(const std::string& word);
 		double place_feature(const std::vector<std::string>& word);
 		double place_indicator_feature(const std::vector<std::string>& word);
-		double job_feature(const std::vector<std::string>& word);
+		void job_feature(const std::vector<std::string>& word, double& jfp, double& jfw);
 		double job_indicator_feature(const std::vector<std::string>& word);
 	private:
 		W2V::Matrix w2vmat;
-		AreaDic	areadic;
-		JobDic jobdic;
+		Dictonary areadic;
+		JobDictonary jobdic;
 		std::set<std::string> unknown_words;
 		const static int FEATURE_DIM;
 		static std::set<std::string> brakets;
