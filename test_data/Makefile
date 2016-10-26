@@ -72,7 +72,7 @@ test4:
 FILES3=check14.json
 
 test5:
-	time $(SEMICRF) -t ${FILES3} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ${AREA_DIC} -j ${JOB_DIC} && echo "OK" || echo "ERROR"
+	time $(SEMICRF) -t ${FILES3} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-2 --regularization-parameter 1e-8 -a ${AREA_DIC} -j ${JOB_DIC} && echo "OK" || echo "ERROR"
 	$(SEMICRF) -i ${FILES3} -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} > tmp2 && echo "OK" || echo "ERROR"
 	jq '.pages[].data[][][2]' ${FILES3} > r1
 	jq '.pages[].data[][][2]' tmp2 > r2

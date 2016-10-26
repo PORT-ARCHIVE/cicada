@@ -291,7 +291,8 @@ namespace App {
 		Logger::trace() << "Jpn::write()";
 	}
 
-	std::set<std::string> Jpn::brakets { "(",")","{","}","[","]","（","）","｛","｝","「","」","【","】" };
+	std::vector<std::string> Jpn::open_brakets { "(","{","[","（","｛","「","【" };
+	std::vector<std::string> Jpn::close_brakets { ")","}","]","）","｝","」","】" };
 
 	bool Jpn::isDelimiter(const std::string& word)
 	{
@@ -412,26 +413,12 @@ namespace App {
 				"勤務地", "勤務先", "勤務場所", "就業先", "就業場所" };
 
 		double feature = 0.0;
-		unsigned int num_of_brakets = 0;
 
-		int i = 0;
-		int s = word.size();
 		for( auto& w : word ) {
 
 			if( place_indicators.find(w) != place_indicators.end() ) {
 				feature += 1.0;
 			}
-
-			if( brakets.find(w) != brakets.end() ) {
-				num_of_brakets++;
-			}
-
-			i++;
-		}
-
-		// 括弧が奇数はあり得ない
-		if( num_of_brakets & 0x1 ) {
-			feature	= 0.0;
 		}
 
 		return feature;
@@ -442,44 +429,22 @@ namespace App {
 		jfp = 0.0;
 		jfw = 0.0;
 
-		unsigned int num_of_brakets = 0;
-		static std::vector<std::string> job_features { "ー", "スト", "シャン", "スタッフ", "エンジニア", "師", "士", "員", "職", "種" };
-
 		for( auto& w : word ) {
 
 			// 職種
 			bool is_person = false;
 			if( jobdic.get() && jobdic->exist(w, is_person) ) {
-				jfp++;
-			}
-
-			if( is_person ) {
-				jfw++;
-			}
-
-  			// for( auto& k : job_features ) {
-			// 	size_t p = w.find_last_of(k);
-			// 	if( p != std::string::npos & p == w.size() - k.size() ) {
-			// 		feature += 1.0;
-			// 		break;
-			// 	}
-			// }
-
-			if( brakets.find(w) != brakets.end() ) {
-				num_of_brakets++;
+				if( is_person ) {
+					jfp++;
+				} else {
+					jfw++;
+				}
 			}
 		}
 
 		if( 1.0 < jfp ) { // 人は表す語は一つ
-			jfp	= 1.0;
+			jfp	= 0.0;
 		}
-
-		// 括弧が奇数はあり得ない
-		// if( num_of_brakets & 0x1 ) {
-		// 	feature	= 0.0;
-		// }
-
-		// return feature;
 	}
 
 	double Jpn::job_indicator_feature(const std::vector<std::string>& word)
@@ -487,25 +452,63 @@ namespace App {
 		static std::set<std::string> job_indicators { "募集", "仕事", "業務", "職務", "職種", "区分", "内容", "カテゴリ", "科目" };
 
 		double feature = 0.0;
-		unsigned int num_of_brakets = 0;
 
 		for( auto& w : word ) {
 
 			if( job_indicators.find(w) != job_indicators.end() ) {
 				feature += 1.0;
 			}
-
-			if( brakets.find(w) != brakets.end() ) {
-				num_of_brakets++;
-			}
-		}
-
-		// 括弧が奇数はあり得ない
-		if( num_of_brakets & 0x1 ) {
-			feature	= 0.0;
 		}
 
 		return feature;
+	}
+
+	double Jpn::bracket_feature(const std::vector<std::string>& word)
+	{
+		double ret = 0.0;
+
+		int p = 0;
+		int bp;
+		int op = -1;
+		int cp = -1;
+		int obp = -1;
+		int cbp = -1;
+		int is_found_o = 0;
+		int is_found_c = 0;
+
+		for( auto& w : word ) {
+
+			bp = -1;
+			for( auto ob : open_brakets ) {
+				bp++;
+				if( ob == w ) {
+					is_found_o++;
+					obp = bp;
+					op = p;
+					break;
+				}
+			}
+
+			bp = -1;
+			for( auto cb : close_brakets ) {
+				bp++;
+				if( cb == w ) {
+					is_found_c++;
+					cbp = bp;
+					cp = p;
+					break;
+				}
+			}
+
+			p++;
+		}
+
+		//　開括弧、閉括弧が同じ種類、開括弧、閉括弧がの数が0か1、開括弧が前、閉括弧が後
+		if( obp == cbp && is_found_o == is_found_c && is_found_o <= 1 && op < cp ) {
+			ret = 1.0;
+		}
+
+		return ret;
 	}
 
 	double Jpn::wg (
@@ -540,44 +543,19 @@ namespace App {
 			int fd = yval*FEATURE_DIM;
 			double pf = place_feature(word);
 			double pif = place_indicator_feature(word);
-			// double jf = job_feature(word);
 			double jfp = 0.0;
 			double jfw = 0.0;
 			job_feature(word, jfp, jfw);
 			double jif = job_indicator_feature(word);
+			double bf = bracket_feature(word);
 
-			// if( pf < eps && pif < eps && jf < eps && jif < eps ) { // "なし"
-			if( pf < eps && pif < eps && jfp < eps && jfw < eps && jif < eps ) { // "なし"
-				fvec(fd) = 1;
-			}
+			fvec(fd++) = pif;
+			fvec(fd++) = pf;
+			fvec(fd++) = jif;
+			fvec(fd++) = jfp;
+			fvec(fd++) = jfw;
+			fvec(fd) = bf;
 
-			fd++;
-
-			if( eps < pif && pf < eps ) { // "勤務地指示子" ( 勤務地は勤務地を含まない )
-				fvec(fd) = pif;
-			}
-
-			fd++;
-
-			if( eps < pf ) { // "勤務地"
-				fvec(fd) = pf;
-			}
-
-			fd++;
-
-			if( eps < jif ) { // "職種指示子"
-				fvec(fd) = jif;
-			}
-
-			fd++;
-
-			if( eps < jfp ) { // "職種(人)"
-				fvec(fd) = jfp;
-			}
-
-			if( eps < jfw ) { // "職種関連語"
-				fvec(fd) = jfw;
-			}
 #if 0
 			for( auto& s : word ) {
 				std::cout << s;

@@ -72,13 +72,15 @@ namespace App {
 		double place_indicator_feature(const std::vector<std::string>& word);
 		void job_feature(const std::vector<std::string>& word, double& jfp, double& jfw);
 		double job_indicator_feature(const std::vector<std::string>& word);
+		double bracket_feature(const std::vector<std::string>& word);
 	private:
 		W2V::Matrix w2vmat;
 		Dictonary areadic;
 		JobDictonary jobdic;
 		std::set<std::string> unknown_words;
 		const static int FEATURE_DIM;
-		static std::set<std::string> brakets;
+		static std::vector<std::string> open_brakets;
+		static std::vector<std::string> close_brakets;
 	};
 }
 
