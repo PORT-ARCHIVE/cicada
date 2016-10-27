@@ -1,5 +1,13 @@
 
 TRAINING_DATA=\
+	3710a0af5fec95c9.html
+	9565259e79069401.html\
+	a75001d37fcf72f5.html\
+	aa69bf79b034eaf1.html\
+	bf6173d2216db4bd.html\
+	8c69f07d0b731092.html\
+	b4eedd4f7ef60ab6.html\
+	e6e7a3baab0d3a01.html\
 	b01df03d39b14d51.html\
 	7503f280a4b2af3c.html\
 	afe9fdd85e915cd7.html\
