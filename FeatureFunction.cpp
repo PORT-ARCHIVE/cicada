@@ -449,7 +449,7 @@ namespace App {
 
 	double Jpn::job_indicator_feature(const std::vector<std::string>& word)
 	{
-		static std::set<std::string> job_indicators { "募集", "仕事", "業務", "職務", "職種", "区分", "内容", "カテゴリ", "科目" };
+		static std::set<std::string> job_indicators { "募集", "仕事", "業務", "職務", "職種", "区分", "内容", "カテゴリ", "科目", "分類" };
 
 		double feature = 0.0;
 
