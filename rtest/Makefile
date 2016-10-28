@@ -1,6 +1,10 @@
 
+JCMP=../jcmp
+
+LAVEL_FILE=../../setting_files/label_settings.json
+
 TRAINING_DATA=\
-	3710a0af5fec95c9.html
+	3710a0af5fec95c9.html\
 	9565259e79069401.html\
 	a75001d37fcf72f5.html\
 	aa69bf79b034eaf1.html\
@@ -16,23 +20,41 @@ TRAINING_DATA=\
 	da74ae14f81f8398.html\
 	e53e04c8f92ae251.html
 
-LOG_LEVEL=1
+LOG_LEVEL=2
+RESULT0=result0.json
+RESULT1=result1.json
 
 learn:
+	echo "[" > $(RESULT1)
 	for file in $(TRAINING_DATA); do \
+		echo $$file; \
 		ruby ../../traning-data-converter/converter.rb $$file --labels ../../setting_files/label_settings.json --length 16 | jq '.' > tr.json; \
 		../semicrf -t tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt; \
-		../semicrf -i tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1; \
+		../semicrf -i tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1 | jq '.[].crf_estimate | { job_opening_type:. .job_opening_type,  place: .place }' >> $(RESULT1); \
+		echo "," >> $(RESULT1); \
 	done;
+	sed -i '' '$$d' $(RESULT1)
+	echo "]" >> $(RESULT1)
+	$(JCMP) $(RESULT0) $(RESULT1) place
+	$(JCMP) $(RESULT0) $(RESULT1) job_opening_type
 
 learn_all:
+	rm -f $(RESULT1)
 	ruby ../../traning-data-converter/converter.rb *.html --labels ../../setting_files/label_settings.json --length 16 | jq '.' > tr.json
 	../semicrf -t tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt
-	../semicrf -i tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1
+	../semicrf -i tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1 | jq '.[].crf_estimate | { job_opening_type:. .job_opening_type,  place: .place }' >> $(RESULT1);
+	$(JCMP) $(RESULT0) $(RESULT1) place
+	$(JCMP) $(RESULT0) $(RESULT1) job_opening_type
 
-test:
+predict:
+	rm -f $(RESULT1)
 	../bd2c -b body.json -l ../../setting_files/label_settings.json --set-overlap-size 8 --set-sentence-size 1024 > tmp.json
-	../semicrf -i tmp.json -w w.json --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1
+	../semicrf -i tmp.json -w w.json --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1 | jq '.[].crf_estimate | { job_opening_type:. .job_opening_type,  place: .place }' >> $(RESULT1);
+	$(JCMP) $(RESULT0) $(RESULT1) place
+	$(JCMP) $(RESULT0) $(RESULT1) job_opening_type
+
+update:
+	cp $(RESULT1) $(RESULT0)
 
 
 
