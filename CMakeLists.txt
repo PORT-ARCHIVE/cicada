@@ -28,6 +28,7 @@ add_executable(semicrf Main.cpp SemiCrf.cpp SemiCrfData.cpp FeatureFunction.cpp 
 add_executable(gen Generator.cpp Logger.cpp Error.cpp ujson.cpp double-conversion.cc)
 add_executable(bd2c	bd2c.cpp Logger.cpp MultiByteTokenizer.cpp Error.cpp W2V.cpp ujson.cpp double-conversion.cc JsonIO.cpp)
 add_executable(bdc2e bdc2e.cpp SemiCrfData.cpp Logger.cpp MultiByteTokenizer.cpp Error.cpp W2V.cpp ujson.cpp double-conversion.cc JsonIO.cpp)
+add_executable(jcmp jcmp.cpp Logger.cpp Error.cpp ujson.cpp double-conversion.cc JsonIO.cpp)
 find_library(MECAB_LIB mecab HINTS ${MECAB_LIB_PATH})
 
 target_link_libraries(semicrf ${MECAB_LIB})
@@ -36,6 +37,7 @@ target_link_libraries(bd2c ${MECAB_LIB})
 target_link_libraries(bd2c stdc++)
 target_link_libraries(gen stdc++)
 target_link_libraries(bdc2e stdc++)
+target_link_libraries(jcmp stdc++)
 
 message(STATUS ${MECAB_LIB_PATH})
 message(STATUS ${MECAB_LIB})
