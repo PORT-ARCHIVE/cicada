@@ -307,7 +307,7 @@ namespace App {
 
 	double Jpn::place_feature(const std::vector<std::string>& word)
 	{
-		static std::set<std::string> prefecture_divisions { "都","道","府","県","州","省" };
+		static std::set<std::string> prefecture_divisions { "都","道","府","県","州","省","国","王国" };
 		static std::set<std::string> sub_divisions { "市", "区", "町", "村", "郡", "字", "大字", "小字" };
 		static std::set<std::string> prefecture_names { "北海","青森","岩手","宮城","秋田","山形","福島","茨城","栃木",
 				"群馬","埼玉","千葉","東京都","神奈川","新潟","富山","石川","福井","山梨","長野","岐阜","静岡","愛知","三重",
