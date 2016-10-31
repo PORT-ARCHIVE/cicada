@@ -34,6 +34,10 @@ public:
 
 void Options::parse(int argc, char *argv[])
 {
+	if( argc < 4 ) {
+		throw Error("some argments missing");
+	}
+
 	try {
 
 		file_name_0 = argv[1];
@@ -158,13 +162,12 @@ int main(int argc, char *argv[])
 			auto object_1 = object_cast(std::move(*i1));
 
 
-			// check title
 			{
 				bool flg0 = true;
 				auto t0 = find(object_0, options.item_name.c_str());
 				if( t0 == object_0.end() || !t0->second.is_array() ) {
 					std::stringstream ss;
-					ss << options.file_name_0 << ": no title found in " << count << " th element";
+					ss << options.file_name_0 << ": no " << options.item_name << " found in " << count << " th element";
 					Logger::out()->warn("{}", ss.str());
 					flg0 = false;
 				}
@@ -173,7 +176,7 @@ int main(int argc, char *argv[])
 				auto t1 = find(object_1, options.item_name.c_str());
 				if( t1 == object_1.end() || !t1->second.is_array() ) {
 					std::stringstream ss;
-					ss << options.file_name_1 << ": no title found in " << count << " th element";
+					ss << options.file_name_0 << ": no " << options.item_name << " found in " << count << " th element";
 					Logger::out()->warn("{}", ss.str());
 					flg1 = false;
 				}
