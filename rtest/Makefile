@@ -53,7 +53,7 @@ predict:
 	rm -f $(RESULT1)
 	../bd2c -b body.json -l ../../setting_files/label_settings.json --set-overlap-size 8 --set-sentence-size 1024 > tmp1.json
 	../semicrf -i tmp1.json -w w.json --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1 > tmp2.json
-	jq '. | map({ job_opening_type: .crf_estimate.job_opening_type, place: .crf_estimate.place, , title: .title })' tmp2.json > tmp3.json;
+	jq '. | map({ job_opening_type: .crf_estimate.job_opening_type, place: .crf_estimate.place, title: .title })' tmp2.json > tmp3.json;
 	jq 'sort_by(.title)' tmp3.json > $(RESULT1)
 	$(JCMP) $(RESULT0) $(RESULT1) place
 	$(JCMP) $(RESULT0) $(RESULT1) job_opening_type
