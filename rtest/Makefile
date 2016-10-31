@@ -4,6 +4,11 @@ JCMP=../jcmp
 LAVEL_FILE=../../setting_files/label_settings.json
 
 TRAINING_DATA=\
+	dcc37ef3619217e0.html\
+	31ab570617c735d1.html\
+	5475bd27921f7ea9.html\
+	61698eff64fdd9cb.html\
+	76a24d6d68d7650f.html\
 	3710a0af5fec95c9.html\
 	9565259e79069401.html\
 	a75001d37fcf72f5.html\
