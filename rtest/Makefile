@@ -25,31 +25,36 @@ RESULT0=result0.json
 RESULT1=result1.json
 
 learn:
-	echo "[" > $(RESULT1)
+	echo "[" > tmp1.json
 	for file in $(TRAINING_DATA); do \
 		echo $$file; \
 		ruby ../../traning-data-converter/converter.rb $$file --labels ../../setting_files/label_settings.json --length 16 | jq '.' > tr.json; \
 		../semicrf -t tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt; \
-		../semicrf -i tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1 | jq '.[].crf_estimate | { job_opening_type:. .job_opening_type,  place: .place }' >> $(RESULT1); \
-		echo "," >> $(RESULT1); \
+		../semicrf -i tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1 > tmp2.json; \
+		jq '.[] | { job_opening_type:. .crf_estimate.job_opening_type, place: .crf_estimate.place, title: .title }' tmp2.json >> tmp1.json; \
+		echo "," >> tmp1.json; \
 	done;
-	sed -i '' '$$d' $(RESULT1)
-	echo "]" >> $(RESULT1)
+	sed -i '' '$$d' tmp1.json
+	echo "]" >> tmp1.json
+	jq 'sort_by(.title)' tmp1.json > $(RESULT1)
 	$(JCMP) $(RESULT0) $(RESULT1) place
 	$(JCMP) $(RESULT0) $(RESULT1) job_opening_type
 
 learn_all:
-	rm -f $(RESULT1)
 	ruby ../../traning-data-converter/converter.rb *.html --labels ../../setting_files/label_settings.json --length 16 | jq '.' > tr.json
 	../semicrf -t tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt
-	../semicrf -i tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1 | jq '.[].crf_estimate | { job_opening_type:. .job_opening_type,  place: .place }' >> $(RESULT1);
+	../semicrf -i tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1 > tmp1.json;
+	jq '. | map({ job_opening_type: .crf_estimate.job_opening_type, place: .crf_estimate.place, title: .title })' tmp1.json > tmp2.json;
+	jq 'sort_by(.title)' tmp2.json > $(RESULT1)
 	$(JCMP) $(RESULT0) $(RESULT1) place
 	$(JCMP) $(RESULT0) $(RESULT1) job_opening_type
 
 predict:
 	rm -f $(RESULT1)
-	../bd2c -b body.json -l ../../setting_files/label_settings.json --set-overlap-size 8 --set-sentence-size 1024 > tmp.json
-	../semicrf -i tmp.json -w w.json --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1 | jq '.[].crf_estimate | { job_opening_type:. .job_opening_type,  place: .place }' >> $(RESULT1);
+	../bd2c -b body.json -l ../../setting_files/label_settings.json --set-overlap-size 8 --set-sentence-size 1024 > tmp1.json
+	../semicrf -i tmp1.json -w w.json --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1 > tmp2.json
+	jq '. | map({ job_opening_type: .crf_estimate.job_opening_type, place: .crf_estimate.place, , title: .title })' tmp2.json > tmp3.json;
+	jq 'sort_by(.title)' tmp3.json > $(RESULT1)
 	$(JCMP) $(RESULT0) $(RESULT1) place
 	$(JCMP) $(RESULT0) $(RESULT1) job_opening_type
 
