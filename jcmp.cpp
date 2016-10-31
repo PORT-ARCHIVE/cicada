@@ -218,7 +218,7 @@ int main(int argc, char *argv[])
 
 						if( cset1.find(s) == cset1.end() ) {
 							c0++;
-							std::cout << s << " is missing in " << count << "th element." << std::endl;
+							std::cerr << s << " is missing in " << count << "th element." << std::endl;
 						} else {
 							c1++;
 						}
@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
 
 						if( cset0.find(s) == cset0.end() ) {
 							c2++;
-							std::cout << s << " is extra in " << count << "th element." << std::endl;
+							std::cerr << s << " is extra in " << count << "th element." << std::endl;
 						} else {
 							c3++;
 						}
