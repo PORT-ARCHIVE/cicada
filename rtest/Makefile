@@ -1,9 +1,15 @@
 
+CONVERTER=../../traning-data-converter/converter.rb
+CICADA=../semicrf
 JCMP=../jcmp
 
-LAVEL_FILE=../../setting_files/label_settings.json
+LAVELS=../../setting_files/label_settings.json
+LENGTH=16
+ADIC=../dic/Noun.place.utf8.csv
+JDIC=../dic/job.txt
 
 TRAINING_DATA=\
+	e53e04c8f92ae251.html\
 	dcc37ef3619217e0.html\
 	31ab570617c735d1.html\
 	5475bd27921f7ea9.html\
@@ -22,49 +28,49 @@ TRAINING_DATA=\
 	afe9fdd85e915cd7.html\
 	1c52e1f96f3a3a08.html\
 	935ecbf0e73d351f.html\
-	da74ae14f81f8398.html\
-	e53e04c8f92ae251.html
+	da74ae14f81f8398.html
 
-LOG_LEVEL=2
-RESULT0=result0.json
-RESULT1=result1.json
+simple:
+	@for file in $(TRAINING_DATA); do \
+		echo $$file; \
+		ruby $(CONVERTER) $$file --labels $(LAVELS) --length $(LENGTH) | jq '.' > tr.json; \
+		$(CICADA) -t tr.json -w w.json --log-level 3 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a $(ADIC) -j $(JDIC); \
+		$(CICADA) -i tr.json -w w.json --log-level 3 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a $(ADIC) -j $(JDIC) --output-format 1 > tmp1.json; \
+		jq '. | map({ job_opening_type:. .crf_estimate.job_opening_type, place: .crf_estimate.place, title: .title })' tmp1.json | tee $$file.json; \
+		$(JCMP) ref/$$file.json $$file.json place; \
+		$(JCMP) ref/$$file.json $$file.json job_opening_type; \
+	done;
 
 learn:
-	echo "[" > tmp1.json
-	for file in $(TRAINING_DATA); do \
-		echo $$file; \
-		ruby ../../traning-data-converter/converter.rb $$file --labels ../../setting_files/label_settings.json --length 16 | jq '.' > tr.json; \
-		../semicrf -t tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt; \
-		../semicrf -i tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1 > tmp2.json; \
-		jq '.[] | { job_opening_type:. .crf_estimate.job_opening_type, place: .crf_estimate.place, title: .title }' tmp2.json >> tmp1.json; \
-		echo "," >> tmp1.json; \
-	done;
-	sed -i '' '$$d' tmp1.json
-	echo "]" >> tmp1.json
-	jq 'sort_by(.title)' tmp1.json > $(RESULT1)
-	$(JCMP) $(RESULT0) $(RESULT1) place
-	$(JCMP) $(RESULT0) $(RESULT1) job_opening_type
-
-learn_all:
-	ruby ../../traning-data-converter/converter.rb *.html --labels ../../setting_files/label_settings.json --length 16 | jq '.' > tr.json
-	../semicrf -t tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt
-	../semicrf -i tr.json -w w.json --log-level $(LOG_LEVEL) -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1 > tmp1.json;
-	jq '. | map({ job_opening_type: .crf_estimate.job_opening_type, place: .crf_estimate.place, title: .title })' tmp1.json > tmp2.json;
-	jq 'sort_by(.title)' tmp2.json > $(RESULT1)
-	$(JCMP) $(RESULT0) $(RESULT1) place
-	$(JCMP) $(RESULT0) $(RESULT1) job_opening_type
+	ruby $(CONVERTER) *.html --labels $(LAVELS) --length $(LENGTH) | jq '.' > tr.json
+	$(CICADA) -t tr.json -w w.json --log-level 2 -e0 1.0e-6 -e1 1.0e-2 --regularization-parameter 1e-8 -a $(ADIC) -j $(JDIC)
 
 predict:
-	rm -f $(RESULT1)
-	../bd2c -b body.json -l ../../setting_files/label_settings.json --set-overlap-size 8 --set-sentence-size 1024 > tmp1.json
-	../semicrf -i tmp1.json -w w.json --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ../dic/Noun.place.utf8.csv -j ../dic/job.txt --output-format 1 > tmp2.json
-	jq '. | map({ job_opening_type: .crf_estimate.job_opening_type, place: .crf_estimate.place, title: .title })' tmp2.json > tmp3.json;
-	jq 'sort_by(.title)' tmp3.json > $(RESULT1)
-	$(JCMP) $(RESULT0) $(RESULT1) place
-	$(JCMP) $(RESULT0) $(RESULT1) job_opening_type
+	echo "[" > tmp2.json
+	@for file in $(TRAINING_DATA); do \
+		echo $$file; \
+		ruby ../../traning-data-converter/converter.rb $$file --labels $(LAVELS) --length $(LENGTH) | jq '.' > tr.json; \
+		$(CICADA) -i tr.json -w w.json --log-level 3 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a $(ADIC) -j $(JDIC) --output-format 1 > tmp1.json; \
+		jq '.[] | { job_opening_type:. .crf_estimate.job_opening_type, place: .crf_estimate.place, title: .title }' tmp1.json | tee $$file.json; \
+		cat $$file.json >> tmp2.json; \
+		echo "," >> tmp2.json; \
+	done;
+	sed -i '' '$$d' tmp2.json
+	echo "]" >> tmp2.json
+	jq 'sort_by(.title)' tmp2.json > result0.json
+	$(JCMP) ref/result0.json result0.json place
+	$(JCMP) ref/result0.json result0.json job_opening_type
 
 update:
-	cp $(RESULT1) $(RESULT0)
+	@for file in $(TRAINING_DATA); do \
+		mv $$file.json ref/$$file.json; \
+	done;
+	cp result0.json ref/result0.json
+
+clean:
+	rm tmp1.json tmp2.json
+
+
 
 
 
