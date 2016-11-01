@@ -255,7 +255,7 @@ namespace App {
 
 	///////////////
 
-	const int Jpn::FEATURE_DIM = 6;
+	const int Jpn::FEATURE_DIM = 10;
 
 	Jpn::Jpn()
 	{
@@ -293,26 +293,36 @@ namespace App {
 
 	std::vector<std::string> Jpn::open_brakets { "(","{","[","（","｛","「","【" };
 	std::vector<std::string> Jpn::close_brakets { ")","}","]","）","｝","」","】" };
+	std::vector<std::string> Jpn::delmiters { ",","、",":","：","/","／","・" };
 
-	bool Jpn::isDelimiter(const std::string& word)
+	double Jpn::delimiter_feature(const std::vector<std::string>& words)
 	{
-		static std::vector<std::string> delmiters { ",","、",":","：","/","／","・" };
-		for( auto d : delmiters	) {
-			if( word.find(d) != std::string::npos ) {
-				return true;
+		double ret = 0.0;
+
+		for( auto& w : words ) {
+			for( auto d : delmiters	) {
+				if( w == d ) {
+					ret = 1.0;
+					break;
+				}
 			}
 		}
-		return false;
+
+		return ret;
 	}
 
-	double Jpn::place_feature(const std::vector<std::string>& word)
+	double Jpn::place_feature(const std::vector<std::string>& words)
 	{
 		static std::set<std::string> prefecture_divisions { "都","道","府","県","州","省","国","王国" };
-		static std::set<std::string> sub_divisions { "市", "区", "町", "村", "郡", "字", "大字", "小字" };
-		static std::set<std::string> prefecture_names { "北海","青森","岩手","宮城","秋田","山形","福島","茨城","栃木",
-				"群馬","埼玉","千葉","東京都","神奈川","新潟","富山","石川","福井","山梨","長野","岐阜","静岡","愛知","三重",
-				"滋賀","京都","大阪","兵庫","奈良","和歌山","鳥取","島根","岡山","広島","山口","徳島","香川","愛媛","高知",
-				"福岡","佐賀","長崎","熊本","大分","宮崎","鹿児島","沖縄" };
+		static std::set<std::string> sub_divisions { "市","区","町","村","郡","字","大字","小字" };
+		static std::set<std::string> prefecture_names
+		{
+		  "北海","青森","岩手","宮城","秋田","山形","福島","茨城","栃木",
+ 		  "群馬","埼玉","千葉","東京都","神奈川","新潟","富山","石川","福井",
+		  "山梨","長野","岐阜","静岡","愛知","三重","滋賀","京都","大阪","兵庫",
+		  "奈良","和歌山","鳥取","島根","岡山","広島","山口","徳島","香川","愛媛","高知",
+		  "福岡","佐賀","長崎","熊本","大分","宮崎","鹿児島","沖縄"
+		};
 
 		double feature = 0;
 		int is_area = 0;
@@ -326,9 +336,9 @@ namespace App {
 		std::string prefecture_name;
 
 		int i = 0;
-		int s = word.size();
+		int s = words.size();
 		bool is_first = true;
-		for( auto& w : word ) {
+		for( auto& w : words ) {
 
 			bool is_none_area_relate_check = true;
 
@@ -407,14 +417,14 @@ namespace App {
 		return feature;
 	}
 
-	double Jpn::place_indicator_feature(const std::vector<std::string>& word)
+	double Jpn::place_indicator_feature(const std::vector<std::string>& words)
 	{
-		static std::set<std::string> place_indicators { "最寄駅", "最寄り駅", "アクセス", "所在地", "本社", "支社", "オフィス", "住所",
-				"勤務地", "勤務先", "勤務場所", "就業先", "就業場所" };
+		static std::set<std::string> place_indicators
+		{ "最寄駅", "最寄り駅", "アクセス", "所在地", "本社", "支社", "オフィス", "住所", "勤務地", "勤務先", "勤務場所", "就業先", "就業場所" };
 
 		double feature = 0.0;
 
-		for( auto& w : word ) {
+		for( auto& w : words ) {
 
 			if( place_indicators.find(w) != place_indicators.end() ) {
 				feature += 1.0;
@@ -424,12 +434,12 @@ namespace App {
 		return feature;
 	}
 
-	void Jpn::job_feature(const std::vector<std::string>& word, double& jfp, double& jfw)
+	void Jpn::job_feature(const std::vector<std::string>& words, double& jfp, double& jfw)
 	{
 		jfp = 0.0;
 		jfw = 0.0;
 
-		for( auto& w : word ) {
+		for( auto& w : words ) {
 
 			// 職種
 			bool is_person = false;
@@ -443,13 +453,14 @@ namespace App {
 		}
 	}
 
-	double Jpn::job_indicator_feature(const std::vector<std::string>& word)
+	double Jpn::job_indicator_feature(const std::vector<std::string>& words)
 	{
-		static std::set<std::string> job_indicators { "募集", "仕事", "業務", "職務", "職種", "区分", "内容", "カテゴリ", "科目", "分類", "概要" };
+		static std::set<std::string> job_indicators
+		{ "募集", "仕事", "業務", "職務", "職種", "区分", "内容", "カテゴリ", "科目", "分類", "概要" };
 
 		double feature = 0.0;
 
-		for( auto& w : word ) {
+		for( auto& w : words ) {
 
 			if( job_indicators.find(w) != job_indicators.end() ) {
 				feature += 1.0;
@@ -459,49 +470,33 @@ namespace App {
 		return feature;
 	}
 
-	double Jpn::bracket_feature(const std::vector<std::string>& word)
+	double Jpn::open_bracket_feature(const std::vector<std::string>& words)
 	{
 		double ret = 0.0;
 
-		int p = 0;
-		int bp;
-		int op = -1;
-		int cp = -1;
-		int obp = -1;
-		int cbp = -1;
-		int is_found_o = 0;
-		int is_found_c = 0;
-
-		for( auto& w : word ) {
-
-			bp = -1;
+		for( auto& w : words ) {
 			for( auto ob : open_brakets ) {
-				bp++;
-				if( ob == w ) {
-					is_found_o++;
-					obp = bp;
-					op = p;
+				if( w == ob ) {
+					ret = 1.0;
 					break;
 				}
 			}
-
-			bp = -1;
-			for( auto cb : close_brakets ) {
-				bp++;
-				if( cb == w ) {
-					is_found_c++;
-					cbp = bp;
-					cp = p;
-					break;
-				}
-			}
-
-			p++;
 		}
 
-		//　開括弧、閉括弧が同じ種類、開括弧、閉括弧がの数が0か1、開括弧が前、閉括弧が後
-		if( obp == cbp && is_found_o == is_found_c && is_found_o <= 1 && op < cp ) {
-			ret = 1.0;
+		return ret;
+	}
+
+	double Jpn::close_bracket_feature(const std::vector<std::string>& words)
+	{
+		double ret = 0.0;
+
+		for( auto& w : words ) {
+			for( auto cb : close_brakets ) {
+				if( w == cb ) {
+					ret = 1.0;
+					break;
+				}
+			}
 		}
 
 		return ret;
@@ -516,44 +511,68 @@ namespace App {
 		int i,
 		uvector& gs )
 	{
-		//assert(0 < xDim);
 		assert(0 < yDim);
 
 		const double eps = 1e-3;
+		const int w = 3;
 
 		double v = 0.0;
 		int yval = static_cast<int>(y);
 		int ydval = static_cast<int>(yd);
 		int d = i - j + 1;
 		uvector fvec(getDim(), 0.0);
-		std::vector<std::string> word;
+		std::vector<std::string> words;
+		std::vector<std::string> pre_words;
+		std::vector<std::string> post_words;
 
 		try {
 
-			for( int l = 0; l < d; l++ ) {
-				int s = x.getStrs()->at(j+l).size();
-				word.push_back(x.getStrs()->at(j+l).at(s-1));
-				// 学習、推論で word のカラムが違うが、どちらにしろ最後に入っている
+			auto& xs = *x.getStrs();
+
+			for( int i = 0; i < d; i++ ) {
+				words.push_back(xs.at(j+i).back());
+				// 学習、推論で words のカラムが違うが、どちらにしろ最後に入っている
+			}
+
+			for( int i = 0; i < w; i++ ) {
+				int pos = j-w+i;
+				if( -1 < pos ) {
+					pre_words.push_back(xs.at(pos).back());
+				}
+			}
+
+			for( int i = 0; i < w; i++ ) {
+				int pos = j+d+i;
+				if( pos < xs.size() ) {
+					post_words.push_back(xs.at(pos).back());
+				}
 			}
 
 			int fd = yval*FEATURE_DIM;
-			double pf = place_feature(word);
-			double pif = place_indicator_feature(word);
+			double pf = place_feature(words);
+			double pif = place_indicator_feature(words);
 			double jfp = 0.0;
 			double jfw = 0.0;
-			job_feature(word, jfp, jfw);
-			double jif = job_indicator_feature(word);
-			double bf = bracket_feature(word);
+			job_feature(words, jfp, jfw);
+			double jif = job_indicator_feature(words);
+			double obf = open_bracket_feature(pre_words);
+			double cbf = close_bracket_feature(post_words);
+			double fdf = delimiter_feature(pre_words);
+			double df = delimiter_feature(words);
+			double bdf = delimiter_feature(post_words);
 
 			fvec(fd++) = pif;
 			fvec(fd++) = pf;
 			fvec(fd++) = jif;
 			fvec(fd++) = jfp;
 			fvec(fd++) = jfw;
-			fvec(fd) = bf;
-
+			fvec(fd++) = obf;
+			fvec(fd++) = cbf;
+			fvec(fd++) = dfd;
+			fvec(fd++) = df;
+			fvec(fd++) = bdf;
 #if 0
-			for( auto& s : word ) {
+			for( auto& s : words ) {
 				std::cout << s;
 			}
 			std::cout << " ";

@@ -67,12 +67,14 @@ namespace App {
 		void setAreaDic(Dictonary dic) { areadic = dic; }
 		void setJobDic(JobDictonary dic) { jobdic = dic; }
 	private:
-		bool isDelimiter(const std::string& word);
-		double place_feature(const std::vector<std::string>& word);
-		double place_indicator_feature(const std::vector<std::string>& word);
-		void job_feature(const std::vector<std::string>& word, double& jfp, double& jfw);
-		double job_indicator_feature(const std::vector<std::string>& word);
-		double bracket_feature(const std::vector<std::string>& word);
+		double delimiter_feature(const std::vector<std::string>& words);
+		double place_feature(const std::vector<std::string>& words);
+		double place_indicator_feature(const std::vector<std::string>& words);
+		void job_feature(const std::vector<std::string>& words, double& jfp, double& jfw);
+		double job_indicator_feature(const std::vector<std::string>& words);
+		//double bracket_feature(const std::vector<std::string>& words);
+		double open_bracket_feature(const std::vector<std::string>& words);
+		double close_bracket_feature(const std::vector<std::string>& words);
 	private:
 		W2V::Matrix w2vmat;
 		Dictonary areadic;
@@ -81,6 +83,7 @@ namespace App {
 		const static int FEATURE_DIM;
 		static std::vector<std::string> open_brakets;
 		static std::vector<std::string> close_brakets;
+		static std::vector<std::string> delmiters;
 	};
 }
 
