@@ -241,7 +241,7 @@ namespace App {
 			fvec(dim1+yval) = f;
 
 			int k = 0;
-			for( auto w : ws ) {
+			for( const auto& w : ws ) {
 				gs(k) = fvec(k);
 				v += w*fvec(k++);
 			}
@@ -255,7 +255,7 @@ namespace App {
 
 	///////////////
 
-	const int Jpn::FEATURE_DIM = 10;
+	const int Jpn::FEATURE_DIM = 11;
 
 	Jpn::Jpn()
 	{
@@ -295,16 +295,36 @@ namespace App {
 	std::vector<std::string> Jpn::close_brakets { ")","}","]","）","｝","」","】" };
 	std::vector<std::string> Jpn::delmiters { ",","、",":","：","/","／","・" };
 
-	double Jpn::delimiter_feature(const std::vector<std::string>& words)
+	double Jpn::front_delimiter_feature(const std::vector<std::string>& words)
 	{
 		double ret = 0.0;
 
-		for( auto& w : words ) {
-			for( auto d : delmiters	) {
-				if( w == d ) {
-					ret = 1.0;
-					break;
-				}
+		if( words.empty() )
+			return ret;
+
+		const auto& w = words.back();
+		for( const auto& d : delmiters	) {
+			if( w == d ) {
+				ret = 1.0;
+				break;
+			}
+		}
+
+		return ret;
+	}
+
+	double Jpn::back_delimiter_feature(const std::vector<std::string>& words)
+	{
+		double ret = 0.0;
+
+		if( words.empty() )
+			return ret;
+
+		const auto& w = words.front();
+		for( const auto& d : delmiters	) {
+			if( w == d ) {
+				ret = 1.0;
+				break;
 			}
 		}
 
@@ -338,7 +358,7 @@ namespace App {
 		int i = 0;
 		int s = words.size();
 		bool is_first = true;
-		for( auto& w : words ) {
+		for( const auto& w : words ) {
 
 			bool is_none_area_relate_check = true;
 
@@ -389,7 +409,7 @@ namespace App {
 		feature += is_area;
 		feature += is_prefecture;
 		feature += is_station;
-		for( auto& p : is_sub_division ) {
+		for( const auto& p : is_sub_division ) {
 			feature += p.second;
 		}
 
@@ -406,7 +426,7 @@ namespace App {
 
 		} else {
 
-			for( auto& p : is_sub_division ) {
+			for( const auto& p : is_sub_division ) {
 				if( 1 < p.second ) { // 同じ行政区分(市町村郡字)を2以上含む
 					feature *= 0.1; // 可能性は低い
 					break;
@@ -424,7 +444,7 @@ namespace App {
 
 		double feature = 0.0;
 
-		for( auto& w : words ) {
+		for( const auto& w : words ) {
 
 			if( place_indicators.find(w) != place_indicators.end() ) {
 				feature += 1.0;
@@ -439,7 +459,7 @@ namespace App {
 		jfp = 0.0;
 		jfw = 0.0;
 
-		for( auto& w : words ) {
+		for( const auto& w : words ) {
 
 			// 職種
 			bool is_person = false;
@@ -464,7 +484,7 @@ namespace App {
 
 		double feature = 0.0;
 
-		for( auto& w : words ) {
+		for( const auto& w : words ) {
 
 			if( job_indicators.find(w) != job_indicators.end() ) {
 				feature += 1.0;
@@ -474,32 +494,36 @@ namespace App {
 		return feature;
 	}
 
-	double Jpn::open_bracket_feature(const std::vector<std::string>& words)
+	double Jpn::front_bracket_feature(const std::vector<std::string>& words)
 	{
 		double ret = 0.0;
 
-		for( auto& w : words ) {
-			for( auto ob : open_brakets ) {
-				if( w == ob ) {
-					ret = 1.0;
-					break;
-				}
+		if( words.empty() )
+			return ret;
+
+		const auto& w = words.back();
+		for( const auto& ob : open_brakets ) {
+			if( w == ob ) {
+				ret = 1.0;
+				break;
 			}
 		}
 
 		return ret;
 	}
 
-	double Jpn::close_bracket_feature(const std::vector<std::string>& words)
+	double Jpn::back_bracket_feature(const std::vector<std::string>& words)
 	{
 		double ret = 0.0;
 
-		for( auto& w : words ) {
-			for( auto cb : close_brakets ) {
-				if( w == cb ) {
-					ret = 1.0;
-					break;
-				}
+		if( words.empty() )
+			return ret;
+
+		const auto& w = words.front();
+		for( const auto& cb : close_brakets ) {
+			if( w == cb ) {
+				ret = 1.0;
+				break;
 			}
 		}
 
@@ -518,7 +542,7 @@ namespace App {
 		assert(0 < yDim);
 
 		const double eps = 1e-3;
-		const int w = 3;
+		const int w = 10;
 
 		double v = 0.0;
 		int yval = static_cast<int>(y);
@@ -554,29 +578,31 @@ namespace App {
 
 			int fd = yval*FEATURE_DIM;
 			double pf = place_feature(words);
-			double pif = place_indicator_feature(words);
+			double pif0 = place_indicator_feature(pre_words);
+			double pif1 = place_indicator_feature(words);
 			double jfp = 0.0;
 			double jfw = 0.0;
 			job_feature(words, jfp, jfw);
-			double jif = job_indicator_feature(words);
-			double obf = open_bracket_feature(pre_words);
-			double cbf = close_bracket_feature(post_words);
-			double fdf = delimiter_feature(pre_words);
-			double df = delimiter_feature(words);
-			double bdf = delimiter_feature(post_words);
+			double jif0 = job_indicator_feature(pre_words);
+			double jif1 = job_indicator_feature(words);
+			double fbf = front_bracket_feature(pre_words);
+			double bbf = back_bracket_feature(post_words);
+			double fdf = front_delimiter_feature(pre_words);
+			double bdf = back_delimiter_feature(post_words);
 
-			fvec(fd++) = pif;
+			fvec(fd++) = pif0;
+			fvec(fd++) = pif1;
 			fvec(fd++) = pf;
-			fvec(fd++) = jif;
+			fvec(fd++) = jif0;
+			fvec(fd++) = jif1;
 			fvec(fd++) = jfp;
 			fvec(fd++) = jfw;
-			fvec(fd++) = obf;
-			fvec(fd++) = cbf;
+			fvec(fd++) = fbf;
+			fvec(fd++) = bbf;
 			fvec(fd++) = fdf;
-			fvec(fd++) = df;
 			fvec(fd++) = bdf;
 #if 0
-			for( auto& s : words ) {
+			for( const auto& s : words ) {
 				std::cout << s;
 			}
 			std::cout << " ";
@@ -596,7 +622,7 @@ namespace App {
 		try {
 
 			int k = 0;
-			for( auto w : ws ) {
+			for( const auto& w : ws ) {
 				gs(k) = fvec(k);
 				v += w*fvec(k++);
 			}
