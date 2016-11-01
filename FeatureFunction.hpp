@@ -67,14 +67,14 @@ namespace App {
 		void setAreaDic(Dictonary dic) { areadic = dic; }
 		void setJobDic(JobDictonary dic) { jobdic = dic; }
 	private:
-		double delimiter_feature(const std::vector<std::string>& words);
+		double front_delimiter_feature(const std::vector<std::string>& words);
+		double back_delimiter_feature(const std::vector<std::string>& words);
+		double front_bracket_feature(const std::vector<std::string>& words);
+		double back_bracket_feature(const std::vector<std::string>& words);
 		double place_feature(const std::vector<std::string>& words);
 		double place_indicator_feature(const std::vector<std::string>& words);
 		void job_feature(const std::vector<std::string>& words, double& jfp, double& jfw);
 		double job_indicator_feature(const std::vector<std::string>& words);
-		//double bracket_feature(const std::vector<std::string>& words);
-		double open_bracket_feature(const std::vector<std::string>& words);
-		double close_bracket_feature(const std::vector<std::string>& words);
 	private:
 		W2V::Matrix w2vmat;
 		Dictonary areadic;
