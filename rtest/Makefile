@@ -36,7 +36,7 @@ simple:
 		ruby $(CONVERTER) $$file --labels $(LAVELS) --length $(LENGTH) | jq '.' > tr.json; \
 		$(CICADA) -t tr.json -w w.json --log-level 3 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a $(ADIC) -j $(JDIC); \
 		$(CICADA) -i tr.json -w w.json --log-level 3 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a $(ADIC) -j $(JDIC) --output-format 1 > tmp1.json; \
-		jq '. | map({ job_opening_type:. .crf_estimate.job_opening_type, place: .crf_estimate.place, title: .title })' tmp1.json | tee $$file.json; \
+		jq '. | map({ job_opening_type:. .crf_estimate.job_opening_type, place: .crf_estimate.place, title: .title })' tmp1.json > $$file.json; \
 		$(JCMP) ref/$$file.json $$file.json place; \
 		$(JCMP) ref/$$file.json $$file.json job_opening_type; \
 	done;
