@@ -451,6 +451,10 @@ namespace App {
 				}
 			}
 		}
+
+		if( 1.0 < jfp ) {
+			jfp = 0.0;
+		}
 	}
 
 	double Jpn::job_indicator_feature(const std::vector<std::string>& words)
@@ -568,7 +572,7 @@ namespace App {
 			fvec(fd++) = jfw;
 			fvec(fd++) = obf;
 			fvec(fd++) = cbf;
-			fvec(fd++) = dfd;
+			fvec(fd++) = fdf;
 			fvec(fd++) = df;
 			fvec(fd++) = bdf;
 #if 0
