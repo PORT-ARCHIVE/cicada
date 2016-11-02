@@ -239,10 +239,11 @@ int main(int argc, char *argv[])
 
 		///// 結果表示
 
-		double v0 = static_cast<double>(c1)/static_cast<double>(c0+c1)*1e2;
-		double v1 = static_cast<double>(c3)/static_cast<double>(c2+c3)*1e2;
+		double v0 = static_cast<double>(c1)/static_cast<double>(c0+c1);
+		double v1 = static_cast<double>(c3)/static_cast<double>(c2+c3);
+		double f  = 2.0*v0*v1/(v0+v1);
 		std::cout << "item: " << options.item_name << std::endl;
-		std::cout << boost::format("accuracy: %4.1f %%, recall: %4.1f %%") % v0 % v1 << std::endl;
+		std::cout << boost::format("F: %4.1f %%, recall: %4.1f %%, precision: %4.1f %%") % (f*1e2) % (v0*1e2) % (v1*1e2) << std::endl;
 
 	} catch(Error& e) {
 
