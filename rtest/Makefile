@@ -53,20 +53,21 @@ learn:
 	$(CICADA) -t tr.json -w w.json --log-level 2 -e0 1.0e-6 -e1 1.0e-2 --regularization-parameter 1e-8 -a $(ADIC) -j $(JDIC)
 
 predict:
-	echo "[" > tmp2.json
+	echo "[" > result0.json
 	@for file in $(TRAINING_DATA); do \
 		echo $$file; \
 		ruby ../../traning-data-converter/converter.rb $$file --labels $(LAVELS) --length $(LENGTH) | jq '.' > tr.json; \
 		$(CICADA) -i tr.json -w w.json --log-level 3 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a $(ADIC) -j $(JDIC) --output-format 1 > tmp1.json; \
 		jq '.[] | { job_opening_type:. .crf_estimate.job_opening_type, place: .crf_estimate.place, title: .title }' tmp1.json | tee $$file.json; \
-		cat $$file.json >> tmp2.json; \
-		echo "," >> tmp2.json; \
+		cat $$file.json >> result0.json; \
+		echo "," >> result0.json; \
 	done;
-	sed -i '' '$$d' tmp2.json
-	echo "]" >> tmp2.json
-	jq 'sort_by(.title)' tmp2.json > result0.json
-	$(JCMP) ref/result0.json result0.json place
-	$(JCMP) ref/result0.json result0.json job_opening_type
+	sed -i '' '$$d' result0.json
+	echo "]" >> result0.json
+	jq 'sort_by(.title)' result0.json > tmp2.json
+	jq 'sort_by(.title)' ref/result0.json > tmp3.json
+	$(JCMP) tmp3.json tmp2.json place
+	$(JCMP) tmp3.json tmp2.json job_opening_type
 
 update:
 	@for file in $(TRAINING_DATA); do \
