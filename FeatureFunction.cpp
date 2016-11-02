@@ -473,8 +473,23 @@ namespace App {
 		}
 
 		if( 1.0 < jfp ) {
-			jfp = 0.0;
+			jfp *= 0.1;
 		}
+	}
+
+	double Jpn::back_job_feature(const std::vector<std::string>& words)
+	{
+		double ret = 0.0;
+
+		if( words.empty() )
+			return ret;
+
+		const auto& w = words.back();
+		if( w == "求人" || w == "募集" || w == "募集要項" ) {
+			ret = 1.0;
+		}
+
+		return ret;
 	}
 
 	double Jpn::job_indicator_feature(const std::vector<std::string>& words)
@@ -583,6 +598,7 @@ namespace App {
 			double jfp = 0.0;
 			double jfw = 0.0;
 			job_feature(words, jfp, jfw);
+			double bjf = back_job_feature(post_words);
 			double jif0 = job_indicator_feature(pre_words);
 			double jif1 = job_indicator_feature(words);
 			double fbf = front_bracket_feature(pre_words);
@@ -595,6 +611,7 @@ namespace App {
 			fvec(fd++) = pf;
 			fvec(fd++) = jif0;
 			fvec(fd++) = jif1;
+			fvec(fd++) = bjf;
 			fvec(fd++) = jfp;
 			fvec(fd++) = jfw;
 			fvec(fd++) = fbf;

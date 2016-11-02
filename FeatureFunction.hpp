@@ -74,6 +74,7 @@ namespace App {
 		double place_feature(const std::vector<std::string>& words);
 		double place_indicator_feature(const std::vector<std::string>& words);
 		void job_feature(const std::vector<std::string>& words, double& jfp, double& jfw);
+		double back_job_feature(const std::vector<std::string>& words);
 		double job_indicator_feature(const std::vector<std::string>& words);
 	private:
 		W2V::Matrix w2vmat;
