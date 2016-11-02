@@ -9,6 +9,9 @@ ADIC=../dic/Noun.place.utf8.csv
 JDIC=../dic/job.txt
 
 TRAINING_DATA=\
+	2471b501418402e2.html\
+	0cd6f17aec5899c7.html\
+	d52404eb286f7780.html\
 	70aa7c762a0a0a18.html\
 	87ef9fbb4566746e.html\
 	590bd694608c67ab.html\
