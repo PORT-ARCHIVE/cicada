@@ -53,7 +53,7 @@ simple:
 
 learn:
 	ruby $(CONVERTER) *.html --labels $(LAVELS) --length $(LENGTH) | jq '.' > tr.json
-	$(CICADA) -t tr.json -w w.json --log-level 2 -e0 1.0e-6 -e1 1.0e-2 --regularization-parameter 1e-8 -a $(ADIC) -j $(JDIC)
+	$(CICADA) -t tr.json -w w.json --log-level 2 -e0 1.0e-8 -e1 1.0e-2 --regularization-parameter 1e-10 -a $(ADIC) -j $(JDIC)
 
 predict:
 	echo "[" > result0.json
