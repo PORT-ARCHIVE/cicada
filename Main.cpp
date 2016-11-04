@@ -151,15 +151,15 @@ decltype( std::make_shared<SemiCrf::Algorithm>() ) createAlgorithm(const Options
 	open(ifs, file);
 
 	try {
-		Logger::info() << "read " << file;
+		Logger::info() << "parsing... " << file;
 		datas->read(ifs);
 	} catch(Error& e) {
 		std::stringstream ss;
-		ss << "failed to read " << file << ": " << e.what();
+		ss << "failed to parse " << file << ": " << e.what();
 		throw Error(ss.str());
 	} catch(...) {
 		std::stringstream ss;
-		ss << "failed to read " << file << ": " << "unexpected excption";
+		ss << "failed to parse " << file << ": " << "unexpected excption";
 		throw Error(ss.str());
 	}
 

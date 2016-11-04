@@ -287,7 +287,7 @@ namespace SemiCrf {
 	{
 		Logger::trace() << "Learner()";
 		if( !(flg & ENABLE_LIKELIHOOD_ONLY) ) {
-			Logger::info() << "Learning...";
+			Logger::info() << "learning...";
 		}
 	}
 
@@ -808,7 +808,7 @@ namespace SemiCrf {
 		: Algorithm(arg)
 	{
 		Logger::trace() << "Predictor()";
-		Logger::info() << "Prediction...";
+		Logger::info() << "predicting...";
 	}
 
 	Predictor::~Predictor()
@@ -829,15 +829,15 @@ namespace SemiCrf {
 		std::ifstream ifs; // 入力
 		open(ifs, wfile);
 		try {
-			Logger::out()->info( "read {}", wfile );
+			Logger::out()->info( "parsing... {}", wfile );
 			weights->read(ifs);
 		} catch(Error& e) {
 			std::stringstream ss;
-			ss << "failed to read " << wfile << ": " << e.what();
+			ss << "failed to parse " << wfile << ": " << e.what();
 			throw Error(ss.str());
 		} catch(...) {
 			std::stringstream ss;
-			ss << "failed to read " << wfile << ": unexpectied excption";
+			ss << "failed to parse " << wfile << ": unexpectied excption";
 			throw Error(ss.str());
 		}
 		setWeights(weights);

@@ -34,7 +34,7 @@ namespace App {
 
 		std::ifstream ifs;
 		open(ifs, file);
-		Logger::out()->info( "read {}", file );
+		Logger::out()->info( "parsing... {}", file );
 		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
 
 		std::string line;
@@ -50,7 +50,7 @@ namespace App {
 			Logger::out()->trace( "{}", word );
 		}
 
-		Logger::out()->info( "the number of words: {}", dic.size() );
+		Logger::out()->info( "# of words: {}", dic.size() );
 	}
 
 	bool Dictonary_::exist(const std::string& word)
@@ -81,7 +81,7 @@ namespace App {
 
 		std::ifstream ifs;
 		open(ifs, file);
-		Logger::out()->info( "read {}", file );
+		Logger::out()->info( "parsing... {}", file );
 		setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
 
 		std::string line;
@@ -99,7 +99,7 @@ namespace App {
 			Logger::out()->trace( "{}", word );
 		}
 
-		Logger::out()->info( "the number of words: {}", dic.size() );
+		Logger::out()->info( "# of words: {}", dic.size() );
 	}
 
 	bool JobDictonary_::exist(const std::string& word, bool& is_person)

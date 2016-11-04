@@ -5,7 +5,7 @@
             "company_name" : "hoge Inc.",
             "salary" : "100$"
         },
-        "title" : "1"
+        "title" : null
     },
     {
         "body_split_text" : "fugafugafuga",
@@ -13,7 +13,7 @@
             "company_name" : "fuga Inc.",
             "salary" : "200$"
         },
-        "title" : "2"
+        "title" : null
     },
     {
         "body_split_text" : "chomechomechome",
@@ -21,6 +21,6 @@
             "company_name" : "chome Inc.",
             "salary" : "300$"
         },
-        "title" : "3"
+        "title" : null
     }
 ]

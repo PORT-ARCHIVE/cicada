@@ -263,11 +263,11 @@ std::string zen2han(const std::string& body, bool flg)
 int main(int argc, char *argv[])
 {
 	int ret = 0x0;
+	Options options;
 	Logger::setName("bd2c");
 
 	try {
 
-		Options options;
 		options.parse(argc, argv);
 
 		Logger::setLevel(options.logLevel);
@@ -290,7 +290,7 @@ int main(int argc, char *argv[])
 		{
 			std::ifstream ifb;
 			open(ifb, options.labelTableFile);
-			Logger::info() << "parse " << options.labelTableFile;
+			Logger::info() << "parsing... " << options.labelTableFile;
 			auto v = JsonIO::parse(ifb);
 			auto object = object_cast(std::move(v));
 			labelArray = JsonIO::readUAry(object, "labels");
@@ -306,15 +306,16 @@ int main(int argc, char *argv[])
 			const long long wth0 = 100000;
 			if( matrix->getNumWords() < wth0 ) {
 				std::stringstream ss;
-				ss << "the number of words in word2vec vector less than ";
+				ss << "# of words in word2vec vector less than ";
 				ss << wth0;
-				Logger::warn() << ss.str();
+				Logger::out()->warn("{}: {}", options.w2vMatrixFile, ss.str());
 			}
 
 			const long long wth1 = 10000;
 			if( matrix->getNumWords() < wth1 ) {
 				std::stringstream ss;
-				ss << "the number of words in word2vec vector less than ";
+				ss << options.w2vMatrixFile;
+				ss << ": # of words in word2vec vector less than ";
 				ss << wth1;
 				throw Error(ss.str());
 			}
@@ -324,7 +325,7 @@ int main(int argc, char *argv[])
 
 		std::ifstream ifb;
 		open(ifb, options.bodyTextFile);
-		Logger::info() << "parse " << options.bodyTextFile;
+		Logger::info() << "parsing... " << options.bodyTextFile;
 		auto v = JsonIO::parse(ifb);
 
 		if( !v.is_array() ) {
@@ -352,13 +353,13 @@ int main(int argc, char *argv[])
 			std::string title;
 			try {
 				title = JsonIO::readString(object, "title");
-				Logger::info() << "transform " << title;
+				Logger::info() << "transforming... " << title;
 			} catch(Error& e) {
-				Logger::out()->warn("{}", e.what());
+				Logger::out()->warn("{}: {}", options.bodyTextFile, e.what());
 			}
 			auto body = JsonIO::readString(object, "body_text");
 			if( body.empty() ) {
-				Logger::warn() << title << ": empty body";
+				Logger::out()->warn("{}: empty body", options.bodyTextFile);
 			}
 
 			///////////////	data
@@ -433,7 +434,9 @@ int main(int argc, char *argv[])
 		{
 			long long size = matrix->getSize();
 			if( std::numeric_limits<int>::max() < size ) {
-				throw Error("too large matrix");
+				std::stringstream ss;
+				ss << options.w2vMatrixFile	<< ": too large matrix";
+				throw Error(ss.str());
 			}
 			int dim0 = size; // !!! long long -> int !!!
 			int dim1 = labelArray.size();
@@ -453,12 +456,12 @@ int main(int argc, char *argv[])
 
 	} catch(std::exception& e) {
 
-		Logger::out()->error("{}", e.what());
+		Logger::out()->error("{}: {}", options.bodyTextFile, e.what());
 		ret = 0x2;
 
 	} catch(...) {
 
-		Logger::out()->error("unexpected exception");
+		Logger::out()->error("{}: unexpected exception", options.bodyTextFile);
 		ret = 0x3;
 	}
 

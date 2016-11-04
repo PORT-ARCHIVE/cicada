@@ -1,10 +1,10 @@
 Algorithm()
 cicada
 Learner()
-Learning...
+learning...
 Datas()
 TrainingDatas()
-read check1.json
+parsing... check1.json
 TrainingDatas::read()
 Data()
 ~Data()
@@ -18,8 +18,8 @@ S/E
 1
 [:0[:1
 END : data was pushed.
-### the number of sentences: 1
-### the number of lavels
+# of sentences: 1
+# of lavels
 0: 1
 1: 1
 ### avg length of lavels

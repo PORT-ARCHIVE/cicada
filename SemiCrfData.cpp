@@ -669,14 +669,14 @@ namespace SemiCrf {
 		for( auto& d : *this ) {
 			nData += d.second.size();
 		}
-		Logger::out()->info( "### the number of sentences: {}", nData);
+		Logger::out()->info( "# of sentences: {}", nData);
 
 		reverse_label_map.resize(label_map.size()+1);
 		for( auto& p : label_map ) {
 			reverse_label_map[p.second] = p.first;
 		}
 
-		Logger::out()->info( "### the number of lavels" );
+		Logger::out()->info( "# of lavels" );
 
 		const auto& lavelHistgram = SemiCrf::Segment::getLavelHistgram();
 		const auto& lavelLengthHistgram = SemiCrf::Segment::getLavelLengthHistgram();
@@ -783,14 +783,14 @@ namespace SemiCrf {
 		for( auto& d : *this ) {
 			nData += d.second.size();
 		}
-		Logger::out()->info( "### the number of sentences: {}", nData);
+		Logger::out()->info( "# of sentences: {}", nData);
 
 		// reverse_label_map.resize(label_map.size()+1);
 		// for( auto& p : label_map ) {
 		// 	reverse_label_map[p.second] = p.first;
 		// }
 
-		Logger::out()->info( "### the number of lavels" );
+		Logger::out()->info( "# of lavels" );
 
 		const auto& lavelHistgram = SemiCrf::Segment::getLavelHistgram();
 		const auto& lavelLengthHistgram = SemiCrf::Segment::getLavelLengthHistgram();

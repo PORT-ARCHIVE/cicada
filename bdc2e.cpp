@@ -57,11 +57,11 @@ void Options::parse(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	int ret = 0x0;
+	Options options;
 	Logger::setName("bdc2e");
 
 	try {
 
-		Options options;
 		options.parse(argc, argv);
 
 		Logger::setLevel(options.logLevel);
@@ -80,12 +80,12 @@ int main(int argc, char *argv[])
 		{
 			std::ifstream ifs;
 			open(ifs, options.bodyTextFile);
-			Logger::info() << "parse " << options.bodyTextFile;
+			Logger::info() << "parsing... " << options.bodyTextFile;
 			try {
 				body = JsonIO::parse(ifs);
 			} catch(...) {
 				std::stringstream ss;
-				ss << options.bodyTextFile << ": cannot parse";
+				ss << options.bodyTextFile << ": failed to parse";
 				throw Error(ss.str());
 			}
 			if( !body.is_array() ) {
@@ -101,12 +101,12 @@ int main(int argc, char *argv[])
 		{
 			std::ifstream ifs;
 			open(ifs, options.predictionResultFile);
-			Logger::info() << "parse " << options.predictionResultFile;
+			Logger::info() << "parsing... " << options.predictionResultFile;
 			try {
 				prediction_result = JsonIO::parse(ifs);
 			} catch(...) {
 				std::stringstream ss;
-				ss << options.predictionResultFile << ": cannot parse";
+				ss << options.predictionResultFile << ": failed to parse";
 				throw Error(ss.str());
 			}
 			if( !prediction_result.is_array() ) {
@@ -118,14 +118,12 @@ int main(int argc, char *argv[])
 
 		///////////////	transform
 
-		Logger::info("transform data...");
-
 		auto ob = array_cast(std::move(body));
 		auto oa = array_cast(std::move(prediction_result));
 
 		if( ob.size() != oa.size() ) {
 			std::stringstream ss;
-			ss << "size of data are different";
+			ss << options.predictionResultFile << ", " <<  options.bodyTextFile << ": size of data are different";
 			throw Error(ss.str());
 		}
 
@@ -178,10 +176,13 @@ int main(int argc, char *argv[])
 
 					if( s0 != s1 ) {
 						std::stringstream ss;
-						ss << "titles of objects are different in " << count << " th element";
+						ss << options.predictionResultFile << ", " <<  options.bodyTextFile;
+						ss << ": titles of objects are different in " << count << " th element";
 						throw Error(ss.str());
 					}
 				}
+
+				Logger::out()->info("transforming... {}", string_cast(std::move(t0->second)));
 			}
 
 			// replace crf_estimate
@@ -225,7 +226,7 @@ int main(int argc, char *argv[])
 
 	} catch(std::exception& e) {
 
-		Logger::out()->error("{}", e.what());
+		Logger::out()->error("{}: {}", options.bodyTextFile, e.what());
 		ret = 0x2;
 
 	} catch(...) {
