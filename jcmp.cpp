@@ -77,6 +77,8 @@ int main(int argc, char *argv[])
 		Logger::setColor(options.logColor);
 		if( !options.logPattern.empty() ) {
 			Logger::setPattern(options.logPattern);
+		} else {
+			Logger::setPattern("[%n][%l] %v");
 		}
 
 		Logger::info() << "jcmp 0.0.1";
@@ -149,14 +151,14 @@ int main(int argc, char *argv[])
 
 			if( !i0->is_object() ) {
 				std::stringstream ss;
-				ss << options.file_name_0 << ": " << count <<  "th element not an object.";
+				ss << options.file_name_0 << ": " << count << "th element not an object.";
 				throw Error(ss.str());
 			}
 			auto object_0 = object_cast(std::move(*i0));
 
 			if( !i1->is_object() ) {
 				std::stringstream ss;
-				ss << options.file_name_1 << ": " << count <<  "th element not an object.";
+				ss << options.file_name_1 << ": " << count << "th element not an object.";
 				throw Error(ss.str());
 			}
 			auto object_1 = object_cast(std::move(*i1));
@@ -167,7 +169,7 @@ int main(int argc, char *argv[])
 				auto t0 = find(object_0, options.item_name.c_str());
 				if( t0 == object_0.end() || !t0->second.is_array() ) {
 					std::stringstream ss;
-					ss << options.file_name_0 << ": no " << options.item_name << " found in " << count << " th element";
+					ss << options.file_name_0 << ": no " << options.item_name << " found in " << count << "th element";
 					Logger::out()->warn("{}", ss.str());
 					flg0 = false;
 				}
@@ -176,7 +178,7 @@ int main(int argc, char *argv[])
 				auto t1 = find(object_1, options.item_name.c_str());
 				if( t1 == object_1.end() || !t1->second.is_array() ) {
 					std::stringstream ss;
-					ss << options.file_name_0 << ": no " << options.item_name << " found in " << count << " th element";
+					ss << options.file_name_1 << ": no " << options.item_name << " found in " << count << "th element";
 					Logger::out()->warn("{}", ss.str());
 					flg1 = false;
 				}
@@ -243,7 +245,7 @@ int main(int argc, char *argv[])
 		double v1 = static_cast<double>(c3)/static_cast<double>(c2+c3);
 		double f  = 2.0*v0*v1/(v0+v1);
 		std::cout << "item: " << options.item_name << std::endl;
-		std::cout << boost::format("F: %4.1f %%, recall: %4.1f %%, precision: %4.1f %%") % (f*1e2) % (v0*1e2) % (v1*1e2) << std::endl;
+		std::cout << boost::format("F: %4.1f%%, recall: %4.1f%%, precision: %4.1f%%") % (f*1e2) % (v0*1e2) % (v1*1e2) << std::endl;
 
 	} catch(Error& e) {
 
