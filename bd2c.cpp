@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <list>
 #include <deque>
 #include <numeric>
 #include <regex>
@@ -107,7 +108,7 @@ void replace_string(std::string& body, const std::string& from, const std::strin
 }
 
 // bodyを [max_splited_body_size]文字オーバーラップさせて [max_splited_body_size]byte 毎に分割する
-void split_body(std::string& body, std::vector<std::string>& bodies, int max_offset_size, int max_splited_body_size)
+void split_body(std::string& body, std::list<std::string>& bodies, int max_offset_size, int max_splited_body_size)
 {
 	const char* p = body.c_str();
 	std::string splited_body;
@@ -368,8 +369,9 @@ int main(int argc, char *argv[])
 			ujson::array lines;
 
 			// body分割
-			std::vector<std::string> bodies;
+			std::list<std::string> bodies;
 			split_body(body, bodies, options.overlap_size, options.sentence_size);
+			bodies.push_front(title);
 
 			setlocale(LC_CTYPE, "ja_JP.UTF-8"); // T.B.D.
 
