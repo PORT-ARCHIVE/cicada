@@ -390,20 +390,22 @@ int main(int argc, char *argv[])
 
 				std::string tok = zen2han(toknizer.get(), options.normalize);
 				std::string tok0 = tok;
-				std::string tok1 = tok;
 
-				std::regex pattern(R"(([0-9]+)\\:([0-9]+_digit))");
+				std::regex pattern(R"(([0-9]+))");
 				std::smatch results;
 				if( std::regex_match( tok, results, pattern ) &&
-					results.size() == 3 ) {
+					results.size() == 2 ) {
 					tok0 = results[1];
-					tok1 = results[2];
+					auto s = tok0.size();
+					tok0 += "\\:";
+					tok0 += boost::lexical_cast<std::string>(s);
+					tok0 += "_digit";
 				}
 
 				while( !tok.empty() ) {
 
 					ujson::array line;
-					auto i = matrix->w2i(tok1);
+					auto i = matrix->w2i(tok);
 					std::string ID = boost::lexical_cast<std::string>(i);
 					line.push_back(ID);
 					line.push_back("*");
@@ -413,11 +415,14 @@ int main(int argc, char *argv[])
 
 					tok = zen2han(toknizer.get(), options.normalize);
 					tok0 = tok;
-					tok1 = tok;
+					//tok1 = tok;
 					if( std::regex_match( tok, results, pattern ) &&
-						results.size() == 3 ) {
+						results.size() == 2 ) {
 						tok0 = results[1];
-						tok1 = results[2];
+						auto s = tok0.size();
+						tok0 += "\\:";
+						tok0 += boost::lexical_cast<std::string>(s);
+						tok0 += "_digit";
 					}
 				}
 
