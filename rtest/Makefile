@@ -8,9 +8,12 @@ LENGTH=16
 ADIC=../dic/Noun.place.utf8.csv
 JDIC=../dic/job.txt
 
+#	2471b501418402e2.html\
+
 TRAINING_DATA=\
+	a2fb2a78ab3535d1.html\
+	044539b691204dcd.html\
 	ed9d1d940ccabdbb.html\
-	2471b501418402e2.html\
 	0cd6f17aec5899c7.html\
 	d52404eb286f7780.html\
 	70aa7c762a0a0a18.html\
@@ -53,7 +56,7 @@ simple:
 	done;
 
 learn:
-	ruby $(CONVERTER) *.html --labels $(LAVELS) --length $(LENGTH) | jq '.' > tr.json
+	ruby $(CONVERTER) $(TRAINING_DATA) --labels $(LAVELS) --length $(LENGTH) | jq '.' > tr.json
 	$(CICADA) -t tr.json -w w.json --log-level 2 -e0 1.0e-8 -e1 1.0e-2 --regularization-parameter 1e-10 -a $(ADIC) -j $(JDIC)
 
 predict:
