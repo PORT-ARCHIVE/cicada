@@ -255,7 +255,7 @@ namespace App {
 
 	///////////////
 
-	const int Jpn::FEATURE_DIM = 11;
+	const int Jpn::FEATURE_DIM = 12;
 
 	Jpn::Jpn()
 	{
@@ -445,48 +445,55 @@ namespace App {
 		double feature = 0.0;
 
 		for( const auto& w : words ) {
-
 			if( place_indicators.find(w) != place_indicators.end() ) {
-				feature += 1.0;
+				feature = 1.0;
+				break;
 			}
 		}
 
 		return feature;
 	}
 
-	void Jpn::job_feature(const std::vector<std::string>& words, double& jfp, double& jfw)
+	double Jpn::job_feature_0(const std::vector<std::string>& words)
 	{
-		jfp = 0.0;
-		jfw = 0.0;
+		double ret = 0.0;
 
-		for( const auto& w : words ) {
+		for( int i = 0; i < words.size()-1; i++ ) {
+			const auto& w = words[i];
 
-			// 職種
 			bool is_person = false;
 			if( jobdic.get() && jobdic->exist(w, is_person) ) {
-				if( is_person ) {
-					jfp++;
-				} else {
-					jfw++;
-				}
+				ret++;
 			}
 		}
 
-		if( 1.0 < jfp ) {
-			jfp *= 0.1;
+		return ret;
+	}
+
+	double Jpn::job_feature_1(const std::vector<std::string>& words)
+	{
+		double ret = 0.0;
+
+		const auto& w = words.back();
+		bool is_person = false;
+		if( jobdic.get() && jobdic->exist(w, is_person) ) {
+			if( is_person ) {
+				ret = 1.0;
+			}
 		}
+
+		return ret;
 	}
 
 	double Jpn::back_job_feature(const std::vector<std::string>& words)
 	{
 		double ret = 0.0;
 
-		if( words.empty() )
-			return ret;
-
-		const auto& w = words.back();
-		if( w == "求人" || w == "募集" || w == "募集要項" ) {
-			ret = 1.0;
+		for( const auto& w : words ) {
+			if( w == "求人" || w == "募集" || w == "募集要項" ) {
+				ret = 1.0;
+				break;
+			}
 		}
 
 		return ret;
@@ -500,9 +507,9 @@ namespace App {
 		double feature = 0.0;
 
 		for( const auto& w : words ) {
-
 			if( job_indicators.find(w) != job_indicators.end() ) {
-				feature += 1.0;
+				feature = 1.0;
+				break;
 			}
 		}
 
@@ -592,32 +599,18 @@ namespace App {
 			}
 
 			int fd = yval*FEATURE_DIM;
-			double pf = place_feature(words);
-			double pif0 = place_indicator_feature(pre_words);
-			double pif1 = place_indicator_feature(words);
-			double jfp = 0.0;
-			double jfw = 0.0;
-			job_feature(words, jfp, jfw);
-			double bjf = back_job_feature(post_words);
-			double jif0 = job_indicator_feature(pre_words);
-			double jif1 = job_indicator_feature(words);
-			double fbf = front_bracket_feature(pre_words);
-			double bbf = back_bracket_feature(post_words);
-			double fdf = front_delimiter_feature(pre_words);
-			double bdf = back_delimiter_feature(post_words);
-
-			fvec(fd++) = pif0;
-			fvec(fd++) = pif1;
-			fvec(fd++) = pf;
-			fvec(fd++) = jif0;
-			fvec(fd++) = jif1;
-			fvec(fd++) = bjf;
-			fvec(fd++) = jfp;
-			fvec(fd++) = jfw;
-			fvec(fd++) = fbf;
-			fvec(fd++) = bbf;
-			fvec(fd++) = fdf;
-			fvec(fd++) = bdf;
+			fvec(fd++) = place_feature(words);
+			fvec(fd++) = place_indicator_feature(pre_words);
+			fvec(fd++) = place_indicator_feature(words);
+			fvec(fd++) = job_feature_0(words);
+			fvec(fd++) = job_feature_1(words);
+			fvec(fd++) = back_job_feature(post_words);
+			fvec(fd++) = job_indicator_feature(pre_words);
+			fvec(fd++) = job_indicator_feature(words);
+			fvec(fd++) = front_bracket_feature(pre_words);
+			fvec(fd++) = back_bracket_feature(post_words);
+			fvec(fd++) = front_delimiter_feature(pre_words);
+			fvec(fd++) = back_delimiter_feature(post_words);
 #if 0
 			for( const auto& s : words ) {
 				std::cout << s;
