@@ -474,11 +474,22 @@ namespace App {
 	{
 		double ret = 0.0;
 
+		// 最後の単語が単独で職種となる
 		const auto& w = words.back();
 		bool is_person = false;
 		if( jobdic.get() && jobdic->exist(w, is_person) ) {
 			if( is_person ) {
 				ret = 1.0;
+			}
+		}
+
+		// 単独で職種となる単語が最後以外にもある
+		for( int i = 0; i < words.size()-1; i++ ) {
+			const auto& w = words[i];
+			if( jobdic.get() && jobdic->exist(w, is_person) ) {
+				if( is_person ) {
+					ret *= 0.5;
+				}
 			}
 		}
 
