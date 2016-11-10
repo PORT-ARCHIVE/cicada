@@ -19,7 +19,7 @@ public:
 		, file_name_1("")
 		, item_name("")
 		, logLevel(3)
-		, logColor(true)
+		, logColor(false)
 		, logPattern("")
 		{};
 	void parse(int argc, char *argv[]);
@@ -30,6 +30,7 @@ public:
 	int logLevel;
 	bool logColor;
 	std::string logPattern;
+	bool verbose;
 };
 
 void Options::parse(int argc, char *argv[])
@@ -48,8 +49,8 @@ void Options::parse(int argc, char *argv[])
 			std::string arg = argv[i];
 			if( arg == "--set-log-pattern" ) {
 				logPattern = argv[++i];
-			} else if( arg == "--disable-log-color" ) {
-				logColor = false;
+			} else if( arg == "--enable-log-color" ) {
+				logColor = true;
 			} else if( arg == "--log-level" ) {
 				logLevel = boost::lexical_cast<int>(argv[++i]);
 			} else {
@@ -220,7 +221,7 @@ int main(int argc, char *argv[])
 
 						if( cset1.find(s) == cset1.end() ) {
 							c0++;
-							std::cerr << s << " is missing in " << count << "th element." << std::endl;
+							Logger::out()->warn("{} is missing in {}th element.", s, count);
 						} else {
 							c1++;
 						}
@@ -230,7 +231,7 @@ int main(int argc, char *argv[])
 
 						if( cset0.find(s) == cset0.end() ) {
 							c2++;
-							std::cerr << s << " is extra in " << count << "th element." << std::endl;
+							Logger::out()->warn("{} is extra in {}th element.", s, count);
 						} else {
 							c3++;
 						}
