@@ -77,6 +77,8 @@ namespace App {
 		double job_feature_1(const std::vector<std::string>& words);
 		double back_job_feature(const std::vector<std::string>& words);
 		double job_indicator_feature(const std::vector<std::string>& words);
+		double employment_structure_indicator_feature(const std::vector<std::string>& words);
+		double employment_structure_feature(const std::vector<std::string>& words);
 	private:
 		W2V::Matrix w2vmat;
 		Dictonary areadic;

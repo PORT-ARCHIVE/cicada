@@ -563,6 +563,42 @@ namespace App {
 		return ret;
 	}
 
+	double Jpn::employment_structure_indicator_feature(const std::vector<std::string>& words)
+	{
+		static std::set<std::string> employment_structure_indicator { "雇用形態" };
+
+		double feature = 0.0;
+
+		for( const auto& w : words ) {
+			if( employment_structure_indicator.find(w) != employment_structure_indicator.end() ) {
+				feature = 1.0;
+				break;
+			}
+		}
+
+		return feature;
+	}
+
+	double Jpn::employment_structure_feature(const std::vector<std::string>& words)
+	{
+		static std::set<std::string> employment_structure
+		{ "嘱託", "在宅", "契約", "委託", "派遣", "請負", "パート", "正社員", "準社員", "登録制", "非正規", "一般派遣",
+		  "嘱託社員", "契約社員", "業務委託", "派遣社員", "特定派遣", "アルバイト", "インターン", "パート社員" "家内労働者",
+		  "派遣労働者", "非正規社員", "パートタイム", "在宅ワーカー", "有料職業紹介", "有期労働契約", "短時間正社員", "アルバイト社員",
+		  "パートタイム労働者" };
+
+		double feature = 0.0;
+
+		for( const auto& w : words ) {
+			if( employment_structure.find(w) != employment_structure.end() ) {
+				feature = 1.0;
+				break;
+			}
+		}
+
+		return feature;
+	}
+
 	double Jpn::wg (
 		Weights& ws,
 		Label y,
