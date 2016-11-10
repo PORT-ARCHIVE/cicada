@@ -79,6 +79,11 @@ namespace App {
 		double job_indicator_feature(const std::vector<std::string>& words);
 		double employment_structure_indicator_feature(const std::vector<std::string>& words);
 		double employment_structure_feature(const std::vector<std::string>& words);
+		double salaly_feature_0(const std::vector<std::string>& words);
+		double salaly_feature_1(const std::vector<std::string>& words);
+		double salaly_feature_2(const std::vector<std::string>& words);
+		double hyphen_feature(const std::vector<std::string>& words);
+
 	private:
 		W2V::Matrix w2vmat;
 		Dictonary areadic;

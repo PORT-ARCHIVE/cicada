@@ -599,6 +599,30 @@ namespace App {
 		return feature;
 	}
 
+	double Jpn::salaly_feature_0(const std::vector<std::string>& words)
+	{
+		double f = 0.0;
+		return f;
+	}
+
+	double Jpn::salaly_feature_1(const std::vector<std::string>& words)
+	{
+		double f = 0.0;
+		return f;
+	}
+
+	double Jpn::salaly_feature_2(const std::vector<std::string>& words)
+	{
+		double f = 0.0;
+		return f;
+	}
+
+	double Jpn::hyphen_feature(const std::vector<std::string>& words)
+	{
+		double f = 0.0;
+		return f;
+	}
+
 	double Jpn::wg (
 		Weights& ws,
 		Label y,
