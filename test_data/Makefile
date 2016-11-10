@@ -41,7 +41,7 @@ FILES1=check6.json
 #MATRIX=../../word2vec/wakati.bin
 
 test3:
-	time $(SEMICRF) -t ${FILES1} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a ${AREA_DIC} -j ${JOB_DIC} && echo "OK" || echo "ERROR"
+	time $(SEMICRF) -t ${FILES1} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-2 --regularization-parameter 1e-8 -a ${AREA_DIC} -j ${JOB_DIC} && echo "OK" || echo "ERROR"
 	$(SEMICRF) -i ${FILES1} -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} > tmp2 && echo "OK" || echo "ERROR"
 	jq '.pages[].data[][][2]' ${FILES1} > r1
 	jq '.pages[].data[][][2]' tmp2 > r2
@@ -78,11 +78,6 @@ test5:
 	jq '.pages[].data[][][2]' tmp2 > r2
 	echo "diff -c r1 r2"
 	diff -c r1 r2 && echo "OK" || echo "ERROR"
-#	$(SEMICRF) -i ${FILES3} -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --output-format 1 > simple_output4.json && echo "OK" || echo "ERROR"
-#	diff -c answer/simple_output4.json simple_output4.json && echo "OK" || echo "ERROR"
-#	$(SEMICRF) -i check13.json -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --output-format 1 > check13_output.json && echo "OK" || echo "ERROR"
-#	diff -c answer/check13_output.json check13_output.json && echo "OK" || echo "ERROR"
-#	rm tmp1 tmp2
 
 learn:
 	../gen -i p0.json -r 32 -l 16 > tmp1

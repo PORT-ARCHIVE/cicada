@@ -1,6 +1,9 @@
 [
     {
         "crf_estimate" : {
+            "employment_structure" : [
+                "正社員"
+            ],
             "job" : [
                 "エンジニア"
             ],
@@ -10,7 +13,7 @@
             "place" : [
                 "熊本県熊本市",
                 "東京都港区芝",
-                "神奈川県横浜市港北区"
+                "神奈川県横浜市港北"
             ],
             "place_indicator" : [
                 "勤務地"
@@ -20,6 +23,9 @@
     },
     {
         "crf_estimate" : {
+            "employment_structure" : [
+                "契約社員"
+            ],
             "job" : [
                 "アートディレクター"
             ],
@@ -37,6 +43,9 @@
     },
     {
         "crf_estimate" : {
+            "employment_structure" : [
+                "業務委託"
+            ],
             "job" : [
                 "メディカルドクター"
             ],
@@ -55,6 +64,9 @@
     },
     {
         "crf_estimate" : {
+            "employment_structure" : [
+                "正社員"
+            ],
             "job" : [
                 "研究開発エンジニア"
             ],
@@ -73,9 +85,12 @@
     },
     {
         "crf_estimate" : {
+            "employment_structure" : [
+                "嘱託"
+            ],
             "place" : [
                 "東京都大田区",
-                "糀谷"
+                "糀谷駅"
             ],
             "place_indicator" : [
                 "勤務地【勤務地詳細】",
@@ -86,6 +101,10 @@
     },
     {
         "crf_estimate" : {
+            "employment_structure" : [
+                "パート",
+                "アルバイト"
+            ],
             "job" : [
                 "人工知能エンジニア"
             ],
