@@ -255,7 +255,7 @@ namespace App {
 
 	///////////////
 
-	const int Jpn::FEATURE_DIM = 12;
+	const int Jpn::FEATURE_DIM = 14;
 
 	Jpn::Jpn()
 	{
@@ -488,7 +488,7 @@ namespace App {
 			const auto& w = words[i];
 			if( jobdic.get() && jobdic->exist(w, is_person) ) {
 				if( is_person ) {
-					ret *= 0.5;
+					ret *= 0.1;
 				}
 			}
 		}
@@ -513,7 +513,7 @@ namespace App {
 	double Jpn::job_indicator_feature(const std::vector<std::string>& words)
 	{
 		static std::set<std::string> job_indicators
-		{ "募集", "仕事", "業務", "職務", "職種", "区分", "内容", "カテゴリ", "科目", "分類", "概要" };
+		{ "募集", "仕事", "業務", "職務", "職種", "区分", "内容", "カテゴリ", "科目", "分類", "概要", "ポジション" };
 
 		double feature = 0.0;
 
@@ -654,6 +654,8 @@ namespace App {
 			fvec(fd++) = back_job_feature(post_words);
 			fvec(fd++) = job_indicator_feature(pre_words);
 			fvec(fd++) = job_indicator_feature(words);
+			fvec(fd++) = employment_structure_indicator_feature(pre_words);
+			fvec(fd++) = employment_structure_feature(words);
 			fvec(fd++) = front_bracket_feature(pre_words);
 			fvec(fd++) = back_bracket_feature(post_words);
 			fvec(fd++) = front_delimiter_feature(pre_words);
