@@ -255,7 +255,7 @@ namespace App {
 
 	///////////////
 
-	const int Jpn::FEATURE_DIM = 14;
+	const int Jpn::FEATURE_DIM = 16;
 
 	Jpn::Jpn()
 	{
@@ -599,19 +599,41 @@ namespace App {
 		return feature;
 	}
 
-	double Jpn::salaly_feature_0(const std::vector<std::string>& words)
+	double Jpn::pre_salaly_feature(const std::vector<std::string>& words)
 	{
+		static std::set<std::string> pre_salaly_features { "給与", "年収", "月収", "日給", "時給", "給料" };
+
 		double f = 0.0;
+
+		for( const auto& w : words ) {
+			if( pre_salaly_features.find(w) != pre_salaly_features.end() ) {
+				feature = 1.0;
+				break;
+			}
+		}
+
 		return f;
 	}
 
-	double Jpn::salaly_feature_1(const std::vector<std::string>& words)
+	double Jpn::post_salaly_feature(const std::vector<std::string>& words)
 	{
+		static std::set<std::string> post_salaly_features { "万", "円", "ドル" };
+
 		double f = 0.0;
+
+		for( const auto& w : words ) {
+			if( post_salaly_features.find(w) != post_salaly_features.end() ) {
+				feature += 1.0;
+			} else {
+				feature	= 0.0;
+				break;
+			}
+		}
+
 		return f;
 	}
 
-	double Jpn::salaly_feature_2(const std::vector<std::string>& words)
+	double Jpn::number_feature(const std::vector<std::string>& words)
 	{
 		double f = 0.0;
 		return f;
@@ -684,6 +706,8 @@ namespace App {
 			fvec(fd++) = back_bracket_feature(post_words);
 			fvec(fd++) = front_delimiter_feature(pre_words);
 			fvec(fd++) = back_delimiter_feature(post_words);
+			fvec(fd++) = pre_salaly_feature(words);
+			fvec(fd++) = post_salaly_feature(words);
 #if 0
 			for( const auto& s : words ) {
 				std::cout << s;

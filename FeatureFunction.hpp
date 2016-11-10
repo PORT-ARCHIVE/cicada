@@ -79,9 +79,9 @@ namespace App {
 		double job_indicator_feature(const std::vector<std::string>& words);
 		double employment_structure_indicator_feature(const std::vector<std::string>& words);
 		double employment_structure_feature(const std::vector<std::string>& words);
-		double salaly_feature_0(const std::vector<std::string>& words);
-		double salaly_feature_1(const std::vector<std::string>& words);
-		double salaly_feature_2(const std::vector<std::string>& words);
+		double pre_salaly_feature(const std::vector<std::string>& words);
+		double post_salaly_feature(const std::vector<std::string>& words);
+		double number_feature(const std::vector<std::string>& words);
 		double hyphen_feature(const std::vector<std::string>& words);
 
 	private:
