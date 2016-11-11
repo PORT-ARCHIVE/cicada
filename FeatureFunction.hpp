@@ -83,6 +83,7 @@ namespace App {
 		double post_salaly_feature(const std::vector<std::string>& words);
 		double number_feature(const std::vector<std::string>& words);
 		double hyphen_feature(const std::vector<std::string>& words);
+		double comma_feature(const std::vector<std::string>& words);
 
 	private:
 		W2V::Matrix w2vmat;

@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <fstream>
+#include <regex>
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -255,7 +256,7 @@ namespace App {
 
 	///////////////
 
-	const int Jpn::FEATURE_DIM = 16;
+	const int Jpn::FEATURE_DIM = 19;
 
 	Jpn::Jpn()
 	{
@@ -605,7 +606,9 @@ namespace App {
 
 		double f = 0.0;
 
-		for( const auto& w : words ) {
+		// 最後以外に pre_salaly_features のいずれかを含む
+		for( int i = 0; i < words.size()-1; i++ ) {
+			const auto& w = words[i];
 			if( pre_salaly_features.find(w) != pre_salaly_features.end() ) {
 				feature = 1.0;
 				break;
@@ -617,17 +620,14 @@ namespace App {
 
 	double Jpn::post_salaly_feature(const std::vector<std::string>& words)
 	{
-		static std::set<std::string> post_salaly_features { "万", "円", "ドル" };
+		static std::set<std::string> post_salaly_features { "円", "ドル" };
 
 		double f = 0.0;
 
-		for( const auto& w : words ) {
-			if( post_salaly_features.find(w) != post_salaly_features.end() ) {
-				feature += 1.0;
-			} else {
-				feature	= 0.0;
-				break;
-			}
+		// 最後が円かドル
+		const auto& w = words.back();
+		if( post_salaly_features.find(w) != post_salaly_features.end() ) {
+			feature += 1.0;
 		}
 
 		return f;
@@ -635,13 +635,52 @@ namespace App {
 
 	double Jpn::number_feature(const std::vector<std::string>& words)
 	{
+		static std::regex pattern(R"(([0-9]+))");
 		double f = 0.0;
+
+		// いずれかの単語が数字である
+		for( const auto& w : words ) {
+			std::smatch results;
+			if( std::regex_match( w, results, pattern ) ) {
+				f = 1.0;
+				break;
+			}
+		}
+
 		return f;
 	}
 
 	double Jpn::hyphen_feature(const std::vector<std::string>& words)
 	{
+		static std::set<std::string> hyphen_features { "-", "~" };
+
 		double f = 0.0;
+
+		// いずれかの単語が-,~である
+		for( const auto& w : words ) {
+			if( hyphen_features.find(w) != hyphen_features.end() ) {
+				feature = 1.0;
+				break;
+			}
+		}
+
+		return f;
+	}
+
+	double Jpn::comma_feature(const std::vector<std::string>& words)
+	{
+		static std::set<std::string> comma_features { "," };
+
+		double f = 0.0;
+
+		// いずれかの単語が,である
+		for( const auto& w : words ) {
+			if( comma_features.find(w) != comma_features.end() ) {
+				feature = 1.0;
+				break;
+			}
+		}
+
 		return f;
 	}
 
@@ -692,22 +731,37 @@ namespace App {
 			}
 
 			int fd = yval*FEATURE_DIM;
+
+			// 勤務地の素性
 			fvec(fd++) = place_feature(words);
 			fvec(fd++) = place_indicator_feature(pre_words);
 			fvec(fd++) = place_indicator_feature(words);
+
+			// 職種の素性
 			fvec(fd++) = job_feature_0(words);
 			fvec(fd++) = job_feature_1(words);
 			fvec(fd++) = back_job_feature(post_words);
 			fvec(fd++) = job_indicator_feature(pre_words);
 			fvec(fd++) = job_indicator_feature(words);
+
+			// 雇用形態の素性
 			fvec(fd++) = employment_structure_indicator_feature(pre_words);
 			fvec(fd++) = employment_structure_feature(words);
-			fvec(fd++) = front_bracket_feature(pre_words);
-			fvec(fd++) = back_bracket_feature(post_words);
-			fvec(fd++) = front_delimiter_feature(pre_words);
-			fvec(fd++) = back_delimiter_feature(post_words);
+
+			// 給与の素性
 			fvec(fd++) = pre_salaly_feature(words);
 			fvec(fd++) = post_salaly_feature(words);
+			fvec(fd++) = number_feature(words);
+			fvec(fd++) = hyphen_feature(words);
+			fvec(fd++) = comma_feature(words);
+
+			// 括弧
+			fvec(fd++) = front_bracket_feature(pre_words);
+			fvec(fd++) = back_bracket_feature(post_words);
+
+			// デリミタ
+			fvec(fd++) = front_delimiter_feature(pre_words);
+			fvec(fd++) = back_delimiter_feature(post_words);
 #if 0
 			for( const auto& s : words ) {
 				std::cout << s;
