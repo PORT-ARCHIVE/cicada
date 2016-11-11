@@ -245,7 +245,8 @@ static std::map<std::string,std::string> zen2han_map =
 	{"ｚ","z"},
 	{"｛","{"},
 	{"｜","|"},
-	{"｝","}"}
+	{"｝","}"},
+	{"〜","~"}
 };
 
 std::string zen2han(const std::string& body, bool flg)
@@ -390,7 +391,7 @@ int main(int argc, char *argv[])
 
 				std::string tok = zen2han(toknizer.get(), options.normalize);
 				std::string tok0 = tok;
-
+#if 0
 				std::regex pattern(R"(([0-9]+))");
 				std::smatch results;
 				if( std::regex_match( tok, results, pattern ) &&
@@ -401,7 +402,7 @@ int main(int argc, char *argv[])
 					tok0 += boost::lexical_cast<std::string>(s);
 					tok0 += "_digit";
 				}
-
+#endif
 				while( !tok.empty() ) {
 
 					ujson::array line;
@@ -415,6 +416,7 @@ int main(int argc, char *argv[])
 
 					tok = zen2han(toknizer.get(), options.normalize);
 					tok0 = tok;
+#if 0
 					//tok1 = tok;
 					if( std::regex_match( tok, results, pattern ) &&
 						results.size() == 2 ) {
@@ -424,6 +426,7 @@ int main(int argc, char *argv[])
 						tok0 += boost::lexical_cast<std::string>(s);
 						tok0 += "_digit";
 					}
+#endif
 				}
 
 				data.push_back(std::move(lines));
