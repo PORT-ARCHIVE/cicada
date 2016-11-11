@@ -345,7 +345,7 @@ namespace App {
 		  "福岡","佐賀","長崎","熊本","大分","宮崎","鹿児島","沖縄"
 		};
 
-		double feature = 0;
+		double f = 0;
 		int is_area = 0;
 		int is_head_area = 0;
 		int is_prefecture = 0;
@@ -407,35 +407,35 @@ namespace App {
 			i++;
 		}
 
-		feature += is_area;
-		feature += is_prefecture;
-		feature += is_station;
+		f += is_area;
+		f += is_prefecture;
+		f += is_station;
 		for( const auto& p : is_sub_division ) {
-			feature += p.second;
+			f += p.second;
 		}
 
 		// 先頭が地名でない、地名関連語以外を含む
 		if( !is_head_area || is_none_area_relate ) {
 
-			feature = 0; // あり得ない
+			f = 0; // あり得ない
 
 		} else if( 1 < is_prefecture || // 行政区分(都,道,府,県)を2以上含む
 				   is_head_prefecture || // 先頭が行政区分
 				   1 < is_prefecture_name ) { // 異なる都道府県名を含む
 
-			feature *= 0.1; // 可能性は低い
+			f *= 0.1; // 可能性は低い
 
 		} else {
 
 			for( const auto& p : is_sub_division ) {
 				if( 1 < p.second ) { // 同じ行政区分(市町村郡字)を2以上含む
-					feature *= 0.1; // 可能性は低い
+					f *= 0.1; // 可能性は低い
 					break;
 				}
 			}
 		}
 
-		return feature;
+		return f;
 	}
 
 	double Jpn::place_indicator_feature(const std::vector<std::string>& words)
@@ -443,16 +443,16 @@ namespace App {
 		static std::set<std::string> place_indicators
 		{ "最寄駅", "最寄り駅", "アクセス", "所在地", "本社", "支社", "オフィス", "住所", "勤務地", "勤務先", "勤務場所", "就業先", "就業場所" };
 
-		double feature = 0.0;
+		double f = 0.0;
 
 		for( const auto& w : words ) {
 			if( place_indicators.find(w) != place_indicators.end() ) {
-				feature = 1.0;
+				f = 1.0;
 				break;
 			}
 		}
 
-		return feature;
+		return f;
 	}
 
 	double Jpn::job_feature_0(const std::vector<std::string>& words)
@@ -516,16 +516,16 @@ namespace App {
 		static std::set<std::string> job_indicators
 		{ "募集", "仕事", "業務", "職務", "職種", "区分", "内容", "カテゴリ", "科目", "分類", "概要", "ポジション" };
 
-		double feature = 0.0;
+		double f = 0.0;
 
 		for( const auto& w : words ) {
 			if( job_indicators.find(w) != job_indicators.end() ) {
-				feature = 1.0;
+				f = 1.0;
 				break;
 			}
 		}
 
-		return feature;
+		return f;
 	}
 
 	double Jpn::front_bracket_feature(const std::vector<std::string>& words)
@@ -568,36 +568,36 @@ namespace App {
 	{
 		static std::set<std::string> employment_structure_indicator { "雇用形態" };
 
-		double feature = 0.0;
+		double f = 0.0;
 
 		for( const auto& w : words ) {
 			if( employment_structure_indicator.find(w) != employment_structure_indicator.end() ) {
-				feature = 1.0;
+				f = 1.0;
 				break;
 			}
 		}
 
-		return feature;
+		return f;
 	}
 
 	double Jpn::employment_structure_feature(const std::vector<std::string>& words)
 	{
 		static std::set<std::string> employment_structure
-		{ "嘱託", "在宅", "契約", "委託", "派遣", "請負", "パート", "正社員", "準社員", "登録制", "非正規", "一般派遣",
+		{ "嘱託", "在宅", "契約", "委託", "派遣", "請負", "バイト", "パート", "正社員", "準社員", "登録制", "非正規", "一般派遣",
 		  "嘱託社員", "契約社員", "業務委託", "派遣社員", "特定派遣", "アルバイト", "インターン", "パート社員" "家内労働者",
-		  "派遣労働者", "非正規社員", "パートタイム", "在宅ワーカー", "有料職業紹介", "有期労働契約", "短時間正社員", "アルバイト社員",
+		  "派遣労働者", "非正規社員", "パートタイム", "在宅ワーカー", "在宅勤務", "有料職業紹介", "有期労働契約", "短時間正社員", "アルバイト社員",
 		  "パートタイム労働者" };
 
-		double feature = 0.0;
+		double f = 0.0;
 
 		for( const auto& w : words ) {
 			if( employment_structure.find(w) != employment_structure.end() ) {
-				feature = 1.0;
+				f = 1.0;
 				break;
 			}
 		}
 
-		return feature;
+		return f;
 	}
 
 	double Jpn::pre_salaly_feature(const std::vector<std::string>& words)
@@ -610,7 +610,7 @@ namespace App {
 		for( int i = 0; i < words.size()-1; i++ ) {
 			const auto& w = words[i];
 			if( pre_salaly_features.find(w) != pre_salaly_features.end() ) {
-				feature = 1.0;
+				f = 1.0;
 				break;
 			}
 		}
@@ -627,7 +627,7 @@ namespace App {
 		// 最後が円かドル
 		const auto& w = words.back();
 		if( post_salaly_features.find(w) != post_salaly_features.end() ) {
-			feature += 1.0;
+			f += 1.0;
 		}
 
 		return f;
@@ -659,7 +659,7 @@ namespace App {
 		// いずれかの単語が-,~である
 		for( const auto& w : words ) {
 			if( hyphen_features.find(w) != hyphen_features.end() ) {
-				feature = 1.0;
+				f = 1.0;
 				break;
 			}
 		}
@@ -676,7 +676,7 @@ namespace App {
 		// いずれかの単語が,である
 		for( const auto& w : words ) {
 			if( comma_features.find(w) != comma_features.end() ) {
-				feature = 1.0;
+				f = 1.0;
 				break;
 			}
 		}
