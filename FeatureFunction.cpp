@@ -514,7 +514,7 @@ namespace App {
 	double Jpn::job_indicator_feature(const std::vector<std::string>& words)
 	{
 		static std::set<std::string> job_indicators
-		{ "募集", "仕事", "業務", "職務", "職種", "区分", "内容", "カテゴリ", "科目", "分類", "概要", "ポジション" };
+		{ "募集", "仕事", "業務", "職務", "職種", "区分", "内容", "カテゴリ", "科目", "分類", "概要", "ポジション", "業務内容" };
 
 		double f = 0.0;
 
@@ -586,7 +586,7 @@ namespace App {
 		{ "嘱託", "在宅", "契約", "委託", "派遣", "請負", "バイト", "パート", "正社員", "準社員", "登録制", "非正規", "一般派遣",
 		  "嘱託社員", "契約社員", "業務委託", "派遣社員", "特定派遣", "アルバイト", "インターン", "パート社員" "家内労働者",
 		  "派遣労働者", "非正規社員", "パートタイム", "在宅ワーカー", "在宅勤務", "有料職業紹介", "有期労働契約", "短時間正社員", "アルバイト社員",
-		  "パートタイム労働者" };
+		  "パートタイム労働者", "非常勤" };
 
 		double f = 0.0;
 
@@ -602,7 +602,7 @@ namespace App {
 
 	double Jpn::pre_salaly_feature(const std::vector<std::string>& words)
 	{
-		static std::set<std::string> pre_salaly_features { "給与", "年収", "月収", "日給", "時給", "給料" };
+		static std::set<std::string> pre_salaly_features { "給与", "年収", "月収", "月給", "日給", "時給", "給料" };
 
 		double f = 0.0;
 
@@ -620,7 +620,7 @@ namespace App {
 
 	double Jpn::post_salaly_feature(const std::vector<std::string>& words)
 	{
-		static std::set<std::string> post_salaly_features { "円", "ドル" };
+		static std::set<std::string> post_salaly_features { "円", "万", "ドル", "応相談", "相談可", "以上", "以下" };
 
 		double f = 0.0;
 
