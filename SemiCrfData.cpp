@@ -414,6 +414,11 @@ namespace SemiCrf {
 
 				if( d == 0 ) {
 
+					if( p.second != "NONE" &&
+						p.second != "place_indicator" &&
+						p.second != "job_indicator" ) {
+						Logger::out()->warn("{} not extracted: {}: {}", p.second, title, file_name );
+					}
 					continue;
 
 				} else {

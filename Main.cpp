@@ -147,6 +147,7 @@ decltype( std::make_shared<SemiCrf::Algorithm>() ) createAlgorithm(const Options
 		throw Error("no input file specified");
 	}
 
+	datas->set_file_name(file);
 	std::ifstream ifs;
 	open(ifs, file);
 

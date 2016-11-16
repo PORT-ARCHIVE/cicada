@@ -132,6 +132,7 @@ namespace SemiCrf {
 		std::vector<ujson::value> labels;
 		std::map<int,int> label_map;
 		std::vector<int> reverse_label_map;
+		std::string file_name;
 
 	public:
 
@@ -155,6 +156,7 @@ namespace SemiCrf {
 		void setMean(const std::map<int,double>& arg);
 		void setVariance(const std::map<int,double>& arg);
 		void setLabelMap(const std::map<int,int>& arg);
+		void set_file_name(const std::string& arg) { file_name = arg; }
 		std::add_const<decltype((mean))>::type getMean() { return mean; }
 		std::add_const<decltype((variance))>::type getVariance() { return variance; }
 		std::add_const<decltype((feature))>::type getFeature() { return feature; }
