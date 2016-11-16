@@ -669,14 +669,14 @@ namespace SemiCrf {
 		for( auto& d : *this ) {
 			nData += d.second.size();
 		}
-		Logger::out()->info( "# of sentences: {}", nData);
+		Logger::out()->info( "# sentences: {}", nData);
 
 		reverse_label_map.resize(label_map.size()+1);
 		for( auto& p : label_map ) {
 			reverse_label_map[p.second] = p.first;
 		}
 
-		Logger::out()->info( "# of lavels" );
+		Logger::out()->info( "# lavels" );
 
 		const auto& lavelHistgram = SemiCrf::Segment::getLavelHistgram();
 		const auto& lavelLengthHistgram = SemiCrf::Segment::getLavelLengthHistgram();
@@ -690,7 +690,7 @@ namespace SemiCrf {
 			total_length[lvl.first.first] += (lvl.first.second) * (lvl.second);
 		}
 
-		Logger::out()->info( "### avg length of lavels" );
+		Logger::out()->info( "Average length of lavels" );
 
 		for( auto& l : total_length ) {
 			int n = lavelHistgram.find(l.first)->second;
@@ -783,14 +783,14 @@ namespace SemiCrf {
 		for( auto& d : *this ) {
 			nData += d.second.size();
 		}
-		Logger::out()->info( "# of sentences: {}", nData);
+		Logger::out()->info( "# sentences: {}", nData);
 
 		// reverse_label_map.resize(label_map.size()+1);
 		// for( auto& p : label_map ) {
 		// 	reverse_label_map[p.second] = p.first;
 		// }
 
-		Logger::out()->info( "# of lavels" );
+		Logger::out()->info( "# lavels" );
 
 		const auto& lavelHistgram = SemiCrf::Segment::getLavelHistgram();
 		const auto& lavelLengthHistgram = SemiCrf::Segment::getLavelLengthHistgram();
@@ -805,7 +805,7 @@ namespace SemiCrf {
 			total_length[lvl.first.first] += (lvl.first.second) * (lvl.second);
 		}
 
-		Logger::out()->info( "### avg length of lavels" );
+		Logger::out()->info( "Average length of lavels" );
 
 		for( auto& l : total_length ) {
 			int n = lavelHistgram.find(l.first)->second;
