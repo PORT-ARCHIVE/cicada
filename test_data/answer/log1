@@ -18,11 +18,11 @@ S/E
 1
 [:0[:1
 END : data was pushed.
-# of sentences: 1
-# of lavels
+# sentences: 1
+# lavels
 0: 1
 1: 1
-### avg length of lavels
+Average length of lavels
 0: 1
 1: 1
 FeatureFunction()
