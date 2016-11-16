@@ -319,13 +319,16 @@ namespace Optimizer {
 		if( itr == 0 ) {
 
 			r0 = r;
+			f0 = ofunc->savedValue();
 
 		} else {
 
-			double err = r/(r0*re + ae);
-			flg = ( err < 1.0 );
+			double err0 = r/(r0*re + ae);
 			double f = ofunc->savedValue();
-			Logger::info() << boost::format("f= %10.6e |∇f|= %10.6e alp=%10.6e") % f % err % alpha;
+			double err1 = fabs( (f - f0)/(re*f0+ae) );
+			flg = ( err1 < 1.0 );
+			Logger::info() << boost::format("f= %10.6e |∇f|= %10.6e |Δf/f|=%10.6e alp=%10.6e") % f % err0 % err1 % alpha;
+			f0 = f;
 		}
 
 		if( !flg && itr == maxIteration ) {

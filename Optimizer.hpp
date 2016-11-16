@@ -71,6 +71,7 @@ namespace Optimizer {
 		double xi;
 		double tau;
 		double r0;
+		double f0;
 		double re;
 		double ae;
 		vector x;
