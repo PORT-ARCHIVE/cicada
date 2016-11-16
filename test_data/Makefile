@@ -9,7 +9,7 @@ all: test1 test2 test3 test4 test5 learn infer gen_test bd2c_test bd2w_test bdc2
 
 test1:
 	@echo "###### check0 ######"
-	$(SEMICRF) -t check1.json -w tmp1 --log-level 0 -e0 2.0 -e1 1.0e-5 --disable-date-version --disable-regularization --disable-log-color --set-log-pattern "%v" -l auto 2>log1 
+	$(SEMICRF) -t check1.json -w tmp1 --log-level 0 -e0 1.0e-6 -e1 1.0e-5 --disable-date-version --disable-regularization --disable-log-color --set-log-pattern "%v" -l auto 2>log1 
 	@diff answer/log1 log1 && echo "OK" || echo "ERROR"
 
 FILES0=\
@@ -22,8 +22,8 @@ FILES0=\
 test2:
 	@for file in $(FILES0); do \
 		echo "###### $$file ######"; \
-		echo "$(SEMICRF) -t $$file -w tmp1 --log-level 3 -e0 2.0 -e1 1.0e-3 --disable-regularization"; \
-		$(SEMICRF) -t $$file -w tmp1 --log-level 3 -e0 2.0 -e1 1.0e-6 --disable-regularization && echo "OK" || echo "ERROR"; \
+		echo "$(SEMICRF) -t $$file -w tmp1 --log-level 3 -e0 1.0e-6 -e1 1.0e-5 --disable-regularization"; \
+		$(SEMICRF) -t $$file -w tmp1 --log-level 3 -e0 1.0e-6 -e1 1.0e-5 --disable-regularization && echo "OK" || echo "ERROR"; \
 		echo "$(SEMICRF) -i $$file -w tmp1 --log-level 3"; \
 		$(SEMICRF) -i $$file -w tmp1 --log-level 3 > tmp2 && echo "OK" || echo "ERROR"; \
 		cat $$file | jq '.pages[].data[][][]' > r1; \
@@ -41,7 +41,7 @@ FILES1=check6.json
 #MATRIX=../../word2vec/wakati.bin
 
 test3:
-	time $(SEMICRF) -t ${FILES1} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-2 --regularization-parameter 1e-8 -a ${AREA_DIC} -j ${JOB_DIC} && echo "OK" || echo "ERROR"
+	time $(SEMICRF) -t ${FILES1} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-5 --regularization-parameter 1e-8 -a ${AREA_DIC} -j ${JOB_DIC} && echo "OK" || echo "ERROR"
 	$(SEMICRF) -i ${FILES1} -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} > tmp2 && echo "OK" || echo "ERROR"
 	jq '.pages[].data[][][2]' ${FILES1} > r1
 	jq '.pages[].data[][][2]' tmp2 > r2
@@ -51,13 +51,13 @@ test3:
 	diff -c answer/simple_output3.json simple_output3.json && echo "OK" || echo "ERROR"
 	$(SEMICRF) -i check10.json -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --output-format 1 > check10_output.json && echo "OK" || echo "ERROR"
 	diff -c answer/check10_output.json check10_output.json && echo "OK" || echo "ERROR"
-	rm tmp1 tmp2
+#	rm tmp1 tmp2
 
 
 FILES2=check12.json
 
 test4:
-	time $(SEMICRF) -t ${FILES2} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-4 --regularization-parameter 1e-8 -a ${AREA_DIC} -j ${JOB_DIC} && echo "OK" || echo "ERROR"
+	time $(SEMICRF) -t ${FILES2} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-5 --regularization-parameter 1e-8 -a ${AREA_DIC} -j ${JOB_DIC} && echo "OK" || echo "ERROR"
 	$(SEMICRF) -i ${FILES2} -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} > tmp2 && echo "OK" || echo "ERROR"
 	jq '.pages[].data[][][2]' ${FILES2} > r1
 	jq '.pages[].data[][][2]' tmp2 > r2
@@ -67,12 +67,12 @@ test4:
 	diff -c answer/simple_output4.json simple_output4.json && echo "OK" || echo "ERROR"
 	$(SEMICRF) -i check13.json -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} --output-format 1 > check13_output.json && echo "OK" || echo "ERROR"
 	diff -c answer/check13_output.json check13_output.json && echo "OK" || echo "ERROR"
-	rm tmp1 tmp2
+#	rm tmp1 tmp2
 
 FILES3=check14.json
 
 test5:
-	time $(SEMICRF) -t ${FILES3} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-2 --regularization-parameter 1e-8 -a ${AREA_DIC} -j ${JOB_DIC} && echo "OK" || echo "ERROR"
+	time $(SEMICRF) -t ${FILES3} -w tmp1 --log-level 2 -e0 1.0e-6 -e1 1.0e-5 --regularization-parameter 1e-8 -a ${AREA_DIC} -j ${JOB_DIC} && echo "OK" || echo "ERROR"
 	$(SEMICRF) -i ${FILES3} -w tmp1 --log-level 3 -a ${AREA_DIC} -j ${JOB_DIC} > tmp2 && echo "OK" || echo "ERROR"
 	jq '.pages[].data[][][2]' ${FILES3} > r1
 	jq '.pages[].data[][][2]' tmp2 > r2
@@ -81,7 +81,7 @@ test5:
 
 learn:
 	../gen -i p0.json -r 32 -l 16 > tmp1
-	time $(SEMICRF) -t tmp1 -w tmp2 --log-level 2 -e0 1.0e-3 -e1 1.0e-4 --regularization-parameter 1e-3 && echo "OK" || echo "ERROR"
+	time $(SEMICRF) -t tmp1 -w tmp2 --log-level 2 -e0 1.0e-6 -e1 1.0e-5 --regularization-parameter 1e-3 && echo "OK" || echo "ERROR"
 
 infer:
 	@rm -f r1 r2 a b tmp5;

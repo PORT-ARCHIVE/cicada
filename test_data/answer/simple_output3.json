@@ -118,6 +118,9 @@
             "place_indicator" : [
                 "(勤務地)",
                 "最寄り駅"
+            ],
+            "salary" : [
+                "日給7000円"
             ]
         },
         "title" : "check10"
