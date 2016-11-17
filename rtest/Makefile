@@ -8,9 +8,9 @@ LENGTH=16
 ADIC=../dic/Noun.place.utf8.csv
 JDIC=../dic/job.txt
 
-#	2471b501418402e2.html\
 
 TRAINING_DATA=\
+	2471b501418402e2.html\
 	8f15429129e10740.html\
 	14416a08c5a9b926.html\
 	27b62192221f179e.html\
@@ -51,9 +51,9 @@ simple:
 	@for file in $(TRAINING_DATA); do \
 		echo $$file; \
 		ruby $(CONVERTER) $$file --labels $(LAVELS) --length $(LENGTH) | jq '.' > tr.json; \
-		$(CICADA) -t tr.json -w w.json --log-level 2 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a $(ADIC) -j $(JDIC); \
-		$(CICADA) -i tr.json -w w.json --log-level 3 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a $(ADIC) -j $(JDIC) --output-format 1 > tmp1.json; \
-		jq '. | map({ job_opening_type: .crf_estimate.job_opening_type, place: .crf_estimate.place, salary: .crf_estimate.salary, employment_structure: .crf_estimate.employment_structure, title: .title  })' tmp1.json > $$file.json; \
+		$(CICADA) -t tr.json -w w.json --log-level 2 -e0 1.0e-8 -e1 1.0e-4 --regularization-parameter 1e-8 -a $(ADIC) -j $(JDIC); \
+		$(CICADA) -i tr.json -w w.json --log-level 3 -e0 1.0e-8 -e1 1.0e-4 --regularization-parameter 1e-8 -a $(ADIC) -j $(JDIC) --output-format 1 > tmp1.json; \
+		jq '. | map({ job_opening_type: .crf_estimate.job_opening_type, place: .crf_estimate.place, salary: .crf_estimate.salary, employment_structure: .crf_estimate.employment_structure, title: .title  })' tmp1.json | tee $$file.json; \
 		$(JCMP) ref/$$file.json $$file.json place; \
 		$(JCMP) ref/$$file.json $$file.json job_opening_type; \
 		$(JCMP) ref/$$file.json $$file.json employment_strcuture; \
@@ -62,15 +62,15 @@ simple:
 
 learn:
 	ruby $(CONVERTER) $(TRAINING_DATA) --labels $(LAVELS) --length $(LENGTH) | jq '.' > tr.json
-	$(CICADA) -t tr.json -w w.json --log-level 2 -e0 1.0e-8 -e1 1.0e-2 --regularization-parameter 1e-10 -a $(ADIC) -j $(JDIC)
+	$(CICADA) -t tr.json -w w.json -w0 w0.json --log-level 2 -e0 1.0e-8 -e1 1.0e-4 --regularization-parameter 1e-10 -a $(ADIC) -j $(JDIC)
 
 predict:
 	echo "[" > result0.json
 	@for file in $(TRAINING_DATA); do \
 		echo $$file; \
 		ruby ../../traning-data-converter/converter.rb $$file --labels $(LAVELS) --length $(LENGTH) | jq '.' > tr.json; \
-		$(CICADA) -i tr.json -w w.json --log-level 3 -e0 1.0e-6 -e1 1.0e-3 --regularization-parameter 1e-8 -a $(ADIC) -j $(JDIC) --output-format 1 > tmp1.json; \
-		jq '.[] | { job_opening_type:. .crf_estimate.job_opening_type, place: .crf_estimate.place, title: .title }' tmp1.json | tee $$file.json; \
+		$(CICADA) -i tr.json -w w.json --log-level 3 -e0 1.0e-8 -e1 1.0e-4 --regularization-parameter 1e-8 -a $(ADIC) -j $(JDIC) --output-format 1 > tmp1.json; \
+		jq '.[] | { job_opening_type:. .crf_estimate.job_opening_type, place: .crf_estimate.place, salary: .crf_estimate.salary, employment_structure: .crf_estimate.employment_structure, title: .title }' tmp1.json | tee $$file.json; \
 		cat $$file.json >> result0.json; \
 		echo "," >> result0.json; \
 	done;
@@ -80,8 +80,8 @@ predict:
 	jq 'sort_by(.title)' ref/result0.json > tmp3.json
 	$(JCMP) tmp3.json tmp2.json place
 	$(JCMP) tmp3.json tmp2.json job_opening_type
-#	$(JCMP) tmp3.json tmp2.json employment_structure
-#	$(JCMP) tmp3.json tmp2.json salary
+	$(JCMP) tmp3.json tmp2.json employment_structure
+	$(JCMP) tmp3.json tmp2.json salary
 
 update:
 	@for file in $(TRAINING_DATA); do \
@@ -91,8 +91,3 @@ update:
 
 clean:
 	rm tmp1.json tmp2.json
-
-
-
-
-
