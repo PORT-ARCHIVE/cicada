@@ -327,7 +327,7 @@ namespace Optimizer {
 			double f = ofunc->savedValue();
 			double err1 = fabs( (f - f0)/(re*f0+ae) );
 			flg = ( err1 < 1.0 );
-			Logger::info() << boost::format("f= %10.6e |∇f|= %10.6e |Δf/f|=%10.6e alp=%10.6e") % f % err0 % err1 % alpha;
+			Logger::info() << boost::format("f= %10.6e |∇f|= %10.6e |Δf/f|= %10.6e alp= %10.6e") % f % err0 % err1 % alpha;
 			f0 = f;
 		}
 

@@ -330,7 +330,7 @@ namespace SemiCrf {
 		if( !w0file.empty() ) { // 初期重みが指定されている場合
 			std::ifstream ifs; // 入力
 			open(ifs, w0file);
-			Logger::info() << "read " << w0file;
+			Logger::info() << "parsing... " << w0file;
 			weights->resize(0);
 			weights->read(ifs); // 重みを初期重みで初期化
 		}
