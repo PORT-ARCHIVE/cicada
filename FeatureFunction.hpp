@@ -36,7 +36,7 @@ namespace App {
 		JobDictonary_();
 		virtual ~JobDictonary_();
 		virtual void read(const std::string& file);
-		bool exist(const std::string& word, bool& is_person);
+		bool exist(const std::string& word, int& flg);
 	private:
 		std::map<std::string,std::string> dic;
 	};
@@ -75,6 +75,7 @@ namespace App {
 		double place_indicator_feature(const std::vector<std::string>& words);
 		double job_feature_0(const std::vector<std::string>& words);
 		double job_feature_1(const std::vector<std::string>& words);
+		double job_feature_2(const std::vector<std::string>& words);
 		double back_job_feature(const std::vector<std::string>& words);
 		double job_indicator_feature(const std::vector<std::string>& words);
 		double employment_structure_indicator_feature(const std::vector<std::string>& words);

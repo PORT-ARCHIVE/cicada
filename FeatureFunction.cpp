@@ -103,16 +103,16 @@ namespace App {
 		Logger::out()->info( "# of words: {}", dic.size() );
 	}
 
-	bool JobDictonary_::exist(const std::string& word, bool& is_person)
+	bool JobDictonary_::exist(const std::string& word, int& flg)
 	{
 		bool ret = true;
-		is_person = false;
 
 		auto it = dic.find(word);
 		if( it == dic.end() ) {
 			ret = false;
-		} else if( it->second == "1" ) {
-			is_person = true;
+			flg = 0;
+		} else {
+			flg = boost::lexical_cast<int>(it->second);
 		}
 
 		return ret;
@@ -256,7 +256,7 @@ namespace App {
 
 	///////////////
 
-	const int Jpn::FEATURE_DIM = 19;
+	const int Jpn::FEATURE_DIM = 20;
 
 	Jpn::Jpn()
 	{
@@ -458,16 +458,23 @@ namespace App {
 	double Jpn::job_feature_0(const std::vector<std::string>& words)
 	{
 		double ret = 0.0;
+		int persion = 0;
 
 		for( int i = 0; i < words.size()-1; i++ ) {
 			const auto& w = words[i];
 
-			bool is_person = false;
-			if( jobdic.get() && jobdic->exist(w, is_person) ) {
+			int flg = 0;
+			if( jobdic.get() && jobdic->exist(w, flg) ) {
 				ret++;
+				if( flg == 1 ) {
+					persion++;
+				}
 			}
 		}
 
+		if( persion ) { // 単独で職種となる単語は２つ以上含みにくい
+			ret /= persion;
+		}
 		return ret;
 	}
 
@@ -477,22 +484,28 @@ namespace App {
 
 		// 最後の単語が単独で職種となる
 		const auto& w = words.back();
-		bool is_person = false;
-		if( jobdic.get() && jobdic->exist(w, is_person) ) {
-			if( is_person ) {
+		int flg = 0;
+		if( jobdic.get() && jobdic->exist(w, flg) ) {
+			if( flg == 1 ) {
 				ret = 1.0;
 			}
 		}
 
-		// // 単独で職種となる単語が最後以外にもある
-		// for( int i = 0; i < words.size()-1; i++ ) {
-		// 	const auto& w = words[i];
-		// 	if( jobdic.get() && jobdic->exist(w, is_person) ) {
-		// 		if( is_person ) {
-		// 			ret *= 0.1;
-		// 		}
-		// 	}
-		// }
+		return ret;
+	}
+
+	double Jpn::job_feature_2(const std::vector<std::string>& words)
+	{
+		double ret = 0.0;
+
+		// 単独では職種とはならないが接尾辞
+		const auto& w = words.back();
+		int flg = 0;
+		if( jobdic.get() && jobdic->exist(w, flg) ) {
+			if( flg == 2 && 1 < words.size() ) {
+				ret = 1.0;
+			}
+		}
 
 		return ret;
 	}
@@ -657,7 +670,7 @@ namespace App {
 
 	double Jpn::hyphen_feature(const std::vector<std::string>& words)
 	{
-		static std::set<std::string> hyphen_features { "-", "~" };
+		static std::set<std::string> hyphen_features { "-", "~", "〜" };
 
 		double f = 0.0;
 
@@ -745,6 +758,7 @@ namespace App {
 			// 職種の素性
 			fvec(fd++) = job_feature_0(words);
 			fvec(fd++) = job_feature_1(words);
+			fvec(fd++) = job_feature_2(words);
 			fvec(fd++) = back_job_feature(post_words);
 			fvec(fd++) = job_indicator_feature(pre_words);
 			fvec(fd++) = job_indicator_feature(words);
