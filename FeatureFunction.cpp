@@ -334,6 +334,8 @@ namespace App {
 
 	double Jpn::place_feature(const std::vector<std::string>& words)
 	{
+		static std::set<std::string> countories { "国", "王国", "連合", "連邦", "公国", "帝国", "市国", "共和国", "首長国",
+				"合衆国", "大公国", "連合王国", "王国連合", "首長国連邦", "連邦共和国", "共和国連邦" };
 		static std::set<std::string> prefecture_divisions { "都","道","府","県","州","省","国","王国" };
 		static std::set<std::string> sub_divisions { "市","区","町","村","郡","字","大字","小字" };
 		static std::set<std::string> prefecture_names
@@ -348,6 +350,8 @@ namespace App {
 		double f = 0;
 		int is_area = 0;
 		int is_head_area = 0;
+		int is_countory = 0;
+		int is_head_countory = 0;
 		int is_prefecture = 0;
 		int is_head_prefecture = 0;
 		int is_none_area_relate	= 0;
@@ -362,6 +366,15 @@ namespace App {
 		for( const auto& w : words ) {
 
 			bool is_none_area_relate_check = true;
+
+			// countoriesのどれか
+			if( countories.find(w) != countories.end() ) {
+				is_countory++;
+				if( is_first ) {
+					is_head_countory = 1;
+				}
+				is_none_area_relate_check = false;
+			}
 
 			// 都道府県州省のどれか
 			if( prefecture_divisions.find(w) != prefecture_divisions.end() ) {
@@ -408,6 +421,7 @@ namespace App {
 		}
 
 		f += is_area;
+		f += is_countory;
 		f += is_prefecture;
 		f += is_station;
 		for( const auto& p : is_sub_division ) {
@@ -419,7 +433,9 @@ namespace App {
 
 			f = 0; // あり得ない
 
-		} else if( 1 < is_prefecture || // 行政区分(都,道,府,県)を2以上含む
+		} else if( 1 < is_countory || // 国を2以上含む
+				   1 < is_prefecture || // 行政区分(都,道,府,県)を2以上含む
+				   is_head_countory || // 先頭が国
 				   is_head_prefecture || // 先頭が行政区分
 				   1 < is_prefecture_name ) { // 異なる都道府県名を含む
 
