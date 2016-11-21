@@ -66,6 +66,7 @@ NCオペレーター,1
 OA,0
 OS,0
 OTC,0
+PA,0
 PG,1
 PLC,0
 PM,1
