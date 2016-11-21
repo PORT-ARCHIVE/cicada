@@ -256,7 +256,7 @@ namespace App {
 
 	///////////////
 
-	const int Jpn::FEATURE_DIM = 20;
+	const int Jpn::FEATURE_DIM = 21;
 
 	Jpn::Jpn()
 	{
@@ -443,6 +443,22 @@ namespace App {
 		static std::set<std::string> place_indicators
 		{ "場所", "駅", "最寄駅", "最寄り駅", "交通手段", "アクセス", "所在地", "本社", "支社", "オフィス", "住所", "地域",
 		  "勤務地", "勤務先", "勤務場所", "就業先", "就業場所", "所在住所", "勤務エリア", "勤務地エリア" };
+
+		double f = 0.0;
+
+		for( const auto& w : words ) {
+			if( place_indicators.find(w) != place_indicators.end() ) {
+				f = 1.0;
+				break;
+			}
+		}
+
+		return f;
+	}
+
+	double Jpn::back_place_indicator_feature(const std::vector<std::string>& words)
+	{
+		static std::set<std::string> place_indicators { "配属", "勤務" };
 
 		double f = 0.0;
 
@@ -755,6 +771,7 @@ namespace App {
 			fvec(fd++) = place_feature(words);
 			fvec(fd++) = place_indicator_feature(pre_words);
 			fvec(fd++) = place_indicator_feature(words);
+			fvec(fd++) = back_place_indicator_feature(post_words);
 
 			// 職種の素性
 			fvec(fd++) = job_feature_0(words);
