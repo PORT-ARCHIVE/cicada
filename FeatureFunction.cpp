@@ -256,7 +256,7 @@ namespace App {
 
 	///////////////
 
-	const int Jpn::FEATURE_DIM = 21;
+	const int Jpn::FEATURE_DIM = 22;
 
 	Jpn::Jpn()
 	{
@@ -718,15 +718,15 @@ namespace App {
 		return f;
 	}
 
-	double Jpn::comma_feature(const std::vector<std::string>& words)
+	double Jpn::yen_feature(const std::vector<std::string>& words)
 	{
-		static std::set<std::string> comma_features { "," };
+		static std::set<std::string> yen_features { "¥" };
 
 		double f = 0.0;
 
-		// いずれかの単語が,である
+		// いずれかの単語が "¥"である
 		for( const auto& w : words ) {
-			if( comma_features.find(w) != comma_features.end() ) {
+			if( yen_features.find(w) != yen_features.end() ) {
 				f = 1.0;
 				break;
 			}
@@ -788,6 +788,7 @@ namespace App {
 			fvec(fd++) = place_indicator_feature(pre_words);
 			fvec(fd++) = place_indicator_feature(words);
 			fvec(fd++) = back_place_indicator_feature(post_words);
+			fvec(fd++) = number_feature(post_words); // 番地が続く
 
 			// 職種の素性
 			fvec(fd++) = job_feature_0(words);
@@ -806,7 +807,7 @@ namespace App {
 			fvec(fd++) = post_salaly_feature(words);
 			fvec(fd++) = number_feature(words);
 			fvec(fd++) = hyphen_feature(words);
-			fvec(fd++) = comma_feature(words);
+			fvec(fd++) = yen_feature(words);
 
 			// 括弧
 			fvec(fd++) = front_bracket_feature(pre_words);
