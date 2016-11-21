@@ -441,7 +441,7 @@ namespace App {
 	double Jpn::place_indicator_feature(const std::vector<std::string>& words)
 	{
 		static std::set<std::string> place_indicators
-		{ "駅", "最寄駅", "最寄り駅", "アクセス", "所在地", "本社", "支社", "オフィス", "住所", "地域",
+		{ "場所", "駅", "最寄駅", "最寄り駅", "交通手段", "アクセス", "所在地", "本社", "支社", "オフィス", "住所", "地域",
 		  "勤務地", "勤務先", "勤務場所", "就業先", "就業場所", "所在住所", "勤務エリア", "勤務地エリア" };
 
 		double f = 0.0;
