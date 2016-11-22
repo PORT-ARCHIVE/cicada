@@ -336,11 +336,11 @@ namespace App {
 	{
 		static std::set<std::string> countories { "国", "王国", "連合", "連邦", "公国", "帝国", "市国", "共和国", "首長国",
 				"合衆国", "大公国", "連合王国", "王国連合", "首長国連邦", "連邦共和国", "共和国連邦" };
-		static std::set<std::string> prefecture_divisions { "都","道","府","県","州","省","国","王国" };
+		static std::set<std::string> prefecture_divisions { "都","北海道","府","県","州","省","国","王国" };
 		static std::set<std::string> sub_divisions { "市","区","町","村","郡","字","大字","小字" };
 		static std::set<std::string> prefecture_names
 		{
-		  "北海","青森","岩手","宮城","秋田","山形","福島","茨城","栃木",
+		  "北海道","青森","岩手","宮城","秋田","山形","福島","茨城","栃木",
  		  "群馬","埼玉","千葉","東京都","神奈川","新潟","富山","石川","福井",
 		  "山梨","長野","岐阜","静岡","愛知","三重","滋賀","京都","大阪","兵庫",
 		  "奈良","和歌山","鳥取","島根","岡山","広島","山口","徳島","香川","愛媛","高知",
@@ -379,7 +379,7 @@ namespace App {
 			// 都道府県州省のどれか
 			if( prefecture_divisions.find(w) != prefecture_divisions.end() ) {
 				is_prefecture++;
-				if( is_first ) {
+				if( is_first && w != "北海道" ) {
 					is_head_prefecture = 1;
 				}
 				is_none_area_relate_check = false;
