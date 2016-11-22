@@ -1,4 +1,5 @@
 #仕事,0
+.NET,0
 2D,0
 3D,0
 AD,0
@@ -11,6 +12,8 @@ AWS,0
 Android,0
 BPR,0
 BY,0
+C++,0
+C,0
 CAD,0
 CAD設計エンジニア,1
 CAE,1
@@ -26,6 +29,7 @@ CRA,0
 CRC,0
 CTO,1
 CUDA,0
+C言語,0
 DI,0
 DIY,0
 DM,0
@@ -75,11 +79,13 @@ PMS,0
 PR,0
 PRMDWeb,0
 PV,0
+Python,0
 QA,1
 QC,0
 QMS,0
 RC,0
 RF,0
+Ruby,0
 SCM,0
 SE,1
 SMA,0
@@ -89,6 +95,8 @@ STAFF,1
 UI,0
 UX,0
 VMD,0
+Visual Basic .NET,0
+Visual Basic,0
 WEB,0
 WEBデザイン,1
 WEBデザイナー,1
@@ -102,7 +110,12 @@ Webデザイナー,1
 Webプログラマ,1
 Webプログラマー,1
 Webアプリケーションエンジニア,1
+c++,0
+c,0
+c言語,0
 iOS,0
+python,0
+ruby,0
 人,2
 係,2
 員,2
