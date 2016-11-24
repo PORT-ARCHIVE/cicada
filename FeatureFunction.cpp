@@ -256,7 +256,7 @@ namespace App {
 
 	///////////////
 
-	const int Jpn::FEATURE_DIM = 22;
+	const int Jpn::FEATURE_DIM = 20;
 
 	Jpn::Jpn()
 	{
@@ -671,14 +671,14 @@ namespace App {
 
 	double Jpn::post_salaly_feature(const std::vector<std::string>& words)
 	{
-		static std::set<std::string> post_salaly_features { "円", "万", "ドル", "応相談", "相談可", "以上", "以下" };
+		static std::set<std::string> post_salaly_features { "円", "万", "ドル", "¥", "-", "~", "〜", "応相談", "相談可", "以上", "以下" };
 
 		double f = 0.0;
 
-		// 最後が円かドル
-		const auto& w = words.back();
-		if( post_salaly_features.find(w) != post_salaly_features.end() ) {
-			f += 1.0;
+		for( const auto& w : words ) {
+			if( post_salaly_features.find(w) != post_salaly_features.end() ) {
+				f += 1.0;
+			}
 		}
 
 		return f;
@@ -806,8 +806,8 @@ namespace App {
 			fvec(fd++) = pre_salaly_feature(words);
 			fvec(fd++) = post_salaly_feature(words);
 			fvec(fd++) = number_feature(words);
-			fvec(fd++) = hyphen_feature(words);
-			fvec(fd++) = yen_feature(words);
+			// fvec(fd++) = hyphen_feature(words);
+			// fvec(fd++) = yen_feature(words);
 
 			// 括弧
 			fvec(fd++) = front_bracket_feature(pre_words);
