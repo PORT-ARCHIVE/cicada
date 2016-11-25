@@ -1,6 +1,52 @@
 [
   {
     "job_opening_type": [
+      "エステティシャン"
+    ],
+    "place": [
+      "沖縄県中頭郡北谷町美浜",
+      "県庁前駅"
+    ],
+    "salary": [
+      "月給¥185000~¥400000"
+    ],
+    "employment_structure": [
+      "正社員"
+    ],
+    "title": "SLIM BEAUTY HOUSE(スリムビューティハウス)ひの企画ビル エステティシャンの正社員募集 - ビアーレ(1386-52)"
+  },
+  {
+    "job_opening_type": [
+      "フロントエンドエンジニア"
+    ],
+    "place": [
+      "千代田区",
+      "東京駅"
+    ],
+    "salary": [
+      "~470000円/月"
+    ],
+    "employment_structure": [
+      "業務委託"
+    ],
+    "title": "【BtoC向け】Webサービスマークアップ案件のフリーランス案件・求人(〜470,000円/月,東京駅)|8024件目"
+  },
+  {
+    "job_opening_type": [
+      "調理"
+    ],
+    "place": [
+      "土井駅",
+      "福岡県福岡市東区名子"
+    ],
+    "salary": [
+      "給与7300円/日~9000円/日"
+    ],
+    "employment_structure": null,
+    "title": "特養　なごみの里 調理の募集詳細"
+  },
+  {
+    "job_opening_type": [
       "PAエンジニア"
     ],
     "place": [

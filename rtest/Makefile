@@ -10,6 +10,9 @@ JDIC=../dic/job.txt
 
 
 TRAINING_DATA=\
+	c5ddc74a0c0b1cc7.html\
+	77adcff2f7c45776.html\
+	ecf7d5c8caba28b2.html\
 	605624aa458ea0c6.html\
 	2471b501418402e2.html\
 	8f15429129e10740.html\
