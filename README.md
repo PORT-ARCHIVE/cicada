@@ -42,3 +42,7 @@
 + Main.cpp メイン
 + SemiCrf.hpp SemiCRFクラスのインターフェース
 + SemiCrf.cpp SemiCRFクラスの実装
+
+Copyright (c) 2017 Port INC
+Released under the MIT license
+https://opensource.org/licenses/mit-license.php
